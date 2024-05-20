@@ -16,4 +16,3 @@ export default {
     return apiClient.post('/orders', orderDetails);
   }
 };
-

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import FlattradeServiceAxios from '@/api/FlattradeServiceAxios';
+import DhanAPIService from '@/api/DhanAPIService';
 
 const marketData = ref(null);
 const loading = ref(false);
@@ -10,7 +10,7 @@ onMounted(async () => {
   loading.value = true;
   error.value = null;
   try {
-    const response = await FlattradeServiceAxios.getMarketData();
+    const response = await DhanAPIService.getFundLimit();
     marketData.value = response.data;
   } catch (error) {
     console.error('Failed to fetch market data:', error);
