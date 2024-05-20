@@ -26,16 +26,22 @@
   <section class="row py-2">
     <div class="col">
       <div class="row">
-        <div class="col-6">
+        <div class="col-4">
           <select class="form-select" aria-label="Instrument">
             <option selected value="BankNifty">BankNifty</option>
             <option value="Nifty">Nifty</option>
           </select>
         </div>
-        <div class="col-6">
+        <div class="col-4">
           <select class="form-select" aria-label="OrderType">
-            <option selected value="Market">Market</option>
-            <option value="Limit">Limit</option>
+            <option selected value="Market">Market Order</option>
+            <option value="Limit">Limit Order</option>
+          </select>
+        </div>
+        <div class="col-4">
+          <select class="form-select" aria-label="OrderType">
+            <option selected value="Weekly">Weekly Expiry</option>
+            <option value="Monthly">Monthly Expiry</option>
           </select>
         </div>
       </div>
