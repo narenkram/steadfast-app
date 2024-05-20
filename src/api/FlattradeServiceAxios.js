@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://pi.flattrade.in/api',
+  baseURL: 'https://piconnect.flattrade.in/PiConnectTP',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
