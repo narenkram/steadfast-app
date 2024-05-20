@@ -1,0 +1,69 @@
+@import './base.css';
+
+@media (prefers-color-scheme: light) {
+  html,
+  body {
+    color: #000000;
+    background-color: #ffffff;
+  }
+
+  small {
+    color: rgb(29, 29, 29);
+  }
+
+  .feed-list a {
+    color: inherit !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    color: #ffffff;
+    background-color: #000000;
+  }
+
+  small {
+    color: #fff;
+  }
+
+  .feed-list a {
+    color: #ffffff !important;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed #aaa;
+}
+
+a:hover {
+  /* font-family: 'SansBold'; */
+  font-weight: bold;
+  color: #ff6666 !important;
+}
+
+.Card {
+  border-radius: 6px;
+  padding: 12px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid gray;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.container {
+  max-width: 960px;
+}
+
+button:focus,
+button:hover,
+select,
+option {
+  outline: none;
+  box-shadow: none !important;
+}
