@@ -42,17 +42,15 @@ onMounted(async () => {
     </div>
 
     <div class="col-12">
-      <div>
-        <h1>Market Data</h1>
-        <div v-if="loading">
-          Loading data...
-        </div>
-        <div v-else-if="error">
-          Error: {{ error }}
-        </div>
-        <div v-else>
-          <pre>{{ marketData }}</pre>
-        </div>
+      <h6>Market Data</h6>
+      <div v-if="loading">
+        Loading data...
+      </div>
+      <div v-else-if="error">
+        Error: {{ error }}
+      </div>
+      <div v-else>
+        <pre>{{ marketData }}</pre>
       </div>
     </div>
   </nav>
