@@ -39,7 +39,31 @@
         tabindex="0"
       >
         <div class="col-12 text-center py-5">
-          <button>Add New Broker</button>
+          <button class="btn btn-primary">Add New Broker</button>
+        </div>
+        <div class="col-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Broker</th>
+                <th scope="col">Broker ID</th>
+                <th scope="col">App ID</th>
+                <th scope="col">App Secret</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Flattrade</td>
+                <td>FT****23</td>
+                <td>80d********fb5</td>
+                <td>80d********fb5</td>
+                <td><span class="badge text-bg-success">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div
