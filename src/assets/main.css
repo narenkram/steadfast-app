@@ -63,7 +63,8 @@ a:hover {
 button:focus,
 button:hover,
 select,
-option {
+option,
+input:focus {
   outline: none;
   box-shadow: none !important;
 }

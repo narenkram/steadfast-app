@@ -1,12 +1,6 @@
 <script setup></script>
 
 <template>
-  <section class="row">
-    <div class="col-12">
-      <h1>Steadfast Stoic</h1>
-      <p class="lead">Designed to survive options buying.</p>
-    </div>
-  </section>
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">

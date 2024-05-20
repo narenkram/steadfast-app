@@ -1,19 +1,14 @@
 <script setup>
+import HeaderNav from './components/HeaderNav.vue'
+
 // import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/account">Account</RouterLink>
-      </nav>
-    </div>
-  </header>
+  <header></header>
 
   <main class="container py-5">
+    <HeaderNav />
     <RouterView />
   </main>
 </template>
