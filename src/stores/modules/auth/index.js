@@ -6,8 +6,11 @@ export default {
     namespaced: true,
     state() {
         return {
-            name: 'Narendra Ram',
+            token: '',
             email: 'email@narenkram.com',
+            userId: '',
+            refreshToken: '',
+            expiresIn: '',
         };
     },
     mutations,
