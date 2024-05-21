@@ -18,18 +18,5 @@
         </li>
       </ul>
     </div>
-
-    <div class="col-12">
-      <h6>Market Data</h6>
-      <!-- <div v-if="loading">
-        Loading data...
-      </div>
-      <div v-else-if="error">
-        Error: {{ error }}
-      </div>
-      <div v-else>
-        <pre>{{ marketData }}</pre>
-      </div> -->
-    </div>
   </nav>
 </template>

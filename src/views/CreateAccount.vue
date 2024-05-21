@@ -24,7 +24,9 @@
 <script>
 import CreateAccValidation from '../services/CreateAccValidation.js';
 import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
 import { CREATE_ACCOUNT_ACTION } from '../stores/storeconstants.js';
+import { SHOW_LOADER_MUTATION } from '../stores/storeconstants.js';
 
 export default {
   data() {
@@ -39,7 +41,10 @@ export default {
     ...mapActions('auth', {
       CreateAccount: CREATE_ACCOUNT_ACTION,
     }),
-    createAccount() {
+    ...mapMutations({
+      ShowLoader: SHOW_LOADER_MUTATION
+    }),
+    async createAccount() {
       let validations = new CreateAccValidation(
         this.email,
         this.password,
@@ -50,13 +55,18 @@ export default {
         return false;
       }
 
+      // show loader
+      this.ShowLoader(true);
       // Create Account Registration
-      this.CreateAccount({
+      await this.CreateAccount({
         email: this.email,
         password: this.password
       }).catch((error) => {
         this.error = error;
+        // hide loader
+        this.ShowLoader(false);
       });
+      this.ShowLoader(false);
     }
   }
 }
