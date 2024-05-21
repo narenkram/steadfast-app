@@ -1,25 +1,3 @@
-<script setup>
-import { onMounted, ref } from 'vue';
-import DhanAPIService from '@/api/DhanAPIService';
-
-const marketData = ref(null);
-const loading = ref(false);
-const error = ref(null);
-
-onMounted(async () => {
-  loading.value = true;
-  error.value = null;
-  try {
-    const response = await DhanAPIService.getFundLimit();
-    marketData.value = response.data;
-  } catch (error) {
-    console.error('Failed to fetch market data:', error);
-    error.value = 'Failed to load data. Please try again later.';
-  } finally {
-    loading.value = false;
-  }
-});
-</script>
 
 <template>
   <nav class="row">
@@ -43,7 +21,7 @@ onMounted(async () => {
 
     <div class="col-12">
       <h6>Market Data</h6>
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         Loading data...
       </div>
       <div v-else-if="error">
@@ -51,7 +29,7 @@ onMounted(async () => {
       </div>
       <div v-else>
         <pre>{{ marketData }}</pre>
-      </div>
+      </div> -->
     </div>
   </nav>
 </template>
