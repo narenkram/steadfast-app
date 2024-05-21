@@ -20,6 +20,8 @@
 
 <script>
 import CreateAccValidation from '../services/CreateAccValidation.js';
+import { mapActions } from 'vuex';
+import { CREATE_ACCOUNT_ACTION } from '../stores/storeconstants.js';
 
 export default {
   data() {
@@ -30,6 +32,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions('auth', {
+      CreateAccount: CREATE_ACCOUNT_ACTION,
+    }),
     createAccount() {
       let validations = new CreateAccValidation(
         this.email,
@@ -37,9 +42,15 @@ export default {
       );
 
       this.errors = validations.checkValidations();
-      if (this.errors.length) {
+      if ('email' in this.errors || 'password' in this.errors) {
         return false;
       }
+
+      // Create Account Registration
+      this.CreateAccount({
+        email: this.email,
+        password: this.password
+      });
     }
   }
 }
