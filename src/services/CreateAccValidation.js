@@ -22,5 +22,12 @@ export default class CreateAccountValidation {
 
         return errors;
     }
+
+    static getErrorMessageFromCode(errorCode) {
+        switch (errorCode) {
+            case 'EMAIL_EXISTS':
+                return 'Email already exists';
+        }
+    }
 }
 

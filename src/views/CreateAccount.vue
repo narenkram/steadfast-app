@@ -1,6 +1,9 @@
 <template>
   <section class="row py-5">
     <div class="col-md-4 mx-auto">
+      <div class="alert alert-danger" v-if="error">
+        {{ error }}
+      </div>
       <form @submit.prevent="createAccount()">
         <div class="mb-3">
           <label for="NewUserEmail" class="form-label">Email address</label>
@@ -28,7 +31,8 @@ export default {
     return {
       email: '',
       password: '',
-      errors: []
+      errors: [],
+      error: '',
     };
   },
   methods: {
@@ -50,6 +54,8 @@ export default {
       this.CreateAccount({
         email: this.email,
         password: this.password
+      }).catch((error) => {
+        this.error = error;
       });
     }
   }
