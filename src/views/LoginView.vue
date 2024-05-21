@@ -67,6 +67,8 @@ export default {
         this.ShowLoader(false);
       }
       this.ShowLoader(false);
+
+      this.$router.push('/trade-view');
     }
   }
 }
