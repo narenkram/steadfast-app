@@ -27,6 +27,10 @@ export default class CreateAccountValidation {
         switch (errorCode) {
             case 'EMAIL_EXISTS':
                 return 'Email already exists';
+            case 'INVALID_LOGIN_CREDENTIALS':
+                return 'Invalid email or password';
+            default:
+                return 'An unknown error occurred';
         }
     }
 }
