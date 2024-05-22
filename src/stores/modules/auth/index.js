@@ -7,7 +7,7 @@ export default {
     state() {
         return {
             token: '',
-            email: 'email@narenkram.com',
+            email: '',
             userId: '',
             refreshToken: '',
             expiresIn: '',

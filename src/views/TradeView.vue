@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
   <section class="row py-3">
     <div class="col-lg-5">
@@ -57,13 +55,7 @@
         <div class="col-6">
           <blockquote class="blockquote">
             <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="AutoKill"
-                name="AutoKill"
-                checked
-              />
+              <input class="form-check-input" type="checkbox" id="AutoKill" name="AutoKill" checked />
               <label class="form-check-label" for="AutoKill">Auto Kill (Activated)</label>
             </div>
             <div class="form-check mt-4">
@@ -71,13 +63,7 @@
               <label class="form-check-label" for="optionMode1"> In the Money </label>
             </div>
             <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="optionMode"
-                id="optionMode2"
-                checked
-              />
+              <input class="form-check-input" type="radio" name="optionMode" id="optionMode2" checked />
               <label class="form-check-label" for="optionMode2"> At the Money </label>
             </div>
             <div class="form-check">
@@ -121,3 +107,39 @@
     </div>
   </section>
 </template>
+
+
+<script>
+import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants';
+import { mapGetters } from 'vuex';
+// import axios from 'axios';
+
+export default {
+  // data() {
+  //   return;
+  // },
+
+  computed: {
+    ...mapGetters('auth', {
+      token: GET_USER_TOKEN_GETTER,
+    }),
+  },
+
+  mounted() {
+
+    // Get Trade Data from broker API
+    // axios
+    //   .get('http://localhost:8000/api/user/?auth_token=' + this.token)
+    //   .then((response) => {
+    //     console.log(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+
+    // console.log(this.token);
+  },
+};
+</script>
+
