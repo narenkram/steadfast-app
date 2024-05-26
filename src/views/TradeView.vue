@@ -112,7 +112,7 @@
 <script>
 import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants';
 import { mapGetters } from 'vuex';
-// import axios from 'axios';
+import axiosInstance from '@/services/AxiosTokenInstance';
 
 export default {
   // data() {
@@ -128,17 +128,17 @@ export default {
   mounted() {
 
     // Get Trade Data from broker API
-    // axios
-    //   .get('http://localhost:8000/api/user/?auth_token=' + this.token)
-    //   .then((response) => {
-    //     console.log(response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    axiosInstance
+      .get('http://localhost:8000/api/user/?auth_token=' + this.token)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
 
-    // console.log(this.token);
+    console.log(this.token);
   },
 };
 </script>

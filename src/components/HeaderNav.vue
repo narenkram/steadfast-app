@@ -16,6 +16,9 @@
         <li class="nav-item ms-2">
           <RouterLink class="nav-link" to="/account">Account</RouterLink>
         </li>
+        <li class="nav-item ms-2">
+          <RouterLink class="nav-link" to="/trade-view">TradeView</RouterLink>
+        </li>
       </ul>
     </div>
   </nav>
