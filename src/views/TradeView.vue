@@ -33,9 +33,7 @@
       <div class="Card">
         <blockquote class="fs-3">₹ 653.25</blockquote>
         <small>
-          ₹ 606.25 Net PNL Estimated
-          <br />
-          ₹ 47 Spent on Brokerage
+          ₹ 606.25 Net PNL Estimated (after all charges)
         </small>
       </div>
     </div>
@@ -210,34 +208,43 @@
 <script>
 import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants';
 import { mapGetters } from 'vuex';
-import axiosInstance from '@/services/AxiosTokenInstance';
+import axios from 'axios';
 
 export default {
-  // data() {
-  //   return;
-  // },
-
+  data() {
+    return {
+      fundLimits: null, // Data storage for API response
+    };
+  },
   computed: {
     ...mapGetters('auth', {
       token: GET_USER_TOKEN_GETTER,
     }),
   },
-
   mounted() {
+    const fetchFundLimit = async () => {
+      const accessToken = import.meta.env.VITE_DHAN_API_TOKEN;
+      console.log('Access Token:', accessToken); // Log the token to verify
 
-    // Get Trade Data from broker API
-    axiosInstance
-      .get('http://localhost:8000/api/user/?auth_token=' + this.token)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      const options = {
+        method: 'GET',
+        url: 'http://localhost:3000/api/fundlimit', // Updated URL to use the proxy
+        headers: {
+          Accept: 'application/json',
+          'access-token': accessToken // Add access-token header
+        }
+      };
 
+      try {
+        const { data } = await axios.request(options);
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching fund limit:', error);
+      }
+    };
 
-    console.log(this.token);
-  },
+    // Call the function
+    fetchFundLimit();
+  }
 };
 </script>
-

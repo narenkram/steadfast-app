@@ -92,7 +92,8 @@ export default {
                 token: response.data.idToken,
                 userId: response.data.localId,
                 refreshToken: response.data.refreshToken,
-                expiresIn: expirationTime
+                expiresIn: expirationTime,
+                apiAccessToken: response.data.apiAccessToken // Assuming this is the key for the API access token
             }
             localStorage.setItem('userData', JSON.stringify(tokenData))
             context.commit(SET_USER_TOKEN_DATA_MUTATION, tokenData)
@@ -101,5 +102,3 @@ export default {
 
 
 };
-
-

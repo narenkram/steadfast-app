@@ -3,7 +3,7 @@ import store from '../stores/store';
 import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants'
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5173/api',
+    baseURL: 'https://api.dhan.co/',
 });
 
 axiosInstance.interceptors.request.use((config) => {
