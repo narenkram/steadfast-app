@@ -1,10 +1,21 @@
 import Axios from 'axios';
 import { CREATE_ACCOUNT_ACTION } from '../../storeconstants.js';
 import { LOGIN_ACTION } from '../../storeconstants.js';
+import { LOGOUT_ACTION } from '../../storeconstants.js';
 import { SET_USER_TOKEN_DATA_MUTATION } from '../../storeconstants.js';
 import CreateAccountValidation from '@/services/CreateAccValidation.js';
 
 export default {
+    [LOGOUT_ACTION](context) {
+        context.commit(SET_USER_TOKEN_DATA_MUTATION, {
+            email: null,
+            token: null,
+            userId: null,
+            refreshToken: null,
+            expiresIn: null
+        });
+    },
+
     async [LOGIN_ACTION](context, payload) {
         let postData = {
             email: payload.email,

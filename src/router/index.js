@@ -4,6 +4,8 @@ import LoginView from '../views/LoginView.vue'
 import CreateAccount from '../views/CreateAccount.vue'
 import AccountView from '../views/AccountView.vue'
 import TradeView from '../views/TradeView.vue'
+import store from '../stores/store'
+import { IS_USER_AUTHENTICATED_GETTER } from '@/stores/storeconstants'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,22 +18,34 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      meta: {
+        auth: false
+      }
     },
     {
       path: '/create-account',
       name: 'create-account',
-      component: CreateAccount
+      component: CreateAccount,
+      meta: {
+        auth: false
+      }
     },
     {
       path: '/account',
       name: 'account',
-      component: AccountView
+      component: AccountView,
+      meta: {
+        auth: true
+      }
     },
     {
       path: '/trade-view',
       name: 'trade-view',
-      component: TradeView
+      component: TradeView,
+      meta: {
+        auth: true
+      }
     }
 
 
@@ -43,7 +57,28 @@ const router = createRouter({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import('../views/AccountView.vue')
     // }
+
   ]
+
+})
+
+router.beforeEach((to, from, next) => {
+  if (
+    'auth' in to.meta &&
+    to.meta.auth &&
+    !store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
+  ) {
+    next('/login')
+  }
+  else if (
+    'auth' in to.meta &&
+    !to.meta.auth &&
+    store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
+  ) {
+    next('/trade-view')
+  } else {
+    next()
+  }
 })
 
 export default router
