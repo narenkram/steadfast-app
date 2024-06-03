@@ -1,5 +1,34 @@
 <template>
   <section class="row py-3">
+    <div class="col-12">
+      <!-- Broker Name and Status with Broker ID -->
+      <div class="row">
+        <div class="col-4">
+          <p class="mb-0"><b>Broker</b></p>
+          <p>Dhan ID 1234567890 <span class="badge bg-success">Active</span></p>
+        </div>
+        <div class="col-3">
+          <p class="mb-0"><b>Total Funds</b></p>
+          <p>₹ 10,000</p>
+        </div>
+        <div class="col-3">
+          <p class="mb-0"><b>Utilized Margin</b></p>
+          <p>₹ 5,000</p>
+        </div>
+        <div class="col-2">
+          <div class="d-flex align-items-center float-end">
+            <label class="ToggleSwitch">
+              <input class="ToggleInput" type="checkbox" id="AutoKill" name="AutoKill" checked>
+              <span class="ToggleSlider SliderRound"></span>
+            </label>
+            <span class="ToggleLabel"><b>Auto Kill</b></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
         <blockquote class="fs-1">₹ 653.25</blockquote>
@@ -22,75 +51,76 @@
   <hr />
 
   <section class="row py-2">
-    <div class="col">
-      <div class="row">
-        <div class="col-4">
-          <select class="form-select" aria-label="Instrument">
-            <option selected value="BankNifty">BankNifty</option>
-            <option value="Nifty">Nifty</option>
-          </select>
-        </div>
-        <div class="col-4">
-          <select class="form-select" aria-label="OrderType">
-            <option selected value="Market">Market Order</option>
-            <option value="Limit">Limit Order</option>
-          </select>
-        </div>
-        <div class="col-4">
-          <select class="form-select" aria-label="OrderType">
-            <option selected value="Weekly">Weekly Expiry</option>
-            <option value="Monthly">Monthly Expiry</option>
-          </select>
-        </div>
+    <div class="row">
+      <div class="col-2">
+        <label for="Exchange" class="form-label mb-0">Exchange</label>
+        <select class="form-select" aria-label="Instrument">
+          <option selected value="Exchange">NSE</option>
+          <option value="BSE">BSE</option>
+        </select>
       </div>
-      <div class="row align-items-center">
-        <div class="col-6">
-          <blockquote class="mt-3 blockquote row text-left">
-            <p>BankNifty Spot - 48502 0.5%</p>
-            <p>BankNifty FUT 1 - 48700 1.05%</p>
-            <p>BankNifty FUT 2 - 48745 1.2%</p>
-            <p>BankNifty FUT 3 - 48760 1.5%</p>
-          </blockquote>
-        </div>
-        <div class="col-6">
-          <blockquote class="blockquote">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="AutoKill" name="AutoKill" checked />
-              <label class="form-check-label" for="AutoKill">Auto Kill (Activated)</label>
-            </div>
-            <div class="form-check mt-4">
-              <input class="form-check-input" type="radio" name="optionMode" id="optionMode1" />
-              <label class="form-check-label" for="optionMode1"> In the Money </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionMode" id="optionMode2" checked />
-              <label class="form-check-label" for="optionMode2"> At the Money </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionMode" id="optionMode3" />
-              <label class="form-check-label" for="optionMode3"> Out of the Money </label>
-            </div>
-          </blockquote>
-        </div>
+      <div class="col-3">
+        <label for="Instrument" class="form-label mb-0">Instrument</label>
+        <select class="form-select" aria-label="Instrument">
+          <option selected value="BankNifty">BankNifty</option>
+          <option value="Nifty">Nifty</option>
+        </select>
       </div>
-
-      <hr />
-
-      <div class="row py-4">
-        <div class="col-6">
-          <p class="mb-0"><b>LTP 432</b></p>
-          <p>BankNifty Strike</p>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy CE</button>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Close Position</button>
-        </div>
-        <div class="col-6">
-          <p class="mb-0"><b>LTP 345</b></p>
-          <p>BankNifty Strike</p>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100 mb-2">Buy PE</button>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
-        </div>
+      <div class="col-2">
+        <label for="OrderType" class="form-label mb-0">Order Type</label>
+        <select class="form-select" aria-label="OrderType">
+          <option selected value="Market">Market</option>
+          <option value="Limit">Limit</option>
+        </select>
+      </div>
+      <div class="col-3">
+        <label for="Expiry" class="form-label mb-0">Expiry</label>
+        <select class="form-select" aria-label="Expiry">
+          <option selected value="current">05-Jun-2024</option>
+          <option value="next">12-Jun-2024</option>
+        </select>
+      </div>
+      <div class="col-2">
+        <label for="Quantity" class="form-label mb-0">Quantity</label>
+        <select class="form-select" aria-label="Quantity">
+          <option selected value="15">15</option>
+          <option value="30">30</option>
+          <option value="45">45</option>
+        </select>
       </div>
     </div>
+    <div class="row mt-2 align-items-center justify-content-between">
+      <div class="col-3">
+        <label for="Call Strike" class="form-label mb-0">Call Strike</label>
+        <select class="form-select" aria-label="Call Strike">
+          <option selected value="51700">51700</option>
+          <option value="51800">51800</option>
+        </select>
+
+        <p class="mb-0">BankNifty 51700 LTP 432</p>
+        <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy CE</button>
+        <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
+      </div>
+      <div class="col-3 text-center">
+        <br />
+        <p class="mb-0">Nifty Bank</p>
+        <p><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+        <button class="btn btn-lg btn-outline-secondary fs-5 w-100 mb-2">Close Position</button>
+        <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
+      </div>
+      <div class="col-3">
+        <label for="Put Strike" class="form-label mb-0">Put Strike</label>
+        <select class="form-select" aria-label="Put Strike">
+          <option selected value="51700">51700</option>
+          <option value="51800">51800</option>
+        </select>
+
+        <p class="mb-0">BankNifty 51700 LTP 345</p>
+        <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy PE</button>
+        <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
+      </div>
+    </div>
+
   </section>
 
   <hr />
