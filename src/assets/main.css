@@ -155,3 +155,12 @@ input:focus {
 .ToggleSlider.SliderRound:before {
   border-radius: 50%;
 }
+
+.table {
+  border: 1px solid gray;
+}
+
+th {
+  background-color: #f5f7f7 !important;
+  color: black !important;
+}

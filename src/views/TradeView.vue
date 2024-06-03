@@ -148,7 +148,37 @@
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
-          positions-tab
+          <div class="row align-items-center">
+            <div class="col-6 text-center py-2">
+              <p class="mb-0"><b>Net Qty: </b>0</p>
+            </div>
+            <div class="col-6 text-center py-2">
+              <p class="mb-0"><b>Total Buy Value: </b>10,000</p>
+              <p class="mb-0"><b>Total Sell Value: </b>10,653</p>
+            </div>
+          </div>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <input type="checkbox" class="form-check-input" />
+                </th>
+                <th scope="col">Symbol Name</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Executed Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td scope="row">
+                  <input type="checkbox" class="form-check-input" />
+                </td>
+                <td>BANKNIFTY 51700</td>
+                <td>15</td>
+                <td>432</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           trades-tab
