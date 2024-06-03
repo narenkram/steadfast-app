@@ -31,14 +31,18 @@
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
-        <blockquote class="fs-1">₹ 653.25</blockquote>
-        <blockquote class="fs-4">₹ 606.25 <small> After ₹ 47 Tax charges</small></blockquote>
+        <blockquote class="fs-3">₹ 653.25</blockquote>
+        <small>
+          ₹ 606.25 Net PNL Estimated
+          <br />
+          ₹ 47 Spent on Brokerage
+        </small>
       </div>
     </div>
     <div class="col-lg-5">
       <div class="Card">
-        <blockquote class="fs-2">1.25% <small> on Total Capital</small></blockquote>
-        <blockquote class="fs-4">10.5% <small> on Deployed Capital</small></blockquote>
+        <blockquote class="fs-3">1.25% <small> on Total Capital</small></blockquote>
+        <small>10.5% on Deployed Capital</small>
       </div>
     </div>
     <div class="col-lg-2 d-flex justify-content-center align-items-center">
@@ -164,6 +168,7 @@
                   <input type="checkbox" class="form-check-input" />
                 </th>
                 <th scope="col">Symbol Name</th>
+                <th scope="col">Product Type</th>
                 <th scope="col">Qty</th>
                 <th scope="col">Executed Price</th>
               </tr>
@@ -174,6 +179,7 @@
                   <input type="checkbox" class="form-check-input" />
                 </td>
                 <td>BANKNIFTY 51700</td>
+                <td>MIS</td>
                 <td>15</td>
                 <td>432</td>
               </tr>
