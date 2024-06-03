@@ -120,21 +120,46 @@
         <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
       </div>
     </div>
-
   </section>
-
-  <hr />
 
   <section class="row py-3">
     <div class="col-12">
-      <h3>Live Notifications</h3>
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
+            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true">Positions</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
+            role="tab" aria-controls="trades-tab-pane" aria-selected="false">Trades</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane"
+            type="button" role="tab" aria-controls="notifications-tab-pane" aria-selected="false">Notifications</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
+          tabindex="0">
+          positions-tab
+        </div>
+        <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
+          trades-tab
+        </div>
+        <div class="tab-pane fade" id="notifications-tab-pane" role="tabpanel" aria-labelledby="notifications-tab"
+          tabindex="0">
+          notifications-tab
+          <div class="card-body text-danger">
+            <p class="fs-5">
+              Total Buy/Sell Value 10,500
+              <small>exceeds 2 times more than total capital, OVER TRADE Warning</small>
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="card-body text-danger">
-      <p class="fs-5">
-        Total Buy/Sell Value 10,500
-        <small>exceeds 2 times more than total capital, OVER TRADE Warning</small>
-      </p>
-    </div>
+
   </section>
 </template>
 
