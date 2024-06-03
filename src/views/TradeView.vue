@@ -59,7 +59,7 @@
           <option value="BSE">BSE</option>
         </select>
       </div>
-      <div class="col-3">
+      <div class="col-2">
         <label for="Instrument" class="form-label mb-0">Instrument</label>
         <select class="form-select" aria-label="Instrument">
           <option selected value="BankNifty">BankNifty</option>
@@ -73,7 +73,14 @@
           <option value="Limit">Limit</option>
         </select>
       </div>
-      <div class="col-3">
+      <div class="col-2">
+        <label for="ProductType" class="form-label mb-0">Product Type</label>
+        <select class="form-select" aria-label="ProductType">
+          <option selected value="MIS">MIS</option>
+          <option value="NRML">NRML</option>
+        </select>
+      </div>
+      <div class="col-2">
         <label for="Expiry" class="form-label mb-0">Expiry</label>
         <select class="form-select" aria-label="Expiry">
           <option selected value="current">05-Jun-2024</option>
