@@ -20,8 +20,15 @@ export default {
   name: 'App',
   computed: {
     ...mapState({
-      showLoader: state => state.showLoader
+      showLoader: state => state.showLoader,
+      autoLogout: state => state.auth.autoLogout
     })
+  },
+  watch: {
+    autoLogout(currentValue, oldValue) {
+      if (currentValue && currentValue != oldValue)
+        this.$router.replace('/login')
+    }
   },
   components: {
     TheLoader,

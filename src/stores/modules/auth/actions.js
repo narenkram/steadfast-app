@@ -6,6 +6,10 @@ import { SET_USER_TOKEN_DATA_MUTATION } from '../../storeconstants.js';
 import CreateAccountValidation from '@/services/CreateAccValidation.js';
 import { AUTH_ACTION } from '../../storeconstants.js';
 import { AUTO_LOGIN_ACTION } from '../../storeconstants.js';
+import { AUTO_LOGOUT_ACTION } from '../../storeconstants.js';
+import { SET_AUTO_LOGOUT_MUTATION } from '../../storeconstants.js';
+
+let timer = ''
 
 export default {
     [LOGOUT_ACTION](context) {
@@ -17,6 +21,14 @@ export default {
             expiresIn: null
         });
         localStorage.removeItem('userData')
+        if (timer) {
+            clearTimeout(timer)
+        }
+    },
+
+    [AUTO_LOGOUT_ACTION](context) {
+        context.dispatch(LOGOUT_ACTION)
+        context.commit(SET_AUTO_LOGOUT_MUTATION)
     },
 
     async [LOGIN_ACTION](context, payload) {
@@ -34,9 +46,19 @@ export default {
     },
 
     [AUTO_LOGIN_ACTION](context) {
-        let userData = localStorage.getItem('userData')
-        if (userData) {
-            context.commit(SET_USER_TOKEN_DATA_MUTATION, JSON.parse(userData))
+        let userDataString = localStorage.getItem('userData')
+        if (userDataString) {
+            let userData = JSON.parse(userDataString)
+            let expirationTime = userData.expiresIn - new Date().getTime();
+
+            if (expirationTime < 10000) {
+                context.dispatch(AUTO_LOGOUT_ACTION);
+            } else {
+                timer = setTimeout(() => {
+                    context.dispatch(AUTO_LOGOUT_ACTION)
+                }, expirationTime)
+            }
+            context.commit(SET_USER_TOKEN_DATA_MUTATION, userData)
         }
     },
 
@@ -59,12 +81,18 @@ export default {
             throw errorMessage;
         }
         if (response.status === 200) {
+            let expirationTime = response.data.expiresIn * 1000;
+
+            timer = setTimeout(() => {
+                context.dispatch(AUTO_LOGOUT_ACTION)
+            }, expirationTime)
+
             let tokenData = {
                 email: response.data.email,
                 token: response.data.idToken,
                 userId: response.data.localId,
                 refreshToken: response.data.refreshToken,
-                expiresIn: response.data.expiresIn
+                expiresIn: expirationTime
             }
             localStorage.setItem('userData', JSON.stringify(tokenData))
             context.commit(SET_USER_TOKEN_DATA_MUTATION, tokenData)

@@ -7,4 +7,6 @@ export const IS_USER_AUTHENTICATED_GETTER = '[getters] is user authenticated';
 export const LOGOUT_ACTION = '[actions] logout user';
 export const AUTH_ACTION = '[actions] do auth user';
 export const AUTO_LOGIN_ACTION = '[actions] do auto login';
+export const AUTO_LOGOUT_ACTION = '[actions] do auto logout';
+export const SET_AUTO_LOGOUT_MUTATION = '[mutations] set auto logout';
 
