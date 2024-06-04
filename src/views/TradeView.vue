@@ -266,8 +266,22 @@ export default {
           params: { killSwitchStatus: newStatus }
         });
         console.log(`Kill Switch ${newStatus.toLowerCase()}d:`, response.data);
-        this.killSwitchActive = !this.killSwitchActive; // Toggle the state
-        this.toastMessage = `Kill Switch ${newStatus.toLowerCase()}d successfully`;
+
+        // Handle different response messages
+        if (response.data.killSwitchStatus === 'Kill Switch Activated') {
+          this.toastMessage = 'Kill Switch activated successfully';
+          this.killSwitchActive = true;
+        } else if (response.data.killSwitchStatus === 'Kill Switch Deactivated') {
+          this.toastMessage = 'Kill Switch deactivated successfully';
+          this.killSwitchActive = false;
+        } else if (response.data.killSwitchStatus === 'Kill Switch is already activated') {
+          this.toastMessage = 'Kill Switch is already activated';
+        } else if (response.data.killSwitchStatus === 'Kill switch deactivate allowed only once a day.') {
+          this.toastMessage = 'Kill switch deactivate allowed only once a day.';
+        } else {
+          this.toastMessage = 'Unknown response from server';
+        }
+
         this.showToast = true;
       } catch (error) {
         console.error(`Error ${newStatus.toLowerCase()}ing Kill Switch:`, error);
