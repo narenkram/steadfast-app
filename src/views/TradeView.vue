@@ -205,6 +205,17 @@
     </div>
 
   </section>
+
+  <div class="toast" :class="{ 'show': showToast }" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Notification</strong>
+      <small>Just now</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" @click="hideToast"></button>
+    </div>
+    <div class="toast-body">
+      {{ toastMessage }}
+    </div>
+  </div>
 </template>
 
 
@@ -218,6 +229,8 @@ export default {
     return {
       fundLimits: {}, // Initialize as an empty object
       dhanClientId: null, // Initialize as null
+      showToast: false, // Controls the visibility of the toast
+      toastMessage: '', // Message displayed in the toast
     };
   },
   computed: {
@@ -255,10 +268,12 @@ export default {
         });
         console.log('Kill Switch activated:', data);
         console.log('Kill Switch Status:', data.killSwitchStatus);
-        alert('Kill Switch activated successfully');
+        this.toastMessage = 'Kill Switch activated successfully';
+        this.showToast = true;
       } catch (error) {
         console.error('Error activating Kill Switch:', error);
-        alert('Failed to activate Kill Switch');
+        this.toastMessage = 'Failed to activate Kill Switch';
+        this.showToast = true;
       }
     },
     async deactivateKillSwitch() {
@@ -269,11 +284,16 @@ export default {
           }
         });
         console.log('Kill Switch deactivated:', response.data);
-        alert('Kill Switch deactivated successfully');
+        this.toastMessage = 'Kill Switch deactivated successfully';
+        this.showToast = true;
       } catch (error) {
         console.error('Error deactivating Kill Switch:', error);
-        alert('Failed to deactivate Kill Switch');
+        this.toastMessage = 'Failed to deactivate Kill Switch';
+        this.showToast = true;
       }
+    },
+    hideToast() {
+      this.showToast = false;
     }
   },
 
