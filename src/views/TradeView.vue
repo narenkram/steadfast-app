@@ -5,15 +5,15 @@
       <div class="row">
         <div class="col-4">
           <p class="mb-0"><b>Broker</b></p>
-          <p>Dhan ID 1234567890 <span class="badge bg-success">Active</span></p>
+          <p>Dhan ID {{ fundLimits?.dhanClientId || 'N/A' }} <span class="badge bg-success">Active</span></p>
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Total Funds</b></p>
-          <p>₹ 10,000</p>
+          <p>₹ {{ fundLimits?.availabelBalance || 0 }}</p>
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Utilized Margin</b></p>
-          <p>₹ 5,000</p>
+          <p>₹ {{ fundLimits?.utilizedAmount || 0 }}</p>
         </div>
         <div class="col-2">
           <div class="d-flex align-items-center float-end">
@@ -213,7 +213,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      fundLimits: null, // Data storage for API response
+      fundLimits: {}, // Initialize as an empty object
     };
   },
   computed: {
