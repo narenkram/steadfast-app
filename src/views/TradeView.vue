@@ -189,7 +189,26 @@
           </table>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
-          trades-tab
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in orders" :key="order.orderId">
+                <td>{{ order.orderId }}</td>
+                <td>{{ order.tradingSymbol }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.price }}</td>
+                <td>{{ order.orderStatus }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="tab-pane fade" id="notifications-tab-pane" role="tabpanel" aria-labelledby="notifications-tab"
           tabindex="0">
@@ -229,6 +248,7 @@ export default {
       showToast: false, // Controls the visibility of the toast
       toastMessage: '', // Message displayed in the toast
       killSwitchActive: false, // Initial state of the kill switch
+      orders: [], // Define orders as an empty array initially
     };
   },
   computed: {
@@ -239,6 +259,8 @@ export default {
   mounted() {
     this.fetchFundLimit();
     this.fetchDhanClientId();
+    this.fetchOrders(); // Fetch orders when component mounts
+
   },
   methods: {
     async fetchFundLimit() {
@@ -257,6 +279,16 @@ export default {
         console.log('Dhan Client ID:', data.dhanClientId);
       } catch (error) {
         console.error('Error fetching Dhan Client ID:', error);
+      }
+    },
+    async fetchOrders() {
+      try {
+        const response = await axios.get('http://localhost:3000/getOrders');
+        console.log('Orders:', response.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        this.toastMessage = 'Error fetching orders';
+        this.showToast = true;
       }
     },
     async toggleKillSwitch() {
@@ -291,7 +323,7 @@ export default {
     },
     updateToastVisibility(value) {
       this.showToast = value;
-    }
+    },
   },
 
 };
