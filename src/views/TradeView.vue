@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col-4">
           <p class="mb-0"><b>Broker</b></p>
-          <p>Dhan ID {{ fundLimits?.dhanClientId || 'N/A' }} <span class="badge bg-success">Active</span></p>
+          <p>Dhan ID {{ dhanClientId || 'N/A' }} <span class="badge bg-success">Active</span></p>
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Total Funds</b></p>
@@ -53,82 +53,84 @@
   <hr />
 
   <section class="row py-2">
-    <div class="row">
-      <div class="col-2">
-        <label for="Exchange" class="form-label mb-0">Exchange</label>
-        <select class="form-select" aria-label="Instrument">
-          <option selected value="Exchange">NSE</option>
-          <option value="BSE">BSE</option>
-        </select>
+    <form @submit.prevent="placeOrder">
+      <div class="row">
+        <div class="col-2">
+          <label for="Exchange" class="form-label mb-0">Exchange</label>
+          <select class="form-select" aria-label="Instrument">
+            <option selected value="Exchange">NSE</option>
+            <option value="BSE">BSE</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label for="Instrument" class="form-label mb-0">Instrument</label>
+          <select class="form-select" aria-label="Instrument">
+            <option selected value="BankNifty">BankNifty</option>
+            <option value="Nifty">Nifty</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label for="OrderType" class="form-label mb-0">Order Type</label>
+          <select class="form-select" aria-label="OrderType">
+            <option selected value="Market">Market</option>
+            <option value="Limit">Limit</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label for="ProductType" class="form-label mb-0">Product Type</label>
+          <select class="form-select" aria-label="ProductType">
+            <option selected value="MIS">MIS</option>
+            <option value="NRML">NRML</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label for="Expiry" class="form-label mb-0">Expiry</label>
+          <select class="form-select" aria-label="Expiry">
+            <option selected value="current">05-Jun-2024</option>
+            <option value="next">12-Jun-2024</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label for="Quantity" class="form-label mb-0">Quantity</label>
+          <select class="form-select" aria-label="Quantity">
+            <option selected value="15">15</option>
+            <option value="30">30</option>
+            <option value="45">45</option>
+          </select>
+        </div>
       </div>
-      <div class="col-2">
-        <label for="Instrument" class="form-label mb-0">Instrument</label>
-        <select class="form-select" aria-label="Instrument">
-          <option selected value="BankNifty">BankNifty</option>
-          <option value="Nifty">Nifty</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="OrderType" class="form-label mb-0">Order Type</label>
-        <select class="form-select" aria-label="OrderType">
-          <option selected value="Market">Market</option>
-          <option value="Limit">Limit</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="ProductType" class="form-label mb-0">Product Type</label>
-        <select class="form-select" aria-label="ProductType">
-          <option selected value="MIS">MIS</option>
-          <option value="NRML">NRML</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="Expiry" class="form-label mb-0">Expiry</label>
-        <select class="form-select" aria-label="Expiry">
-          <option selected value="current">05-Jun-2024</option>
-          <option value="next">12-Jun-2024</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="Quantity" class="form-label mb-0">Quantity</label>
-        <select class="form-select" aria-label="Quantity">
-          <option selected value="15">15</option>
-          <option value="30">30</option>
-          <option value="45">45</option>
-        </select>
-      </div>
-    </div>
-    <div class="row mt-2 align-items-center justify-content-between">
-      <div class="col-3">
-        <label for="Call Strike" class="form-label mb-0">Call Strike</label>
-        <select class="form-select" aria-label="Call Strike">
-          <option selected value="51700">51700</option>
-          <option value="51800">51800</option>
-        </select>
+      <div class="row mt-2 align-items-center justify-content-between">
+        <div class="col-3">
+          <label for="Call Strike" class="form-label mb-0">Call Strike</label>
+          <select class="form-select" aria-label="Call Strike">
+            <option selected value="51700">51700</option>
+            <option value="51800">51800</option>
+          </select>
 
-        <p class="mb-0">BankNifty 51700 LTP 432</p>
-        <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy CE</button>
-        <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
-      </div>
-      <div class="col-3 text-center">
-        <br />
-        <p class="mb-0">Nifty Bank</p>
-        <p><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-        <button class="btn btn-lg btn-outline-secondary fs-5 w-100 mb-2">Close Position</button>
-        <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
-      </div>
-      <div class="col-3">
-        <label for="Put Strike" class="form-label mb-0">Put Strike</label>
-        <select class="form-select" aria-label="Put Strike">
-          <option selected value="51700">51700</option>
-          <option value="51800">51800</option>
-        </select>
+          <p class="mb-0">BankNifty 51700 LTP 432</p>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy CE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
+        </div>
+        <div class="col-3 text-center">
+          <br />
+          <p class="mb-0">Nifty Bank</p>
+          <p><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 mb-2">Close Position</button>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
+        </div>
+        <div class="col-3">
+          <label for="Put Strike" class="form-label mb-0">Put Strike</label>
+          <select class="form-select" aria-label="Put Strike">
+            <option selected value="51700">51700</option>
+            <option value="51800">51800</option>
+          </select>
 
-        <p class="mb-0">BankNifty 51700 LTP 345</p>
-        <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy PE</button>
-        <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
+          <p class="mb-0">BankNifty 51700 LTP 345</p>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy PE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
+        </div>
       </div>
-    </div>
+    </form>
   </section>
 
   <section class="row py-3">
@@ -214,6 +216,7 @@ export default {
   data() {
     return {
       fundLimits: {}, // Initialize as an empty object
+      dhanClientId: null, // Initialize as null
     };
   },
   computed: {
@@ -223,6 +226,7 @@ export default {
   },
   mounted() {
     this.fetchFundLimit();
+    this.fetchDhanClientId();
   },
   methods: {
     async fetchFundLimit() {
@@ -232,6 +236,15 @@ export default {
         console.log('Fund Limits:', data);
       } catch (error) {
         console.error('Error fetching fund limit:', error);
+      }
+    },
+    async fetchDhanClientId() {
+      try {
+        const { data } = await axios.get('http://localhost:3000/dhanClientId');
+        this.dhanClientId = data.dhanClientId;
+        console.log('Dhan Client ID:', data.dhanClientId);
+      } catch (error) {
+        console.error('Error fetching Dhan Client ID:', error);
       }
     }
   },
