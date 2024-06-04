@@ -222,29 +222,19 @@ export default {
     }),
   },
   mounted() {
-    const fetchFundLimit = async () => {
-      const accessToken = import.meta.env.VITE_DHAN_API_TOKEN;
-      console.log('Access Token:', accessToken); // Log the token to verify
-
-      const options = {
-        method: 'GET',
-        url: 'http://localhost:3000/api/fundlimit', // Updated URL to use the proxy
-        headers: {
-          Accept: 'application/json',
-          'access-token': accessToken // Add access-token header
-        }
-      };
-
+    this.fetchFundLimit();
+  },
+  methods: {
+    async fetchFundLimit() {
       try {
-        const { data } = await axios.request(options);
-        console.log(data);
+        const { data } = await axios.get('http://localhost:3000/fundlimit');
+        this.fundLimits = data;
+        console.log('Fund Limits:', data);
       } catch (error) {
         console.error('Error fetching fund limit:', error);
       }
-    };
+    }
+  },
 
-    // Call the function
-    fetchFundLimit();
-  }
 };
 </script>
