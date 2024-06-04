@@ -45,8 +45,9 @@
     </div>
     <div class="col-lg-2 d-flex justify-content-center align-items-center">
       <div class="Card">
-        <button class="btn btn-primary shadow fs-3" @click="activateKillSwitch">Activate Kill Switch</button>
-        <button class="btn btn-danger shadow fs-3" @click="deactivateKillSwitch">Deactivate Kill Switch</button>
+        <button class="btn btn-primary shadow fs-3" @click="toggleKillSwitch">
+          Toggle Kill Switch
+        </button>
       </div>
     </div>
   </section>
@@ -227,6 +228,7 @@ export default {
       dhanClientId: null, // Initialize as null
       showToast: false, // Controls the visibility of the toast
       toastMessage: '', // Message displayed in the toast
+      killSwitchActive: false, // Initial state of the kill switch
     };
   },
   computed: {
@@ -257,34 +259,19 @@ export default {
         console.error('Error fetching Dhan Client ID:', error);
       }
     },
-    async activateKillSwitch() {
-      try {
-        const { data } = await axios.post('http://localhost:3000/killSwitch', {
-          killSwitchStatus: 'ACTIVATE'
-        });
-        console.log('Kill Switch activated:', data);
-        console.log('Kill Switch Status:', data.killSwitchStatus);
-        this.toastMessage = 'Kill Switch activated successfully';
-        this.showToast = true;
-      } catch (error) {
-        console.error('Error activating Kill Switch:', error);
-        this.toastMessage = 'Failed to activate Kill Switch';
-        this.showToast = true;
-      }
-    },
-    async deactivateKillSwitch() {
+    async toggleKillSwitch() {
+      const newStatus = this.killSwitchActive ? 'DEACTIVATE' : 'ACTIVATE';
       try {
         const response = await axios.post('http://localhost:3000/killSwitch', null, {
-          params: {
-            killSwitchStatus: 'DEACTIVATE'
-          }
+          params: { killSwitchStatus: newStatus }
         });
-        console.log('Kill Switch deactivated:', response.data);
-        this.toastMessage = 'Kill Switch deactivated successfully';
+        console.log(`Kill Switch ${newStatus.toLowerCase()}d:`, response.data);
+        this.killSwitchActive = !this.killSwitchActive; // Toggle the state
+        this.toastMessage = `Kill Switch ${newStatus.toLowerCase()}d successfully`;
         this.showToast = true;
       } catch (error) {
-        console.error('Error deactivating Kill Switch:', error);
-        this.toastMessage = 'Failed to deactivate Kill Switch';
+        console.error(`Error ${newStatus.toLowerCase()}ing Kill Switch:`, error);
+        this.toastMessage = `Failed to ${newStatus.toLowerCase()} Kill Switch`;
         this.showToast = true;
       }
     },
