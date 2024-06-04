@@ -206,16 +206,8 @@
 
   </section>
 
-  <div class="toast" :class="{ 'show': showToast }" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Notification</strong>
-      <small>Just now</small>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" @click="hideToast"></button>
-    </div>
-    <div class="toast-body">
-      {{ toastMessage }}
-    </div>
-  </div>
+  <ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
+
 </template>
 
 
@@ -223,8 +215,12 @@
 import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants';
 import { mapGetters } from 'vuex';
 import axios from 'axios';
+import ToastAlert from '../components/ToastAlert.vue';
 
 export default {
+  components: {
+    ToastAlert
+  },
   data() {
     return {
       fundLimits: {}, // Initialize as an empty object
@@ -292,8 +288,8 @@ export default {
         this.showToast = true;
       }
     },
-    hideToast() {
-      this.showToast = false;
+    updateToastVisibility(value) {
+      this.showToast = value;
     }
   },
 

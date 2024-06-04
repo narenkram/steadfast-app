@@ -164,3 +164,12 @@ th {
   background-color: #f5f7f7 !important;
   color: black !important;
 }
+
+.toast {
+  position: absolute;
+  top: 10%;
+  z-index: 1000;
+  transform: translateY(-50%);
+  transform: translateX(-50%);
+  left: 50%;
+}
