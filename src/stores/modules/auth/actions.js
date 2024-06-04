@@ -49,9 +49,11 @@ export default {
         let userDataString = localStorage.getItem('userData')
         if (userDataString) {
             let userData = JSON.parse(userDataString)
-            let expirationTime = userData.expiresIn - new Date().getTime();
+            let currentTime = new Date().getTime();
+            let expirationTime = userData.expiresIn - currentTime;
 
-            if (expirationTime < 10000) {
+            // Check if the remaining time is less than 12 hours
+            if (expirationTime < 43200000) { // 12 hours in milliseconds
                 context.dispatch(AUTO_LOGOUT_ACTION);
             } else {
                 timer = setTimeout(() => {
