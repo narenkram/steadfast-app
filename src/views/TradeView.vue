@@ -45,7 +45,8 @@
     </div>
     <div class="col-lg-2 d-flex justify-content-center align-items-center">
       <div class="Card">
-        <button class="btn btn-primary shadow fs-3">Kill Switch</button>
+        <button class="btn btn-primary shadow fs-3" @click="activateKillSwitch">Activate Kill Switch</button>
+        <button class="btn btn-danger shadow fs-3" @click="deactivateKillSwitch">Deactivate Kill Switch</button>
       </div>
     </div>
   </section>
@@ -245,6 +246,33 @@ export default {
         console.log('Dhan Client ID:', data.dhanClientId);
       } catch (error) {
         console.error('Error fetching Dhan Client ID:', error);
+      }
+    },
+    async activateKillSwitch() {
+      try {
+        const { data } = await axios.post('http://localhost:3000/killSwitch', {
+          killSwitchStatus: 'ACTIVATE'
+        });
+        console.log('Kill Switch activated:', data);
+        console.log('Kill Switch Status:', data.killSwitchStatus);
+        alert('Kill Switch activated successfully');
+      } catch (error) {
+        console.error('Error activating Kill Switch:', error);
+        alert('Failed to activate Kill Switch');
+      }
+    },
+    async deactivateKillSwitch() {
+      try {
+        const response = await axios.post('http://localhost:3000/killSwitch', null, {
+          params: {
+            killSwitchStatus: 'DEACTIVATE'
+          }
+        });
+        console.log('Kill Switch deactivated:', response.data);
+        alert('Kill Switch deactivated successfully');
+      } catch (error) {
+        console.error('Error deactivating Kill Switch:', error);
+        alert('Failed to deactivate Kill Switch');
       }
     }
   },
