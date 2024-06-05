@@ -60,7 +60,7 @@
   <hr />
 
   <section class="row py-2">
-    <form @submit.prevent="placeOrder">
+    <form @submit.prevent>
       <div class="row">
         <!-- Exchange Selection -->
         <div class="col-2">
@@ -129,8 +129,9 @@
               {{ strike }}
             </option>
           </select>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy CE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'CALL')">Buy
+            CE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'CALL')">Sell CE</button>
         </div>
 
         <div class="col-3 text-center">
@@ -149,8 +150,9 @@
               {{ strike }}
             </option>
           </select>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy PE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'PUT')">Buy
+            PE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'PUT')">Sell PE</button>
         </div>
 
 
@@ -273,7 +275,8 @@ export default {
       toastMessage: '', // Message displayed in the toast
       killSwitchActive: false, // Initial state of the kill switch
       orders: [], // Define orders as an empty array initially
-      selectedExchange: null, // Initialize selected exchange as null
+      selectedExchange: 'NSE',
+      exchangeSegment: null, // Initialize exchangeSegment
       selectedInstrument: null, // Initialize selected instrument as null
       selectedExpiry: null, // Initialize selected expiry as null
       selectedCallStrike: null, // Initialize selected call strike as null
@@ -300,6 +303,7 @@ export default {
     this.fetchInstruments(); // Fetch instruments when component mounts
     this.fetchExpiryDates(); // Fetch expiry dates when component mounts
     this.fetchStrikes(); // Fetch strikes when component mounts
+    this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
   },
   methods: {
     async fetchFundLimit() {
@@ -393,6 +397,11 @@ export default {
     },
     updateInstruments() {
       // Implement logic to update instruments based on selected exchange
+      if (this.selectedExchange === 'NSE') {
+        this.exchangeSegment = 'NSE_FNO';
+      } else if (this.selectedExchange === 'BSE') {
+        this.exchangeSegment = 'BSE_FNO';
+      }
     },
     toggleDhanIdVisibility() {
       this.showDhanId = !this.showDhanId;
@@ -405,6 +414,32 @@ export default {
       const lastPart = dhanClientId.slice(-endUnmaskedLength);
       const middleMask = '******'; // Mask middle 6 characters
       return `${firstPart}${middleMask}${lastPart}`;
+    },
+
+
+    async placeOrder(transactionType, drvOptionType) {
+      console.log('Attempting to place order:', transactionType, drvOptionType); // Log the attempt to place an order
+
+      const orderData = {
+        symbol: 'NIFTY-Jun2024-21700-CE',
+        quantity: 25,
+        orderType: 'LIMIT',
+        productType: 'INTRADAY',
+        price: 10,
+        validity: 'DAY',
+        transactionType: transactionType,
+        drvOptionType: drvOptionType,
+        exchangeSegment: this.exchangeSegment // Ensure this is correctly referencing the data property
+      };
+
+      console.log('Order Data:', orderData); // Log the order data to the console
+
+      try {
+        const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+        console.log('Order placed:', response.data); // Log the successful placement of the order
+      } catch (error) {
+        console.error('Error placing order:', error); // Log any errors encountered
+      }
     },
   },
 
