@@ -369,7 +369,9 @@ export default {
             } else if (tradingSymbol.includes('PE')) {
               this.putStrikes.push(tradingSymbol);
             }
-
+            if (this.expiryDates.length > 0) {
+              this.selectedExpiry = this.expiryDates[0];
+            }
             // Add expiry date if it's not already in the array to avoid duplicates
             if (!this.expiryDates.includes(drvExpiryDate)) {
               this.expiryDates.push(drvExpiryDate);
