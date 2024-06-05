@@ -71,12 +71,12 @@
           </select>
         </div>
 
-        <!-- Instrument Selection -->
+        <!-- Symbol Selection -->
         <div class="col-2">
-          <label for="Instrument" class="form-label mb-0">Instrument</label>
-          <select class="form-select" v-model="selectedInstrument" aria-label="Instrument">
-            <option v-for="instrument in instruments" :key="instrument" :value="instrument">
-              {{ instrument }}
+          <label for="Symbol" class="form-label mb-0">Symbol</label>
+          <select class="form-select" v-model="selectedSymbol" aria-label="Symbol">
+            <option v-for="symbol in symbols" :key="symbol" :value="symbol">
+              {{ symbol }}
             </option>
           </select>
         </div>
@@ -278,8 +278,9 @@ export default {
       killSwitchActive: false, // Initial state of the kill switch
       orders: [], // Define orders as an empty array initially
       selectedExchange: 'NSE',
+      symbols: [], // Initialize symbols as an empty array
       exchangeSegment: null, // Initialize exchangeSegment
-      selectedInstrument: null, // Initialize selected instrument as null
+      selectedSymbol: null, // Initialize selected instrument as null
       selectedExpiry: null, // Initialize selected expiry as null
       selectedCallStrike: null, // Initialize selected call strike as null
       selectedPutStrike: null, // Initialize selected put strike as null
@@ -287,7 +288,7 @@ export default {
       expiryDates: [], // Initialize expiry dates as an empty array
       strikes: [], // Initialize strikes as an empty array
       selectedProductType: 'INTRADAY',
-      selectedQuantity: null, // Initialize selected quantity as null
+      selectedQuantity: 15, // Initialize selected quantity as null
       selectedOrderType: 'Market', // Initialize selected order type as null
       currentTransactionType: '', // This will store either 'BUY' or 'SELL'
       // New properties
@@ -302,10 +303,12 @@ export default {
   mounted() {
     this.fetchFundLimit();
     this.fetchDhanClientId();
+    this.fetchSymbols(); // Fetch symbols when the component is mounted
     this.fetchInstruments(); // Fetch instruments when component mounts
     this.fetchExpiryDates(); // Fetch expiry dates when component mounts
     this.fetchStrikes(); // Fetch strikes when component mounts
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
+
   },
   methods: {
     async fetchFundLimit() {
@@ -324,6 +327,14 @@ export default {
         console.log('Dhan Client ID:', data.dhanClientId);
       } catch (error) {
         console.error('Error fetching Dhan Client ID:', error);
+      }
+    },
+    async fetchSymbols() {
+      try {
+        const response = await axios.get('http://localhost:3000/symbols');
+        this.symbols = response.data; // Assuming the API returns an array of symbols
+      } catch (error) {
+        console.error('Failed to fetch symbols:', error);
       }
     },
     async fetchOrders() {
@@ -424,8 +435,8 @@ export default {
       this.currentTransactionType = transactionType; // Update the transaction type
 
       const orderData = {
-        symbol: 'NIFTY-Jun2024-21700-CE',
-        quantity: 25,
+        symbol: this.selectedSymbol,
+        quantity: this.selectedQuantity,
         orderType: this.selectedOrderType,
         productType: this.selectedProductType,
         price: 10,
