@@ -65,16 +65,17 @@
         <!-- Exchange Selection -->
         <div class="col-2">
           <label for="Exchange" class="form-label mb-0">Exchange</label>
-          <select class="form-select" v-model="selectedExchange" @change="updateInstruments" aria-label="Exchange">
+          <select id="Exchange" class="form-select" v-model="selectedExchange" @change="updateInstruments"
+            aria-label="Exchange">
             <option value="NSE">NSE</option>
             <option value="BSE">BSE</option>
           </select>
         </div>
 
-        <!-- Symbol Selection -->
+        <!-- Master Symbol Selection -->
         <div class="col-2">
-          <label for="Symbol" class="form-label mb-0">Symbol</label>
-          <select class="form-select" v-model="selectedSymbol" aria-label="Symbol">
+          <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
+          <select class="form-select" v-model="masterSymbol" aria-label="Master Symbol" id="MasterSymbol">
             <option v-for="symbol in symbols" :key="symbol" :value="symbol">
               {{ symbol }}
             </option>
@@ -84,7 +85,7 @@
         <!-- Expiry Date Selection -->
         <div class="col-2">
           <label for="Expiry" class="form-label mb-0">Expiry</label>
-          <select class="form-select" v-model="selectedExpiry" aria-label="Expiry">
+          <select id="Expiry" class="form-select" v-model="selectedExpiry" aria-label="Expiry">
             <option v-for="date in expiryDates" :key="date" :value="date">
               {{ date }}
             </option>
@@ -94,7 +95,7 @@
         <!-- Product Type Selection -->
         <div class="col-2">
           <label for="ProductType" class="form-label mb-0">Product Type</label>
-          <select class="form-select" v-model="selectedProductType" aria-label="ProductType">
+          <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
             <option value="INTRADAY">Intraday</option>
             <option value="MARGIN">Margin</option>
           </select>
@@ -103,7 +104,7 @@
         <!-- Quantity Selection -->
         <div class="col-2">
           <label for="Quantity" class="form-label mb-0">Quantity</label>
-          <select class="form-select" v-model="selectedQuantity" aria-label="Quantity">
+          <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
             <option value="15">15</option>
             <option value="30">30</option>
             <option value="45">45</option>
@@ -113,7 +114,7 @@
         <!-- Order Type -->
         <div class="col-2">
           <label for="OrderType" class="form-label mb-0">Order Type</label>
-          <select class="form-select" aria-label="OrderType" v-model="selectedOrderType">
+          <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType">
             <option value="Market">Market</option>
             <option value="Limit">Limit</option>
           </select>
@@ -123,8 +124,8 @@
       <div class="row mt-2 align-items-center justify-content-between">
         <!-- Call Strike Selection -->
         <div class="col-3">
-          <label for="Call Strike" class="form-label mb-0">Call Strike</label>
-          <select class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
+          <label for="CallStrike" class="form-label mb-0">Call Strike</label>
+          <select id="CallStrike" class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
             <option v-for="strike in strikes" :key="strike" :value="strike">
               {{ strike }}
             </option>
@@ -144,8 +145,8 @@
 
         <!-- Put Strike Selection -->
         <div class="col-3">
-          <label for="Put Strike" class="form-label mb-0">Put Strike</label>
-          <select class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
+          <label for="PutStrike" class="form-label mb-0">Put Strike</label>
+          <select id="PutStrike" class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
             <option v-for="strike in strikes" :key="strike" :value="strike">
               {{ strike }}
             </option>
@@ -154,9 +155,6 @@
             PE</button>
           <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'PUT')">Sell PE</button>
         </div>
-
-
-
       </div>
     </form>
   </section>
@@ -193,7 +191,7 @@
             <thead>
               <tr>
                 <th scope="col">
-                  <input type="checkbox" class="form-check-input" />
+                  <input type="checkbox" id="selectAllPositions" class="form-check-input" />
                 </th>
                 <th scope="col">Symbol Name</th>
                 <th scope="col">Trade Side</th>
@@ -205,7 +203,7 @@
             <tbody>
               <tr>
                 <td scope="row">
-                  <input type="checkbox" class="form-check-input" />
+                  <input type="checkbox" id="selectPosition" class="form-check-input" />
                 </td>
                 <td>BANKNIFTY 51700</td>
                 <td>{{ currentTransactionType }}</td>
@@ -280,7 +278,7 @@ export default {
       selectedExchange: 'NSE',
       symbols: [], // Initialize symbols as an empty array
       exchangeSegment: null, // Initialize exchangeSegment
-      selectedSymbol: null, // Initialize selected instrument as null
+      masterSymbol: null, // Initialize master instrument as null
       selectedExpiry: null, // Initialize selected expiry as null
       selectedCallStrike: null, // Initialize selected call strike as null
       selectedPutStrike: null, // Initialize selected put strike as null
@@ -293,6 +291,10 @@ export default {
       currentTransactionType: '', // This will store either 'BUY' or 'SELL'
       // New properties
       showDhanId: false, // Controls the visibility of the Dhan ID
+      exchangeSymbols: {
+        NSE: ['NIFTY', 'BANKNIFTY'],
+        BSE: ['FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+      }, // Predefined symbols for each exchange
     };
   },
   computed: {
@@ -301,14 +303,17 @@ export default {
     }),
   },
   mounted() {
+    this.symbols = this.exchangeSymbols[this.selectedExchange];
+    this.masterSymbol = this.symbols[0] || null;
     this.fetchFundLimit();
     this.fetchDhanClientId();
-    this.fetchSymbols(); // Fetch symbols when the component is mounted
-    this.fetchInstruments(); // Fetch instruments when component mounts
-    this.fetchExpiryDates(); // Fetch expiry dates when component mounts
-    this.fetchStrikes(); // Fetch strikes when component mounts
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
-
+  },
+  watch: {
+    selectedExchange(newVal, oldVal) {
+      this.symbols = this.exchangeSymbols[newVal] || [];
+      this.masterSymbol = this.symbols[0] || null; // Automatically select the first symbol or null if none
+    }
   },
   methods: {
     async fetchFundLimit() {
@@ -331,8 +336,9 @@ export default {
     },
     async fetchSymbols() {
       try {
-        const response = await axios.get('http://localhost:3000/symbols');
-        this.symbols = response.data; // Assuming the API returns an array of symbols
+        const response = await axios.get(`http://localhost:3000/symbols?selectedExchange=${this.selectedExchange}`);
+        this.symbols = response.data; // Assuming the API returns an array of objects with tradingSymbol
+        console.log('Sample of fetched symbols:', response.data.sort(() => 0.5 - Math.random()).slice(0, 2));
       } catch (error) {
         console.error('Failed to fetch symbols:', error);
       }
@@ -381,33 +387,6 @@ export default {
     updateToastVisibility(value) {
       this.showToast = value;
     },
-    async fetchInstruments() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/instruments');
-        this.instruments = data;
-        console.log('Instruments:', data);
-      } catch (error) {
-        console.error('Error fetching instruments:', error);
-      }
-    },
-    async fetchExpiryDates() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/expiryDates');
-        this.expiryDates = data;
-        console.log('Expiry Dates:', data);
-      } catch (error) {
-        console.error('Error fetching expiry dates:', error);
-      }
-    },
-    async fetchStrikes() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/strikes');
-        this.strikes = data;
-        console.log('Strikes:', data);
-      } catch (error) {
-        console.error('Error fetching strikes:', error);
-      }
-    },
     updateInstruments() {
       // Implement logic to update instruments based on selected exchange
       if (this.selectedExchange === 'NSE') {
@@ -435,7 +414,7 @@ export default {
       this.currentTransactionType = transactionType; // Update the transaction type
 
       const orderData = {
-        symbol: this.selectedSymbol,
+        symbol: this.masterSymbol,
         quantity: this.selectedQuantity,
         orderType: this.selectedOrderType,
         productType: this.selectedProductType,
