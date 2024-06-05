@@ -196,6 +196,7 @@
                   <input type="checkbox" class="form-check-input" />
                 </th>
                 <th scope="col">Symbol Name</th>
+                <th scope="col">Trade Side</th>
                 <th scope="col">Product Type</th>
                 <th scope="col">Qty</th>
                 <th scope="col">Executed Price</th>
@@ -207,7 +208,8 @@
                   <input type="checkbox" class="form-check-input" />
                 </td>
                 <td>BANKNIFTY 51700</td>
-                <td>MIS</td>
+                <td>{{ currentTransactionType }}</td>
+                <td>{{ selectedProductType }}</td>
                 <td>15</td>
                 <td>432</td>
               </tr>
@@ -287,7 +289,7 @@ export default {
       selectedProductType: 'INTRADAY',
       selectedQuantity: null, // Initialize selected quantity as null
       selectedOrderType: 'Market', // Initialize selected order type as null
-
+      currentTransactionType: '', // This will store either 'BUY' or 'SELL'
       // New properties
       showDhanId: false, // Controls the visibility of the Dhan ID
     };
@@ -419,6 +421,7 @@ export default {
 
     async placeOrder(transactionType, drvOptionType) {
       console.log('Attempting to place order:', transactionType, drvOptionType); // Log the attempt to place an order
+      this.currentTransactionType = transactionType; // Update the transaction type
 
       const orderData = {
         symbol: 'NIFTY-Jun2024-21700-CE',
