@@ -443,7 +443,8 @@ export default {
         validity: 'DAY',
         transactionType: transactionType,
         drvOptionType: drvOptionType,
-        exchangeSegment: this.exchangeSegment // Ensure this is correctly referencing the data property
+        exchangeSegment: this.exchangeSegment, // Ensure this is correctly referencing the data property
+        drvExpiryDate: this.selectedExpiry,
       };
 
       console.log('Order Data:', orderData); // Log the order data to the console
