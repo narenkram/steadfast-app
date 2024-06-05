@@ -126,7 +126,7 @@
         <div class="col-3">
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
-            <option v-for="strike in callStrikes" :key="strike" :value="strike">
+            <option v-for="(strike, index) in callStrikes" :key="`${strike}-${index}`" :value="strike">
               {{ strike }}
             </option>
           </select>
@@ -148,7 +148,7 @@
         <div class="col-3">
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
-            <option v-for="strike in putStrikes" :key="strike" :value="strike">
+            <option v-for="(strike, index) in putStrikes" :key="`${strike}-${index}`" :value="strike">
               {{ strike }}
             </option>
           </select>
@@ -317,6 +317,11 @@ export default {
     selectedExchange(newVal, oldVal) {
       this.masterSymbols = this.exchangeSymbols[newVal] || [];
       this.masterSymbol = this.masterSymbols[0] || null;
+    },
+    masterSymbol(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
+      }
     }
   },
   methods: {
@@ -356,24 +361,33 @@ export default {
         response.data.forEach(item => {
           const { tradingSymbol, drvExpiryDate } = item;
 
-          // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
-          if (tradingSymbol.includes('CE')) {
-            this.callStrikes.push(tradingSymbol);
-          } else if (tradingSymbol.includes('PE')) {
-            this.putStrikes.push(tradingSymbol);
-          }
+          // Check if the trading symbol starts with the selected masterSymbol followed by a dash
+          if (tradingSymbol.startsWith(this.masterSymbol + '-')) {
+            // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
+            if (tradingSymbol.includes('CE')) {
+              this.callStrikes.push(tradingSymbol);
+            } else if (tradingSymbol.includes('PE')) {
+              this.putStrikes.push(tradingSymbol);
+            }
 
-          // Add expiry date if it's not already in the array to avoid duplicates
-          if (!this.expiryDates.includes(drvExpiryDate)) {
-            this.expiryDates.push(drvExpiryDate);
+            // Add expiry date if it's not already in the array to avoid duplicates
+            if (!this.expiryDates.includes(drvExpiryDate)) {
+              this.expiryDates.push(drvExpiryDate);
+            }
           }
         });
 
         // Optionally sort expiryDates if needed
         this.expiryDates.sort(); // Sorts dates in ascending order if they are in a standard format
-
-        console.log('Call Strikes:', this.callStrikes);
-        console.log('Put Strikes:', this.putStrikes);
+        // Set default selected values
+        if (this.callStrikes.length > 0) {
+          this.selectedCallStrike = this.callStrikes[0];
+        }
+        if (this.putStrikes.length > 0) {
+          this.selectedPutStrike = this.putStrikes[0];
+        }
+        console.log('Filtered Call Strikes:', this.callStrikes);
+        console.log('Filtered Put Strikes:', this.putStrikes);
         console.log('Expiry Dates:', this.expiryDates);
       } catch (error) {
         console.error('Failed to fetch symbols:', error);
