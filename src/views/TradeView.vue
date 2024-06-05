@@ -308,6 +308,7 @@ export default {
     this.fetchFundLimit();
     this.fetchDhanClientId();
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
+    this.fetchSymbols();
   },
   watch: {
     selectedExchange(newVal, oldVal) {
@@ -336,7 +337,18 @@ export default {
     },
     async fetchSymbols() {
       try {
-        const response = await axios.get(`http://localhost:3000/symbols?selectedExchange=${this.selectedExchange}`);
+        // Ensure masterSymbol is defined before making the request
+        if (!this.masterSymbol) {
+          console.error('masterSymbol is not defined');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:3000/symbols`, {
+          params: {
+            selectedExchange: this.selectedExchange,
+            masterSymbol: this.masterSymbol
+          }
+        });
         this.symbols = response.data; // Assuming the API returns an array of objects with tradingSymbol
         console.log('Sample of fetched symbols:', response.data.sort(() => 0.5 - Math.random()).slice(0, 2));
       } catch (error) {
@@ -388,6 +400,8 @@ export default {
       this.showToast = value;
     },
     updateInstruments() {
+      this.symbols = this.exchangeSymbols[this.selectedExchange];
+      this.masterSymbol = this.symbols[0] || null; // Automatically select the first symbol or null if none
       // Implement logic to update instruments based on selected exchange
       if (this.selectedExchange === 'NSE') {
         this.exchangeSegment = 'NSE_FNO';
