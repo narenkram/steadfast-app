@@ -95,8 +95,8 @@
         <div class="col-2">
           <label for="ProductType" class="form-label mb-0">Product Type</label>
           <select class="form-select" v-model="selectedProductType" aria-label="ProductType">
-            <option value="MIS">MIS</option>
-            <option value="NRML">NRML</option>
+            <option value="INTRADAY">Intraday</option>
+            <option value="MARGIN">Margin</option>
           </select>
         </div>
 
@@ -114,7 +114,7 @@
         <div class="col-2">
           <label for="OrderType" class="form-label mb-0">Order Type</label>
           <select class="form-select" aria-label="OrderType" v-model="selectedOrderType">
-            <option selected value="Market">Market</option>
+            <option value="Market">Market</option>
             <option value="Limit">Limit</option>
           </select>
         </div>
@@ -284,9 +284,9 @@ export default {
       instruments: [], // Initialize instruments as an empty array
       expiryDates: [], // Initialize expiry dates as an empty array
       strikes: [], // Initialize strikes as an empty array
-      selectedProductType: null, // Initialize selected product type as null
+      selectedProductType: 'INTRADAY',
       selectedQuantity: null, // Initialize selected quantity as null
-      selectedOrderType: null, // Initialize selected order type as null
+      selectedOrderType: 'Market', // Initialize selected order type as null
 
       // New properties
       showDhanId: false, // Controls the visibility of the Dhan ID
@@ -423,8 +423,8 @@ export default {
       const orderData = {
         symbol: 'NIFTY-Jun2024-21700-CE',
         quantity: 25,
-        orderType: 'LIMIT',
-        productType: 'INTRADAY',
+        orderType: this.selectedOrderType,
+        productType: this.selectedProductType,
         price: 10,
         validity: 'DAY',
         transactionType: transactionType,
