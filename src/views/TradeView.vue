@@ -5,7 +5,12 @@
       <div class="row">
         <div class="col-4">
           <p class="mb-0"><b>Broker</b></p>
-          <p>Dhan ID {{ dhanClientId || 'N/A' }} <span class="badge bg-success">Active</span></p>
+          <p>
+            Dhan ID
+            <span v-if="showDhanId" @click="toggleDhanIdVisibility">{{ dhanClientId || 'N/A' }}</span>
+            <span v-else @click="toggleDhanIdVisibility">{{ maskDhanId(dhanClientId) }}</span>
+            <span class="badge bg-success">Active</span>
+          </p>
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Total Funds</b></p>
@@ -57,80 +62,99 @@
   <section class="row py-2">
     <form @submit.prevent="placeOrder">
       <div class="row">
+        <!-- Exchange Selection -->
         <div class="col-2">
           <label for="Exchange" class="form-label mb-0">Exchange</label>
-          <select class="form-select" aria-label="Instrument">
-            <option selected value="Exchange">NSE</option>
+          <select class="form-select" v-model="selectedExchange" @change="updateInstruments" aria-label="Exchange">
+            <option value="NSE">NSE</option>
             <option value="BSE">BSE</option>
           </select>
         </div>
+
+        <!-- Instrument Selection -->
         <div class="col-2">
           <label for="Instrument" class="form-label mb-0">Instrument</label>
-          <select class="form-select" aria-label="Instrument">
-            <option selected value="BankNifty">BankNifty</option>
-            <option value="Nifty">Nifty</option>
+          <select class="form-select" v-model="selectedInstrument" aria-label="Instrument">
+            <option v-for="instrument in instruments" :key="instrument" :value="instrument">
+              {{ instrument }}
+            </option>
           </select>
         </div>
+
+        <!-- Expiry Date Selection -->
         <div class="col-2">
-          <label for="OrderType" class="form-label mb-0">Order Type</label>
-          <select class="form-select" aria-label="OrderType">
-            <option selected value="Market">Market</option>
-            <option value="Limit">Limit</option>
+          <label for="Expiry" class="form-label mb-0">Expiry</label>
+          <select class="form-select" v-model="selectedExpiry" aria-label="Expiry">
+            <option v-for="date in expiryDates" :key="date" :value="date">
+              {{ date }}
+            </option>
           </select>
         </div>
+
+        <!-- Product Type Selection -->
         <div class="col-2">
           <label for="ProductType" class="form-label mb-0">Product Type</label>
-          <select class="form-select" aria-label="ProductType">
-            <option selected value="MIS">MIS</option>
+          <select class="form-select" v-model="selectedProductType" aria-label="ProductType">
+            <option value="MIS">MIS</option>
             <option value="NRML">NRML</option>
           </select>
         </div>
-        <div class="col-2">
-          <label for="Expiry" class="form-label mb-0">Expiry</label>
-          <select class="form-select" aria-label="Expiry">
-            <option selected value="current">05-Jun-2024</option>
-            <option value="next">12-Jun-2024</option>
-          </select>
-        </div>
+
+        <!-- Quantity Selection -->
         <div class="col-2">
           <label for="Quantity" class="form-label mb-0">Quantity</label>
-          <select class="form-select" aria-label="Quantity">
-            <option selected value="15">15</option>
+          <select class="form-select" v-model="selectedQuantity" aria-label="Quantity">
+            <option value="15">15</option>
             <option value="30">30</option>
             <option value="45">45</option>
           </select>
         </div>
+
+        <!-- Order Type -->
+        <div class="col-2">
+          <label for="OrderType" class="form-label mb-0">Order Type</label>
+          <select class="form-select" aria-label="OrderType" v-model="selectedOrderType">
+            <option selected value="Market">Market</option>
+            <option value="Limit">Limit</option>
+          </select>
+        </div>
       </div>
+
       <div class="row mt-2 align-items-center justify-content-between">
+        <!-- Call Strike Selection -->
         <div class="col-3">
           <label for="Call Strike" class="form-label mb-0">Call Strike</label>
-          <select class="form-select" aria-label="Call Strike">
-            <option selected value="51700">51700</option>
-            <option value="51800">51800</option>
+          <select class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
+            <option v-for="strike in strikes" :key="strike" :value="strike">
+              {{ strike }}
+            </option>
           </select>
-
-          <p class="mb-0">BankNifty 51700 LTP 432</p>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy CE</button>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy CE</button>
           <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
         </div>
+
         <div class="col-3 text-center">
           <br />
           <p class="mb-0">Nifty Bank</p>
-          <p><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 mb-2">Close Position</button>
+          <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2">Close Position</button>
           <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
         </div>
+
+        <!-- Put Strike Selection -->
         <div class="col-3">
           <label for="Put Strike" class="form-label mb-0">Put Strike</label>
-          <select class="form-select" aria-label="Put Strike">
-            <option selected value="51700">51700</option>
-            <option value="51800">51800</option>
+          <select class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
+            <option v-for="strike in strikes" :key="strike" :value="strike">
+              {{ strike }}
+            </option>
           </select>
-
-          <p class="mb-0">BankNifty 51700 LTP 345</p>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 mb-2">Buy PE</button>
+          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy PE</button>
           <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
         </div>
+
+
+
       </div>
     </form>
   </section>
@@ -144,7 +168,7 @@
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
-            role="tab" aria-controls="trades-tab-pane" aria-selected="false">Trades</button>
+            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="fetchOrders">Trades</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane"
@@ -200,8 +224,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.orderId">
-                <td>{{ order.orderId }}</td>
+              <tr v-for="order in orders" :key="order.exchangeOrderId">
+                <td>{{ order.exchangeOrderId }}</td>
                 <td>{{ order.tradingSymbol }}</td>
                 <td>{{ order.quantity }}</td>
                 <td>{{ order.price }}</td>
@@ -249,6 +273,20 @@ export default {
       toastMessage: '', // Message displayed in the toast
       killSwitchActive: false, // Initial state of the kill switch
       orders: [], // Define orders as an empty array initially
+      selectedExchange: null, // Initialize selected exchange as null
+      selectedInstrument: null, // Initialize selected instrument as null
+      selectedExpiry: null, // Initialize selected expiry as null
+      selectedCallStrike: null, // Initialize selected call strike as null
+      selectedPutStrike: null, // Initialize selected put strike as null
+      instruments: [], // Initialize instruments as an empty array
+      expiryDates: [], // Initialize expiry dates as an empty array
+      strikes: [], // Initialize strikes as an empty array
+      selectedProductType: null, // Initialize selected product type as null
+      selectedQuantity: null, // Initialize selected quantity as null
+      selectedOrderType: null, // Initialize selected order type as null
+
+      // New properties
+      showDhanId: false, // Controls the visibility of the Dhan ID
     };
   },
   computed: {
@@ -259,8 +297,9 @@ export default {
   mounted() {
     this.fetchFundLimit();
     this.fetchDhanClientId();
-    this.fetchOrders(); // Fetch orders when component mounts
-
+    this.fetchInstruments(); // Fetch instruments when component mounts
+    this.fetchExpiryDates(); // Fetch expiry dates when component mounts
+    this.fetchStrikes(); // Fetch strikes when component mounts
   },
   methods: {
     async fetchFundLimit() {
@@ -284,6 +323,7 @@ export default {
     async fetchOrders() {
       try {
         const response = await axios.get('http://localhost:3000/getOrders');
+        this.orders = response.data; // Set the orders array
         console.log('Orders:', response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -323,6 +363,48 @@ export default {
     },
     updateToastVisibility(value) {
       this.showToast = value;
+    },
+    async fetchInstruments() {
+      try {
+        const { data } = await axios.get('http://localhost:3000/instruments');
+        this.instruments = data;
+        console.log('Instruments:', data);
+      } catch (error) {
+        console.error('Error fetching instruments:', error);
+      }
+    },
+    async fetchExpiryDates() {
+      try {
+        const { data } = await axios.get('http://localhost:3000/expiryDates');
+        this.expiryDates = data;
+        console.log('Expiry Dates:', data);
+      } catch (error) {
+        console.error('Error fetching expiry dates:', error);
+      }
+    },
+    async fetchStrikes() {
+      try {
+        const { data } = await axios.get('http://localhost:3000/strikes');
+        this.strikes = data;
+        console.log('Strikes:', data);
+      } catch (error) {
+        console.error('Error fetching strikes:', error);
+      }
+    },
+    updateInstruments() {
+      // Implement logic to update instruments based on selected exchange
+    },
+    toggleDhanIdVisibility() {
+      this.showDhanId = !this.showDhanId;
+    },
+    maskDhanId(dhanClientId) {
+      if (!dhanClientId || dhanClientId.length < 10) return 'N/A'; // Ensure there are enough characters to mask
+      const startUnmaskedLength = Math.ceil((dhanClientId.length - 6) / 2);
+      const endUnmaskedLength = Math.floor((dhanClientId.length - 6) / 2);
+      const firstPart = dhanClientId.slice(0, startUnmaskedLength);
+      const lastPart = dhanClientId.slice(-endUnmaskedLength);
+      const middleMask = '******'; // Mask middle 6 characters
+      return `${firstPart}${middleMask}${lastPart}`;
     },
   },
 
