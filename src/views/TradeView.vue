@@ -126,7 +126,7 @@
         <div class="col-3">
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
-            <option v-for="strike in strikes" :key="strike" :value="strike">
+            <option v-for="strike in callStrikes" :key="strike" :value="strike">
               {{ strike }}
             </option>
           </select>
@@ -148,7 +148,7 @@
         <div class="col-3">
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
-            <option v-for="strike in strikes" :key="strike" :value="strike">
+            <option v-for="strike in putStrikes" :key="strike" :value="strike">
               {{ strike }}
             </option>
           </select>
@@ -296,6 +296,8 @@ export default {
         NSE: ['NIFTY', 'BANKNIFTY'],
         BSE: ['FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
       }, // Predefined symbols for each exchange
+      callStrikes: [],
+      putStrikes: []
     };
   },
   computed: {
@@ -338,22 +340,43 @@ export default {
     },
     async fetchSymbols() {
       try {
-        // Ensure masterSymbol is defined before making the request
-        if (!this.masterSymbol) {
-          console.error('masterSymbol is not defined');
-          return;
-        }
-
         const response = await axios.get(`http://localhost:3000/symbols`, {
           params: {
             selectedExchange: this.selectedExchange,
             masterSymbol: this.masterSymbol
           }
         });
-        this.masterSymbols = response.data; // Assuming the API returns an array of objects with tradingSymbol
-        console.log('Sample of fetched masterSymbols:', response.data.sort(() => 0.5 - Math.random()).slice(0, 2));
+
+        // Reset arrays
+        this.callStrikes = [];
+        this.putStrikes = [];
+        this.expiryDates = [];
+
+        // Process each item in the response data
+        response.data.forEach(item => {
+          const { tradingSymbol, drvExpiryDate } = item;
+
+          // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
+          if (tradingSymbol.includes('CE')) {
+            this.callStrikes.push(tradingSymbol);
+          } else if (tradingSymbol.includes('PE')) {
+            this.putStrikes.push(tradingSymbol);
+          }
+
+          // Add expiry date if it's not already in the array to avoid duplicates
+          if (!this.expiryDates.includes(drvExpiryDate)) {
+            this.expiryDates.push(drvExpiryDate);
+          }
+        });
+
+        // Optionally sort expiryDates if needed
+        this.expiryDates.sort(); // Sorts dates in ascending order if they are in a standard format
+
+        console.log('Call Strikes:', this.callStrikes);
+        console.log('Put Strikes:', this.putStrikes);
+        console.log('Expiry Dates:', this.expiryDates);
       } catch (error) {
-        console.error('Failed to fetch masterSymbols:', error);
+        console.error('Failed to fetch symbols:', error);
       }
     },
     async fetchOrders() {
