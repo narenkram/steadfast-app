@@ -76,7 +76,7 @@
         <div class="col-2">
           <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
           <select class="form-select" v-model="masterSymbol" aria-label="Master Symbol" id="MasterSymbol">
-            <option v-for="symbol in symbols" :key="symbol" :value="symbol">
+            <option v-for="symbol in masterSymbols" :key="symbol" :value="symbol">
               {{ symbol }}
             </option>
           </select>
@@ -136,6 +136,7 @@
         </div>
 
         <div class="col-3 text-center">
+
           <br />
           <p class="mb-0">Nifty Bank</p>
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
@@ -276,7 +277,7 @@ export default {
       killSwitchActive: false, // Initial state of the kill switch
       orders: [], // Define orders as an empty array initially
       selectedExchange: 'NSE',
-      symbols: [], // Initialize symbols as an empty array
+      masterSymbols: [], // Initialize masterSymbols as an empty array
       exchangeSegment: null, // Initialize exchangeSegment
       masterSymbol: null, // Initialize master instrument as null
       selectedExpiry: null, // Initialize selected expiry as null
@@ -303,8 +304,8 @@ export default {
     }),
   },
   mounted() {
-    this.symbols = this.exchangeSymbols[this.selectedExchange];
-    this.masterSymbol = this.symbols[0] || null;
+    this.masterSymbols = this.exchangeSymbols[this.selectedExchange];
+    this.masterSymbol = this.masterSymbols[0] || null;
     this.fetchFundLimit();
     this.fetchDhanClientId();
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
@@ -312,8 +313,8 @@ export default {
   },
   watch: {
     selectedExchange(newVal, oldVal) {
-      this.symbols = this.exchangeSymbols[newVal] || [];
-      this.masterSymbol = this.symbols[0] || null; // Automatically select the first symbol or null if none
+      this.masterSymbols = this.exchangeSymbols[newVal] || [];
+      this.masterSymbol = this.masterSymbols[0] || null;
     }
   },
   methods: {
@@ -349,10 +350,10 @@ export default {
             masterSymbol: this.masterSymbol
           }
         });
-        this.symbols = response.data; // Assuming the API returns an array of objects with tradingSymbol
-        console.log('Sample of fetched symbols:', response.data.sort(() => 0.5 - Math.random()).slice(0, 2));
+        this.masterSymbols = response.data; // Assuming the API returns an array of objects with tradingSymbol
+        console.log('Sample of fetched masterSymbols:', response.data.sort(() => 0.5 - Math.random()).slice(0, 2));
       } catch (error) {
-        console.error('Failed to fetch symbols:', error);
+        console.error('Failed to fetch masterSymbols:', error);
       }
     },
     async fetchOrders() {
@@ -400,8 +401,8 @@ export default {
       this.showToast = value;
     },
     updateInstruments() {
-      this.symbols = this.exchangeSymbols[this.selectedExchange];
-      this.masterSymbol = this.symbols[0] || null; // Automatically select the first symbol or null if none
+      this.masterSymbols = this.exchangeSymbols[this.selectedExchange];
+      this.masterSymbol = this.masterSymbols[0] || null; // Automatically select the first symbol or null if none
       // Implement logic to update instruments based on selected exchange
       if (this.selectedExchange === 'NSE') {
         this.exchangeSegment = 'NSE_FNO';
