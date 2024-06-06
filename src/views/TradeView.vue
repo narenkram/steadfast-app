@@ -394,6 +394,7 @@ export default {
       this.callStrikes = [];
       this.putStrikes = [];
       this.expiryDates = [];
+      this.securityIds = {}; // Reset securityIds
 
       try {
         const response = await axios.get(`http://localhost:3000/symbols`, {
@@ -404,8 +405,15 @@ export default {
         });
 
         // Process the fetched data
-        this.callStrikes = response.data.callStrikes.map(item => item.tradingSymbol);
-        this.putStrikes = response.data.putStrikes.map(item => item.tradingSymbol);
+        this.callStrikes = response.data.callStrikes.map(item => {
+          this.securityIds[item.tradingSymbol] = item.securityId; // Populate securityIds
+          return item.tradingSymbol;
+        });
+
+        this.putStrikes = response.data.putStrikes.map(item => {
+          this.securityIds[item.tradingSymbol] = item.securityId; // Populate securityIds
+          return item.tradingSymbol;
+        });
 
         // Extract expiry dates from callStrikes for simplicity
         response.data.callStrikes.forEach(item => {
@@ -504,8 +512,11 @@ export default {
       console.log('Attempting to place order:', transactionType, drvOptionType); // Log the attempt to place an order
       this.currentTransactionType = transactionType; // Update the transaction type
 
+      const selectedStrike = drvOptionType === 'CALL' ? this.selectedCallStrike : this.selectedPutStrike;
+      const securityId = this.securityIds[selectedStrike];
+
       const orderData = {
-        symbol: this.selectedCallStrike,
+        symbol: selectedStrike,
         quantity: this.selectedQuantity,
         orderType: this.selectedOrderType,
         productType: this.selectedProductType,
@@ -515,7 +526,7 @@ export default {
         drvOptionType: drvOptionType,
         exchangeSegment: this.exchangeSegment, // Ensure this is correctly referencing the data property
         drvExpiryDate: this.selectedExpiry,
-        securityId: this.securityIds[this.selectedCallStrike] // Include securityId here
+        securityId: securityId // Include securityId here
       };
 
       console.log('Order Data:', orderData); // Log the order data to the console
