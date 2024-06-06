@@ -296,14 +296,14 @@ export default {
       // New properties
       showDhanId: false, // Controls the visibility of the Dhan ID
       exchangeSymbols: {
-        NSE: ['NIFTY', 'BANKNIFTY'],
-        BSE: ['FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+        NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+        BSE: ['SENSEX', 'BANKEX']
       }, // Predefined symbols for each exchange
       callStrikes: [],
       putStrikes: [],
       securityIds: {}, // Store security IDs associated with symbols
-      positions: [] // Stores the positions fetched from the API
-
+      positions: [], // Stores the positions fetched from the API
+      isInitialized: false,
     };
   },
   computed: {
@@ -335,12 +335,13 @@ export default {
   },
   watch: {
     selectedExchange(newVal, oldVal) {
-      console.log('Selected Exchange:watch running', newVal);
+      console.log('selectedExchange changed:', newVal);
       this.masterSymbols = this.exchangeSymbols[newVal] || [];
       this.masterSymbol = this.masterSymbols[0] || null;
       this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes
     },
     masterSymbol(newVal, oldVal) {
+      console.log('masterSymbol changed:', newVal);
       if (newVal !== oldVal) {
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
       }
@@ -382,7 +383,18 @@ export default {
         this.showToast = true;
       }
     },
+    initializeData() {
+      if (!this.isInitialized) {
+        this.fetchSymbols();
+        this.isInitialized = true;
+      }
+    },
     async fetchSymbols() {
+      // Reset arrays before fetching new data
+      this.callStrikes = [];
+      this.putStrikes = [];
+      this.expiryDates = [];
+
       try {
         const response = await axios.get(`http://localhost:3000/symbols`, {
           params: {
@@ -391,28 +403,7 @@ export default {
           }
         });
 
-        // Reset arrays
-        this.callStrikes = [];
-        this.putStrikes = [];
-        this.expiryDates = [];
-
-        // Month mapping
-        const monthMapping = {
-          '01': 'Jan',
-          '02': 'Feb',
-          '03': 'Mar',
-          '04': 'Apr',
-          '05': 'May',
-          '06': 'Jun',
-          '07': 'Jul',
-          '08': 'Aug',
-          '09': 'Sep',
-          '10': 'Oct',
-          '11': 'Nov',
-          '12': 'Dec'
-        };
-
-        // Update callStrikes and putStrikes directly from the response
+        // Process the fetched data
         this.callStrikes = response.data.callStrikes.map(item => item.tradingSymbol);
         this.putStrikes = response.data.putStrikes.map(item => item.tradingSymbol);
 
@@ -426,6 +417,9 @@ export default {
 
         // Optionally sort expiryDates if needed
         this.expiryDates.sort(); // Sorts dates in ascending order if they are in a standard format
+        console.log('Filtered Call Strikes:', this.callStrikes);
+        console.log('Filtered Put Strikes:', this.putStrikes);
+        console.log('Expiry Dates:', this.expiryDates);
         // Set default selected values
         if (this.callStrikes.length > 0) {
           this.selectedCallStrike = this.callStrikes[0];
@@ -433,9 +427,6 @@ export default {
         if (this.putStrikes.length > 0) {
           this.selectedPutStrike = this.putStrikes[0];
         }
-        console.log('Filtered Call Strikes:', this.callStrikes);
-        console.log('Filtered Put Strikes:', this.putStrikes);
-        console.log('Expiry Dates:', this.expiryDates);
       } catch (error) {
         console.error('Failed to fetch symbols:', error);
       }
