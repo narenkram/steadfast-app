@@ -9,7 +9,7 @@
             Dhan ID
             <span v-if="showDhanId" @click="toggleDhanIdVisibility">{{ dhanClientId || 'N/A' }}</span>
             <span v-else @click="toggleDhanIdVisibility">{{ maskDhanId(dhanClientId) }}</span>
-            <span class="badge bg-success">Active</span>
+            <span class="badge bg-success">Connected</span>
           </p>
         </div>
         <div class="col-3">
@@ -297,7 +297,8 @@ export default {
         BSE: ['FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
       }, // Predefined symbols for each exchange
       callStrikes: [],
-      putStrikes: []
+      putStrikes: [],
+      securityIds: {} // Store security IDs associated with symbols
     };
   },
   computed: {
@@ -359,15 +360,17 @@ export default {
 
         // Process each item in the response data
         response.data.forEach(item => {
-          const { tradingSymbol, drvExpiryDate } = item;
+          const { tradingSymbol, drvExpiryDate, securityId } = item;
 
           // Check if the trading symbol starts with the selected masterSymbol followed by a dash
           if (tradingSymbol.startsWith(this.masterSymbol + '-')) {
             // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
             if (tradingSymbol.includes('CE')) {
               this.callStrikes.push(tradingSymbol);
+              this.securityIds[tradingSymbol] = securityId; // Store security ID
             } else if (tradingSymbol.includes('PE')) {
               this.putStrikes.push(tradingSymbol);
+              this.securityIds[tradingSymbol] = securityId; // Store security ID
             }
             if (this.expiryDates.length > 0) {
               this.selectedExpiry = this.expiryDates[0];
@@ -468,7 +471,7 @@ export default {
       this.currentTransactionType = transactionType; // Update the transaction type
 
       const orderData = {
-        symbol: this.masterSymbol,
+        symbol: this.selectedCallStrike,
         quantity: this.selectedQuantity,
         orderType: this.selectedOrderType,
         productType: this.selectedProductType,
@@ -478,6 +481,7 @@ export default {
         drvOptionType: drvOptionType,
         exchangeSegment: this.exchangeSegment, // Ensure this is correctly referencing the data property
         drvExpiryDate: this.selectedExpiry,
+        securityId: this.securityIds[this.selectedCallStrike] // Include securityId here
       };
 
       console.log('Order Data:', orderData); // Log the order data to the console
