@@ -417,6 +417,7 @@ export default {
 
         // Optionally sort expiryDates if needed
         this.expiryDates.sort(); // Sorts dates in ascending order if they are in a standard format
+        this.selectedExpiry = this.expiryDates[0]; // Set the earliest date as default
         console.log('Filtered Call Strikes:', this.callStrikes);
         console.log('Filtered Put Strikes:', this.putStrikes);
         console.log('Expiry Dates:', this.expiryDates);
