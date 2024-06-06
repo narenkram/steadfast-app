@@ -346,6 +346,11 @@ export default {
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
       }
     },
+    selectedExpiry(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchSymbols(); // Refetch symbols when the selected expiry date changes
+      }
+    },
   },
   methods: {
     async fetchFundLimit() {
@@ -395,7 +400,8 @@ export default {
         const response = await axios.get(`http://localhost:3000/symbols`, {
           params: {
             selectedExchange: this.selectedExchange,
-            masterSymbol: this.masterSymbol
+            masterSymbol: this.masterSymbol,
+            drvExpiryDate: this.selectedExpiry // Include the selected expiry date in the request
           }
         });
 
