@@ -342,6 +342,11 @@ export default {
       if (newVal !== oldVal) {
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
       }
+    },
+    selectedExpiry(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.updateStrikes(); // Call updateStrikes to filter strikes based on the new selectedExpiry
+      }
     }
   },
   methods: {
@@ -389,22 +394,40 @@ export default {
         this.putStrikes = [];
         this.expiryDates = [];
 
+        // Month mapping
+        const monthMapping = {
+          '01': 'Jan',
+          '02': 'Feb',
+          '03': 'Mar',
+          '04': 'Apr',
+          '05': 'May',
+          '06': 'Jun',
+          '07': 'Jul',
+          '08': 'Aug',
+          '09': 'Sep',
+          '10': 'Oct',
+          '11': 'Nov',
+          '12': 'Dec'
+        };
+
         // Process each item in the response data
         response.data.forEach(item => {
           const { tradingSymbol, drvExpiryDate, securityId } = item;
 
+          // Extract the month and year from the expiry date
+          const expiryMonth = drvExpiryDate.slice(5, 7); // Extracts the month part
+          const expiryYear = drvExpiryDate.slice(0, 4); // Extracts the year part
+          const expiryMonthAbbr = monthMapping[expiryMonth]; // Get the month abbreviation
+
           // Check if the trading symbol starts with the selected masterSymbol followed by a dash
           if (tradingSymbol.startsWith(this.masterSymbol + '-')) {
             // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
-            if (tradingSymbol.includes('CE')) {
+            if (tradingSymbol.includes('CE') && tradingSymbol.includes(`${expiryMonthAbbr}${expiryYear}`)) {
               this.callStrikes.push(tradingSymbol);
               this.securityIds[tradingSymbol] = securityId; // Store security ID
-            } else if (tradingSymbol.includes('PE')) {
+            } else if (tradingSymbol.includes('PE') && tradingSymbol.includes(`${expiryMonthAbbr}${expiryYear}`)) {
               this.putStrikes.push(tradingSymbol);
               this.securityIds[tradingSymbol] = securityId; // Store security ID
-            }
-            if (this.expiryDates.length > 0) {
-              this.selectedExpiry = this.expiryDates[0];
             }
             // Add expiry date if it's not already in the array to avoid duplicates
             if (!this.expiryDates.includes(drvExpiryDate)) {
@@ -422,8 +445,8 @@ export default {
         if (this.putStrikes.length > 0) {
           this.selectedPutStrike = this.putStrikes[0];
         }
-        // console.log('Filtered Call Strikes:', this.callStrikes);
-        // console.log('Filtered Put Strikes:', this.putStrikes);
+        console.log('Filtered Call Strikes:', this.callStrikes);
+        console.log('Filtered Put Strikes:', this.putStrikes);
         console.log('Expiry Dates:', this.expiryDates);
       } catch (error) {
         console.error('Failed to fetch symbols:', error);
@@ -524,6 +547,28 @@ export default {
         console.error('Error placing order:', error); // Log any errors encountered
       }
     },
+    updateStrikes() {
+      const selectedExpiryMonth = this.selectedExpiry.slice(5, 7); // Extracts the month part
+      const selectedExpiryYear = this.selectedExpiry.slice(0, 4); // Extracts the year part
+      const monthMapping = {
+        '01': 'Jan',
+        '02': 'Feb',
+        '03': 'Mar',
+        '04': 'Apr',
+        '05': 'May',
+        '06': 'Jun',
+        '07': 'Jul',
+        '08': 'Aug',
+        '09': 'Sep',
+        '10': 'Oct',
+        '11': 'Nov',
+        '12': 'Dec'
+      };
+      const selectedExpiryMonthAbbr = monthMapping[selectedExpiryMonth]; // Get the month abbreviation
+
+      this.callStrikes = this.callStrikes.filter(strike => strike.includes(`${selectedExpiryMonthAbbr}${selectedExpiryYear}`));
+      this.putStrikes = this.putStrikes.filter(strike => strike.includes(`${selectedExpiryMonthAbbr}${selectedExpiryYear}`));
+    }
   },
 
 };
