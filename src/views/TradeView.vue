@@ -346,11 +346,6 @@ export default {
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
       }
     },
-    selectedExpiry(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.updateStrikes(); // Call updateStrikes to filter strikes based on the new selectedExpiry
-      }
-    }
   },
   methods: {
     async fetchFundLimit() {
@@ -538,28 +533,6 @@ export default {
         console.error('Error placing order:', error); // Log any errors encountered
       }
     },
-    updateStrikes() {
-      const selectedExpiryMonth = this.selectedExpiry.slice(5, 7); // Extracts the month part
-      const selectedExpiryYear = this.selectedExpiry.slice(0, 4); // Extracts the year part
-      const monthMapping = {
-        '01': 'Jan',
-        '02': 'Feb',
-        '03': 'Mar',
-        '04': 'Apr',
-        '05': 'May',
-        '06': 'Jun',
-        '07': 'Jul',
-        '08': 'Aug',
-        '09': 'Sep',
-        '10': 'Oct',
-        '11': 'Nov',
-        '12': 'Dec'
-      };
-      const selectedExpiryMonthAbbr = monthMapping[selectedExpiryMonth]; // Get the month abbreviation
-
-      this.callStrikes = this.callStrikes.filter(strike => strike.includes(`${selectedExpiryMonthAbbr}${selectedExpiryYear}`));
-      this.putStrikes = this.putStrikes.filter(strike => strike.includes(`${selectedExpiryMonthAbbr}${selectedExpiryYear}`));
-    }
   },
 
 };
