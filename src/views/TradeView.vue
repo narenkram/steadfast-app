@@ -332,12 +332,14 @@ export default {
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
     this.fetchSymbols();
     this.fetchPositions();
+    this.fetchAllExpiryDates(); // Fetch all expiry dates when component is mounted
   },
   watch: {
     selectedExchange(newVal, oldVal) {
       console.log('selectedExchange changed:', newVal);
       this.masterSymbols = this.exchangeSymbols[newVal] || [];
       this.masterSymbol = this.masterSymbols[0] || null;
+      this.fetchAllExpiryDates();
       this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes
     },
     masterSymbol(newVal, oldVal) {
@@ -387,6 +389,27 @@ export default {
       if (!this.isInitialized) {
         this.fetchSymbols();
         this.isInitialized = true;
+      }
+    },
+    async fetchAllExpiryDates() {
+      try {
+        const response = await axios.get(`http://localhost:3000/symbols`, {
+          params: {
+            selectedExchange: this.selectedExchange,
+            masterSymbol: this.masterSymbol
+          }
+        });
+
+        // Extract and store all unique expiry dates from the response
+        const allExpiryDates = new Set();
+        response.data.results.forEach(item => {
+          allExpiryDates.add(item.drvExpiryDate);
+        });
+
+        this.expiryDates = Array.from(allExpiryDates).sort(); // Convert Set to Array and sort
+        this.selectedExpiry = this.expiryDates[0]; // Optionally set the earliest date as default
+      } catch (error) {
+        console.error('Failed to fetch all expiry dates:', error);
       }
     },
     async fetchSymbols() {
