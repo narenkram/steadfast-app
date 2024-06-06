@@ -189,36 +189,11 @@
               <p class="mb-0"><b>Total Sell Value: </b>10,653</p>
             </div>
           </div>
-          <!-- <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">
-                  <input type="checkbox" id="selectAllPositions" class="form-check-input" />
-                </th>
-                <th scope="col">Symbol Name</th>
-                <th scope="col">Trade Side</th>
-                <th scope="col">Product Type</th>
-                <th scope="col">Qty</th>
-                <th scope="col">Executed Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td scope="row">
-                  <input type="checkbox" id="selectPosition" class="form-check-input" />
-                </td>
-                <td>BANKNIFTY 51700</td>
-                <td>{{ currentTransactionType }}</td>
-                <td>{{ selectedProductType }}</td>
-                <td>15</td>
-                <td>432</td>
-              </tr>
-            </tbody>
-          </table> -->
           <table class="table table-hover">
             <thead>
               <tr>
                 <th scope="col">Symbol Name</th>
+                <th scope="col">Trade Side</th>
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
                 <th scope="col">Net Qty</th>
@@ -231,6 +206,7 @@
             <tbody>
               <tr v-for="position in positions" :key="position.securityId">
                 <td>{{ position.tradingSymbol }}</td>
+                <td>{{ currentTransactionType }}</td>
                 <td>{{ position.positionType }}</td>
                 <td>{{ position.productType }}</td>
                 <td>{{ position.netQty }}</td>
