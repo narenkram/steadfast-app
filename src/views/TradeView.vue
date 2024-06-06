@@ -106,6 +106,7 @@
           <label for="Quantity" class="form-label mb-0">Quantity</label>
           <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
             <option value="15">15</option>
+            <option value="25">25</option>
             <option value="30">30</option>
             <option value="45">45</option>
           </select>
