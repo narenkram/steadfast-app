@@ -14,11 +14,11 @@
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Total Funds</b></p>
-          <p>₹ {{ fundLimits?.availabelBalance || 0 }}</p>
+          <p>₹ {{ fundLimits.availabelBalance || 0 }}</p>
         </div>
         <div class="col-3">
           <p class="mb-0"><b>Utilized Margin</b></p>
-          <p>₹ {{ fundLimits?.utilizedAmount || 0 }}</p>
+          <p>₹ {{ fundLimits.utilizedAmount || 0 }}</p>
         </div>
         <div class="col-2">
           <div class="d-flex align-items-center float-end">
@@ -36,7 +36,7 @@
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
-        <blockquote class="fs-3">₹ 653.25</blockquote>
+        <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
           ₹ 606.25 Net PNL Estimated (after all charges)
         </small>
@@ -44,8 +44,8 @@
     </div>
     <div class="col-lg-5">
       <div class="Card">
-        <blockquote class="fs-3">1.25% <small> on Total Capital</small></blockquote>
-        <small>10.5% on Deployed Capital</small>
+        <blockquote class="fs-3">{{ totalCapitalPercentage.toFixed(2) }}% <small> on Total Capital</small></blockquote>
+        <small>{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
     <div class="col-lg-2 d-flex justify-content-center align-items-center">
@@ -189,7 +189,7 @@
               <p class="mb-0"><b>Total Sell Value: </b>10,653</p>
             </div>
           </div>
-          <table class="table table-hover">
+          <!-- <table class="table table-hover">
             <thead>
               <tr>
                 <th scope="col">
@@ -212,6 +212,32 @@
                 <td>{{ selectedProductType }}</td>
                 <td>15</td>
                 <td>432</td>
+              </tr>
+            </tbody>
+          </table> -->
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Symbol Name</th>
+                <th scope="col">Position Type</th>
+                <th scope="col">Product Type</th>
+                <th scope="col">Net Qty</th>
+                <th scope="col">Buy Avg</th>
+                <th scope="col">Sell Avg</th>
+                <th scope="col">Realized Profit</th>
+                <th scope="col">Unrealized Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="position in positions" :key="position.securityId">
+                <td>{{ position.tradingSymbol }}</td>
+                <td>{{ position.positionType }}</td>
+                <td>{{ position.productType }}</td>
+                <td>{{ position.netQty }}</td>
+                <td>{{ position.buyAvg }}</td>
+                <td>{{ position.sellAvg }}</td>
+                <td>{{ position.realizedProfit }}</td>
+                <td>{{ position.unrealizedProfit }}</td>
               </tr>
             </tbody>
           </table>
@@ -299,13 +325,28 @@ export default {
       }, // Predefined symbols for each exchange
       callStrikes: [],
       putStrikes: [],
-      securityIds: {} // Store security IDs associated with symbols
+      securityIds: {}, // Store security IDs associated with symbols
+      positions: [] // Stores the positions fetched from the API
+
     };
   },
   computed: {
     ...mapGetters('auth', {
       token: GET_USER_TOKEN_GETTER,
     }),
+    totalProfit() {
+      return this.positions.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
+    },
+    totalCapitalPercentage() {
+      // Total Capital Percentage based on totalProfit and totalMoney
+      const totalMoney = (this.fundLimits.availabelBalance || 0) + (this.fundLimits.utilizedAmount || 0);
+      return (this.totalProfit / totalMoney) * 100;
+    },
+    deployedCapitalPercentage() {
+      // Deployed Capital Percentage based on totalProfit as a percentage of utilizedAmount
+      const utilizedAmount = this.fundLimits.utilizedAmount || 0;
+      return utilizedAmount ? (this.totalProfit / utilizedAmount) * 100 : 0;
+    }
   },
   mounted() {
     this.masterSymbols = this.exchangeSymbols[this.selectedExchange];
@@ -314,6 +355,7 @@ export default {
     this.fetchDhanClientId();
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
     this.fetchSymbols();
+    this.fetchPositions();
   },
   watch: {
     selectedExchange(newVal, oldVal) {
@@ -343,6 +385,18 @@ export default {
         console.log('Dhan Client ID:', data.dhanClientId);
       } catch (error) {
         console.error('Error fetching Dhan Client ID:', error);
+      }
+    },
+    async fetchPositions() {
+      try {
+        const response = await axios.get('http://localhost:3000/positions');
+        console.log('Fetched positions:', response.data); // Log the fetched data
+        this.positions = response.data; // Store the fetched data in the positions data property
+        console.log('Updated positions:', this.positions); // Log the updated positions data property
+      } catch (error) {
+        console.error('Error fetching positions:', error);
+        this.toastMessage = 'Failed to fetch positions';
+        this.showToast = true;
       }
     },
     async fetchSymbols() {
@@ -392,8 +446,8 @@ export default {
         if (this.putStrikes.length > 0) {
           this.selectedPutStrike = this.putStrikes[0];
         }
-        console.log('Filtered Call Strikes:', this.callStrikes);
-        console.log('Filtered Put Strikes:', this.putStrikes);
+        // console.log('Filtered Call Strikes:', this.callStrikes);
+        // console.log('Filtered Put Strikes:', this.putStrikes);
         console.log('Expiry Dates:', this.expiryDates);
       } catch (error) {
         console.error('Failed to fetch symbols:', error);
