@@ -335,8 +335,10 @@ export default {
   },
   watch: {
     selectedExchange(newVal, oldVal) {
+      console.log('Selected Exchange:watch running', newVal);
       this.masterSymbols = this.exchangeSymbols[newVal] || [];
       this.masterSymbol = this.masterSymbols[0] || null;
+      this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes
     },
     masterSymbol(newVal, oldVal) {
       if (newVal !== oldVal) {
@@ -410,29 +412,15 @@ export default {
           '12': 'Dec'
         };
 
-        // Process each item in the response data
-        response.data.forEach(item => {
-          const { tradingSymbol, drvExpiryDate, securityId } = item;
+        // Update callStrikes and putStrikes directly from the response
+        this.callStrikes = response.data.callStrikes.map(item => item.tradingSymbol);
+        this.putStrikes = response.data.putStrikes.map(item => item.tradingSymbol);
 
-          // Extract the month and year from the expiry date
-          const expiryMonth = drvExpiryDate.slice(5, 7); // Extracts the month part
-          const expiryYear = drvExpiryDate.slice(0, 4); // Extracts the year part
-          const expiryMonthAbbr = monthMapping[expiryMonth]; // Get the month abbreviation
-
-          // Check if the trading symbol starts with the selected masterSymbol followed by a dash
-          if (tradingSymbol.startsWith(this.masterSymbol + '-')) {
-            // Check if the trading symbol contains 'CE' or 'PE' and push to respective arrays
-            if (tradingSymbol.includes('CE') && tradingSymbol.includes(`${expiryMonthAbbr}${expiryYear}`)) {
-              this.callStrikes.push(tradingSymbol);
-              this.securityIds[tradingSymbol] = securityId; // Store security ID
-            } else if (tradingSymbol.includes('PE') && tradingSymbol.includes(`${expiryMonthAbbr}${expiryYear}`)) {
-              this.putStrikes.push(tradingSymbol);
-              this.securityIds[tradingSymbol] = securityId; // Store security ID
-            }
-            // Add expiry date if it's not already in the array to avoid duplicates
-            if (!this.expiryDates.includes(drvExpiryDate)) {
-              this.expiryDates.push(drvExpiryDate);
-            }
+        // Extract expiry dates from callStrikes for simplicity
+        response.data.callStrikes.forEach(item => {
+          const expiryDate = item.drvExpiryDate;
+          if (!this.expiryDates.includes(expiryDate)) {
+            this.expiryDates.push(expiryDate);
           }
         });
 
