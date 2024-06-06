@@ -38,7 +38,7 @@
       <div class="Card">
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
-          ₹ 606.25 Net PNL Estimated (after all charges)
+          ₹ ** Net PNL Estimated (after all charges)
         </small>
       </div>
     </div>
