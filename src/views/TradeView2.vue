@@ -41,7 +41,7 @@
             </option>
           </select>
           <div>
-            Selected Security ID: {{ selectedCallStrike.securityId || 'Select a strike' }}
+            Selected Security ID: {{ defaultCallSecurityId }}
           </div>
           <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy CE</button>
           <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell CE</button>
@@ -56,7 +56,7 @@
             </option>
           </select>
           <div>
-            Selected Security ID: {{ selectedPutStrike.securityId || 'Select a strike' }}
+            Selected Security ID: {{ defaultPutSecurityId }}
           </div>
           <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2">Buy PE</button>
           <button class="btn btn-lg btn-outline-danger fs-5 w-100">Sell PE</button>
@@ -83,7 +83,8 @@ export default {
       },
       callStrikes: [],
       putStrikes: [],
-      expiryDates: []
+      expiryDates: [],
+      synchronizeOnLoad: true, // Flag to control synchronization behavior
     };
   },
   methods: {
@@ -114,35 +115,43 @@ export default {
       }
 
       // Automatically set the security IDs for the default selected strikes
-      this.defaultCallSecurityId = this.getSecurityId(this.callStrikes, this.selectedCallStrike);
-      this.defaultPutSecurityId = this.getSecurityId(this.putStrikes, this.selectedPutStrike);
+      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
+      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
+
+      this.synchronizeOnLoad = true; // Enable synchronization after data is loaded
+      this.updateStrikesForExpiry(this.selectedExpiry); // Initial update with synchronization
     },
     getSecurityId(strikes, strike) {
       return strike ? strike.securityId : 'N/A';
     },
     updateStrikesForExpiry(expiryDate) {
-      // Filter call and put strikes based on the selected expiry date
       const filteredCallStrikes = this.callStrikes.filter(strike => strike.expiryDate === expiryDate);
       const filteredPutStrikes = this.putStrikes.filter(strike => strike.expiryDate === expiryDate);
 
-      // Attempt to find the previously selected trading symbol in the new filtered list
       const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === this.selectedCallStrike.tradingSymbol);
       const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === this.selectedPutStrike.tradingSymbol);
 
-      // Update the selected strikes only if the same trading symbol is found in the new expiry date
       if (foundCallStrike) {
         this.selectedCallStrike = foundCallStrike;
       } else {
-        // Optionally reset or set to the first available strike for the new expiry
-        this.selectedCallStrike = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : null;
+        this.selectedCallStrike = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
       }
 
       if (foundPutStrike) {
         this.selectedPutStrike = foundPutStrike;
       } else {
-        // Optionally reset or set to the first available strike for the new expiry
-        this.selectedPutStrike = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : null;
+        this.selectedPutStrike = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
       }
+
+      if (this.synchronizeOnLoad) {
+        this.synchronizeStrikes(); // Synchronize only if the flag is true
+        this.synchronizeOnLoad = false; // Turn off synchronization after the initial load
+      }
+    },
+    synchronizeStrikes() {
+      // Synchronize call and put strikes based on the current selection
+      this.synchronizeCallStrikes();
+      this.synchronizePutStrikes();
     },
     synchronizeCallStrikes() {
       if (this.selectedPutStrike) {
@@ -153,9 +162,10 @@ export default {
         if (matchingCallStrike) {
           this.selectedCallStrike = matchingCallStrike;
         } else {
-          this.selectedCallStrike = null; // or set to a default if necessary
+          this.selectedCallStrike = {};
         }
       }
+      this.updateSecurityIds();
     },
     synchronizePutStrikes() {
       if (this.selectedCallStrike) {
@@ -166,24 +176,28 @@ export default {
         if (matchingPutStrike) {
           this.selectedPutStrike = matchingPutStrike;
         } else {
-          this.selectedPutStrike = null; // or set to a default if necessary
+          this.selectedPutStrike = {};
         }
       }
+      this.updateSecurityIds();
+    },
+    updateSecurityIds() {
+      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
+      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
     }
   },
   watch: {
     selectedExpiry(newExpiry) {
-      // Filter strikes by the new expiry date
       this.updateStrikesForExpiry(newExpiry);
     },
     selectedCallStrike(newStrike, oldStrike) {
-      if (newStrike !== oldStrike) {
-        this.synchronizePutStrikes();
+      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
+        this.updateSecurityIds();
       }
     },
     selectedPutStrike(newStrike, oldStrike) {
-      if (newStrike !== oldStrike) {
-        this.synchronizeCallStrikes();
+      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
+        this.updateSecurityIds();
       }
     }
   },
