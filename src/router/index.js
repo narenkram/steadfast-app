@@ -63,22 +63,28 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (
-    'auth' in to.meta &&
-    to.meta.auth &&
-    !store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
-  ) {
-    next('/login')
-  }
-  else if (
-    'auth' in to.meta &&
-    !to.meta.auth &&
-    store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
-  ) {
-    next('/trade-view')
+  // Temporary flag to disable auth for development
+  const isDevelopment = true; // Set this to false to re-enable auth checks
+
+  if (!isDevelopment) {
+    if (
+      'auth' in to.meta &&
+      to.meta.auth &&
+      !store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
+    ) {
+      next('/login');
+    } else if (
+      'auth' in to.meta &&
+      !to.meta.auth &&
+      store.getters[`auth/${IS_USER_AUTHENTICATED_GETTER}`]
+    ) {
+      next('/trade-view');
+    } else {
+      next();
+    }
   } else {
-    next()
+    next(); // Bypass all auth checks in development mode
   }
-})
+});
 
 export default router
