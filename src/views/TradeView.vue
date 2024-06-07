@@ -183,18 +183,17 @@
           tabindex="0">
           <div class="row align-items-center">
             <div class="col-6 text-center py-2">
-              <p class="mb-0"><b>Net Qty: </b>0</p>
+              <p class="mb-0"><b>Net Qty: </b>{{ totalNetQty }}</p>
             </div>
             <div class="col-6 text-center py-2">
-              <p class="mb-0"><b>Total Buy Value: </b>10,000</p>
-              <p class="mb-0"><b>Total Sell Value: </b>10,653</p>
+              <p class="mb-0"><b>Total Buy Value: </b>x</p>
+              <p class="mb-0"><b>Total Sell Value: </b>x</p>
             </div>
           </div>
           <table class="table table-hover">
             <thead>
               <tr>
                 <th scope="col">Symbol Name</th>
-                <th scope="col">Trade Side</th>
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
                 <th scope="col">Net Qty</th>
@@ -207,7 +206,6 @@
             <tbody>
               <tr v-for="position in positions" :key="position.securityId">
                 <td>{{ position.tradingSymbol }}</td>
-                <td>{{ currentTransactionType }}</td>
                 <td>{{ position.positionType }}</td>
                 <td>{{ position.productType }}</td>
                 <td>{{ position.netQty }}</td>
@@ -310,6 +308,9 @@ export default {
     ...mapGetters('auth', {
       token: GET_USER_TOKEN_GETTER,
     }),
+    totalNetQty() {
+      return this.positions.reduce((total, position) => total + position.netQty, 0);
+    },
     totalProfit() {
       return this.positions.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
     },
@@ -405,6 +406,8 @@ export default {
         // Filter out dates that are before today's date
         const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
         this.expiryDates = Array.from(allExpiryDates).filter(date => date >= today).sort();
+
+        console.log('Filtered expiryDates:', this.expiryDates);
 
         // Set the earliest valid date as default
         this.selectedExpiry = this.expiryDates[0] || null;
