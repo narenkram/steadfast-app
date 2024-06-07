@@ -330,17 +330,16 @@ export default {
     this.fetchFundLimit();
     this.fetchDhanClientId();
     this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
-    this.fetchSymbols();
     this.fetchPositions();
-    this.fetchAllExpiryDates(); // Fetch all expiry dates when component is mounted
   },
   watch: {
     selectedExchange(newVal, oldVal) {
-      console.log('selectedExchange changed:', newVal);
-      this.masterSymbols = this.exchangeSymbols[newVal] || [];
-      this.masterSymbol = this.masterSymbols[0] || null;
-      this.fetchAllExpiryDates();
-      this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes
+      if (newVal !== oldVal) {
+        console.log('selectedExchange changed:', newVal);
+        this.masterSymbols = this.exchangeSymbols[newVal] || [];
+        this.masterSymbol = this.masterSymbols[0] || null;
+      }
+
     },
     masterSymbol(newVal, oldVal) {
       console.log('masterSymbol changed:', newVal);
@@ -350,7 +349,7 @@ export default {
     },
     selectedExpiry(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchSymbols(); // Refetch symbols when the selected expiry date changes
+        this.fetchAllExpiryDates(); // Refetch symbols when the selected expiry date changes
       }
     },
   },
