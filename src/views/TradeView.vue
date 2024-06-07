@@ -342,8 +342,8 @@ export default {
 
     },
     masterSymbol(newVal, oldVal) {
-      console.log('masterSymbol changed:', newVal);
       if (newVal !== oldVal) {
+        console.log('masterSymbol changed:', newVal);
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
         this.fetchAllExpiryDates();
       }
@@ -402,17 +402,12 @@ export default {
           allExpiryDates.add(item.drvExpiryDate);
         });
 
-        // Extract expiry dates from callStrikes for simplicity
-        response.data.callStrikes.forEach(item => {
-          const expiryDate = item.drvExpiryDate;
-          if (!this.expiryDates.includes(expiryDate)) {
-            this.expiryDates.push(expiryDate);
-          }
-        });
-        console.log('Expiry Dates:', this.expiryDates);
+        // Filter out dates that are before today's date
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        this.expiryDates = Array.from(allExpiryDates).filter(date => date >= today).sort();
 
-        this.expiryDates = Array.from(allExpiryDates).sort(); // Convert Set to Array and sort
-        this.selectedExpiry = this.expiryDates[0]; // Set the earliest date as default
+        // Set the earliest valid date as default
+        this.selectedExpiry = this.expiryDates[0] || null;
 
       } catch (error) {
         console.error('Failed to fetch all expiry dates:', error);
