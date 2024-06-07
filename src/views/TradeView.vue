@@ -166,7 +166,8 @@
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
-            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true">Positions</button>
+            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
+            @click="fetchPositions">Positions</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
@@ -303,7 +304,6 @@ export default {
       putStrikes: [],
       securityIds: {}, // Store security IDs associated with symbols
       positions: [], // Stores the positions fetched from the API
-      isInitialized: false,
     };
   },
   computed: {
@@ -345,11 +345,12 @@ export default {
       console.log('masterSymbol changed:', newVal);
       if (newVal !== oldVal) {
         this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
+        this.fetchAllExpiryDates();
       }
     },
     selectedExpiry(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchAllExpiryDates(); // Refetch symbols when the selected expiry date changes
+        console.log('Selected Expiry:', newVal);
       }
     },
   },
@@ -384,18 +385,14 @@ export default {
         this.showToast = true;
       }
     },
-    initializeData() {
-      if (!this.isInitialized) {
-        this.fetchSymbols();
-        this.isInitialized = true;
-      }
-    },
     async fetchAllExpiryDates() {
+      this.expiryDates = [];
       try {
         const response = await axios.get(`http://localhost:3000/symbols`, {
           params: {
             selectedExchange: this.selectedExchange,
-            masterSymbol: this.masterSymbol
+            masterSymbol: this.masterSymbol,
+            drvExpiryDate: this.selectedExpiry // Include the selected expiry date in the request
           }
         });
 
@@ -405,8 +402,18 @@ export default {
           allExpiryDates.add(item.drvExpiryDate);
         });
 
+        // Extract expiry dates from callStrikes for simplicity
+        response.data.callStrikes.forEach(item => {
+          const expiryDate = item.drvExpiryDate;
+          if (!this.expiryDates.includes(expiryDate)) {
+            this.expiryDates.push(expiryDate);
+          }
+        });
+        console.log('Expiry Dates:', this.expiryDates);
+
         this.expiryDates = Array.from(allExpiryDates).sort(); // Convert Set to Array and sort
-        this.selectedExpiry = this.expiryDates[0]; // Optionally set the earliest date as default
+        this.selectedExpiry = this.expiryDates[0]; // Set the earliest date as default
+
       } catch (error) {
         console.error('Failed to fetch all expiry dates:', error);
       }
@@ -415,7 +422,6 @@ export default {
       // Reset arrays before fetching new data
       this.callStrikes = [];
       this.putStrikes = [];
-      this.expiryDates = [];
       this.securityIds = {}; // Reset securityIds
 
       try {
@@ -423,7 +429,6 @@ export default {
           params: {
             selectedExchange: this.selectedExchange,
             masterSymbol: this.masterSymbol,
-            drvExpiryDate: this.selectedExpiry // Include the selected expiry date in the request
           }
         });
 
@@ -438,20 +443,8 @@ export default {
           return item.tradingSymbol;
         });
 
-        // Extract expiry dates from callStrikes for simplicity
-        response.data.callStrikes.forEach(item => {
-          const expiryDate = item.drvExpiryDate;
-          if (!this.expiryDates.includes(expiryDate)) {
-            this.expiryDates.push(expiryDate);
-          }
-        });
-
-        // Optionally sort expiryDates if needed
-        this.expiryDates.sort(); // Sorts dates in ascending order if they are in a standard format
-        this.selectedExpiry = this.expiryDates[0]; // Set the earliest date as default
         console.log('Filtered Call Strikes:', this.callStrikes);
         console.log('Filtered Put Strikes:', this.putStrikes);
-        console.log('Expiry Dates:', this.expiryDates);
         // Set default selected values
         if (this.callStrikes.length > 0) {
           this.selectedCallStrike = this.callStrikes[0];
@@ -539,17 +532,17 @@ export default {
       const securityId = this.securityIds[selectedStrike];
 
       const orderData = {
-        symbol: selectedStrike,
-        quantity: this.selectedQuantity,
-        orderType: this.selectedOrderType,
-        productType: this.selectedProductType,
-        price: 10,
-        validity: 'DAY',
         transactionType: transactionType,
-        drvOptionType: drvOptionType,
         exchangeSegment: this.exchangeSegment, // Ensure this is correctly referencing the data property
+        productType: this.selectedProductType,
+        orderType: this.selectedOrderType,
+        validity: "DAY",
+        symbol: selectedStrike,
+        securityId: securityId, // Include securityId here
+        quantity: this.selectedQuantity,
+        price: 10,
         drvExpiryDate: this.selectedExpiry,
-        securityId: securityId // Include securityId here
+        drvOptionType: drvOptionType,
       };
 
       console.log('Order Data:', orderData); // Log the order data to the console
