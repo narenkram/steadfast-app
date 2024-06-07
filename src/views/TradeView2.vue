@@ -37,7 +37,7 @@
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
             <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.tradingSymbol }} - {{ strike.expiryDate }}
+              {{ strike.tradingSymbol }}
             </option>
           </select>
           <div>
@@ -52,7 +52,7 @@
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
             <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.tradingSymbol }} - {{ strike.expiryDate }}
+              {{ strike.tradingSymbol }}
             </option>
           </select>
           <div>
@@ -90,11 +90,19 @@ export default {
     async fetchTradingData() {
       const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
       const data = await response.json();
-      this.callStrikes = data.callStrikes;
-      this.putStrikes = data.putStrikes;
-      this.expiryDates = data.expiryDates;
 
-      // Set default values for strikes and expiry if available
+      // Sort expiry dates
+      this.expiryDates = data.expiryDates.sort((a, b) => new Date(a) - new Date(b));
+
+      // Sort call and put strikes by expiry date and then by trading symbol
+      this.callStrikes = data.callStrikes.sort((a, b) => {
+        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+      });
+      this.putStrikes = data.putStrikes.sort((a, b) => {
+        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+      });
+
+      // Set default values if available
       if (this.callStrikes.length > 0) {
         this.selectedCallStrike = this.callStrikes[0];
       }
@@ -114,8 +122,53 @@ export default {
     },
     updateStrikesForExpiry(expiryDate) {
       // Filter call and put strikes based on the selected expiry date
-      this.selectedCallStrike = this.callStrikes.filter(strike => strike.expiryDate === expiryDate)[0] || {};
-      this.selectedPutStrike = this.putStrikes.filter(strike => strike.expiryDate === expiryDate)[0] || {};
+      const filteredCallStrikes = this.callStrikes.filter(strike => strike.expiryDate === expiryDate);
+      const filteredPutStrikes = this.putStrikes.filter(strike => strike.expiryDate === expiryDate);
+
+      // Attempt to find the previously selected trading symbol in the new filtered list
+      const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === this.selectedCallStrike.tradingSymbol);
+      const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === this.selectedPutStrike.tradingSymbol);
+
+      // Update the selected strikes only if the same trading symbol is found in the new expiry date
+      if (foundCallStrike) {
+        this.selectedCallStrike = foundCallStrike;
+      } else {
+        // Optionally reset or set to the first available strike for the new expiry
+        this.selectedCallStrike = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : null;
+      }
+
+      if (foundPutStrike) {
+        this.selectedPutStrike = foundPutStrike;
+      } else {
+        // Optionally reset or set to the first available strike for the new expiry
+        this.selectedPutStrike = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : null;
+      }
+    },
+    synchronizeCallStrikes() {
+      if (this.selectedPutStrike) {
+        const baseSymbol = this.selectedPutStrike.tradingSymbol.replace(/-PE$/, '');
+        const matchingCallStrike = this.callStrikes.find(strike =>
+          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-CE')
+        );
+        if (matchingCallStrike) {
+          this.selectedCallStrike = matchingCallStrike;
+        } else {
+          this.selectedCallStrike = null; // or set to a default if necessary
+        }
+      }
+    },
+    synchronizePutStrikes() {
+      if (this.selectedCallStrike) {
+        const baseSymbol = this.selectedCallStrike.tradingSymbol.replace(/-CE$/, '');
+        const matchingPutStrike = this.putStrikes.find(strike =>
+          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-PE')
+        );
+        if (matchingPutStrike) {
+          this.selectedPutStrike = matchingPutStrike;
+        } else {
+          this.selectedPutStrike = null; // or set to a default if necessary
+        }
+      }
     }
   },
   watch: {
@@ -123,13 +176,15 @@ export default {
       // Filter strikes by the new expiry date
       this.updateStrikesForExpiry(newExpiry);
     },
-    selectedCallStrike(newStrike) {
-      // Update security ID for the selected call strike
-      this.defaultCallSecurityId = this.getSecurityId(this.callStrikes, newStrike);
+    selectedCallStrike(newStrike, oldStrike) {
+      if (newStrike !== oldStrike) {
+        this.synchronizePutStrikes();
+      }
     },
-    selectedPutStrike(newStrike) {
-      // Update security ID for the selected put strike
-      this.defaultPutSecurityId = this.getSecurityId(this.putStrikes, newStrike);
+    selectedPutStrike(newStrike, oldStrike) {
+      if (newStrike !== oldStrike) {
+        this.synchronizeCallStrikes();
+      }
     }
   },
   mounted() {
