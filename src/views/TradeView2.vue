@@ -7,8 +7,8 @@
           <label for="Exchange" class="form-label mb-0">Exchange</label>
           <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
             @change="fetchTradingData">
-            <option value="NSE">NSE</option>
-            <option value="BSE">BSE</option>
+            <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{ exchange }}
+            </option>
           </select>
         </div>
 
@@ -27,6 +27,14 @@
           <label for="Expiry" class="form-label mb-0">Expiry Date</label>
           <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
             <option v-for="date in expiryDates" :key="date" :value="date">{{ date }}</option>
+          </select>
+        </div>
+
+        <!-- Quantity Selection -->
+        <div class="col-2">
+          <label for="Quantity" class="form-label mb-0">Quantity</label>
+          <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
+            <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}</option>
           </select>
         </div>
       </div>
@@ -79,12 +87,23 @@ export default {
       defaultPutSecurityId: null,
       exchangeSymbols: {
         NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-        BSE: ['SENSEX', 'BANKEX']
+        BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
       },
       callStrikes: [],
       putStrikes: [],
       expiryDates: [],
       synchronizeOnLoad: true, // Flag to control synchronization behavior
+      quantities: {
+        NIFTY: [25],
+        BANKNIFTY: [15],
+        FINNIFTY: [40],
+        MIDCPNIFTY: [75],
+        NIFTYNXT50: [10],
+        SENSEX: [10],
+        BANKEX: [15],
+        SENSEX50: [25]
+      },
+      availableQuantities: []
     };
   },
   methods: {
@@ -184,6 +203,12 @@ export default {
     updateSecurityIds() {
       this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
       this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
+    },
+    updateAvailableQuantities() {
+      this.availableQuantities = this.quantities[this.selectedMasterSymbol];
+      if (!this.availableQuantities.includes(this.selectedQuantity)) {
+        this.selectedQuantity = this.availableQuantities[0];
+      }
     }
   },
   watch: {
@@ -199,10 +224,22 @@ export default {
       if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
         this.updateSecurityIds();
       }
+    },
+    selectedMasterSymbol(newSymbol) {
+      this.updateAvailableQuantities();
+    },
+    selectedExchange(newExchange) {
+      if (this.exchangeSymbols[newExchange].length > 0) {
+        this.selectedMasterSymbol = this.exchangeSymbols[newExchange][0];
+      } else {
+        this.selectedMasterSymbol = null; // Handle case where no symbols are available
+      }
+      this.updateAvailableQuantities(); // Update quantities based on the new master symbol
     }
   },
   mounted() {
     this.fetchTradingData();
+    this.updateAvailableQuantities(); // Set initial quantities based on the default selectedMasterSymbol
   }
 };
 </script>
