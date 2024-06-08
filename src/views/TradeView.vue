@@ -88,7 +88,9 @@
         <div class="col-2">
           <label for="Expiry" class="form-label mb-0">Expiry Date</label>
           <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
-            <option v-for="date in expiryDates" :key="date" :value="date">{{ date }}</option>
+            <option v-for="date in expiryDates" :key="date" :value="date">
+              {{ formatDate(date) }}
+            </option>
           </select>
         </div>
 
@@ -127,7 +129,7 @@
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
             <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.tradingSymbol }}
+              {{ formatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -152,7 +154,7 @@
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
             <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.tradingSymbol }}
+              {{ formatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -485,6 +487,19 @@ export default {
       if (!this.availableQuantities.includes(this.selectedQuantity)) {
         this.selectedQuantity = this.availableQuantities[0];
       }
+    },
+    formatTradingSymbol(symbol) {
+      // Split the symbol by '-' and remove the date part and the last part after the strike price
+      let parts = symbol.split('-');
+      if (parts.length > 3) {
+        // Rejoin the parts excluding the date and the last segment
+        return `${parts[0]} ${parts[2]} ${parts[3]}`;
+      }
+      return symbol; // Return the original symbol if it doesn't match the expected format
+    },
+    formatDate(dateString) {
+      // Extract only the date part from the date string
+      return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
     },
     // releated to scrip master
 
