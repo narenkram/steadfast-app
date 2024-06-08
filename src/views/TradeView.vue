@@ -389,8 +389,10 @@ export default {
       const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
       const data = await response.json();
 
-      // Sort expiry dates
-      this.expiryDates = data.expiryDates.sort((a, b) => new Date(a) - new Date(b));
+      const today = new Date();
+      this.expiryDates = data.expiryDates
+        .filter(date => new Date(date.split(' ')[0]) >= today) // Filter out dates before today
+        .sort((a, b) => new Date(a) - new Date(b)); // Sort dates in ascending order
 
       // Sort call and put strikes by expiry date and then by trading symbol
       this.callStrikes = data.callStrikes.sort((a, b) => {
