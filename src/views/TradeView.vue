@@ -321,7 +321,7 @@ export default {
       selectedOrderType: 'MARKET',
       orderTypes: ['MARKET', 'LIMIT'],
       selectedProductType: 'INTRADAY',
-      productTypes: ['INTRADAY', 'DAY']
+      productTypes: ['INTRADAY', 'MARGIN']
     };
   },
   computed: {
