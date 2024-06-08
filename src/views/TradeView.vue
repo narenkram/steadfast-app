@@ -320,7 +320,7 @@ export default {
       availableQuantities: [],
       selectedOrderType: 'MARKET',
       orderTypes: ['MARKET', 'LIMIT'],
-      selectedProductType: 'INTRADAY',
+      selectedProductType: 'MARGIN',
       productTypes: ['INTRADAY', 'MARGIN']
     };
   },
@@ -647,8 +647,15 @@ export default {
         const response = await axios.post('http://localhost:3000/placeOrder', orderData);
         console.log("Order placed successfully:", response.data);
       } catch (error) {
-        console.error("Error placing order:", error);
-        this.toastMessage = 'Failed to place order';
+        // Check if the error has a response and a message, then display it
+        if (error.response && error.response.data && error.response.data.message) {
+          // Split the message and take only the first three words
+          const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
+          this.toastMessage = firstThreeWords;
+        } else {
+          // Fallback if the error does not contain the expected format
+          this.toastMessage = 'Failed to place order';
+        }
         this.showToast = true;
       }
     },
