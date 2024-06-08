@@ -46,8 +46,7 @@ const router = createRouter({
       meta: {
         auth: true
       }
-    }
-
+    },
 
     // {
     //   path: '/account',
