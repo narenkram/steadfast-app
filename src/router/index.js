@@ -6,7 +6,6 @@ import AccountView from '../views/AccountView.vue'
 import TradeView from '../views/TradeView.vue'
 import store from '../stores/store'
 import { IS_USER_AUTHENTICATED_GETTER } from '@/stores/storeconstants'
-import TradeView2 from '../views/TradeView2.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,14 +43,6 @@ const router = createRouter({
       path: '/trade-view',
       name: 'trade-view',
       component: TradeView,
-      meta: {
-        auth: true
-      }
-    },
-    {
-      path: '/trade-view2',
-      name: 'trade-view2',
-      component: TradeView2,
       meta: {
         auth: true
       }

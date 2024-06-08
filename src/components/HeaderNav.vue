@@ -21,9 +21,6 @@
         <li class="nav-item ms-2" v-if="isUserAuthenticated">
           <RouterLink class="nav-link" to="/trade-view">TradeView</RouterLink>
         </li>
-        <li class="nav-item ms-2">
-          <RouterLink class="nav-link" to="/trade-view2">TradeView2</RouterLink>
-        </li>
       </ul>
     </div>
   </nav>

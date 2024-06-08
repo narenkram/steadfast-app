@@ -65,30 +65,30 @@
         <!-- Exchange Selection -->
         <div class="col-2">
           <label for="Exchange" class="form-label mb-0">Exchange</label>
-          <select id="Exchange" class="form-select" v-model="selectedExchange" @change="updateInstruments"
-            aria-label="Exchange">
-            <option value="NSE">NSE</option>
-            <option value="BSE">BSE</option>
+          <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
+            @change="fetchTradingData">
+            <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
+              exchange }}
+            </option>
           </select>
         </div>
 
         <!-- Master Symbol Selection -->
         <div class="col-2">
           <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
-          <select class="form-select" v-model="masterSymbol" aria-label="Master Symbol" id="MasterSymbol">
-            <option v-for="symbol in masterSymbols" :key="symbol" :value="symbol">
-              {{ symbol }}
+          <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
+            @change="fetchTradingData">
+            <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">{{
+              symbol }}
             </option>
           </select>
         </div>
 
         <!-- Expiry Date Selection -->
         <div class="col-2">
-          <label for="Expiry" class="form-label mb-0">Expiry</label>
-          <select id="Expiry" class="form-select" v-model="selectedExpiry" aria-label="Expiry">
-            <option v-for="date in expiryDates" :key="date" :value="date">
-              {{ date }}
-            </option>
+          <label for="Expiry" class="form-label mb-0">Expiry Date</label>
+          <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
+            <option v-for="date in expiryDates" :key="date" :value="date">{{ date }}</option>
           </select>
         </div>
 
@@ -96,8 +96,9 @@
         <div class="col-2">
           <label for="ProductType" class="form-label mb-0">Product Type</label>
           <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
-            <option value="INTRADAY">Intraday</option>
-            <option value="MARGIN">Margin</option>
+            <option v-for="productType in productTypes" :key="productType" :value="productType">{{
+              productType }}
+            </option>
           </select>
         </div>
 
@@ -105,10 +106,8 @@
         <div class="col-2">
           <label for="Quantity" class="form-label mb-0">Quantity</label>
           <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
-            <option value="15">15</option>
-            <option value="25">25</option>
-            <option value="30">30</option>
-            <option value="45">45</option>
+            <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
+            </option>
           </select>
         </div>
 
@@ -116,8 +115,8 @@
         <div class="col-2">
           <label for="OrderType" class="form-label mb-0">Order Type</label>
           <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType">
-            <option value="Market">Market</option>
-            <option value="Limit">Limit</option>
+            <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
+            </option>
           </select>
         </div>
       </div>
@@ -126,18 +125,21 @@
         <!-- Call Strike Selection -->
         <div class="col-3">
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
-          <select id="CallStrike" class="form-select" v-model="selectedCallStrike" aria-label="Call Strike">
-            <option v-for="(strike, index) in callStrikes" :key="`${strike}-${index}`" :value="strike">
-              {{ strike }}
+          <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
+            <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
+              {{ strike.tradingSymbol }}
             </option>
           </select>
+          <div>
+            Selected Security ID: {{ defaultCallSecurityId }}
+          </div>
           <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'CALL')">Buy
             CE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'CALL')">Sell CE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'CALL')">Sell
+            CE</button>
         </div>
 
         <div class="col-3 text-center">
-
           <br />
           <p class="mb-0">Nifty Bank</p>
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
@@ -148,14 +150,18 @@
         <!-- Put Strike Selection -->
         <div class="col-3">
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
-          <select id="PutStrike" class="form-select" v-model="selectedPutStrike" aria-label="Put Strike">
-            <option v-for="(strike, index) in putStrikes" :key="`${strike}-${index}`" :value="strike">
-              {{ strike }}
+          <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
+            <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
+              {{ strike.tradingSymbol }}
             </option>
           </select>
+          <div>
+            Selected Security ID: {{ defaultPutSecurityId }}
+          </div>
           <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'PUT')">Buy
             PE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'PUT')">Sell PE</button>
+          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'PUT')">Sell
+            PE</button>
         </div>
       </div>
     </form>
@@ -268,7 +274,7 @@ import ToastAlert from '../components/ToastAlert.vue';
 
 export default {
   components: {
-    ToastAlert
+    ToastAlert,
   },
   data() {
     return {
@@ -278,30 +284,42 @@ export default {
       toastMessage: '', // Message displayed in the toast
       killSwitchActive: false, // Initial state of the kill switch
       orders: [], // Define orders as an empty array initially
-      selectedExchange: 'NSE',
-      masterSymbols: [], // Initialize masterSymbols as an empty array
-      exchangeSegment: null, // Initialize exchangeSegment
-      masterSymbol: null, // Initialize master instrument as null
-      selectedExpiry: null, // Initialize selected expiry as null
-      selectedCallStrike: null, // Initialize selected call strike as null
-      selectedPutStrike: null, // Initialize selected put strike as null
-      instruments: [], // Initialize instruments as an empty array
-      expiryDates: [], // Initialize expiry dates as an empty array
-      strikes: [], // Initialize strikes as an empty array
-      selectedProductType: 'INTRADAY',
-      selectedQuantity: 15, // Initialize selected quantity as null
-      selectedOrderType: 'Market', // Initialize selected order type as null
       currentTransactionType: '', // This will store either 'BUY' or 'SELL'
       // New properties
       showDhanId: false, // Controls the visibility of the Dhan ID
+      positions: [], // Stores the positions fetched from the API
+
+      selectedExchange: 'NSE',
+      selectedMasterSymbol: 'NIFTY',
+      selectedQuantity: null,
+      selectedExpiry: null,
+      selectedCallStrike: {},
+      selectedPutStrike: {},
+      defaultCallSecurityId: null,
+      defaultPutSecurityId: null,
       exchangeSymbols: {
         NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-        BSE: ['SENSEX', 'BANKEX']
-      }, // Predefined symbols for each exchange
+        BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
+      },
       callStrikes: [],
       putStrikes: [],
-      securityIds: {}, // Store security IDs associated with symbols
-      positions: [], // Stores the positions fetched from the API
+      expiryDates: [],
+      synchronizeOnLoad: true, // Flag to control synchronization behavior
+      quantities: {
+        NIFTY: [25],
+        BANKNIFTY: [15],
+        FINNIFTY: [40],
+        MIDCPNIFTY: [75],
+        NIFTYNXT50: [10],
+        SENSEX: [10],
+        BANKEX: [15],
+        SENSEX50: [25]
+      },
+      availableQuantities: [],
+      selectedOrderType: 'MARKET',
+      orderTypes: ['MARKET', 'LIMIT'],
+      selectedProductType: 'INTRADAY',
+      productTypes: ['INTRADAY', 'DAY']
     };
   },
   computed: {
@@ -326,36 +344,152 @@ export default {
     }
   },
   mounted() {
-    this.masterSymbols = this.exchangeSymbols[this.selectedExchange];
-    this.masterSymbol = this.masterSymbols[0] || null;
     this.fetchFundLimit();
     this.fetchDhanClientId();
-    this.updateInstruments(); // Set initial exchangeSegment based on default selectedExchange
     this.fetchPositions();
+
+    // related to scrip master
+    this.fetchTradingData();
+    this.updateAvailableQuantities();
+    // related to scrip master
   },
   watch: {
-    selectedExchange(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log('selectedExchange changed:', newVal);
-        this.masterSymbols = this.exchangeSymbols[newVal] || [];
-        this.masterSymbol = this.masterSymbols[0] || null;
-      }
-
+    // related to scrip master
+    selectedExpiry(newExpiry) {
+      this.updateStrikesForExpiry(newExpiry);
     },
-    masterSymbol(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log('masterSymbol changed:', newVal);
-        this.fetchSymbols(); // Call fetchSymbols to update callStrikes and putStrikes based on the new masterSymbol
-        this.fetchAllExpiryDates();
+    selectedCallStrike(newStrike, oldStrike) {
+      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
+        this.updateSecurityIds();
       }
     },
-    selectedExpiry(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log('Selected Expiry:', newVal);
+    selectedPutStrike(newStrike, oldStrike) {
+      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
+        this.updateSecurityIds();
       }
     },
+    selectedMasterSymbol(newSymbol) {
+      this.updateAvailableQuantities();
+    },
+    selectedExchange(newExchange) {
+      if (this.exchangeSymbols[newExchange].length > 0) {
+        this.selectedMasterSymbol = this.exchangeSymbols[newExchange][0];
+      } else {
+        this.selectedMasterSymbol = null; // Handle case where no symbols are available
+      }
+      this.updateAvailableQuantities(); // Update quantities based on the new master symbol
+    }
+    // related to scrip master
   },
   methods: {
+    // releated to scrip master
+    async fetchTradingData() {
+      const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
+      const data = await response.json();
+
+      // Sort expiry dates
+      this.expiryDates = data.expiryDates.sort((a, b) => new Date(a) - new Date(b));
+
+      // Sort call and put strikes by expiry date and then by trading symbol
+      this.callStrikes = data.callStrikes.sort((a, b) => {
+        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+      });
+      this.putStrikes = data.putStrikes.sort((a, b) => {
+        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+      });
+
+      // Set default values if available
+      if (this.callStrikes.length > 0) {
+        this.selectedCallStrike = this.callStrikes[0];
+      }
+      if (this.putStrikes.length > 0) {
+        this.selectedPutStrike = this.putStrikes[0];
+      }
+      if (this.expiryDates.length > 0) {
+        this.selectedExpiry = this.expiryDates[0];
+      }
+
+      // Automatically set the security IDs for the default selected strikes
+      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
+      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
+
+      this.synchronizeOnLoad = true; // Enable synchronization after data is loaded
+      this.updateStrikesForExpiry(this.selectedExpiry); // Initial update with synchronization
+    },
+    getSecurityId(strikes, strike) {
+      return strike ? strike.securityId : 'N/A';
+    },
+    updateStrikesForExpiry(expiryDate) {
+      const filteredCallStrikes = this.callStrikes.filter(strike => strike.expiryDate === expiryDate);
+      const filteredPutStrikes = this.putStrikes.filter(strike => strike.expiryDate === expiryDate);
+
+      const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === this.selectedCallStrike.tradingSymbol);
+      const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === this.selectedPutStrike.tradingSymbol);
+
+      if (foundCallStrike) {
+        this.selectedCallStrike = foundCallStrike;
+      } else {
+        this.selectedCallStrike = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
+      }
+
+      if (foundPutStrike) {
+        this.selectedPutStrike = foundPutStrike;
+      } else {
+        this.selectedPutStrike = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+      }
+
+      if (this.synchronizeOnLoad) {
+        this.synchronizeStrikes(); // Synchronize only if the flag is true
+        this.synchronizeOnLoad = false; // Turn off synchronization after the initial load
+      }
+    },
+    synchronizeStrikes() {
+      // Synchronize call and put strikes based on the current selection
+      this.synchronizeCallStrikes();
+      this.synchronizePutStrikes();
+    },
+    synchronizeCallStrikes() {
+      if (this.selectedPutStrike) {
+        const baseSymbol = this.selectedPutStrike.tradingSymbol.replace(/-PE$/, '');
+        const matchingCallStrike = this.callStrikes.find(strike =>
+          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-CE')
+        );
+        if (matchingCallStrike) {
+          this.selectedCallStrike = matchingCallStrike;
+        } else {
+          this.selectedCallStrike = {};
+        }
+      }
+      this.updateSecurityIds();
+    },
+    synchronizePutStrikes() {
+      if (this.selectedCallStrike) {
+        const baseSymbol = this.selectedCallStrike.tradingSymbol.replace(/-CE$/, '');
+        const matchingPutStrike = this.putStrikes.find(strike =>
+          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-PE')
+        );
+        if (matchingPutStrike) {
+          this.selectedPutStrike = matchingPutStrike;
+        } else {
+          this.selectedPutStrike = {};
+        }
+      }
+      this.updateSecurityIds();
+    },
+    updateSecurityIds() {
+      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
+      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
+    },
+    updateAvailableQuantities() {
+      this.availableQuantities = this.quantities[this.selectedMasterSymbol];
+      if (!this.availableQuantities.includes(this.selectedQuantity)) {
+        this.selectedQuantity = this.availableQuantities[0];
+      }
+    },
+    // releated to scrip master
+
+
+
     async fetchFundLimit() {
       try {
         const { data } = await axios.get('http://localhost:3000/fundlimit');
@@ -384,74 +518,6 @@ export default {
         console.error('Error fetching positions:', error);
         this.toastMessage = 'Failed to fetch positions';
         this.showToast = true;
-      }
-    },
-    async fetchAllExpiryDates() {
-      this.expiryDates = [];
-      try {
-        const response = await axios.get(`http://localhost:3000/symbols`, {
-          params: {
-            selectedExchange: this.selectedExchange,
-            masterSymbol: this.masterSymbol,
-            drvExpiryDate: this.selectedExpiry // Include the selected expiry date in the request
-          }
-        });
-
-        // Extract and store all unique expiry dates from the response
-        const allExpiryDates = new Set();
-        response.data.results.forEach(item => {
-          allExpiryDates.add(item.drvExpiryDate);
-        });
-
-        // Filter out dates that are before today's date
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-        this.expiryDates = Array.from(allExpiryDates).filter(date => date >= today).sort();
-
-        console.log('Filtered expiryDates:', this.expiryDates);
-
-        // Set the earliest valid date as default
-        this.selectedExpiry = this.expiryDates[0] || null;
-
-      } catch (error) {
-        console.error('Failed to fetch all expiry dates:', error);
-      }
-    },
-    async fetchSymbols() {
-      // Reset arrays before fetching new data
-      this.callStrikes = [];
-      this.putStrikes = [];
-      this.securityIds = {}; // Reset securityIds
-
-      try {
-        const response = await axios.get(`http://localhost:3000/symbols`, {
-          params: {
-            selectedExchange: this.selectedExchange,
-            masterSymbol: this.masterSymbol,
-          }
-        });
-
-        // Process the fetched data
-        this.callStrikes = response.data.callStrikes.map(item => {
-          this.securityIds[item.tradingSymbol] = item.securityId; // Populate securityIds
-          return item.tradingSymbol;
-        });
-
-        this.putStrikes = response.data.putStrikes.map(item => {
-          this.securityIds[item.tradingSymbol] = item.securityId; // Populate securityIds
-          return item.tradingSymbol;
-        });
-
-        console.log('Filtered Call Strikes:', this.callStrikes);
-        console.log('Filtered Put Strikes:', this.putStrikes);
-        // Set default selected values
-        if (this.callStrikes.length > 0) {
-          this.selectedCallStrike = this.callStrikes[0];
-        }
-        if (this.putStrikes.length > 0) {
-          this.selectedPutStrike = this.putStrikes[0];
-        }
-      } catch (error) {
-        console.error('Failed to fetch symbols:', error);
       }
     },
     async fetchOrders() {
@@ -498,16 +564,6 @@ export default {
     updateToastVisibility(value) {
       this.showToast = value;
     },
-    updateInstruments() {
-      this.masterSymbols = this.exchangeSymbols[this.selectedExchange];
-      this.masterSymbol = this.masterSymbols[0] || null; // Automatically select the first symbol or null if none
-      // Implement logic to update instruments based on selected exchange
-      if (this.selectedExchange === 'NSE') {
-        this.exchangeSegment = 'NSE_FNO';
-      } else if (this.selectedExchange === 'BSE') {
-        this.exchangeSegment = 'BSE_FNO';
-      }
-    },
     toggleDhanIdVisibility() {
       this.showDhanId = !this.showDhanId;
     },
@@ -522,34 +578,61 @@ export default {
     },
 
 
-    async placeOrder(transactionType, drvOptionType) {
-      console.log('Attempting to place order:', transactionType, drvOptionType); // Log the attempt to place an order
-      this.currentTransactionType = transactionType; // Update the transaction type
-
-      const selectedStrike = drvOptionType === 'CALL' ? this.selectedCallStrike : this.selectedPutStrike;
-      const securityId = this.securityIds[selectedStrike];
-
-      const orderData = {
-        transactionType: transactionType,
-        exchangeSegment: this.exchangeSegment, // Ensure this is correctly referencing the data property
-        productType: this.selectedProductType,
-        orderType: this.selectedOrderType,
-        validity: "DAY",
-        symbol: selectedStrike,
-        securityId: securityId, // Include securityId here
-        quantity: this.selectedQuantity,
-        price: 10,
-        drvExpiryDate: this.selectedExpiry,
-        drvOptionType: drvOptionType,
-      };
-
-      console.log('Order Data:', orderData); // Log the order data to the console
-
+    async placeOrder(transactionType) {
       try {
+        // Ensure all required properties are defined
+        if (!this.selectedCallStrike) {
+          throw new Error("Selected call strike is not defined");
+        }
+        if (!this.selectedPutStrike) {
+          throw new Error("Selected put strike is not defined");
+        }
+
+        // Determine the selected strike based on the transaction type
+        const selectedStrike = transactionType === 'BUY' ? this.selectedCallStrike : this.selectedPutStrike;
+
+        // Ensure selectedStrike and its properties are defined
+        if (!selectedStrike) {
+          throw new Error("Selected strike is not defined");
+        }
+        if (!selectedStrike.tradingSymbol) {
+          throw new Error("Selected strike trading symbol is not defined");
+        }
+        if (!selectedStrike.securityId) {
+          throw new Error("Selected strike security ID is not defined");
+        }
+        // Set the exchangeSegment based on the selectedExchange
+        let exchangeSegment;
+        if (this.selectedExchange === 'NSE') {
+          exchangeSegment = 'NSE_FNO';
+        } else if (this.selectedExchange === 'BSE') {
+          exchangeSegment = 'BSE_FNO';
+        } else {
+          throw new Error("Selected exchange is not valid");
+        }
+        const orderData = {
+          dhanClientId: this.dhanClientId,
+          transactionType: transactionType,
+          exchangeSegment: exchangeSegment,
+          productType: this.selectedProductType,
+          orderType: this.selectedOrderType,
+          validity: 'DAY', // Example validity
+          tradingSymbol: selectedStrike.tradingSymbol, // Ensure this is defined
+          securityId: selectedStrike.securityId, // Ensure this is defined
+          quantity: this.selectedQuantity,
+          price: 10, // Example price
+          drvExpiryDate: this.selectedExpiry,
+        };
+
+        // Log the order data to verify it
+        console.log("Placing order with data:", orderData);
+
         const response = await axios.post('http://localhost:3000/placeOrder', orderData);
-        console.log('Order placed:', response.data); // Log the successful placement of the order
+        console.log("Order placed successfully:", response.data);
       } catch (error) {
-        console.error('Error placing order:', error); // Log any errors encountered
+        console.error("Error placing order:", error);
+        this.toastMessage = 'Failed to place order';
+        this.showToast = true;
       }
     },
   },
