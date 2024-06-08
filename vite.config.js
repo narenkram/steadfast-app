@@ -12,5 +12,10 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  server: {
+    proxy: {
+      '/symbols': 'http://localhost:3000' // Adjust the target to your backend server URL
+    }
   }
 })
