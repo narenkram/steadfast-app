@@ -135,13 +135,36 @@
           <div>
             Selected Security ID: {{ defaultCallSecurityId }}
           </div>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'CALL')">Buy
-            CE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'CALL')">Sell
-            CE</button>
+          <div class="btn-group w-100">
+            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'CALL')">
+              <span>⬆️</span>
+              Buy CE
+            </button>
+            <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Place Limit Order</a></li>
+            </ul>
+          </div>
+          <div class="btn-group w-100">
+            <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'CALL')">
+              <span>⬅️</span>
+              Sell CE
+            </button>
+            <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Place Limit Order</a></li>
+            </ul>
+          </div>
         </div>
 
         <div class="col-3 text-center">
+          <br />
           <br />
           <p class="mb-0">Nifty Bank</p>
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
@@ -160,10 +183,32 @@
           <div>
             Selected Security ID: {{ defaultPutSecurityId }}
           </div>
-          <button class="btn btn-lg btn-outline-success fs-5 w-100 my-2" @click="placeOrder('BUY', 'PUT')">Buy
-            PE</button>
-          <button class="btn btn-lg btn-outline-danger fs-5 w-100" @click="placeOrder('SELL', 'PUT')">Sell
-            PE</button>
+          <div class="btn-group w-100">
+            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'PUT')">
+              <span>⬇️</span>
+              Buy PE
+            </button>
+            <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Place Limit Order</a></li>
+            </ul>
+          </div>
+          <div class="btn-group w-100">
+            <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'PUT')">
+              <span>➡️</span>
+              Sell PE
+            </button>
+            <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Place Limit Order</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </form>
@@ -264,6 +309,30 @@
   </section>
 
   <ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
+
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          This is a demo modal
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </template>
 
@@ -595,30 +664,23 @@ export default {
     },
 
 
-    async placeOrder(transactionType) {
+    async placeOrder(transactionType, optionType) {
       try {
-        // Ensure all required properties are defined
-        if (!this.selectedCallStrike) {
-          throw new Error("Selected call strike is not defined");
-        }
-        if (!this.selectedPutStrike) {
-          throw new Error("Selected put strike is not defined");
+        let selectedStrike;
+        if (optionType === 'CALL') {
+          selectedStrike = this.selectedCallStrike;
+        } else if (optionType === 'PUT') {
+          selectedStrike = this.selectedPutStrike;
         }
 
-        // Determine the selected strike based on the transaction type
-        const selectedStrike = transactionType === 'BUY' ? this.selectedCallStrike : this.selectedPutStrike;
-
-        // Ensure selectedStrike and its properties are defined
         if (!selectedStrike) {
-          throw new Error("Selected strike is not defined");
+          throw new Error(`Selected ${optionType.toLowerCase()} strike is not defined`);
         }
-        if (!selectedStrike.tradingSymbol) {
-          throw new Error("Selected strike trading symbol is not defined");
+
+        if (!selectedStrike.tradingSymbol || !selectedStrike.securityId) {
+          throw new Error(`Selected ${optionType.toLowerCase()} strike properties are not properly defined`);
         }
-        if (!selectedStrike.securityId) {
-          throw new Error("Selected strike security ID is not defined");
-        }
-        // Set the exchangeSegment based on the selectedExchange
+
         let exchangeSegment;
         if (this.selectedExchange === 'NSE') {
           exchangeSegment = 'NSE_FNO';
@@ -627,33 +689,29 @@ export default {
         } else {
           throw new Error("Selected exchange is not valid");
         }
+
         const orderData = {
           dhanClientId: this.dhanClientId,
           transactionType: transactionType,
           exchangeSegment: exchangeSegment,
           productType: this.selectedProductType,
           orderType: this.selectedOrderType,
-          validity: 'DAY', // Example validity
-          tradingSymbol: selectedStrike.tradingSymbol, // Ensure this is defined
-          securityId: selectedStrike.securityId, // Ensure this is defined
+          validity: 'DAY',
+          tradingSymbol: selectedStrike.tradingSymbol,
+          securityId: selectedStrike.securityId,
           quantity: this.selectedQuantity,
           price: 10, // Example price
           drvExpiryDate: this.selectedExpiry,
         };
 
-        // Log the order data to verify it
         console.log("Placing order with data:", orderData);
-
         const response = await axios.post('http://localhost:3000/placeOrder', orderData);
         console.log("Order placed successfully:", response.data);
       } catch (error) {
-        // Check if the error has a response and a message, then display it
         if (error.response && error.response.data && error.response.data.message) {
-          // Split the message and take only the first three words
           const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
           this.toastMessage = firstThreeWords;
         } else {
-          // Fallback if the error does not contain the expected format
           this.toastMessage = 'Failed to place order';
         }
         this.showToast = true;
