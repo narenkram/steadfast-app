@@ -430,12 +430,17 @@ export default {
     // related to scrip master
 
     window.addEventListener('keydown', this.handleArrowKeys);
-  },
 
+    // Listen for market_feed event
+    this.$socket.on('market_feed', (data) => {
+      console.log('Received market feed data:', data);
+      // Handle the data as needed
+    });
+  },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
+    this.$socket.off('market_feed'); // Clean up the socket listener
   },
-
   watch: {
     // related to scrip master
     selectedExpiry(newExpiry) {
