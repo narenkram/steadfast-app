@@ -16,17 +16,17 @@
           <p class="mb-0"><b>Total Funds</b></p>
           <p>₹ {{ fundLimits.availabelBalance || 0 }}</p>
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <p class="mb-0"><b>Utilized Margin</b></p>
           <p>₹ {{ fundLimits.utilizedAmount || 0 }}</p>
         </div>
-        <div class="col-2">
+        <div class="col-3">
           <div class="d-flex align-items-center float-end">
             <label class="ToggleSwitch">
-              <input class="ToggleInput" type="checkbox" id="AutoKill" name="AutoKill" checked>
+              <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
               <span class="ToggleSlider SliderRound"></span>
             </label>
-            <span class="ToggleLabel"><b>Auto Kill</b></span>
+            <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
     <div class="col-lg-2 d-flex justify-content-center align-items-center">
       <div class="Card">
         <button class="btn btn-primary shadow fs-3" @click="toggleKillSwitch">
-          Toggle Kill Switch
+          Kill Switch
         </button>
       </div>
     </div>
@@ -390,8 +390,13 @@ export default {
       selectedOrderType: 'MARKET',
       orderTypes: ['MARKET', 'LIMIT'],
       selectedProductType: 'MARGIN',
-      productTypes: ['INTRADAY', 'MARGIN']
+      productTypes: ['INTRADAY', 'MARGIN'],
+
+
+      enableArrowKeys: false, // Controls whether arrow keys are enabled
+
     };
+
   },
   computed: {
     ...mapGetters('auth', {
@@ -423,7 +428,14 @@ export default {
     this.fetchTradingData();
     this.updateAvailableQuantities();
     // related to scrip master
+
+    window.addEventListener('keydown', this.handleArrowKeys);
   },
+
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleArrowKeys);
+  },
+
   watch: {
     // related to scrip master
     selectedExpiry(newExpiry) {
@@ -662,23 +674,41 @@ export default {
       const middleMask = '******'; // Mask middle 6 characters
       return `${firstPart}${middleMask}${lastPart}`;
     },
+    handleArrowKeys(event) {
+      if (!this.enableArrowKeys) return; // Exit if arrow keys are disabled
+
+      switch (event.key) {
+        case 'ArrowUp':
+          this.placeOrder('BUY', 'CALL');
+          break;
+        case 'ArrowDown':
+          this.placeOrder('BUY', 'PUT');
+          break;
+        case 'ArrowRight':
+          this.placeOrder('SELL', 'PUT');
+          break;
+        case 'ArrowLeft':
+          this.placeOrder('SELL', 'CALL');
+          break;
+      }
+    },
 
 
-    async placeOrder(transactionType, optionType) {
+    async placeOrder(transactionType, drvOptionType) {
       try {
         let selectedStrike;
-        if (optionType === 'CALL') {
+        if (drvOptionType === 'CALL') {
           selectedStrike = this.selectedCallStrike;
-        } else if (optionType === 'PUT') {
+        } else if (drvOptionType === 'PUT') {
           selectedStrike = this.selectedPutStrike;
         }
 
         if (!selectedStrike) {
-          throw new Error(`Selected ${optionType.toLowerCase()} strike is not defined`);
+          throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not defined`);
         }
 
         if (!selectedStrike.tradingSymbol || !selectedStrike.securityId) {
-          throw new Error(`Selected ${optionType.toLowerCase()} strike properties are not properly defined`);
+          throw new Error(`Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`);
         }
 
         let exchangeSegment;
@@ -702,6 +732,7 @@ export default {
           quantity: this.selectedQuantity,
           price: 10, // Example price
           drvExpiryDate: this.selectedExpiry,
+          drvOptionType: drvOptionType
         };
 
         console.log("Placing order with data:", orderData);
