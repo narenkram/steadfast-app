@@ -309,7 +309,15 @@
       </div>
 
     </div>
-
+    <!-- Display the received market feed data -->
+    <div class="market-feed">
+      <h3>Market Feed Data</h3>
+      <ul>
+        <li v-for="(data, index) in marketFeedData" :key="index">
+          {{ data }}
+        </li>
+      </ul>
+    </div>
   </section>
 
   <ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
@@ -395,6 +403,11 @@ export default {
 
       enableArrowKeys: false, // Controls whether arrow keys are enabled
 
+      // Your existing data properties for socket
+      exchangeSegment: '', // Initialize as empty string
+      callStrike: { securityId: '' }, // Initialize as empty object with securityId
+      putStrike: { securityId: '' }, // Initialize as empty object with securityId
+      marketFeedData: [],
     };
 
   },
@@ -425,21 +438,30 @@ export default {
     this.fetchPositions();
 
     // related to scrip master
-    this.fetchTradingData();
-    this.updateAvailableQuantities();
-    // related to scrip master
+    this.fetchTradingData().then(() => {
+      this.updateAvailableQuantities();
+      this.initializeSubscriptionData(); // Ensure this is called after fetchTradingData
+    });
 
     window.addEventListener('keydown', this.handleArrowKeys);
-
-    // Listen for market_feed event
-    this.$socket.on('market_feed', (data) => {
-      console.log('Received market feed data:', data);
-      // Handle the data as needed
-    });
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
-    this.$socket.off('market_feed'); // Clean up the socket listener
+    // Ensure exchangeSegment, callStrike, and putStrike are set correctly
+    if (!this.exchangeSegment || !this.callStrike.securityId || !this.putStrike.securityId) {
+      console.error('exchangeSegment, callStrike, or putStrike is not set');
+      return;
+    }
+
+    // Unsubscribe from the specific channels
+    const callChannel = `${this.exchangeSegment}_${this.callStrike.securityId}`;
+    const putChannel = `${this.exchangeSegment}_${this.putStrike.securityId}`;
+    console.log(`Unsubscribing from call channel: ${callChannel}`);
+    console.log(`Unsubscribing from put channel: ${putChannel}`);
+    this.$socket.emit('unsubscribe', callChannel);
+    this.$socket.emit('unsubscribe', putChannel);
+
+    this.$socket.off('market_feed');
   },
   watch: {
     // related to scrip master
@@ -470,7 +492,33 @@ export default {
     // related to scrip master
   },
   methods: {
-    // releated to scrip master
+    initializeSubscriptionData() {
+      // Ensure exchangeSegment, callStrike, and putStrike are set correctly
+      this.exchangeSegment = this.selectedExchange === 'NSE' ? 'NSE_FNO' : 'BSE_FNO';
+      this.callStrike = this.selectedCallStrike;
+      this.putStrike = this.selectedPutStrike;
+
+      if (!this.exchangeSegment || !this.callStrike.securityId || !this.putStrike.securityId) {
+        console.error('exchangeSegment, callStrike, or putStrike is not set');
+        return;
+      }
+
+      // Subscribe to the specific channels
+      const callChannel = `${this.exchangeSegment}_${this.callStrike.securityId}`;
+      const putChannel = `${this.exchangeSegment}_${this.putStrike.securityId}`;
+      console.log(`Subscribing to call channel: ${callChannel}`);
+      console.log(`Subscribing to put channel: ${putChannel}`);
+      this.$socket.emit('subscribe', callChannel);
+      this.$socket.emit('subscribe', putChannel);
+
+      // Listen for market_feed event
+      this.$socket.on('market_feed', (data) => {
+        console.log('Received market feed data:', data);
+        this.marketFeedData.push(data); // Store the received data
+        console.log('Updated marketFeedData:', this.marketFeedData);
+      });
+    },
+
     async fetchTradingData() {
       const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
       const data = await response.json();
