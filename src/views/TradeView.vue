@@ -447,20 +447,8 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
-    // Ensure exchangeSegment, callStrike, and putStrike are set correctly
-    if (!this.exchangeSegment || !this.callStrike.securityId || !this.putStrike.securityId) {
-      console.error('exchangeSegment, callStrike, or putStrike is not set');
-      return;
-    }
 
-    // Unsubscribe from the specific channels
-    const callChannel = `${this.exchangeSegment}_${this.callStrike.securityId}`;
-    const putChannel = `${this.exchangeSegment}_${this.putStrike.securityId}`;
-    console.log(`Unsubscribing from call channel: ${callChannel}`);
-    console.log(`Unsubscribing from put channel: ${putChannel}`);
-    this.$socket.emit('unsubscribe', callChannel);
-    this.$socket.emit('unsubscribe', putChannel);
-
+    this.unsubscribeFromChannels();
     this.$socket.off('market_feed');
   },
   watch: {
@@ -471,11 +459,13 @@ export default {
     selectedCallStrike(newStrike, oldStrike) {
       if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
         this.updateSecurityIds();
+        this.updateSubscriptions();
       }
     },
     selectedPutStrike(newStrike, oldStrike) {
       if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
         this.updateSecurityIds();
+        this.updateSubscriptions();
       }
     },
     selectedMasterSymbol(newSymbol) {
@@ -493,32 +483,50 @@ export default {
   },
   methods: {
     initializeSubscriptionData() {
-      // Ensure exchangeSegment, callStrike, and putStrike are set correctly
       this.exchangeSegment = this.selectedExchange === 'NSE' ? 'NSE_FNO' : 'BSE_FNO';
-      this.callStrike = this.selectedCallStrike;
-      this.putStrike = this.selectedPutStrike;
+      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
+      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
 
-      if (!this.exchangeSegment || !this.callStrike.securityId || !this.putStrike.securityId) {
+      this.updateSubscriptions();
+    },
+    updateSubscriptions() {
+      if (this.isInitialLoad) {
+        console.log('Skipping subscription update during initial load');
+        return;
+      }
+
+      if (!this.exchangeSegment || this.defaultCallSecurityId === 'N/A' || this.defaultPutSecurityId === 'N/A') {
         console.error('exchangeSegment, callStrike, or putStrike is not set');
         return;
       }
 
-      // Subscribe to the specific channels
-      const callChannel = `${this.exchangeSegment}_${this.callStrike.securityId}`;
-      const putChannel = `${this.exchangeSegment}_${this.putStrike.securityId}`;
+      this.unsubscribeFromChannels();
+
+      const callChannel = `${this.exchangeSegment}_${this.defaultCallSecurityId}`;
+      const putChannel = `${this.exchangeSegment}_${this.defaultPutSecurityId}`;
       console.log(`Subscribing to call channel: ${callChannel}`);
       console.log(`Subscribing to put channel: ${putChannel}`);
       this.$socket.emit('subscribe', callChannel);
       this.$socket.emit('subscribe', putChannel);
 
-      // Listen for market_feed event
       this.$socket.on('market_feed', (data) => {
         console.log('Received market feed data:', data);
-        this.marketFeedData.push(data); // Store the received data
+        this.marketFeedData.push(data);
         console.log('Updated marketFeedData:', this.marketFeedData);
       });
     },
-
+    unsubscribeFromChannels() {
+      if (this.defaultCallSecurityId !== 'N/A') {
+        const callChannel = `${this.exchangeSegment}_${this.defaultCallSecurityId}`;
+        console.log(`Unsubscribing from call channel: ${callChannel}`);
+        this.$socket.emit('unsubscribe', callChannel);
+      }
+      if (this.defaultPutSecurityId !== 'N/A') {
+        const putChannel = `${this.exchangeSegment}_${this.defaultPutSecurityId}`;
+        console.log(`Unsubscribing from put channel: ${putChannel}`);
+        this.$socket.emit('unsubscribe', putChannel);
+      }
+    },
     async fetchTradingData() {
       const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
       const data = await response.json();
@@ -617,6 +625,9 @@ export default {
     updateSecurityIds() {
       this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
       this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
+      console.log('Updated callStrike security ID:', this.defaultCallSecurityId);
+      console.log('Updated putStrike security ID:', this.defaultPutSecurityId);
+      this.updateSubscriptions(); // Ensure subscriptions are updated after security IDs are updated
     },
     updateAvailableQuantities() {
       this.availableQuantities = this.quantities[this.selectedMasterSymbol];
