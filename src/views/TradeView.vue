@@ -429,9 +429,15 @@ export default {
     });
 
     window.addEventListener('keydown', this.handleArrowKeys);
+    // Set an interval to fetch orders every second
+    this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
+    // Clear the interval when the component is destroyed
+    if (this.fetchOrdersInterval) {
+      clearInterval(this.fetchOrdersInterval);
+    }
   },
   watch: {
     // related to scrip master
@@ -448,7 +454,7 @@ export default {
         this.updateSecurityIds();
       }
     },
-    selectedMasterSymbol(newSymbol) {
+    selectedMasterSymbol() {
       this.updateAvailableQuantities();
     },
     selectedExchange(newExchange) {
@@ -621,6 +627,9 @@ export default {
         const response = await axios.get('http://localhost:3000/getOrders');
         this.orders = response.data; // Set the orders array
         console.log('Orders:', response.data);
+
+        // Update positions based on the fetched orders
+        this.fetchPositions();
       } catch (error) {
         console.error('Error fetching orders:', error);
         this.toastMessage = 'Error fetching orders';
