@@ -38,8 +38,8 @@
       <div class="Card">
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
-          ₹ ** Net PNL Estimated (after all charges)
-        </small>
+          ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
+      </small>
       </div>
     </div>
     <div class="col-lg-5">
@@ -420,6 +420,14 @@ export default {
       // Deployed Capital Percentage based on totalProfit as a percentage of utilizedAmount
       const utilizedAmount = this.fundLimits.utilizedAmount || 0;
       return utilizedAmount ? (this.totalProfit / utilizedAmount) * 100 : 0;
+    },
+    totalBrokerage() {
+      return this.orders
+        .filter(order => order.orderStatus === 'TRADED')
+        .reduce((total) => total + 20, 0); // Assuming ₹ 20 brokerage per traded order
+    },
+    netPnl() {
+      return this.totalProfit - this.totalBrokerage;
     }
   },
   mounted() {
@@ -740,7 +748,7 @@ export default {
           tradingSymbol: selectedStrike.tradingSymbol,
           securityId: selectedStrike.securityId,
           quantity: this.selectedQuantity,
-          price: this.selectedOrderType === 'LIMIT' ? this.limitPrice : 19, // Use limitPrice if order type is LIMIT
+          price: this.selectedOrderType === 'LIMIT' ? this.limitPrice : 0, // Use limitPrice if order type is LIMIT
           drvExpiryDate: this.selectedExpiry,
           drvOptionType: drvOptionType
         };
