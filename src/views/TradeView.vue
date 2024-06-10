@@ -137,7 +137,7 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'CALL')">
-              <span>⬆️</span>
+              <span v-if="enableArrowKeys">⬆️</span>
               Buy CE
             </button>
             <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
@@ -150,7 +150,7 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'CALL')">
-              <span>⬅️</span>
+              <span v-if="enableArrowKeys">⬅️</span>
               Sell CE
             </button>
             <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
@@ -185,7 +185,7 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'PUT')">
-              <span>⬇️</span>
+              <span v-if="enableArrowKeys">⬇️</span>
               Buy PE
             </button>
             <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
@@ -198,7 +198,7 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'PUT')">
-              <span>➡️</span>
+              <span v-if="enableArrowKeys">➡️</span>
               Sell PE
             </button>
             <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
@@ -591,7 +591,9 @@ export default {
       let parts = symbol.split('-');
       if (parts.length > 3) {
         // Rejoin the parts excluding the date and the last segment
-        return `${parts[0]} ${parts[2]} ${parts[3]}`;
+        // return `${parts[0]} ${parts[2]} ${parts[3]}`; DO NOT REMOVE THIS
+        // this displays only the strike for easy selection
+        return `${parts[2]}`;
       }
       return symbol; // Return the original symbol if it doesn't match the expected format
     },
