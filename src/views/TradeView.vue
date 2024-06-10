@@ -171,7 +171,7 @@
           <p class="mb-0">Nifty Bank</p>
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
           <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2">Close Position</button>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100">Cancel Order</button>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel Order</button>
         </div>
 
         <!-- Put Strike Selection -->
@@ -429,9 +429,14 @@ export default {
     });
 
     window.addEventListener('keydown', this.handleArrowKeys);
+    this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
+    // Clear the interval when the component is destroyed
+    if (this.fetchOrdersInterval) {
+      clearInterval(this.fetchOrdersInterval);
+    }
   },
   watch: {
     // related to scrip master
@@ -448,7 +453,7 @@ export default {
         this.updateSecurityIds();
       }
     },
-    selectedMasterSymbol(newSymbol) {
+    selectedMasterSymbol() {
       this.updateAvailableQuantities();
     },
     selectedExchange(newExchange) {
@@ -621,6 +626,9 @@ export default {
         const response = await axios.get('http://localhost:3000/getOrders');
         this.orders = response.data; // Set the orders array
         console.log('Orders:', response.data);
+        
+        // Update positions based on the fetched orders
+        this.fetchPositions();
       } catch (error) {
         console.error('Error fetching orders:', error);
         this.toastMessage = 'Error fetching orders';
@@ -744,6 +752,31 @@ export default {
           this.toastMessage = 'Failed to place order';
         }
         this.showToast = true;
+      }
+    },
+    async cancelPendingOrders() {
+      const pendingOrders = this.orders.filter(order => order.orderStatus === 'PENDING');
+      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.exchangeOrderId));
+
+      try {
+        await Promise.all(cancelPromises);
+        this.toastMessage = 'Pending orders canceled successfully';
+        this.showToast = true;
+        this.fetchOrders(); // Refresh the orders list
+      } catch (error) {
+        console.error('Failed to cancel orders:', error);
+        this.toastMessage = 'Failed to cancel some orders';
+        this.showToast = true;
+      }
+    },
+    async cancelOrder(orderId) {
+      try {
+        await axios.delete('http://localhost:3000/cancelOrder', {
+          data: { orderId },
+        });
+      } catch (error) {
+        console.error(`Failed to cancel order ${orderId}:`, error);
+        throw error; // Rethrow to handle in cancelPendingOrders
       }
     },
   },
