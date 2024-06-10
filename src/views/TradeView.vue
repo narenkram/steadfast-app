@@ -145,8 +145,7 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit
-                  Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
           <div class="btn-group w-100">
@@ -159,8 +158,7 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit
-                  Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
         </div>
@@ -195,8 +193,7 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit
-                  Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
           <div class="btn-group w-100">
@@ -209,8 +206,7 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit
-                  Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
         </div>
@@ -313,21 +309,27 @@
 
   <ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
 
-  <!-- Modal -->
+
+
+  <!-- Limit Price Input Modal (conditionally rendered) -->
   <div class="modal fade" id="PlaceLimitOrderWindow" tabindex="-1" aria-labelledby="PlaceLimitOrderWindowLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">Limit order</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="resetOrderType"></button>
         </div>
         <div class="modal-body">
-          This is a demo modal
+          <div class="col-2">
+            <label for="LimitPrice" class="form-label mb-0">Limit Price</label>
+            <input type="number" id="LimitPrice" class="form-control" v-model="limitPrice"
+              placeholder="Enter limit price">
+          </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetOrderType">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="placeOrder(modalTransactionType, modalOptionType)">Place Order</button>
         </div>
       </div>
     </div>
@@ -393,7 +395,9 @@ export default {
 
 
       enableArrowKeys: false, // Controls whether arrow keys are enabled
-
+      limitPrice: null, // New data property for limit price
+      modalTransactionType: '', // New data property for modal transaction type
+      modalOptionType: '', // New data property for modal option type
     };
 
   },
@@ -626,7 +630,7 @@ export default {
         const response = await axios.get('http://localhost:3000/getOrders');
         this.orders = response.data; // Set the orders array
         console.log('Orders:', response.data);
-        
+
         // Update positions based on the fetched orders
         this.fetchPositions();
       } catch (error) {
@@ -736,7 +740,7 @@ export default {
           tradingSymbol: selectedStrike.tradingSymbol,
           securityId: selectedStrike.securityId,
           quantity: this.selectedQuantity,
-          price: 19, // Example price
+          price: this.selectedOrderType === 'LIMIT' ? this.limitPrice : 19, // Use limitPrice if order type is LIMIT
           drvExpiryDate: this.selectedExpiry,
           drvOptionType: drvOptionType
         };
@@ -778,6 +782,14 @@ export default {
         console.error(`Failed to cancel order ${orderId}:`, error);
         throw error; // Rethrow to handle in cancelPendingOrders
       }
+    },
+    setOrderDetails(transactionType, optionType) {
+      this.modalTransactionType = transactionType;
+      this.modalOptionType = optionType;
+      this.selectedOrderType = 'LIMIT'; // Set selectedOrderType to LIMIT
+    },
+    resetOrderType() {
+      this.selectedOrderType = 'MARKET'; // Reset selectedOrderType to MARKET
     },
   },
 
