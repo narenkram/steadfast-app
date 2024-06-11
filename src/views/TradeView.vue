@@ -3,6 +3,16 @@
     <div class="col-12">
 
       <div class="row">
+        <!-- Brokers Page -->
+        <div class="col-1">
+          <div class="d-flex align-items-center justify-content-start h-100">
+            <RouterLink class="fs-2 text-decoration-none" to="/manage-brokers">
+              <span>⚙️</span>
+            </RouterLink>
+          </div>
+        </div>
+
+
         <!-- Change Broker -->
         <div class="col-2">
           <label for="SelectBroker" class="form-label mb-0"><b>Select Broker</b></label>
@@ -16,17 +26,16 @@
         </div>
 
         <!-- Broker Name and Status with Broker ID -->
-        <div class="col-3">
+        <div class="col-2">
           <p class="mb-1"><b>Broker</b> <span class="badge bg-success">Connected</span></p>
           <p class="mb-0">
-            Dhan ID
             <span v-if="showDhanId" @click="toggleDhanIdVisibility">
               {{ dhanClientId || 'N/A' }}
-              <button class="btn btn-sm btn-outline-secondary">Hide ID</button>
+              <span>👀</span>
             </span>
             <span v-else @click="toggleDhanIdVisibility">
               {{ maskDhanId(dhanClientId) }}
-              <button class="btn btn-sm btn-outline-secondary">Show ID</button>
+              <span>👁️</span>
             </span>
 
           </p>
@@ -307,8 +316,8 @@
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
-            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
-            @click="fetchPositions">💸 Positions</button>
+            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true" @click="fetchPositions">💸
+            Positions</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
@@ -316,7 +325,8 @@
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="ai-automation-tab" data-bs-toggle="tab" data-bs-target="#ai-automation-tab-pane"
-            type="button" role="tab" aria-controls="ai-automation-tab-pane" aria-selected="false">🤖 AI Automation</button>
+            type="button" role="tab" aria-controls="ai-automation-tab-pane" aria-selected="false">🤖 AI
+            Automation</button>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
