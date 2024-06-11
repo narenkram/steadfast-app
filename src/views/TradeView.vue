@@ -362,8 +362,6 @@
 
 
 <script>
-import { GET_USER_TOKEN_GETTER } from '@/stores/storeconstants';
-import { mapGetters } from 'vuex';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 
@@ -426,9 +424,6 @@ export default {
 
   },
   computed: {
-    ...mapGetters('auth', {
-      token: GET_USER_TOKEN_GETTER,
-    }),
     totalNetQty() {
       return this.positions.reduce((total, position) => total + position.netQty, 0);
     },
