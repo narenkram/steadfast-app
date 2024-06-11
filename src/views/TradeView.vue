@@ -465,7 +465,7 @@ export default {
     });
 
     window.addEventListener('keydown', this.handleArrowKeys);
-    // this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
+    this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
