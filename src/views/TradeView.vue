@@ -136,7 +136,9 @@
             Selected Security ID: {{ defaultCallSecurityId }}
           </div>
           <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'CALL')">
+            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+              @click="selectedOrderType !== 'LIMIT' && placeOrder('BUY', 'CALL')"
+              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬆️</span>
               Buy CE
             </button>
@@ -150,7 +152,9 @@
             </ul>
           </div>
           <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'CALL')">
+            <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+              @click="selectedOrderType !== 'LIMIT' && placeOrder('SELL', 'CALL')"
+              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬅️</span>
               Sell CE
             </button>
@@ -186,7 +190,9 @@
             Selected Security ID: {{ defaultPutSecurityId }}
           </div>
           <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75" @click="placeOrder('BUY', 'PUT')">
+            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+              @click="selectedOrderType !== 'LIMIT' && placeOrder('BUY', 'PUT')"
+              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬇️</span>
               Buy PE
             </button>
@@ -200,7 +206,9 @@
             </ul>
           </div>
           <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-danger fs-5 w-75" @click="placeOrder('SELL', 'PUT')">
+            <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+              @click="selectedOrderType !== 'LIMIT' && placeOrder('SELL', 'PUT')"
+              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">➡️</span>
               Sell PE
             </button>
@@ -340,8 +348,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            @click="resetOrderType">Cancel</button>
-          <button type="button" class="btn btn-primary" @click="placeOrder(modalTransactionType, modalOptionType)">Place
+            @click="resetOrderTypeIfNeeded">Cancel</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+            @click="placeOrder(modalTransactionType, modalOptionType)">Place
             Order</button>
         </div>
       </div>
@@ -411,6 +420,7 @@ export default {
       limitPrice: null, // New data property for limit price
       modalTransactionType: '', // New data property for modal transaction type
       modalOptionType: '', // New data property for modal option type
+      previousOrderType: 'MARKET',
     };
 
   },
@@ -488,8 +498,12 @@ export default {
         this.selectedMasterSymbol = null; // Handle case where no symbols are available
       }
       this.updateAvailableQuantities(); // Update quantities based on the new master symbol
-    }
+    },
     // related to scrip master
+
+    selectedOrderType(newValue, oldValue) {
+      this.previousOrderType = oldValue;
+    },
   },
   methods: {
     async fetchTradingData() {
@@ -771,6 +785,8 @@ export default {
         console.log("Placing order with data:", orderData);
         const response = await axios.post('http://localhost:3000/placeOrder', orderData);
         console.log("Order placed successfully:", response.data);
+        this.toastMessage = 'Order placed successfully';
+        this.showToast = true;
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
@@ -803,6 +819,8 @@ export default {
         });
       } catch (error) {
         console.error(`Failed to cancel order ${orderId}:`, error);
+        this.toastMessage = 'Failed to cancel order';
+        this.showToast = true;
         throw error; // Rethrow to handle in cancelPendingOrders
       }
     },
@@ -811,8 +829,13 @@ export default {
       this.modalOptionType = optionType;
       this.selectedOrderType = 'LIMIT'; // Set selectedOrderType to LIMIT
     },
+    resetOrderTypeIfNeeded() {
+      if (this.previousOrderType === 'MARKET') {
+        this.resetOrderType();
+      }
+    },
     resetOrderType() {
-      this.selectedOrderType = 'MARKET'; // Reset selectedOrderType to MARKET
+      this.selectedOrderType = 'MARKET';
     },
   },
 
