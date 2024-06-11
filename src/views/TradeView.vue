@@ -39,7 +39,7 @@
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
           ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
-      </small>
+        </small>
       </div>
     </div>
     <div class="col-lg-5">
@@ -145,7 +145,8 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
+                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
           <div class="btn-group w-100">
@@ -158,7 +159,8 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
+                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
         </div>
@@ -193,7 +195,8 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
+                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
           <div class="btn-group w-100">
@@ -206,7 +209,8 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal" data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
+                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
             </ul>
           </div>
         </div>
@@ -267,6 +271,9 @@
                 <td>{{ position.realizedProfit }}</td>
                 <td>{{ position.unrealizedProfit }}</td>
               </tr>
+              <tr v-if="positions.length === 0">
+                <td colspan="8" class="text-center">No positions available</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -288,6 +295,9 @@
                 <td>{{ order.quantity }}</td>
                 <td>{{ order.price }}</td>
                 <td>{{ order.orderStatus }}</td>
+              </tr>
+              <tr v-if="orders.length === 0">
+                <td colspan="5" class="text-center">No orders available</td>
               </tr>
             </tbody>
           </table>
@@ -318,7 +328,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">Limit order</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="resetOrderType"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="resetOrderType"></button>
         </div>
         <div class="modal-body">
           <div class="col-2">
@@ -328,8 +339,10 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetOrderType">Cancel</button>
-          <button type="button" class="btn btn-primary" @click="placeOrder(modalTransactionType, modalOptionType)">Place Order</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            @click="resetOrderType">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="placeOrder(modalTransactionType, modalOptionType)">Place
+            Order</button>
         </div>
       </div>
     </div>
