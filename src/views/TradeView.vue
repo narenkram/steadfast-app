@@ -799,7 +799,7 @@ export default {
     },
     async cancelPendingOrders() {
       const pendingOrders = this.orders.filter(order => order.orderStatus === 'PENDING');
-      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.exchangeOrderId, order.orderStatus));
+      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.orderId, order.orderStatus));
 
       try {
         await Promise.all(cancelPromises);
