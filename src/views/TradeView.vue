@@ -1,34 +1,55 @@
 <template>
   <section class="row py-3">
     <div class="col-12">
-      <!-- Broker Name and Status with Broker ID -->
+
       <div class="row">
-        <div class="col-4">
-          <p class="mb-0"><b>Broker</b></p>
-          <p>
-            Dhan ID
-            <span v-if="showDhanId" @click="toggleDhanIdVisibility">{{ dhanClientId || 'N/A' }}</span>
-            <span v-else @click="toggleDhanIdVisibility">{{ maskDhanId(dhanClientId) }}</span>
-            <span class="badge bg-success">Connected</span>
-          </p>
-        </div>
-        <div class="col-3">
-          <p class="mb-0"><b>Total Funds</b></p>
-          <p>₹ {{ fundLimits.availabelBalance || 0 }}</p>
-        </div>
+        <!-- Change Broker -->
         <div class="col-2">
-          <p class="mb-0"><b>Utilized Margin</b></p>
-          <p>₹ {{ fundLimits.utilizedAmount || 0 }}</p>
-        </div>
-        <div class="col-3">
-          <div class="d-flex align-items-center float-end">
-            <label class="ToggleSwitch">
-              <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
-              <span class="ToggleSlider SliderRound"></span>
-            </label>
-            <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
+          <label for="SelectBroker" class="form-label mb-0"><b>Select Broker</b></label>
+          <div class="d-flex align-items-center">
+            <select class="form-select" aria-label="Select Broker">
+              <option value="Dhan" selected>Dhan</option>
+              <option value="Flattrade">Flattrade</option>
+              <option value="Shoonya">Shoonya</option>
+            </select>
           </div>
         </div>
+
+        <!-- Broker Name and Status with Broker ID -->
+        <div class="col-3">
+          <p class="mb-1"><b>Broker</b> <span class="badge bg-success">Connected</span></p>
+          <p class="mb-0">
+            Dhan ID
+            <span v-if="showDhanId" @click="toggleDhanIdVisibility">
+              {{ dhanClientId || 'N/A' }}
+              <button class="btn btn-sm btn-outline-secondary">Hide ID</button>
+            </span>
+            <span v-else @click="toggleDhanIdVisibility">
+              {{ maskDhanId(dhanClientId) }}
+              <button class="btn btn-sm btn-outline-secondary">Show ID</button>
+            </span>
+
+          </p>
+        </div>
+
+        <!-- Total Funds -->
+        <div class="col-3 text-center">
+          <p class="mb-1"><b>Total Funds</b></p>
+          <p class="mb-0">₹ {{ fundLimits.availabelBalance || 0 }}</p>
+        </div>
+
+        <!-- Utilized Margin -->
+        <div class="col-2 text-center">
+          <p class="mb-1"><b>Utilized Margin</b></p>
+          <p>₹ {{ fundLimits.utilizedAmount || 0 }}</p>
+        </div>
+
+        <!-- Today's date -->
+        <div class="col-2 text-end">
+          <p class="mb-1"><b>Today's date</b></p>
+          <p>{{ formattedDate }}</p>
+        </div>
+
       </div>
 
     </div>
@@ -73,6 +94,15 @@
           </select>
         </div>
 
+        <!-- Segment Selection -->
+        <div class="col-2">
+          <label for="Segment" class="form-label mb-0">Segment</label>
+          <select id="Segment" class="form-select" aria-label="Segment">
+            <option value="Options" selected>Options</option>
+            <option value="Futures">Futures</option>
+          </select>
+        </div>
+
         <!-- Master Symbol Selection -->
         <div class="col-2">
           <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
@@ -113,6 +143,9 @@
           </select>
         </div>
 
+      </div>
+
+      <div class="row mt-3">
         <!-- Order Type -->
         <div class="col-2">
           <label for="OrderType" class="form-label mb-0">Order Type</label>
@@ -120,6 +153,47 @@
             <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
             </option>
           </select>
+        </div>
+        <!-- Market Protection Order %-->
+        <div class="col-3">
+          <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
+          <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %">
+            <option value="1">1%</option>
+            <option value="2">2%</option>
+            <option value="3">3%</option>
+            <option value="4">4%</option>
+            <option value="5">5%</option>
+          </select>
+        </div>
+        <!-- Stoploss -->
+        <div class="col-2">
+          <label for="Stoploss" class="form-label mb-0">Stoploss</label>
+          <div class="input-group mb-3">
+            <div class="input-group-text">
+              <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss">
+            </div>
+            <input type="number" class="form-control" aria-label="Stoploss" value="75">
+          </div>
+        </div>
+        <!-- Target -->
+        <div class="col-2">
+          <label for="Target" class="form-label mb-0">Target</label>
+          <div class="input-group mb-3">
+            <div class="input-group-text">
+              <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target">
+            </div>
+            <input type="number" class="form-control" aria-label="Target" value="75">
+          </div>
+        </div>
+        <!-- 1 Click Arrow Keys -->
+        <div class="col-3">
+          <div class="d-flex align-items-center float-end h-100">
+            <label class="ToggleSwitch">
+              <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
+              <span class="ToggleSlider SliderRound"></span>
+            </label>
+            <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
+          </div>
         </div>
       </div>
 
@@ -176,7 +250,8 @@
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
           <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">Close all
             Positions</button>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel Order</button>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel
+            Order</button>
         </div>
 
         <!-- Put Strike Selection -->
@@ -298,8 +373,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.exchangeOrderId">
-                <td>{{ order.exchangeOrderId }}</td>
+              <tr v-for="order in orders" :key="order.orderId">
+                <td>{{ order.orderId }}</td>
                 <td>{{ order.tradingSymbol }}</td>
                 <td>{{ order.quantity }}</td>
                 <td>{{ order.price }}</td>
@@ -424,6 +499,11 @@ export default {
 
   },
   computed: {
+    formattedDate() {
+      const today = new Date();
+      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+      return today.toLocaleDateString('en-US', options).replace(/,/g, '');
+    },
     totalNetQty() {
       return this.positions.reduce((total, position) => total + position.netQty, 0);
     },
