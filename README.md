@@ -8,3 +8,6 @@ npm run dev
 ```
 The application will be available at http://localhost:5173.
 
+# Join Our Telegram Channel
+
+Stay updated by joining our [Telegram Channel](https://t.me/steadfaststoic).
