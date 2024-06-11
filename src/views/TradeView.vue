@@ -174,7 +174,8 @@
           <br />
           <p class="mb-0">Nifty Bank</p>
           <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2">Close Position</button>
+          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">Close all
+            Positions</button>
           <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel Order</button>
         </div>
 
@@ -464,7 +465,7 @@ export default {
     });
 
     window.addEventListener('keydown', this.handleArrowKeys);
-    this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
+    // this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleArrowKeys);
@@ -795,6 +796,54 @@ export default {
           this.toastMessage = 'Failed to place order';
         }
         this.showToast = true;
+      }
+    },
+    async closeAllPositions() {
+      try {
+        for (const position of this.positions) {
+          if (position.positionType !== 'CLOSED') {
+            const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
+            await this.placeOrderForPosition('SELL', optionType, position);
+          }
+        }
+        this.toastMessage = 'All positions closed successfully';
+        this.showToast = true;
+      } catch (error) {
+        console.error('Error closing positions:', error);
+        this.toastMessage = 'Failed to close all positions';
+        this.showToast = true;
+      }
+    },
+    async placeOrderForPosition(transactionType, drvOptionType, position) {
+      try {
+        const selectedStrike = {
+          tradingSymbol: position.tradingSymbol,
+          securityId: position.securityId,
+        };
+
+        const exchangeSegment = this.selectedExchange === 'NSE' ? 'NSE_FNO' : 'BSE_FNO';
+
+        const orderData = {
+          dhanClientId: this.dhanClientId,
+          transactionType: transactionType,
+          exchangeSegment: exchangeSegment,
+          productType: position.productType,
+          orderType: 'MARKET',
+          validity: 'DAY',
+          tradingSymbol: selectedStrike.tradingSymbol,
+          securityId: selectedStrike.securityId,
+          quantity: position.netQty,
+          price: 0,
+          drvExpiryDate: this.selectedExpiry,
+          drvOptionType: drvOptionType,
+        };
+
+        console.log("Placing order with data:", orderData);
+        const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+        console.log("Order placed successfully:", response.data);
+      } catch (error) {
+        console.error('Failed to place order:', error);
+        throw error;
       }
     },
     async cancelPendingOrders() {
