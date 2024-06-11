@@ -799,24 +799,30 @@ export default {
     },
     async cancelPendingOrders() {
       const pendingOrders = this.orders.filter(order => order.orderStatus === 'PENDING');
-      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.exchangeOrderId));
+      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.exchangeOrderId, order.orderStatus));
 
       try {
         await Promise.all(cancelPromises);
         this.toastMessage = 'Pending orders canceled successfully';
         this.showToast = true;
-        this.fetchOrders(); // Refresh the orders list
+        await this.fetchOrders(); // Refresh the orders list
       } catch (error) {
         console.error('Failed to cancel orders:', error);
         this.toastMessage = 'Failed to cancel some orders';
         this.showToast = true;
       }
     },
-    async cancelOrder(orderId) {
+    async cancelOrder(orderId, orderStatus) {
+      if (orderStatus !== 'PENDING') {
+        console.log(`Order ${orderId} is not pending and cannot be canceled.`);
+        return;
+      }
+
       try {
         await axios.delete('http://localhost:3000/cancelOrder', {
           data: { orderId },
         });
+        console.log(`Order ${orderId} canceled successfully.`);
       } catch (error) {
         console.error(`Failed to cancel order ${orderId}:`, error);
         this.toastMessage = 'Failed to cancel order';
