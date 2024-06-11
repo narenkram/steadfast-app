@@ -308,15 +308,15 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
             type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
-            @click="fetchPositions">Positions</button>
+            @click="fetchPositions">💸 Positions</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
-            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="fetchOrders">Trades</button>
+            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="fetchOrders">📄 Trades</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-tab-pane"
-            type="button" role="tab" aria-controls="notifications-tab-pane" aria-selected="false">Notifications</button>
+          <button class="nav-link" id="ai-automation-tab" data-bs-toggle="tab" data-bs-target="#ai-automation-tab-pane"
+            type="button" role="tab" aria-controls="ai-automation-tab-pane" aria-selected="false">🤖 AI Automation</button>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -386,14 +386,16 @@
             </tbody>
           </table>
         </div>
-        <div class="tab-pane fade" id="notifications-tab-pane" role="tabpanel" aria-labelledby="notifications-tab"
+        <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
           tabindex="0">
-          notifications-tab
-          <div class="card-body text-danger">
-            <p class="fs-5">
-              Total Buy/Sell Value 10,500
-              <small>exceeds 2 times more than total capital, OVER TRADE Warning</small>
-            </p>
+
+          <div class="card text-center py-3">
+            <div class="card-body text-danger">
+              <p class="fs-5">
+                AI Automation
+                <small>To be determined</small>
+              </p>
+            </div>
           </div>
         </div>
       </div>

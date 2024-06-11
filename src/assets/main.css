@@ -15,6 +15,10 @@
   .feed-list a {
     color: inherit !important;
   }
+
+  .nav-link {
+    color: #000000 !important;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +34,10 @@
   }
 
   .feed-list a {
+    color: #ffffff !important;
+  }
+
+  .nav-link {
     color: #ffffff !important;
   }
 }
