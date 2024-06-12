@@ -379,6 +379,7 @@
                 <th>Symbol</th>
                 <th>Quantity</th>
                 <th>Price</th>
+                <th>Execution Time</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -388,6 +389,7 @@
                 <td>{{ order.tradingSymbol }}</td>
                 <td>{{ order.quantity }}</td>
                 <td>{{ order.price }}</td>
+                <td>{{ order.createTime }}</td>
                 <td>{{ order.orderStatus }}</td>
               </tr>
               <tr v-if="orders.length === 0">
