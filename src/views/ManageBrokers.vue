@@ -22,7 +22,6 @@
           <tr>
             <th scope="col">Broker</th>
             <th scope="col">Broker ID</th>
-            <th scope="col">Name Tag</th>
             <th scope="col">App ID</th>
             <th scope="col">App Secret Key</th>
             <th scope="col">Status</th>
@@ -33,46 +32,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <!-- Broker -->
+          <tr v-for="broker in brokers" :key="broker.id">
+            <td>{{ broker.brokerName }}</td>
+            <td>{{ broker.brokerClientId }}</td>
+            <td>{{ broker.appId }}</td>
+            <td>{{ maskApiSecret(broker.apiSecret) }}</td>
+            <td><span class="badge text-bg-success">{{ broker.status }}</span></td>
+            <td>{{ broker.lastTokenGeneratedAt }}</td>
+            <td><a class="link">Generate Token</a></td>
             <td>
-              Broker Name
+              <a class="mx-1"><span class="SelectBroker">▶️</span></a>
+              <a class="mx-1"><span class="PauseBroker">⏸️</span></a>
+              <a class="mx-1"><span class="DeleteBroker">❌</span></a>
             </td>
-            <td>
-              Broker ID
-            </td>
-            <td>
-              Name Tag
-            </td>
-            <td>
-              App ID
-            </td>
-            <td>
-              App Secret Key
-            </td>
-            <td>
-              <span class="badge text-bg-success">Active</span>
-            </td>
-            <td>
-              Last Token Generated At Time
-            </td>
-            <td>
-              <a class="link">Generate Token</a>
-            </td>
-            <td>
-              <a class="mx-1">
-                <span class="SelectBroker">▶️</span>
-              </a>
-              <a class="mx-1">
-                <span class="PauseBroker">⏸️</span>
-              </a>
-              <a class="mx-1">
-                <span class="DeleteBroker">❌</span>
-              </a>
-            </td>
-            <td>
-              Added At Time
-            </td>
+            <td>{{ broker.addedAt }}</td>
           </tr>
         </tbody>
       </table>
@@ -83,8 +56,29 @@
 
 
 <script>
+import axios from 'axios';
 
 export default {
-
-}
+  data() {
+    return {
+      brokers: [],
+    };
+  },
+  async mounted() {
+    try {
+      const response = await axios.get('http://localhost:3000/brokers');
+      this.brokers = response.data;
+    } catch (error) {
+      console.error('Failed to fetch brokers:', error);
+    }
+  },
+  methods: {
+    maskApiSecret(apiSecret) {
+      if (!apiSecret || apiSecret.length < 10) return '******'; // Ensure there are enough characters to mask
+      const start = apiSecret.slice(0, 3);
+      const end = apiSecret.slice(-3);
+      return `${start}******${end}`;
+    },
+  },
+};
 </script>
