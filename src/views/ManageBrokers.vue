@@ -21,7 +21,7 @@
         <thead>
           <tr>
             <th scope="col">Broker</th>
-            <th scope="col">Broker ID</th>
+            <th scope="col">Broker Client ID</th>
             <th scope="col">App ID</th>
             <th scope="col">App Secret Key</th>
             <th scope="col">Status</th>
@@ -34,7 +34,9 @@
         <tbody>
           <tr v-for="broker in brokers" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
-            <td>{{ broker.brokerClientId }}</td>
+            <td>
+              <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
+            </td>
             <td>{{ broker.appId }}</td>
             <td>{{ maskApiSecret(broker.apiSecret) }}</td>
             <td><span class="badge text-bg-success">{{ broker.status }}</span></td>
@@ -78,6 +80,22 @@ export default {
       const start = apiSecret.slice(0, 3);
       const end = apiSecret.slice(-3);
       return `${start}******${end}`;
+    },
+    maskBrokerClientId(brokerClientId) {
+      if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
+
+      const length = brokerClientId.length;
+      if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
+
+      const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
+      const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
+      const endUnmaskedLength = length - startUnmaskedLength - maskLength;
+
+      const firstPart = brokerClientId.slice(0, startUnmaskedLength);
+      const lastPart = brokerClientId.slice(-endUnmaskedLength);
+      const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
+
+      return `${firstPart}${middleMask}${lastPart}`;
     },
   },
 };
