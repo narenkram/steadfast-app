@@ -20,7 +20,6 @@
             <select class="form-select" aria-label="Change Broker" v-model="selectedBroker">
               <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
                 {{ broker.brokerName }}
-                <span>{{ broker.brokerClientId }}</span>
               </option>
             </select>
           </div>
