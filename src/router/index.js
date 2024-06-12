@@ -14,10 +14,13 @@ const router = createRouter({
     {
       path: '/manage-brokers',
       name: 'manage-brokers',
-      component: ManageBrokers,
+      component: ManageBrokers
     },
-
+    {
+      path: '/add-broker',
+      name: 'add-broker',
+      component: AddBroker
+    }
   ]
-
 })
 export default router
