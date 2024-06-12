@@ -70,9 +70,9 @@ export default {
   data() {
     return {
       brokers: [],
-      request_code: '', // Initialize request_code in the component's data
+      request_code: null,
       client: null,
-      token: '', // Initialize token in the component's data
+      token: null
     };
   },
   async mounted() {
@@ -135,13 +135,16 @@ export default {
         try {
           const url = new URL(event.data);
           const requestCode = url.searchParams.get('request_code');
-          this.request_code = requestCode;
-          this.client = url.searchParams.get('client');
-          console.log('Extracted request code:', this.request_code);
-          console.log('Extracted client:', this.client);
-          if (!this.request_code) return;
+          const client = url.searchParams.get('client');
+          console.log('Extracted request code:', requestCode);
+          console.log('Extracted client:', client);
 
-          const concatenatedValue = `${apiKey}${this.request_code}${apiSecret}`;
+          if (!requestCode) {
+            console.error('Request code is undefined');
+            return;
+          }
+
+          const concatenatedValue = `${apiKey}${requestCode}${apiSecret}`;
           const hashedSecret = crypto.SHA256(concatenatedValue).toString();
           console.log('Generated hashed secret:', hashedSecret);
 
