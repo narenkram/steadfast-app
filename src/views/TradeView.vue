@@ -17,10 +17,10 @@
         <div class="col-2">
           <label for="ChangeBroker" class="form-label mb-0"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
-            <select class="form-select" aria-label="Change Broker">
-              <option value="Dhan" selected>Dhan</option>
-              <option value="Flattrade">Flattrade</option>
-              <option value="Shoonya">Shoonya</option>
+            <select class="form-select" aria-label="Change Broker" v-model="selectedBroker">
+              <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker.brokerName">
+                {{ broker.brokerName }}
+              </option>
             </select>
           </div>
         </div>
@@ -458,6 +458,8 @@ export default {
   },
   data() {
     return {
+      brokers: [],
+      selectedBroker: null,
       fundLimits: {}, // Initialize as an empty object
       dhanClientId: null, // Initialize as null
       showToast: false, // Controls the visibility of the toast
@@ -542,6 +544,7 @@ export default {
     }
   },
   mounted() {
+    this.fetchBrokers();
     this.fetchFundLimit();
     this.fetchDhanClientId();
     this.fetchPositions();
@@ -594,6 +597,17 @@ export default {
     },
   },
   methods: {
+    async fetchBrokers() {
+      try {
+        const response = await axios.get('http://localhost:3000/brokers');
+        this.brokers = response.data;
+        if (this.brokers.length > 0) {
+          this.selectedBroker = this.brokers[0].brokerName; // Set default broker
+        }
+      } catch (error) {
+        console.error('Failed to fetch brokers:', error);
+      }
+    },
     async fetchTradingData() {
       const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
       const data = await response.json();
