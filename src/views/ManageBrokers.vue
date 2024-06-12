@@ -63,8 +63,6 @@
 
 <script>
 import axios from 'axios';
-import crypto from 'crypto-js'; // Ensure you have crypto-js installed
-import qs from 'qs'; // Ensure you have qs installed
 
 export default {
   data() {
@@ -102,11 +100,10 @@ export default {
       const middleMask = '*'.repeat(maskLength);
       return `${firstPart}${middleMask}${lastPart}`;
     },
-    async generateToken(broker) {
+    generateToken(broker) {
       if (broker.brokerName !== 'Flattrade') return;
 
       const apiKey = broker.apiKey;
-      const apiSecret = broker.apiSecret;
       const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}`;
 
       console.log('Opening auth URL:', authUrl);
@@ -116,62 +113,6 @@ export default {
         console.error('Failed to open auth URL. Check for pop-up blockers.');
         return;
       }
-
-      const messageListener = async (event) => {
-        console.log('Received event:', event);
-        console.log('Event origin:', event.origin);
-        console.log('Event data:', event.data);
-
-        if (event.origin !== 'http://localhost:5173') {
-          console.error('Invalid origin:', event.origin);
-          return;
-        }
-
-        if (typeof event.data !== 'string' || !event.data.includes('request_code')) {
-          console.error('Invalid event data:', event.data);
-          return;
-        }
-
-        try {
-          const url = new URL(event.data);
-          const requestCode = url.searchParams.get('request_code');
-          const client = url.searchParams.get('client');
-          console.log('Extracted request code:', requestCode);
-          console.log('Extracted client:', client);
-
-          if (!requestCode) {
-            console.error('Request code is undefined');
-            return;
-          }
-
-          const concatenatedValue = `${apiKey}${requestCode}${apiSecret}`;
-          const hashedSecret = crypto.SHA256(concatenatedValue).toString();
-          console.log('Generated hashed secret:', hashedSecret);
-
-          try {
-            const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
-              api_key: apiKey,
-              request_code: requestCode,
-              api_secret: hashedSecret,
-            }), {
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              }
-            });
-            console.log('Token:', response.data.token);
-            this.token = response.data.token;
-          } catch (error) {
-            console.error('Failed to generate token:', error);
-          }
-        } catch (error) {
-          console.error('Failed to construct URL:', error);
-        }
-
-        authWindow.close();
-        window.removeEventListener('message', messageListener);
-      };
-
-      window.addEventListener('message', messageListener);
     },
   },
 };
