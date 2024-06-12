@@ -105,58 +105,65 @@ export default {
     async generateToken(broker) {
       if (broker.brokerName !== 'Flattrade') return;
 
-      const apiKey = broker.apiKey; // Ensure this is available in your broker object
-      const apiSecret = broker.apiSecret; // Ensure this is available in your broker object
+      const apiKey = broker.apiKey;
+      const apiSecret = broker.apiSecret;
       const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}`;
 
-      // Open the authorization URL in a new tab
+      console.log('Opening auth URL:', authUrl);
       const authWindow = window.open(authUrl, '_blank');
 
-      // Listen for messages from the new tab
+      if (!authWindow) {
+        console.error('Failed to open auth URL. Check for pop-up blockers.');
+        return;
+      }
+
       const messageListener = async (event) => {
-        console.log('Received message:', event);
+        console.log('Received event:', event);
+        console.log('Event origin:', event.origin);
         console.log('Event data:', event.data);
-        if (event.origin !== 'http://localhost:5173') return; // Ensure the message is from the expected origin
+
+        if (event.origin !== 'http://localhost:5173') {
+          console.error('Invalid origin:', event.origin);
+          return;
+        }
+
+        if (typeof event.data !== 'string' || !event.data.includes('request_code')) {
+          console.error('Invalid event data:', event.data);
+          return;
+        }
 
         try {
-          if (typeof event.data === 'string') {
-            const url = new URL(event.data);
-            const requestCode = url.searchParams.get('request_code'); // Extract the request_code from the URL
-            this.request_code = requestCode;
-            this.client = url.searchParams.get('client'); // Extract the client from the URL
-            console.log('Extracted request code:', this.request_code);
-            console.log('Extracted client:', this.client);
-            if (!this.request_code) return;
+          const url = new URL(event.data);
+          const requestCode = url.searchParams.get('request_code');
+          this.request_code = requestCode;
+          this.client = url.searchParams.get('client');
+          console.log('Extracted request code:', this.request_code);
+          console.log('Extracted client:', this.client);
+          if (!this.request_code) return;
 
-            // Generate the SHA-256 hash
-            const concatenatedValue = `${apiKey}${this.request_code}${apiSecret}`;
-            const hashedSecret = crypto.SHA256(concatenatedValue).toString();
-            console.log('Generated hashed secret:', hashedSecret);
+          const concatenatedValue = `${apiKey}${this.request_code}${apiSecret}`;
+          const hashedSecret = crypto.SHA256(concatenatedValue).toString();
+          console.log('Generated hashed secret:', hashedSecret);
 
-            // Send the POST request to get the token
-            try {
-              const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
-                api_key: apiKey,
-                request_code: requestCode,
-                api_secret: hashedSecret,
-              }), {
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                }
-              });
-              console.log('Token:', response.data.token);
-              this.token = response.data.token; // Store the token in the component's data
-            } catch (error) {
-              console.error('Failed to generate token:', error);
-            }
-          } else {
-            console.error('Invalid event data:', event.data);
+          try {
+            const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
+              api_key: apiKey,
+              request_code: requestCode,
+              api_secret: hashedSecret,
+            }), {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            });
+            console.log('Token:', response.data.token);
+            this.token = response.data.token;
+          } catch (error) {
+            console.error('Failed to generate token:', error);
           }
         } catch (error) {
           console.error('Failed to construct URL:', error);
         }
 
-        // Close the auth window and remove the event listener
         authWindow.close();
         window.removeEventListener('message', messageListener);
       };

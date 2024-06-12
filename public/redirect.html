@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirect</title>
+</head>
+<body>
+  <script>
+    // Extract the request_code and client from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestCode = urlParams.get('request_code');
+    const client = urlParams.get('client');
+
+    console.log('Request code:', requestCode);
+    console.log('Client:', client);
+
+    // Construct the message to send back to the parent window
+    const message = `${window.location.origin}?request_code=${requestCode}&client=${client}`;
+
+    console.log('Sending message:', message);
+
+    // Post the message to the parent window
+    window.opener.postMessage(message, 'http://localhost:5173');
+
+    // Close the current window
+    window.close();
+  </script>
+</body>
+</html>
