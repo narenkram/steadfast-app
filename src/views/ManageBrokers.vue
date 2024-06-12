@@ -1,7 +1,9 @@
 <template>
   <section class="row py-5">
     <div class="col-6 text-start">
-      <button class="btn btn-primary">Add New Broker</button>
+      <RouterLink to="/add-broker">
+        <button class="btn btn-primary">Add New Broker</button>
+      </RouterLink>
       <button class="ms-3 btn btn-outline-secondary">Refresh Broker List</button>
     </div>
     <div class="col-6 text-end">

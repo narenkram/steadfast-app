@@ -15,9 +15,9 @@
 
         <!-- Change Broker -->
         <div class="col-2">
-          <label for="SelectBroker" class="form-label mb-0"><b>Select Broker</b></label>
+          <label for="ChangeBroker" class="form-label mb-0"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
-            <select class="form-select" aria-label="Select Broker">
+            <select class="form-select" aria-label="Change Broker">
               <option value="Dhan" selected>Dhan</option>
               <option value="Flattrade">Flattrade</option>
               <option value="Shoonya">Shoonya</option>
