@@ -2,9 +2,9 @@
   <section class="row py-5">
     <div class="row">
       <div class="col-6">
-        <h3>Steps to generate API Key and API Secret key</h3>
+        <h3>Steps to generate API Key 🔑 and API Secret key</h3>
 
-        <div class="card w-100 h-100 bg-light">
+        <div class="card w-100 h-75 bg-light">
           <div class="card-body">
             <p class="card-text">YouTube Video</p>
           </div>
@@ -12,7 +12,7 @@
       </div>
 
       <div class="col-6">
-        <h3>Add broker API Key and API Secret Key</h3>
+        <h3>Add broker API Details 🔐</h3>
         <p>Please watch the YouTube video on how to obtain the following details.</p>
         <!-- Select Broker -->
         <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
