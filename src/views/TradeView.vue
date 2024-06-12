@@ -29,12 +29,12 @@
         <div class="col-2">
           <p class="mb-1"><b>Broker</b> <span class="badge bg-success">Connected</span></p>
           <p class="mb-0">
-            <span v-if="showDhanId" @click="toggleDhanIdVisibility">
+            <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
               {{ dhanClientId || 'N/A' }}
               <span>👀</span>
             </span>
-            <span v-else @click="toggleDhanIdVisibility">
-              {{ maskDhanId(dhanClientId) }}
+            <span v-else @click="toggleBrokerClientIdVisibility">
+              {{ maskBrokerClientId(dhanClientId) }}
               <span>👁️</span>
             </span>
 
@@ -470,7 +470,7 @@ export default {
       orders: [], // Define orders as an empty array initially
       currentTransactionType: '', // This will store either 'BUY' or 'SELL'
       // New properties
-      showDhanId: false, // Controls the visibility of the Dhan ID
+      showBrokerClientId: false, // Controls the visibility of the Dhan ID
       positions: [], // Stores the positions fetched from the API
 
       selectedExchange: 'NSE',
@@ -813,10 +813,10 @@ export default {
     updateToastVisibility(value) {
       this.showToast = value;
     },
-    toggleDhanIdVisibility() {
-      this.showDhanId = !this.showDhanId;
+    toggleBrokerClientIdVisibility() {
+      this.showBrokerClientId = !this.showBrokerClientId;
     },
-    maskDhanId(dhanClientId) {
+    maskBrokerClientId(dhanClientId) {
       if (!dhanClientId || dhanClientId.length < 10) return 'N/A'; // Ensure there are enough characters to mask
       const startUnmaskedLength = Math.ceil((dhanClientId.length - 6) / 2);
       const endUnmaskedLength = Math.floor((dhanClientId.length - 6) / 2);
