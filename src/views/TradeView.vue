@@ -18,8 +18,9 @@
           <label for="ChangeBroker" class="form-label mb-0"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
             <select class="form-select" aria-label="Change Broker" v-model="selectedBroker">
-              <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker.brokerName">
+              <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
                 {{ broker.brokerName }}
+                <span>{{ broker.brokerClientId }}</span>
               </option>
             </select>
           </div>
@@ -30,14 +31,13 @@
           <p class="mb-1"><b>Broker</b> <span class="badge bg-success">Connected</span></p>
           <p class="mb-0">
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
-              {{ dhanClientId || 'N/A' }}
+              {{ selectedBroker?.brokerClientId || 'N/A' }}
               <span>👀</span>
             </span>
             <span v-else @click="toggleBrokerClientIdVisibility">
-              {{ maskBrokerClientId(dhanClientId) }}
+              {{ maskBrokerClientId(selectedBroker?.brokerClientId) }}
               <span>👁️</span>
             </span>
-
           </p>
         </div>
 
@@ -463,7 +463,7 @@ export default {
       brokers: [],
       selectedBroker: null,
       fundLimits: {}, // Initialize as an empty object
-      dhanClientId: null, // Initialize as null
+      brokerClientId: null, // Initialize as null
       showToast: false, // Controls the visibility of the toast
       toastMessage: '', // Message displayed in the toast
       killSwitchActive: false, // Initial state of the kill switch
@@ -548,7 +548,7 @@ export default {
   mounted() {
     this.fetchBrokers();
     this.fetchFundLimit();
-    this.fetchDhanClientId();
+    this.fetchBrokerClientId();
     this.fetchPositions();
 
     // related to scrip master
@@ -604,10 +604,19 @@ export default {
         const response = await axios.get('http://localhost:3000/brokers');
         this.brokers = response.data;
         if (this.brokers.length > 0) {
-          this.selectedBroker = this.brokers[0].brokerName; // Set default broker
+          this.selectedBroker = this.brokers[0]; // Set default broker to the first broker in the list
         }
       } catch (error) {
         console.error('Failed to fetch brokers:', error);
+      }
+    },
+    async fetchBrokerClientId() {
+      try {
+        const { data } = await axios.get('http://localhost:3000/brokerClientId');
+        this.brokerClientId = data.brokerClientId;
+        console.log('Dhan Client ID:', data.brokerClientId);
+      } catch (error) {
+        console.error('Error fetching Dhan Client ID:', error);
       }
     },
     async fetchTradingData() {
@@ -745,15 +754,7 @@ export default {
         console.error('Error fetching fund limit:', error);
       }
     },
-    async fetchDhanClientId() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/dhanClientId');
-        this.dhanClientId = data.dhanClientId;
-        console.log('Dhan Client ID:', data.dhanClientId);
-      } catch (error) {
-        console.error('Error fetching Dhan Client ID:', error);
-      }
-    },
+
     async fetchPositions() {
       try {
         const response = await axios.get('http://localhost:3000/positions');
@@ -816,13 +817,20 @@ export default {
     toggleBrokerClientIdVisibility() {
       this.showBrokerClientId = !this.showBrokerClientId;
     },
-    maskBrokerClientId(dhanClientId) {
-      if (!dhanClientId || dhanClientId.length < 10) return 'N/A'; // Ensure there are enough characters to mask
-      const startUnmaskedLength = Math.ceil((dhanClientId.length - 6) / 2);
-      const endUnmaskedLength = Math.floor((dhanClientId.length - 6) / 2);
-      const firstPart = dhanClientId.slice(0, startUnmaskedLength);
-      const lastPart = dhanClientId.slice(-endUnmaskedLength);
-      const middleMask = '******'; // Mask middle 6 characters
+    maskBrokerClientId(brokerClientId) {
+      if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
+
+      const length = brokerClientId.length;
+      if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
+
+      const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
+      const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
+      const endUnmaskedLength = length - startUnmaskedLength - maskLength;
+
+      const firstPart = brokerClientId.slice(0, startUnmaskedLength);
+      const lastPart = brokerClientId.slice(-endUnmaskedLength);
+      const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
+
       return `${firstPart}${middleMask}${lastPart}`;
     },
     handleArrowKeys(event) {
@@ -872,7 +880,7 @@ export default {
         }
 
         const orderData = {
-          dhanClientId: this.dhanClientId,
+          brokerClientId: this.selectedBroker.brokerClientId, // Use selectedBroker's brokerClientId
           transactionType: transactionType,
           exchangeSegment: exchangeSegment,
           productType: this.selectedProductType,
@@ -901,6 +909,7 @@ export default {
         this.showToast = true;
       }
     },
+
     async closeAllPositions() {
       try {
         for (const position of this.positions) {
@@ -927,7 +936,7 @@ export default {
         const exchangeSegment = this.selectedExchange === 'NSE' ? 'NSE_FNO' : 'BSE_FNO';
 
         const orderData = {
-          dhanClientId: this.dhanClientId,
+          brokerClientId: this.brokerClientId,
           transactionType: transactionType,
           exchangeSegment: exchangeSegment,
           productType: position.productType,
