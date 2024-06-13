@@ -61,6 +61,8 @@
 
 <script>
 import axios from 'axios';
+import qs from 'qs';
+import crypto from 'crypto-js';
 
 export default {
   data() {
