@@ -108,7 +108,7 @@ export default {
       if (broker.brokerName !== 'Flattrade') return;
 
       const apiKey = broker.apiKey;
-      const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}&redirect_uri=${encodeURIComponent(window.location.origin + '/redirect')}`;
+      const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}`;
 
       console.log('Opening auth URL:', authUrl);
       const authWindow = window.open(authUrl, '_blank');
@@ -123,10 +123,6 @@ export default {
     },
     async handleMessage(event) {
       if (!this.isAuthActive) return;
-
-      console.log('Received event:', event);
-      console.log('Event origin:', event.origin);
-      console.log('Event data:', event.data);
 
       if (event.origin !== 'http://localhost:5173') {
         console.error('Invalid origin:', event.origin);
@@ -175,7 +171,7 @@ export default {
         apiSecret: newHashedApiSecret,
       });
 
-      const response = await axios.post('http://localhost:3000/api/exchange-request-code-for-token', {
+      const response = axios.post('http://localhost:3000/api/exchange-request-code-for-token', {
         apiKey: broker.apiKey,
         requestCode: requestCode,
         apiSecret: newHashedApiSecret
@@ -185,15 +181,7 @@ export default {
         }
       });
 
-      const { token, client, stat, emsg } = response.data;
-      if (stat === 'Ok' && token) {
-        console.log('Token:', token);
-        this.token = token;
-        this.statusMessage = 'Token Key Obtained: ' + token;
-      } else {
-        console.error('Failed to obtain token:', emsg);
-        this.statusMessage = 'Failed to obtain token: ' + emsg;
-      }
+      console.log('Token Response:', response);
     }
   }
 };
