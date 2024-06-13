@@ -54,23 +54,23 @@
     </div>
   </section>
 
-  <div v-if="request_code">
-    <h1>Request Code: {{ request_code }}</h1>
-    <h1>Client: {{ client }}</h1>
-    <h1>Token: {{ token }}</h1>
+  <div v-if="statusMessage">
+    <h1>{{ statusMessage }}</h1>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import qs from 'qs';
+import crypto from 'crypto-js';
 
 export default {
   data() {
     return {
       brokers: [],
-      request_code: null,
-      client: null,
-      token: null
+      statusMessage: null,
+      token: null,
+      isAuthActive: false // Flag to indicate if authentication is active
     };
   },
   async mounted() {
@@ -80,6 +80,11 @@ export default {
     } catch (error) {
       console.error('Failed to fetch brokers:', error);
     }
+
+    window.addEventListener('message', this.handleMessage);
+  },
+  beforeUnmount() {
+    window.removeEventListener('message', this.handleMessage);
   },
   methods: {
     maskApiSecret(apiSecret) {
@@ -104,7 +109,7 @@ export default {
       if (broker.brokerName !== 'Flattrade') return;
 
       const apiKey = broker.apiKey;
-      const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}`;
+      const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}&redirect_uri=${encodeURIComponent(window.location.origin + '/redirect')}`;
 
       console.log('Opening auth URL:', authUrl);
       const authWindow = window.open(authUrl, '_blank');
@@ -113,7 +118,78 @@ export default {
         console.error('Failed to open auth URL. Check for pop-up blockers.');
         return;
       }
+
+      this.isAuthActive = true; // Set the flag to true when authentication starts
+      this.statusMessage = 'Waiting for user to complete auth on broker portal...';
     },
-  },
+    async handleMessage(event) {
+      if (!this.isAuthActive) return; // Ignore messages if authentication is not active
+
+      console.log('Received event:', event);
+      console.log('Event origin:', event.origin);
+      console.log('Event data:', event.data);
+
+      if (event.origin !== 'http://localhost:5173') {
+        console.error('Invalid origin:', event.origin);
+        return;
+      }
+
+      if (typeof event.data !== 'string' || !event.data.includes('request_code')) {
+        console.error('Invalid event data:', event.data);
+        return;
+      }
+
+      try {
+        const url = new URL(event.data);
+        const requestCode = url.searchParams.get('request_code');
+        const client = url.searchParams.get('client');
+        console.log('Extracted request code:', requestCode);
+        console.log('Extracted client:', client);
+
+        if (!requestCode) {
+          console.error('Request code is undefined');
+          return;
+        }
+
+        this.statusMessage = 'Receiving request code, now making call to obtain token...';
+
+        const broker = this.brokers.find(b => b.brokerName === 'Flattrade');
+        if (!broker) {
+          console.error('Broker not found');
+          return;
+        }
+
+        const apiKey = broker.apiKey;
+        const apiSecret = broker.apiSecret;
+        const concatenatedValue = `${apiKey}${requestCode}${apiSecret}`;
+        const hashedSecret = crypto.SHA256(concatenatedValue).toString();
+        console.log('Generated hashed secret:', hashedSecret);
+
+        try {
+          const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
+            api_key: apiKey,
+            request_code: requestCode,
+            api_secret: hashedSecret,
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          });
+          console.log('Token:', response.data.token);
+          this.token = response.data.token;
+          this.statusMessage = 'Token Key Obtained.';
+        } catch (error) {
+          console.error('Failed to generate token:', error);
+          this.statusMessage = 'Failed to obtain token.';
+        } finally {
+          this.isAuthActive = false; // Reset the flag after processing
+        }
+      } catch (error) {
+        console.error('Failed to construct URL:', error);
+        this.statusMessage = 'Failed to process request code.';
+        this.isAuthActive = false; // Reset the flag in case of error
+      }
+    }
+  }
 };
 </script>
