@@ -61,6 +61,7 @@
 
 <script>
 import axios from 'axios';
+import crypto from 'crypto-js';
 
 export default {
   data() {
@@ -149,7 +150,7 @@ export default {
           return;
         }
 
-        this.statusMessage = 'Receiving request code, now making call to obtain token...';
+        this.statusMessage = 'Received request code, ' + requestCode + ' now making call to obtain token...';
 
         const broker = this.brokers.find(b => b.brokerName === 'Flattrade');
         if (!broker) {
@@ -157,30 +158,41 @@ export default {
           return;
         }
 
-        try {
-          const response = await axios.post('http://localhost:3000/api/generate-token', {
-            apiKey: broker.apiKey,
-            requestCode: requestCode,
-            apiSecret: broker.apiSecret,
-          }, {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-
-          console.log('Token:', response.data.token);
-          this.token = response.data.token;
-          this.statusMessage = 'Token Key Obtained.' + response.data.token;
-        } catch (error) {
-          console.error('Failed to generate token:', error);
-          this.statusMessage = 'Failed to obtain token.';
-        } finally {
-          this.isAuthActive = false;
-        }
+        await this.exchangeRequestCodeForToken(broker, requestCode);
       } catch (error) {
         console.error('Failed to construct URL:', error);
         this.statusMessage = 'Failed to process request code.';
         this.isAuthActive = false;
+      }
+    },
+    async exchangeRequestCodeForToken(broker, requestCode) {
+      const concatenatedValue = `${broker.apiKey}${requestCode}${broker.apiSecret}`;
+      const newHashedApiSecret = crypto.SHA256(concatenatedValue).toString();
+
+      console.log('Sending request to exchange request code for token with payload:', {
+        apiKey: broker.apiKey,
+        requestCode: requestCode,
+        apiSecret: newHashedApiSecret,
+      });
+
+      const response = await axios.post('http://localhost:3000/api/exchange-request-code-for-token', {
+        apiKey: broker.apiKey,
+        requestCode: requestCode,
+        apiSecret: newHashedApiSecret
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const { token, client, stat, emsg } = response.data;
+      if (stat === 'Ok' && token) {
+        console.log('Token:', token);
+        this.token = token;
+        this.statusMessage = 'Token Key Obtained: ' + token;
+      } else {
+        console.error('Failed to obtain token:', emsg);
+        this.statusMessage = 'Failed to obtain token: ' + emsg;
       }
     }
   }
