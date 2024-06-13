@@ -14,11 +14,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/symbols': 'http://localhost:3000',
-      '/api': {
+      '/flattradeApi': {
         target: 'https://authapi.flattrade.in',
         changeOrigin: true,
-        pathRewrite: { '^/api': '' }
-      }
+        rewrite: (path) => path.replace(/^\/flattradeApi/, '')
+      },
+      // '/dhanApi': {
+      //   target: 'https://authapi.flattrade.in',
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/dhanApi/, '')
+      // }
     }
   }
 })

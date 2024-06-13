@@ -1,3 +1,79 @@
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import axios from 'axios';
+
+const APIKEY = 'e44ac8efec6f44de9dd8581fc7bd9281';
+const secretKey = '2024.f8792c44c9cd4366b56779cad79e49b015493894fe9eaf39';
+const reqCode = ref('');
+const token = ref('');
+const errorMessage = ref('');
+const statusMessage = ref('');
+const brokers = ref([]);
+
+onMounted(() => {
+  const storedCode = localStorage.getItem('authCode');
+  if (storedCode) {
+    reqCode.value = storedCode;
+    localStorage.removeItem('authCode');
+    localStorage.removeItem('statusMessage');
+  } else {
+    statusMessage.value = localStorage.getItem('statusMessage') || '';
+  }
+});
+
+watch(reqCode, (newCode) => {
+  if (newCode) {
+    generateToken();
+  }
+});
+
+const openAuthUrl = () => {
+  localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
+  const authUrl = `https://auth.flattrade.in/?app_key=${APIKEY}`;
+  window.open(authUrl, '_blank');
+};
+
+const generateToken = async () => {
+  if (!reqCode.value) {
+    errorMessage.value = 'Request code is missing';
+    return;
+  }
+
+  const api_secret = APIKEY + reqCode.value + secretKey;
+  const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
+  const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+  const payload = {
+    api_key: APIKEY,
+    request_code: reqCode.value,
+    api_secret: apiSecretHex
+  };
+
+  try {
+    const res = await axios.post('/flattradeApi/trade/apitoken', payload);
+    const generatedToken = res.data.token;
+    if (!generatedToken) {
+      errorMessage.value = "Token generation failed";
+    } else {
+      token.value = generatedToken;
+      errorMessage.value = '';
+      console.log('Token generated successfully:', generatedToken);
+      const data = {
+        token: generatedToken,
+        api_key: APIKEY,
+        api_secret: secretKey,
+        userid: 'userid',
+        password: 'password'
+      };
+      // Use the data object as needed
+    }
+  } catch (error) {
+    errorMessage.value = 'Error generating token: ' + error.message;
+    console.error('Error generating token:', error);
+  }
+};
+</script>
+
 <template>
   <section class="row py-5">
     <div class="col-6 text-start">
@@ -53,136 +129,12 @@
       </table>
     </div>
   </section>
-
-  <div v-if="statusMessage">
-    <h1>{{ statusMessage }}</h1>
-  </div>
+  
+  <main>
+      <button @click="openAuthUrl">Open Authorization URL</button>
+      <div v-if="reqCode">Request Code: {{ reqCode }}</div>
+      <div v-if="token">Token: {{ token }}</div>
+      <div v-if="errorMessage" style="color: red;">{{ errorMessage }}</div>
+      <div v-if="statusMessage" style="color: blue;">{{ statusMessage }}</div>
+    </main>
 </template>
-
-<script>
-import axios from 'axios';
-import crypto from 'crypto-js';
-
-export default {
-  data() {
-    return {
-      brokers: [],
-      statusMessage: null,
-      token: null,
-      isAuthActive: false // Flag to indicate if authentication is active
-    };
-  },
-  async mounted() {
-    try {
-      const response = await axios.get('http://localhost:3000/brokers');
-      this.brokers = response.data;
-    } catch (error) {
-      console.error('Failed to fetch brokers:', error);
-    }
-
-    window.addEventListener('message', this.handleMessage);
-  },
-  beforeUnmount() {
-    window.removeEventListener('message', this.handleMessage);
-  },
-  methods: {
-    maskApiSecret(apiSecret) {
-      if (!apiSecret || apiSecret.length < 10) return '******';
-      const start = apiSecret.slice(0, 3);
-      const end = apiSecret.slice(-3);
-      return `${start}******${end}`;
-    },
-    maskBrokerClientId(brokerClientId) {
-      if (!brokerClientId) return 'N/A';
-      const length = brokerClientId.length;
-      if (length <= 2) return brokerClientId;
-      const maskLength = Math.max(1, Math.floor(length / 2));
-      const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
-      const endUnmaskedLength = length - startUnmaskedLength - maskLength;
-      const firstPart = brokerClientId.slice(0, startUnmaskedLength);
-      const lastPart = brokerClientId.slice(-endUnmaskedLength);
-      const middleMask = '*'.repeat(maskLength);
-      return `${firstPart}${middleMask}${lastPart}`;
-    },
-    loginBrokerAccount(broker) {
-      if (broker.brokerName !== 'Flattrade') return;
-
-      const apiKey = broker.apiKey;
-      const authUrl = `https://auth.flattrade.in/?app_key=${apiKey}`;
-
-      console.log('Opening auth URL:', authUrl);
-      const authWindow = window.open(authUrl, '_blank');
-
-      if (!authWindow) {
-        console.error('Failed to open auth URL. Check for pop-up blockers.');
-        return;
-      }
-
-      this.isAuthActive = true; // Set the flag to true when authentication starts
-      this.statusMessage = 'Waiting for user to complete auth on broker portal...';
-    },
-    async handleMessage(event) {
-      if (!this.isAuthActive) return;
-
-      if (event.origin !== 'http://localhost:5173') {
-        console.error('Invalid origin:', event.origin);
-        return;
-      }
-
-      if (typeof event.data !== 'string' || !event.data.includes('request_code')) {
-        console.error('Invalid event data:', event.data);
-        return;
-      }
-
-      try {
-        const url = new URL(event.data);
-        const requestCode = url.searchParams.get('request_code');
-        const client = url.searchParams.get('client');
-        console.log('Extracted request code:', requestCode);
-        console.log('Extracted client:', client);
-
-        if (!requestCode) {
-          console.error('Request code is undefined');
-          return;
-        }
-
-        this.statusMessage = 'Received request code, ' + requestCode + ' now making call to obtain token...';
-
-        const broker = this.brokers.find(b => b.brokerName === 'Flattrade');
-        if (!broker) {
-          console.error('Broker not found');
-          return;
-        }
-
-        await this.exchangeRequestCodeForToken(broker, requestCode);
-      } catch (error) {
-        console.error('Failed to construct URL:', error);
-        this.statusMessage = 'Failed to process request code.';
-        this.isAuthActive = false;
-      }
-    },
-    async exchangeRequestCodeForToken(broker, requestCode) {
-      const concatenatedValue = `${broker.apiKey}${requestCode}${broker.apiSecret}`;
-      const newHashedApiSecret = crypto.SHA256(concatenatedValue).toString();
-
-      console.log('Sending request to exchange request code for token with payload:', {
-        apiKey: broker.apiKey,
-        requestCode: requestCode,
-        apiSecret: newHashedApiSecret,
-      });
-
-      const response = axios.post('http://localhost:3000/api/exchange-request-code-for-token', {
-        apiKey: broker.apiKey,
-        requestCode: requestCode,
-        apiSecret: newHashedApiSecret
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('Token Response:', response);
-    }
-  }
-};
-</script>

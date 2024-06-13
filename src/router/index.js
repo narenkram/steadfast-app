@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TradeView from '../views/TradeView.vue'
 import ManageBrokers from '../views/ManageBrokers.vue'
 import AddBroker from '../views/AddBroker.vue'
-import RedirectHandler from '../views/RedirectHandler.vue'; // Import RedirectHandler if needed
+import RedirectView from '../views/RedirectView.vue'; 
 
 
 const router = createRouter({
@@ -25,8 +25,7 @@ const router = createRouter({
     },
     {
       path: '/redirect',
-      name: 'RedirectHandler',
-      component: RedirectHandler, // Use RedirectHandler component to handle the redirection
+      component: RedirectView
     },
   ]
 })
