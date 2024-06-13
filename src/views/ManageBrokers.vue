@@ -123,7 +123,7 @@ export default {
       this.statusMessage = 'Waiting for user to complete auth on broker portal...';
     },
     async handleMessage(event) {
-      if (!this.isAuthActive) return; // Ignore messages if authentication is not active
+      if (!this.isAuthActive) return;
 
       console.log('Received event:', event);
       console.log('Event origin:', event.origin);
@@ -166,28 +166,28 @@ export default {
         console.log('Generated hashed secret:', hashedSecret);
 
         try {
-          const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
+          const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', {
             api_key: apiKey,
             request_code: requestCode,
             api_secret: hashedSecret,
-          }), {
+          }, {
             headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
+              'Content-Type': 'application/json'
             }
           });
           console.log('Token:', response.data.token);
           this.token = response.data.token;
-          this.statusMessage = 'Token Key Obtained.';
+          this.statusMessage = 'Token Key Obtained.' + response.data.token;
         } catch (error) {
           console.error('Failed to generate token:', error);
           this.statusMessage = 'Failed to obtain token.';
         } finally {
-          this.isAuthActive = false; // Reset the flag after processing
+          this.isAuthActive = false;
         }
       } catch (error) {
         console.error('Failed to construct URL:', error);
         this.statusMessage = 'Failed to process request code.';
-        this.isAuthActive = false; // Reset the flag in case of error
+        this.isAuthActive = false;
       }
     }
   }
