@@ -61,7 +61,6 @@
 
 <script>
 import axios from 'axios';
-import qs from 'qs';
 import crypto from 'crypto-js';
 
 export default {
@@ -166,15 +165,15 @@ export default {
         console.log('Generated hashed secret:', hashedSecret);
 
         try {
-          const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', {
+          const response = await axios.post('http://localhost:3000/api/trade/apitoken', {
             api_key: apiKey,
             request_code: requestCode,
             api_secret: hashedSecret,
           }, {
             headers: {
-              'Content-Type': 'application/json'
-            }
-          });
+            'Content-Type': 'application/json'
+          }
+        });
           console.log('Token:', response.data.token);
           this.token = response.data.token;
           this.statusMessage = 'Token Key Obtained.' + response.data.token;
