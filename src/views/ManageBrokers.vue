@@ -129,7 +129,6 @@ export default {
       console.log('Event origin:', event.origin);
       console.log('Event data:', event.data);
 
-      // Ensure the event data is in the expected format
       if (event.origin !== 'http://localhost:5173') {
         console.error('Invalid origin:', event.origin);
         return;
