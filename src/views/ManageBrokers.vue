@@ -134,7 +134,7 @@ export default {
         return;
       }
 
-      if (typeof event.data !== 'string' || !event.data.includes('request_code')) {
+      if (typeof event.data !== 'string' || !event.data.startsWith('http://localhost:5173?request_code=')) {
         console.error('Invalid event data:', event.data);
         return;
       }
@@ -175,9 +175,16 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           });
-          console.log('Token:', response.data.token);
-          this.token = response.data.token;
-          this.statusMessage = 'Token Key Obtained.';
+          console.log('Response:', response); // Log the entire response
+          const token = response.data.token; // Adjust this based on the actual response structure
+          if (token) {
+            console.log('Token:', token);
+            this.token = token;
+            this.statusMessage = 'Token Key Obtained.';
+          } else {
+            console.error('Token not found in response');
+            this.statusMessage = 'Failed to obtain token.';
+          }
         } catch (error) {
           console.error('Failed to generate token:', error);
           this.statusMessage = 'Failed to obtain token.';
