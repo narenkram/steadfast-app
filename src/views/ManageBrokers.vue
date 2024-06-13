@@ -161,19 +161,26 @@ export default {
 
         const apiKey = broker.apiKey;
         const apiSecret = broker.apiSecret;
+        const concatenatedValue = `${apiKey}${requestCode}${apiSecret}`;
+        const hashedSecret = crypto.SHA256(concatenatedValue).toString();
+        console.log('Generated hashed secret:', hashedSecret);
 
         try {
-          const response = await axios.post('http://localhost:3000/api/exchange-code', {
+          const response = await axios.post('https://authapi.flattrade.in/trade/apitoken', qs.stringify({
             api_key: apiKey,
             request_code: requestCode,
-            api_secret: apiSecret,
+            api_secret: hashedSecret,
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
           });
-
-          const token = response.data.token;
+          console.log('Response:', response); // Log the entire response
+          const token = response.data.token; // Adjust this based on the actual response structure
           if (token) {
             console.log('Token:', token);
             this.token = token;
-            this.statusMessage = `Token Key Obtained: ${token}`;
+            this.statusMessage = 'Token Key Obtained.';
           } else {
             console.error('Token not found in response');
             this.statusMessage = 'Failed to obtain token.';
