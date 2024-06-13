@@ -150,7 +150,7 @@ export default {
           return;
         }
 
-        this.statusMessage = 'Received request code, now making call to obtain token...';
+        this.statusMessage = 'Receiving request code, now making call to obtain token...';
 
         const broker = this.brokers.find(b => b.brokerName === 'Flattrade');
         if (!broker) {
@@ -162,25 +162,23 @@ export default {
         const apiSecret = broker.apiSecret;
 
         try {
-          console.log('Frontend Forwarding POST request to backend to exchange code for token...');
-          const response = await fetch('http://localhost:3000/api/exchange-code', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ api_key: apiKey, request_code: requestCode, api_secret: apiSecret }),
+          const response = await axios.post('http://localhost:3000/api/exchange-code', {
+            api_key: apiKey,
+            request_code: requestCode,
+            api_secret: apiSecret,
           });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          const token = response.data.token;
+          if (token) {
+            console.log('Token:', token);
+            this.token = token;
+            this.statusMessage = `Token Key Obtained: ${token}`;
+          } else {
+            console.error('Token not found in response');
+            this.statusMessage = 'Failed to obtain token.';
           }
-
-          const data = await response.json();
-          console.log('Token received from backend:', data.token);
-          this.token = data.token;
-          this.statusMessage = `Token Key Obtained: ${data.token}`;
         } catch (error) {
-          console.error('Failed to forward request to backend:', error);
+          console.error('Failed to generate token:', error);
           this.statusMessage = 'Failed to obtain token.';
         } finally {
           this.isAuthActive = false; // Reset the flag after processing
