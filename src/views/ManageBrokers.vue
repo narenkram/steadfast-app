@@ -41,7 +41,7 @@
             <td>{{ maskApiSecret(broker.apiSecret) }}</td>
             <td><span class="badge text-bg-success">{{ broker.status }}</span></td>
             <td>{{ broker.lastTokenGeneratedAt }}</td>
-            <td><a class="link" @click="generateToken(broker)">Generate Token</a></td>
+            <td><a class="link" @click="loginBrokerAccount(broker)">Generate Token</a></td>
             <td>
               <a class="mx-1"><span class="SelectBroker">▶️</span></a>
               <a class="mx-1"><span class="PauseBroker">⏸️</span></a>
@@ -61,7 +61,6 @@
 
 <script>
 import axios from 'axios';
-import crypto from 'crypto-js';
 
 export default {
   data() {
@@ -104,7 +103,7 @@ export default {
       const middleMask = '*'.repeat(maskLength);
       return `${firstPart}${middleMask}${lastPart}`;
     },
-    generateToken(broker) {
+    loginBrokerAccount(broker) {
       if (broker.brokerName !== 'Flattrade') return;
 
       const apiKey = broker.apiKey;
@@ -158,22 +157,17 @@ export default {
           return;
         }
 
-        const apiKey = broker.apiKey;
-        const apiSecret = broker.apiSecret;
-        const concatenatedValue = `${apiKey}${requestCode}${apiSecret}`;
-        const hashedSecret = crypto.SHA256(concatenatedValue).toString();
-        console.log('Generated hashed secret:', hashedSecret);
-
         try {
-          const response = await axios.post('http://localhost:3000/api/trade/apitoken', {
-            api_key: apiKey,
-            request_code: requestCode,
-            api_secret: hashedSecret,
+          const response = await axios.post('http://localhost:3000/api/generate-token', {
+            apiKey: broker.apiKey,
+            requestCode: requestCode,
+            apiSecret: broker.apiSecret,
           }, {
             headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+              'Content-Type': 'application/json'
+            }
+          });
+
           console.log('Token:', response.data.token);
           this.token = response.data.token;
           this.statusMessage = 'Token Key Obtained.' + response.data.token;
