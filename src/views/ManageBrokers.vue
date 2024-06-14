@@ -109,6 +109,26 @@ const maskApiSecret = (apiSecret) => {
   return `${start}******${end}`;
 };
 
+const fundLimits = ref('');
+const getFundLimits = async () => {
+  const jKey = token.value;
+  const jData = JSON.stringify({ uid: 'FT014523', actid: 'FT014523' });
+
+  const payload = `jKey=${jKey}&jData=${jData}`;
+
+  try {
+    const res = await axios.post('https://piconnect.flattrade.in/PiConnectTP/Limits', payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    fundLimits.value = res.data;
+    console.log(res.data);
+  } catch (error) {
+    errorMessage.value = 'Error fetching fund limits: ' + error.message;
+    console.error('Error fetching fund limits:', error);
+  }
+};
 </script>
 
 <template>
@@ -174,4 +194,10 @@ const maskApiSecret = (apiSecret) => {
     <div v-if="errorMessage" style="color: red;">{{ errorMessage }}</div>
     <div v-if="statusMessage" style="color: blue;">{{ statusMessage }}</div>
   </main>
+
+  <!-- get flattrade fund limits -->
+  <div v-if="token">
+    <button @click="getFundLimits">Get Fund Limits</button>
+    <div v-if="fundLimits">Fund Limits: {{ fundLimits }}</div>
+  </div>
 </template>
