@@ -34,56 +34,74 @@ onMounted(() => {
 
 watch(reqCode, (newCode) => {
   if (newCode) {
+    statusMessage.value = `Received reqCode: ${newCode} Generated Token:` + token.value;
     generateToken();
   }
 });
 
-const openAuthUrl = () => {
+const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
   const authUrl = `https://auth.flattrade.in/?app_key=${APIKEY}`;
   window.open(authUrl, '_blank');
 };
 
-const generateToken = async () => {
-  if (!reqCode.value) {
-    errorMessage.value = 'Request code is missing';
+const clearErrorMessage = () => {
+  setTimeout(() => {
+    errorMessage.value = '';
+  }, 5000); // Clear error message after 5 seconds
+};
+
+const generateToken = async (broker) => {
+  if (!broker) {
+    errorMessage.value = 'Broker information is missing';
+    clearErrorMessage();
     return;
   }
 
-  const api_secret = APIKEY + reqCode.value + secretKey;
-  const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
-  const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
+  if (broker.brokerName === 'Flattrade') {
+    openFlattradeAuthUrl();
+    statusMessage.value = 'Waiting for reqCode...';
+    return;
+  }
 
-  const payload = {
-    api_key: APIKEY,
-    request_code: reqCode.value,
-    api_secret: apiSecretHex
-  };
-
-  try {
-    const res = await axios.post('/flattradeApi/trade/apitoken', payload);
-    const generatedToken = res.data.token;
-    if (!generatedToken) {
-      errorMessage.value = "Token generation failed";
-    } else {
-      token.value = generatedToken;
-      errorMessage.value = '';
-      console.log('Token generated successfully:', generatedToken);
-      const data = {
-        token: generatedToken,
-        api_key: APIKEY,
-        api_secret: secretKey,
-        userid: 'userid',
-        password: 'password'
-      };
-      // Use the data object as needed
-    }
-  } catch (error) {
-    errorMessage.value = 'Error generating token: ' + error.message;
-    console.error('Error generating token:', error);
+  if (!reqCode.value) {
+    errorMessage.value = 'Request code is missing';
+    clearErrorMessage();
+    return;
   }
 };
 
+watch(reqCode, async (newCode) => {
+  if (newCode) {
+    const api_secret = APIKEY + newCode + secretKey;
+    const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
+    const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const payload = {
+      api_key: APIKEY,
+      request_code: newCode,
+      api_secret: apiSecretHex,
+    };
+
+    try {
+      const res = await axios.post('/flattradeApi/trade/apitoken', payload);
+      const generatedToken = res.data.token;
+      if (!generatedToken) {
+        errorMessage.value = "Token generation failed";
+        clearErrorMessage();
+      } else {
+        token.value = generatedToken;
+        errorMessage.value = '';
+        statusMessage.value = `Token generated successfully: ${generatedToken}`;
+        console.log('Token generated successfully:', generatedToken);
+      }
+    } catch (error) {
+      errorMessage.value = 'Error generating token: ' + error.message;
+      clearErrorMessage();
+      console.error('Error generating token:', error);
+    }
+  }
+});
 const maskBrokerClientId = (brokerClientId) => {
   if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
 
@@ -126,6 +144,7 @@ const getFundLimits = async () => {
     console.log(res.data);
   } catch (error) {
     errorMessage.value = 'Error fetching fund limits: ' + error.message;
+    clearErrorMessage();
     console.error('Error fetching fund limits:', error);
   }
 };
@@ -137,7 +156,7 @@ const getFundLimits = async () => {
       <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink>
-      <button class="ms-3 btn btn-outline-secondary">Refresh Broker List</button>
+      <button class="ms-3 btn btn-outline-secondary" @click="fetchBrokers">Refresh Broker List</button>
     </div>
     <div class="col-6 text-end">
       <RouterLink to="/">
@@ -171,14 +190,12 @@ const getFundLimits = async () => {
               <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
             </td>
             <td>{{ broker.appId }}</td>
-            <td>{{ maskApiSecret(broker.apiSecret) }}</td>
-            <td><span class="badge text-bg-success">{{ broker.status }}</span></td>
+            <td>{{ maskApiSecret(broker.appSecretKey) }}</td>
+            <td>{{ broker.status }}</td>
             <td>{{ broker.lastTokenGeneratedAt }}</td>
-            <td><a class="link" @click="loginBrokerAccount(broker)">Generate Token</a></td>
+            <td><a class="link" @click.prevent="generateToken(broker)">Generate Token</a></td>
             <td>
-              <a class="mx-1"><span class="SelectBroker">▶️</span></a>
-              <a class="mx-1"><span class="PauseBroker">⏸️</span></a>
-              <a class="mx-1"><span class="DeleteBroker">❌</span></a>
+              <!-- Add any additional actions here -->
             </td>
             <td>{{ broker.addedAt }}</td>
           </tr>
@@ -187,17 +204,13 @@ const getFundLimits = async () => {
     </div>
   </section>
 
-  <main>
-    <button @click="openAuthUrl">Open Authorization URL</button>
-    <div v-if="reqCode">Request Code: {{ reqCode }}</div>
-    <div v-if="token">Token: {{ token }}</div>
-    <div v-if="errorMessage" style="color: red;">{{ errorMessage }}</div>
-    <div v-if="statusMessage" style="color: blue;">{{ statusMessage }}</div>
-  </main>
+  <section class="row">
+    <div class="col-12">
+      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</div>
+    </div>
+  </section>
 
-  <!-- get flattrade fund limits -->
-  <div v-if="token">
-    <button @click="getFundLimits">Get Fund Limits</button>
-    <div v-if="fundLimits">Fund Limits: {{ fundLimits }}</div>
-  </div>
+  <button @click="getFundLimits">Get Fund Limits</button>
+  {{ fundLimits }}
 </template>

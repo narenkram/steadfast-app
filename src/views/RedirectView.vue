@@ -9,7 +9,7 @@ onMounted(() => {
   if (typeof code === 'string') {
     localStorage.setItem('authCode', code);
     localStorage.removeItem('statusMessage');
-    window.opener.location = '/manage-brokers';
+    window.opener.postMessage({ type: 'authCode', code }, '*');
     window.close();
   } else {
     console.error('No valid code found in the URL');
