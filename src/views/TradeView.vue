@@ -457,101 +457,19 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 
-// Define reactive variables
-const brokers = ref([]);
-const selectedBroker = ref(null);
-const fundLimits = ref({});
-const brokerClientId = ref(null);
-
 const showToast = ref(false);
 const toastMessage = ref('');
 const updateToastVisibility = (value) => {
   showToast.value = value;
 };
 
-const orders = ref([]);
-const showBrokerClientId = ref(false);
 
-const selectedExchange = ref('NSE');
-const selectedMasterSymbol = ref('NIFTY');
-const selectedQuantity = ref(null);
-const selectedExpiry = ref(null);
-const selectedCallStrike = ref({});
-const selectedPutStrike = ref({});
-const defaultCallSecurityId = ref(null);
-const defaultPutSecurityId = ref(null);
-const exchangeSymbols = ref({
-  NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-  BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
-});
-const callStrikes = ref([]);
-const putStrikes = ref([]);
-const expiryDates = ref([]);
-const synchronizeOnLoad = ref(true);
-const quantities = ref({
-  NIFTY: [25],
-  BANKNIFTY: [15],
-  FINNIFTY: [40],
-  MIDCPNIFTY: [75],
-  NIFTYNXT50: [10],
-  SENSEX: [10],
-  BANKEX: [15],
-  SENSEX50: [25]
-});
-const availableQuantities = ref([]);
-
-
-const selectedOrderType = ref('MARKET');
-const previousOrderType = ref('MARKET');
-
-const setOrderDetails = (transactionType, optionType) => {
-  modalTransactionType.value = transactionType;
-  modalOptionType.value = optionType;
-  selectedOrderType.value = 'LIMIT'; // Set selectedOrderType to LIMIT
-};
-
-const resetOrderTypeIfNeeded = () => {
-  if (previousOrderType.value === 'MARKET') {
-    resetOrderType();
-  }
-};
-
-const resetOrderType = () => {
-  selectedOrderType.value = 'MARKET';
-};
-const orderTypes = ref(['MARKET', 'LIMIT']);
-const selectedProductType = ref('MARGIN');
-const productTypes = ref(['INTRADAY', 'MARGIN']);
-
-const limitPrice = ref(null);
-const modalTransactionType = ref('');
-const modalOptionType = ref('');
-
-const activeTab = ref('positions');
 const fetchOrdersInterval = ref(null);
 const fetchPositionsInterval = ref(null);
+const activeTab = ref('positions');
 const setActiveTab = (tab) => {
   activeTab.value = tab;
 };
-
-watch(activeTab, (newTab) => {
-  if (newTab === 'positions') {
-    if (fetchOrdersInterval.value) {
-      clearInterval(fetchOrdersInterval.value);
-      fetchOrdersInterval.value = null;
-    }
-    fetchPositions();
-    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-  } else if (newTab === 'trades') {
-    if (fetchPositionsInterval.value) {
-      clearInterval(fetchPositionsInterval.value);
-      fetchPositionsInterval.value = null;
-    }
-    fetchOrders();
-    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
-  }
-});
-
 
 const killSwitchActive = ref(false);
 const toggleKillSwitch = async () => {
@@ -585,100 +503,9 @@ const toggleKillSwitch = async () => {
   }
 };
 
-// Computed properties
-const formattedDate = computed(() => {
-  const today = new Date();
-  const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-  return today.toLocaleDateString('en-US', options).replace(/,/g, '');
-});
 
-const totalNetQty = computed(() => positions.value.reduce((total, position) => total + position.netQty, 0));
-
-const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
-
-const totalCapitalPercentage = computed(() => {
-  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.utilizedAmount || 0);
-  return (totalProfit.value / totalMoney) * 100;
-});
-
-const deployedCapitalPercentage = computed(() => {
-  const utilizedAmount = fundLimits.value.utilizedAmount || 0;
-  return utilizedAmount ? (totalProfit.value / utilizedAmount) * 100 : 0;
-});
-
-const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
-
-const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
-
-// Lifecycle hooks
-onMounted(() => {
-  fetchBrokers();
-  fetchFundLimit();
-  fetchBrokerClientId();
-  fetchPositions();
-  fetchTradingData().then(() => {
-    updateAvailableQuantities();
-  });
-
-  window.addEventListener('keydown', handleArrowKeys);
-
-
-  // Initialize with the default active tab
-  if (activeTab.value === 'positions') {
-    fetchPositions();
-    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-  } else if (activeTab.value === 'trades') {
-    fetchOrders();
-    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
-  }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleArrowKeys);
-
-  if (fetchOrdersInterval.value) {
-    clearInterval(fetchOrdersInterval.value);
-  }
-  if (fetchPositionsInterval.value) {
-    clearInterval(fetchPositionsInterval.value);
-  }
-});
-
-
-// Watchers
-watch(selectedExpiry, (newExpiry) => {
-  updateStrikesForExpiry(newExpiry);
-});
-
-watch(selectedCallStrike, (newStrike, oldStrike) => {
-  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
-    updateSecurityIds();
-  }
-});
-
-watch(selectedPutStrike, (newStrike, oldStrike) => {
-  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
-    updateSecurityIds();
-  }
-});
-
-watch(selectedMasterSymbol, () => {
-  updateAvailableQuantities();
-});
-
-watch(selectedExchange, (newExchange) => {
-  if (exchangeSymbols.value[newExchange].length > 0) {
-    selectedMasterSymbol.value = exchangeSymbols.value[newExchange][0];
-  } else {
-    selectedMasterSymbol.value = null;
-  }
-  updateAvailableQuantities();
-});
-
-watch(selectedOrderType, (newValue, oldValue) => {
-  previousOrderType.value = oldValue;
-});
-
+const brokers = ref([]);
+const selectedBroker = ref(null);
 // Fetch brokers and set selectedBroker
 const fetchBrokers = async () => {
   try {
@@ -691,7 +518,7 @@ const fetchBrokers = async () => {
     console.error('Failed to fetch brokers:', error);
   }
 };
-
+const brokerClientId = ref(null);
 const fetchBrokerClientId = async () => {
   try {
     const { data } = await axios.get('http://localhost:3000/brokerClientId');
@@ -702,6 +529,23 @@ const fetchBrokerClientId = async () => {
   }
 };
 
+
+const selectedExchange = ref('NSE');
+const selectedMasterSymbol = ref('NIFTY');
+const selectedQuantity = ref(null);
+const selectedExpiry = ref(null);
+const selectedCallStrike = ref({});
+const selectedPutStrike = ref({});
+const defaultCallSecurityId = ref(null);
+const defaultPutSecurityId = ref(null);
+const exchangeSymbols = ref({
+  NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+  BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
+});
+const callStrikes = ref([]);
+const putStrikes = ref([]);
+const expiryDates = ref([]);
+const synchronizeOnLoad = ref(true);
 const fetchTradingData = async () => {
   const response = await fetch(`http://localhost:3000/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
   const data = await response.json();
@@ -840,6 +684,7 @@ const handleArrowKeys = (event) => {
   }
 };
 
+const orders = ref([]);
 const fetchOrders = async () => {
   try {
     const response = await axios.get('http://localhost:3000/getOrders');
@@ -875,6 +720,7 @@ const updatePositions = async () => {
   }
 };
 
+const fundLimits = ref({});
 const fetchFundLimit = async () => {
   try {
     const response = await axios.get('http://localhost:3000/fundLimit');
@@ -884,6 +730,7 @@ const fetchFundLimit = async () => {
   }
 };
 
+const showBrokerClientId = ref(false);
 const toggleBrokerClientIdVisibility = () => {
   showBrokerClientId.value = !showBrokerClientId.value;
 };
@@ -905,6 +752,39 @@ const maskBrokerClientId = (brokerClientId) => {
   return `${firstPart}${middleMask}${lastPart}`;
 };
 
+
+const quantities = ref({
+  NIFTY: [25],
+  BANKNIFTY: [15],
+  FINNIFTY: [40],
+  MIDCPNIFTY: [75],
+  NIFTYNXT50: [10],
+  SENSEX: [10],
+  BANKEX: [15],
+  SENSEX50: [25]
+});
+const availableQuantities = ref([]);
+const selectedOrderType = ref('MARKET');
+const previousOrderType = ref('MARKET');
+const setOrderDetails = (transactionType, optionType) => {
+  modalTransactionType.value = transactionType;
+  modalOptionType.value = optionType;
+  selectedOrderType.value = 'LIMIT'; // Set selectedOrderType to LIMIT
+};
+const resetOrderTypeIfNeeded = () => {
+  if (previousOrderType.value === 'MARKET') {
+    resetOrderType();
+  }
+};
+const resetOrderType = () => {
+  selectedOrderType.value = 'MARKET';
+};
+const orderTypes = ref(['MARKET', 'LIMIT']);
+const selectedProductType = ref('MARGIN');
+const productTypes = ref(['INTRADAY', 'MARGIN']);
+const limitPrice = ref(null);
+const modalTransactionType = ref('');
+const modalOptionType = ref('');
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -1005,7 +885,6 @@ const closeAllPositions = async () => {
   }
 };
 
-
 const cancelOrder = async (orderId, orderStatus) => {
   if (orderStatus !== 'PENDING') {
     console.log(`Order ${orderId} is not pending and cannot be canceled.`);
@@ -1040,5 +919,120 @@ const cancelPendingOrders = async () => {
     showToast.value = true;
   }
 };
+
+
+
+// Computed properties
+const formattedDate = computed(() => {
+  const today = new Date();
+  const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+  return today.toLocaleDateString('en-US', options).replace(/,/g, '');
+});
+
+const totalNetQty = computed(() => positions.value.reduce((total, position) => total + position.netQty, 0));
+
+const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
+
+const totalCapitalPercentage = computed(() => {
+  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.utilizedAmount || 0);
+  return (totalProfit.value / totalMoney) * 100;
+});
+
+const deployedCapitalPercentage = computed(() => {
+  const utilizedAmount = fundLimits.value.utilizedAmount || 0;
+  return utilizedAmount ? (totalProfit.value / utilizedAmount) * 100 : 0;
+});
+
+const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
+
+const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
+
+// Lifecycle hooks
+onMounted(() => {
+  fetchBrokers();
+  fetchFundLimit();
+  fetchBrokerClientId();
+  fetchPositions();
+  fetchTradingData().then(() => {
+    updateAvailableQuantities();
+  });
+
+  window.addEventListener('keydown', handleArrowKeys);
+
+
+  // Initialize with the default active tab
+  if (activeTab.value === 'positions') {
+    fetchPositions();
+    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+  } else if (activeTab.value === 'trades') {
+    fetchOrders();
+    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleArrowKeys);
+
+  if (fetchOrdersInterval.value) {
+    clearInterval(fetchOrdersInterval.value);
+  }
+  if (fetchPositionsInterval.value) {
+    clearInterval(fetchPositionsInterval.value);
+  }
+});
+
+
+// Watchers
+watch(selectedExpiry, (newExpiry) => {
+  updateStrikesForExpiry(newExpiry);
+});
+
+watch(selectedCallStrike, (newStrike, oldStrike) => {
+  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
+    updateSecurityIds();
+  }
+});
+
+watch(selectedPutStrike, (newStrike, oldStrike) => {
+  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
+    updateSecurityIds();
+  }
+});
+
+watch(selectedMasterSymbol, () => {
+  updateAvailableQuantities();
+});
+
+watch(selectedExchange, (newExchange) => {
+  if (exchangeSymbols.value[newExchange].length > 0) {
+    selectedMasterSymbol.value = exchangeSymbols.value[newExchange][0];
+  } else {
+    selectedMasterSymbol.value = null;
+  }
+  updateAvailableQuantities();
+});
+
+watch(selectedOrderType, (newValue, oldValue) => {
+  previousOrderType.value = oldValue;
+});
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'positions') {
+    if (fetchOrdersInterval.value) {
+      clearInterval(fetchOrdersInterval.value);
+      fetchOrdersInterval.value = null;
+    }
+    fetchPositions();
+    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+  } else if (newTab === 'trades') {
+    if (fetchPositionsInterval.value) {
+      clearInterval(fetchPositionsInterval.value);
+      fetchPositionsInterval.value = null;
+    }
+    fetchOrders();
+    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+  }
+});
+
 
 </script>
