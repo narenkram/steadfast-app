@@ -8,9 +8,20 @@ const reqCode = ref('');
 const token = ref('');
 const errorMessage = ref('');
 const statusMessage = ref('');
+
 const brokers = ref([]);
+const fetchBrokers = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/brokers');
+    brokers.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch brokers:', error);
+  }
+};
 
 onMounted(() => {
+  fetchBrokers();
+
   const storedCode = localStorage.getItem('authCode');
   if (storedCode) {
     reqCode.value = storedCode;
@@ -72,6 +83,32 @@ const generateToken = async () => {
     console.error('Error generating token:', error);
   }
 };
+
+const maskBrokerClientId = (brokerClientId) => {
+  if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
+
+  const length = brokerClientId.length;
+  if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
+
+  const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
+  const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
+  const endUnmaskedLength = length - startUnmaskedLength - maskLength;
+
+  const firstPart = brokerClientId.slice(0, startUnmaskedLength);
+  const lastPart = brokerClientId.slice(-endUnmaskedLength);
+  const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
+
+  return `${firstPart}${middleMask}${lastPart}`;
+};
+
+const maskApiSecret = (apiSecret) => {
+  if (!apiSecret || apiSecret.length < 10) return '******'; // Ensure there are enough characters to mask
+  if (!apiSecret || apiSecret.length < 10) return '******';
+  const start = apiSecret.slice(0, 3);
+  const end = apiSecret.slice(-3);
+  return `${start}******${end}`;
+};
+
 </script>
 
 <template>
@@ -129,12 +166,12 @@ const generateToken = async () => {
       </table>
     </div>
   </section>
-  
+
   <main>
-      <button @click="openAuthUrl">Open Authorization URL</button>
-      <div v-if="reqCode">Request Code: {{ reqCode }}</div>
-      <div v-if="token">Token: {{ token }}</div>
-      <div v-if="errorMessage" style="color: red;">{{ errorMessage }}</div>
-      <div v-if="statusMessage" style="color: blue;">{{ statusMessage }}</div>
-    </main>
+    <button @click="openAuthUrl">Open Authorization URL</button>
+    <div v-if="reqCode">Request Code: {{ reqCode }}</div>
+    <div v-if="token">Token: {{ token }}</div>
+    <div v-if="errorMessage" style="color: red;">{{ errorMessage }}</div>
+    <div v-if="statusMessage" style="color: blue;">{{ statusMessage }}</div>
+  </main>
 </template>
