@@ -315,12 +315,14 @@
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
-            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true" @click="fetchPositions">💸
+            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
+            @click="setActiveTab('positions')">💸
             Positions</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
-            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="fetchOrders">📄 Trades</button>
+            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="setActiveTab('trades')">📄
+            Trades</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="ai-automation-tab" data-bs-toggle="tab" data-bs-target="#ai-automation-tab-pane"
@@ -449,561 +451,514 @@
 </template>
 
 
-<script>
+
+<script setup>
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 
-export default {
-  components: {
-    ToastAlert,
-  },
-  data() {
-    return {
-      brokers: [],
-      selectedBroker: null,
-      fundLimits: {}, // Initialize as an empty object
-      brokerClientId: null, // Initialize as null
-      showToast: false, // Controls the visibility of the toast
-      toastMessage: '', // Message displayed in the toast
-      killSwitchActive: false, // Initial state of the kill switch
-      orders: [], // Define orders as an empty array initially
-      currentTransactionType: '', // This will store either 'BUY' or 'SELL'
-      // New properties
-      showBrokerClientId: false, // Controls the visibility of the Dhan ID
-      positions: [], // Stores the positions fetched from the API
+// Define reactive variables
+const brokers = ref([]);
+const selectedBroker = ref(null);
+const fundLimits = ref({});
+const brokerClientId = ref(null);
 
-      selectedExchange: 'NSE',
-      selectedMasterSymbol: 'NIFTY',
-      selectedQuantity: null,
-      selectedExpiry: null,
-      selectedCallStrike: {},
-      selectedPutStrike: {},
-      defaultCallSecurityId: null,
-      defaultPutSecurityId: null,
-      exchangeSymbols: {
-        NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-        BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
-      },
-      callStrikes: [],
-      putStrikes: [],
-      expiryDates: [],
-      synchronizeOnLoad: true, // Flag to control synchronization behavior
-      quantities: {
-        NIFTY: [25],
-        BANKNIFTY: [15],
-        FINNIFTY: [40],
-        MIDCPNIFTY: [75],
-        NIFTYNXT50: [10],
-        SENSEX: [10],
-        BANKEX: [15],
-        SENSEX50: [25]
-      },
-      availableQuantities: [],
-      selectedOrderType: 'MARKET',
-      orderTypes: ['MARKET', 'LIMIT'],
-      selectedProductType: 'MARGIN',
-      productTypes: ['INTRADAY', 'MARGIN'],
+const showToast = ref(false);
+const toastMessage = ref('');
+const updateToastVisibility = (value) => {
+  showToast.value = value;
+};
+
+const orders = ref([]);
+const showBrokerClientId = ref(false);
+
+const selectedExchange = ref('NSE');
+const selectedMasterSymbol = ref('NIFTY');
+const selectedQuantity = ref(null);
+const selectedExpiry = ref(null);
+const selectedCallStrike = ref({});
+const selectedPutStrike = ref({});
+const defaultCallSecurityId = ref(null);
+const defaultPutSecurityId = ref(null);
+const exchangeSymbols = ref({
+  NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+  BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
+});
+const callStrikes = ref([]);
+const putStrikes = ref([]);
+const expiryDates = ref([]);
+const synchronizeOnLoad = ref(true);
+const quantities = ref({
+  NIFTY: [25],
+  BANKNIFTY: [15],
+  FINNIFTY: [40],
+  MIDCPNIFTY: [75],
+  NIFTYNXT50: [10],
+  SENSEX: [10],
+  BANKEX: [15],
+  SENSEX50: [25]
+});
+const availableQuantities = ref([]);
 
 
-      enableArrowKeys: false, // Controls whether arrow keys are enabled
-      limitPrice: null, // New data property for limit price
-      modalTransactionType: '', // New data property for modal transaction type
-      modalOptionType: '', // New data property for modal option type
-      previousOrderType: 'MARKET',
+const selectedOrderType = ref('MARKET');
+const previousOrderType = ref('MARKET');
+
+const setOrderDetails = (transactionType, optionType) => {
+  modalTransactionType.value = transactionType;
+  modalOptionType.value = optionType;
+  selectedOrderType.value = 'LIMIT'; // Set selectedOrderType to LIMIT
+};
+
+const resetOrderTypeIfNeeded = () => {
+  if (previousOrderType.value === 'MARKET') {
+    resetOrderType();
+  }
+};
+
+const resetOrderType = () => {
+  selectedOrderType.value = 'MARKET';
+};
+const orderTypes = ref(['MARKET', 'LIMIT']);
+const selectedProductType = ref('MARGIN');
+const productTypes = ref(['INTRADAY', 'MARGIN']);
+
+const limitPrice = ref(null);
+const modalTransactionType = ref('');
+const modalOptionType = ref('');
+
+const activeTab = ref('positions');
+const fetchOrdersInterval = ref(null);
+const fetchPositionsInterval = ref(null);
+const setActiveTab = (tab) => {
+  activeTab.value = tab;
+};
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'positions') {
+    if (fetchOrdersInterval.value) {
+      clearInterval(fetchOrdersInterval.value);
+      fetchOrdersInterval.value = null;
+    }
+    fetchPositions();
+    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+  } else if (newTab === 'trades') {
+    if (fetchPositionsInterval.value) {
+      clearInterval(fetchPositionsInterval.value);
+      fetchPositionsInterval.value = null;
+    }
+    fetchOrders();
+    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+  }
+});
+
+
+const killSwitchActive = ref(false);
+const toggleKillSwitch = async () => {
+  const newStatus = killSwitchActive.value ? 'DEACTIVATE' : 'ACTIVATE';
+  try {
+    const response = await axios.post('http://localhost:3000/killSwitch', null, {
+      params: { killSwitchStatus: newStatus }
+    });
+    console.log(`Kill Switch ${newStatus.toLowerCase()}d:`, response.data);
+
+    // Handle different response messages
+    if (response.data.killSwitchStatus === 'Kill Switch Activated') {
+      toastMessage.value = 'Kill Switch activated successfully';
+      killSwitchActive.value = true;
+    } else if (response.data.killSwitchStatus === 'Kill Switch Deactivated') {
+      toastMessage.value = 'Kill Switch deactivated successfully';
+      killSwitchActive.value = false;
+    } else if (response.data.killSwitchStatus === 'Kill Switch is already activated') {
+      toastMessage.value = 'Kill Switch is already activated';
+    } else if (response.data.killSwitchStatus === 'Kill switch deactivate allowed only once a day.') {
+      toastMessage.value = 'Kill switch deactivate allowed only once a day.';
+    } else {
+      toastMessage.value = 'Unknown response from server';
+    }
+
+    showToast.value = true;
+  } catch (error) {
+    console.error(`Error ${newStatus.toLowerCase()}ing Kill Switch:`, error);
+    toastMessage.value = `Failed to ${newStatus.toLowerCase()} Kill Switch`;
+    showToast.value = true;
+  }
+};
+
+// Computed properties
+const formattedDate = computed(() => {
+  const today = new Date();
+  const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+  return today.toLocaleDateString('en-US', options).replace(/,/g, '');
+});
+
+const totalNetQty = computed(() => positions.value.reduce((total, position) => total + position.netQty, 0));
+
+const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
+
+const totalCapitalPercentage = computed(() => {
+  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.utilizedAmount || 0);
+  return (totalProfit.value / totalMoney) * 100;
+});
+
+const deployedCapitalPercentage = computed(() => {
+  const utilizedAmount = fundLimits.value.utilizedAmount || 0;
+  return utilizedAmount ? (totalProfit.value / utilizedAmount) * 100 : 0;
+});
+
+const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
+
+const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
+
+// Lifecycle hooks
+onMounted(() => {
+  fetchBrokers();
+  fetchFundLimit();
+  fetchBrokerClientId();
+  fetchPositions();
+  fetchTradingData().then(() => {
+    updateAvailableQuantities();
+  });
+
+  window.addEventListener('keydown', handleArrowKeys);
+
+
+  // Initialize with the default active tab
+  if (activeTab.value === 'positions') {
+    fetchPositions();
+    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+  } else if (activeTab.value === 'trades') {
+    fetchOrders();
+    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleArrowKeys);
+
+  if (fetchOrdersInterval.value) {
+    clearInterval(fetchOrdersInterval.value);
+  }
+  if (fetchPositionsInterval.value) {
+    clearInterval(fetchPositionsInterval.value);
+  }
+});
+
+
+// Watchers
+watch(selectedExpiry, (newExpiry) => {
+  updateStrikesForExpiry(newExpiry);
+});
+
+watch(selectedCallStrike, (newStrike, oldStrike) => {
+  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
+    updateSecurityIds();
+  }
+});
+
+watch(selectedPutStrike, (newStrike, oldStrike) => {
+  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
+    updateSecurityIds();
+  }
+});
+
+watch(selectedMasterSymbol, () => {
+  updateAvailableQuantities();
+});
+
+watch(selectedExchange, (newExchange) => {
+  if (exchangeSymbols.value[newExchange].length > 0) {
+    selectedMasterSymbol.value = exchangeSymbols.value[newExchange][0];
+  } else {
+    selectedMasterSymbol.value = null;
+  }
+  updateAvailableQuantities();
+});
+
+watch(selectedOrderType, (newValue, oldValue) => {
+  previousOrderType.value = oldValue;
+});
+
+// Fetch brokers and set selectedBroker
+const fetchBrokers = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/brokers');
+    brokers.value = response.data;
+    if (brokers.value.length > 0) {
+      selectedBroker.value = brokers.value[0];
+    }
+  } catch (error) {
+    console.error('Failed to fetch brokers:', error);
+  }
+};
+
+const fetchBrokerClientId = async () => {
+  try {
+    const { data } = await axios.get('http://localhost:3000/brokerClientId');
+    brokerClientId.value = data.brokerClientId;
+    console.log('Dhan Client ID:', data.brokerClientId);
+  } catch (error) {
+    console.error('Error fetching Dhan Client ID:', error);
+  }
+};
+
+const fetchTradingData = async () => {
+  const response = await fetch(`http://localhost:3000/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+  const data = await response.json();
+
+  const today = new Date();
+  expiryDates.value = data.expiryDates
+    .filter(date => new Date(date.split(' ')[0]) >= today)
+    .sort((a, b) => new Date(a) - new Date(b));
+
+  callStrikes.value = data.callStrikes.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol));
+  putStrikes.value = data.putStrikes.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol));
+
+  if (callStrikes.value.length > 0) {
+    selectedCallStrike.value = callStrikes.value[0];
+  }
+  if (putStrikes.value.length > 0) {
+    selectedPutStrike.value = putStrikes.value[0];
+  }
+  if (expiryDates.value.length > 0) {
+    selectedExpiry.value = expiryDates.value[0];
+  }
+
+  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
+  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
+
+  synchronizeOnLoad.value = true;
+  updateStrikesForExpiry(selectedExpiry.value);
+};
+
+const formatTradingSymbol = (symbol) => {
+  // Split the symbol by '-' and remove the date part and the last part after the strike price
+  let parts = symbol.split('-');
+  if (parts.length > 3) {
+    // Rejoin the parts excluding the date and the last segment
+    // return `${parts[0]} ${parts[2]} ${parts[3]}`; DO NOT REMOVE THIS
+    // this displays only the strike for easy selection
+    return `${parts[2]}`;
+  }
+  return symbol; // Return the original symbol if it doesn't match the expected format
+};
+
+const formatDate = (dateString) => {
+  // Extract only the date part from the date string
+  return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
+};
+
+const updateStrikesForExpiry = (expiryDate) => {
+  const filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+  const filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+
+  const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === selectedCallStrike.value.tradingSymbol);
+  const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === selectedPutStrike.value.tradingSymbol);
+
+  if (foundCallStrike) {
+    selectedCallStrike.value = foundCallStrike;
+  } else {
+    selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
+  }
+
+  if (foundPutStrike) {
+    selectedPutStrike.value = foundPutStrike;
+  } else {
+    selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+  }
+
+  if (synchronizeOnLoad.value) {
+    synchronizeStrikes();
+    synchronizeOnLoad.value = false;
+  }
+};
+
+const synchronizeStrikes = () => {
+  synchronizeCallStrikes();
+  synchronizePutStrikes();
+};
+
+const synchronizeCallStrikes = () => {
+  if (selectedPutStrike.value) {
+    const baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
+    const matchingCallStrike = callStrikes.value.find(strike =>
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-CE')
+    );
+    if (matchingCallStrike) {
+      selectedCallStrike.value = matchingCallStrike;
+    } else {
+      selectedCallStrike.value = {};
+    }
+  }
+  updateSecurityIds();
+};
+
+const synchronizePutStrikes = () => {
+  if (selectedCallStrike.value) {
+    const baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
+    const matchingPutStrike = putStrikes.value.find(strike =>
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-PE')
+    );
+    if (matchingPutStrike) {
+      selectedPutStrike.value = matchingPutStrike;
+    } else {
+      selectedPutStrike.value = {};
+    }
+  }
+  updateSecurityIds();
+};
+
+const updateSecurityIds = () => {
+  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
+  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
+};
+
+const updateAvailableQuantities = () => {
+  availableQuantities.value = quantities.value[selectedMasterSymbol.value] || [];
+  if (!availableQuantities.value.includes(selectedQuantity.value)) {
+    selectedQuantity.value = availableQuantities.value[0];
+  }
+};
+
+const enableArrowKeys = ref(false);
+const handleArrowKeys = (event) => {
+  if (!enableArrowKeys.value) return;
+
+  switch (event.key) {
+    case 'ArrowUp':
+      placeOrder('BUY', 'CALL');
+      break;
+    case 'ArrowDown':
+      placeOrder('BUY', 'PUT');
+      break;
+    case 'ArrowRight':
+      placeOrder('SELL', 'PUT');
+      break;
+    case 'ArrowLeft':
+      placeOrder('SELL', 'CALL');
+      break;
+  }
+};
+
+const fetchOrders = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/getOrders');
+    orders.value = response.data; // Set the orders array
+    console.log('Orders:', response.data);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    toastMessage.value = 'Error fetching orders';
+    showToast.value = true;
+  }
+};
+
+const positions = ref([]);
+const fetchPositions = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/positions');
+    console.log('Fetched positions:', response.data); // Log the fetched data
+    positions.value = response.data; // Store the fetched data in the positions ref
+    console.log('Updated positions:', positions.value); // Log the updated positions ref
+  } catch (error) {
+    console.error('Error fetching positions:', error);
+    toastMessage.value = 'Failed to fetch positions';
+    showToast.value = true;
+  }
+};
+const updatePositions = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/positions');
+    positions.value = response.data;
+    console.log('Updated positions:', positions.value);
+  } catch (error) {
+    console.error('Failed to update positions:', error);
+  }
+};
+
+const fetchFundLimit = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/fundLimit');
+    fundLimits.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch fund limits:', error);
+  }
+};
+
+const toggleBrokerClientIdVisibility = () => {
+  showBrokerClientId.value = !showBrokerClientId.value;
+};
+
+const maskBrokerClientId = (brokerClientId) => {
+  if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
+
+  const length = brokerClientId.length;
+  if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
+
+  const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
+  const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
+  const endUnmaskedLength = length - startUnmaskedLength - maskLength;
+
+  const firstPart = brokerClientId.slice(0, startUnmaskedLength);
+  const lastPart = brokerClientId.slice(-endUnmaskedLength);
+  const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
+
+  return `${firstPart}${middleMask}${lastPart}`;
+};
+
+const placeOrder = async (transactionType, drvOptionType) => {
+  try {
+    let selectedStrike;
+    if (drvOptionType === 'CALL') {
+      selectedStrike = selectedCallStrike.value;
+    } else if (drvOptionType === 'PUT') {
+      selectedStrike = selectedPutStrike.value;
+    }
+
+    if (!selectedStrike) {
+      throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not defined`);
+    }
+
+    if (!selectedStrike.tradingSymbol || !selectedStrike.securityId) {
+      throw new Error(`Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`);
+    }
+
+    let exchangeSegment;
+    if (selectedExchange.value === 'NSE') {
+      exchangeSegment = 'NSE_FNO';
+    } else if (selectedExchange.value === 'BSE') {
+      exchangeSegment = 'BSE_FNO';
+    } else {
+      throw new Error("Selected exchange is not valid");
+    }
+
+    const orderData = {
+      brokerClientId: selectedBroker.value.brokerClientId, // Use selectedBroker's brokerClientId
+      transactionType: transactionType,
+      exchangeSegment: exchangeSegment,
+      productType: selectedProductType.value,
+      orderType: selectedOrderType.value,
+      validity: 'DAY',
+      tradingSymbol: selectedStrike.tradingSymbol,
+      securityId: selectedStrike.securityId,
+      quantity: selectedQuantity.value,
+      price: selectedOrderType.value === 'LIMIT' ? limitPrice.value : 0, // Use limitPrice if order type is LIMIT
+      drvExpiryDate: selectedExpiry.value,
+      drvOptionType: drvOptionType
     };
 
-  },
-  computed: {
-    formattedDate() {
-      const today = new Date();
-      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-      return today.toLocaleDateString('en-US', options).replace(/,/g, '');
-    },
-    totalNetQty() {
-      return this.positions.reduce((total, position) => total + position.netQty, 0);
-    },
-    totalProfit() {
-      return this.positions.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
-    },
-    totalCapitalPercentage() {
-      // Total Capital Percentage based on totalProfit and totalMoney
-      const totalMoney = (this.fundLimits.availabelBalance || 0) + (this.fundLimits.utilizedAmount || 0);
-      return (this.totalProfit / totalMoney) * 100;
-    },
-    deployedCapitalPercentage() {
-      // Deployed Capital Percentage based on totalProfit as a percentage of utilizedAmount
-      const utilizedAmount = this.fundLimits.utilizedAmount || 0;
-      return utilizedAmount ? (this.totalProfit / utilizedAmount) * 100 : 0;
-    },
-    totalBrokerage() {
-      return this.orders
-        .filter(order => order.orderStatus === 'TRADED')
-        .reduce((total) => total + 20, 0); // Assuming ₹ 20 brokerage per traded order
-    },
-    netPnl() {
-      return this.totalProfit - this.totalBrokerage;
+    console.log("Placing order with data:", orderData);
+    const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+    console.log("Order placed successfully:", response.data);
+    toastMessage.value = 'Order placed successfully';
+    showToast.value = true;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
+      toastMessage.value = firstThreeWords;
+    } else {
+      toastMessage.value = 'Failed to place order';
     }
-  },
-  mounted() {
-    this.fetchBrokers();
-    this.fetchFundLimit();
-    this.fetchBrokerClientId();
-    this.fetchPositions();
-
-    // related to scrip master
-    this.fetchTradingData().then(() => {
-      this.updateAvailableQuantities();
-    });
-
-    window.addEventListener('keydown', this.handleArrowKeys);
-    this.fetchOrdersInterval = setInterval(this.fetchOrders, 1000);
-  },
-  beforeUnmount() {
-    window.removeEventListener('keydown', this.handleArrowKeys);
-    // Clear the interval when the component is destroyed
-    if (this.fetchOrdersInterval) {
-      clearInterval(this.fetchOrdersInterval);
-    }
-  },
-  watch: {
-    // related to scrip master
-    selectedExpiry(newExpiry) {
-      this.updateStrikesForExpiry(newExpiry);
-    },
-    selectedCallStrike(newStrike, oldStrike) {
-      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
-        this.updateSecurityIds();
-      }
-    },
-    selectedPutStrike(newStrike, oldStrike) {
-      if (newStrike !== oldStrike && !this.synchronizeOnLoad) {
-        this.updateSecurityIds();
-      }
-    },
-    selectedMasterSymbol() {
-      this.updateAvailableQuantities();
-    },
-    selectedExchange(newExchange) {
-      if (this.exchangeSymbols[newExchange].length > 0) {
-        this.selectedMasterSymbol = this.exchangeSymbols[newExchange][0];
-      } else {
-        this.selectedMasterSymbol = null; // Handle case where no symbols are available
-      }
-      this.updateAvailableQuantities(); // Update quantities based on the new master symbol
-    },
-    // related to scrip master
-
-    selectedOrderType(newValue, oldValue) {
-      this.previousOrderType = oldValue;
-    },
-  },
-  methods: {
-    async fetchBrokers() {
-      try {
-        const response = await axios.get('http://localhost:3000/brokers');
-        this.brokers = response.data;
-        if (this.brokers.length > 0) {
-          this.selectedBroker = this.brokers[0]; // Set default broker to the first broker in the list
-        }
-      } catch (error) {
-        console.error('Failed to fetch brokers:', error);
-      }
-    },
-    async fetchBrokerClientId() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/brokerClientId');
-        this.brokerClientId = data.brokerClientId;
-        console.log('Dhan Client ID:', data.brokerClientId);
-      } catch (error) {
-        console.error('Error fetching Dhan Client ID:', error);
-      }
-    },
-    async fetchTradingData() {
-      const response = await fetch(`/symbols?exchangeSymbol=${this.selectedExchange}&masterSymbol=${this.selectedMasterSymbol}`);
-      const data = await response.json();
-
-      const today = new Date();
-      this.expiryDates = data.expiryDates
-        .filter(date => new Date(date.split(' ')[0]) >= today) // Filter out dates before today
-        .sort((a, b) => new Date(a) - new Date(b)); // Sort dates in ascending order
-
-      // Sort call and put strikes by expiry date and then by trading symbol
-      this.callStrikes = data.callStrikes.sort((a, b) => {
-        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
-      });
-      this.putStrikes = data.putStrikes.sort((a, b) => {
-        return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
-      });
-
-      // Set default values if available
-      if (this.callStrikes.length > 0) {
-        this.selectedCallStrike = this.callStrikes[0];
-      }
-      if (this.putStrikes.length > 0) {
-        this.selectedPutStrike = this.putStrikes[0];
-      }
-      if (this.expiryDates.length > 0) {
-        this.selectedExpiry = this.expiryDates[0];
-      }
-
-      // Automatically set the security IDs for the default selected strikes
-      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
-      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
-
-      this.synchronizeOnLoad = true; // Enable synchronization after data is loaded
-      this.updateStrikesForExpiry(this.selectedExpiry); // Initial update with synchronization
-    },
-    getSecurityId(strikes, strike) {
-      return strike ? strike.securityId : 'N/A';
-    },
-    updateStrikesForExpiry(expiryDate) {
-      const filteredCallStrikes = this.callStrikes.filter(strike => strike.expiryDate === expiryDate);
-      const filteredPutStrikes = this.putStrikes.filter(strike => strike.expiryDate === expiryDate);
-
-      const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === this.selectedCallStrike.tradingSymbol);
-      const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === this.selectedPutStrike.tradingSymbol);
-
-      if (foundCallStrike) {
-        this.selectedCallStrike = foundCallStrike;
-      } else {
-        this.selectedCallStrike = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
-      }
-
-      if (foundPutStrike) {
-        this.selectedPutStrike = foundPutStrike;
-      } else {
-        this.selectedPutStrike = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
-      }
-
-      if (this.synchronizeOnLoad) {
-        this.synchronizeStrikes(); // Synchronize only if the flag is true
-        this.synchronizeOnLoad = false; // Turn off synchronization after the initial load
-      }
-    },
-    synchronizeStrikes() {
-      // Synchronize call and put strikes based on the current selection
-      this.synchronizeCallStrikes();
-      this.synchronizePutStrikes();
-    },
-    synchronizeCallStrikes() {
-      if (this.selectedPutStrike) {
-        const baseSymbol = this.selectedPutStrike.tradingSymbol.replace(/-PE$/, '');
-        const matchingCallStrike = this.callStrikes.find(strike =>
-          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-CE')
-        );
-        if (matchingCallStrike) {
-          this.selectedCallStrike = matchingCallStrike;
-        } else {
-          this.selectedCallStrike = {};
-        }
-      }
-      this.updateSecurityIds();
-    },
-    synchronizePutStrikes() {
-      if (this.selectedCallStrike) {
-        const baseSymbol = this.selectedCallStrike.tradingSymbol.replace(/-CE$/, '');
-        const matchingPutStrike = this.putStrikes.find(strike =>
-          strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-PE')
-        );
-        if (matchingPutStrike) {
-          this.selectedPutStrike = matchingPutStrike;
-        } else {
-          this.selectedPutStrike = {};
-        }
-      }
-      this.updateSecurityIds();
-    },
-    updateSecurityIds() {
-      this.defaultCallSecurityId = this.selectedCallStrike.securityId || 'N/A';
-      this.defaultPutSecurityId = this.selectedPutStrike.securityId || 'N/A';
-      console.log('Updated callStrike security ID:', this.defaultCallSecurityId);
-      console.log('Updated putStrike security ID:', this.defaultPutSecurityId);
-    },
-    updateAvailableQuantities() {
-      this.availableQuantities = this.quantities[this.selectedMasterSymbol];
-      if (!this.availableQuantities.includes(this.selectedQuantity)) {
-        this.selectedQuantity = this.availableQuantities[0];
-      }
-    },
-    formatTradingSymbol(symbol) {
-      // Split the symbol by '-' and remove the date part and the last part after the strike price
-      let parts = symbol.split('-');
-      if (parts.length > 3) {
-        // Rejoin the parts excluding the date and the last segment
-        // return `${parts[0]} ${parts[2]} ${parts[3]}`; DO NOT REMOVE THIS
-        // this displays only the strike for easy selection
-        return `${parts[2]}`;
-      }
-      return symbol; // Return the original symbol if it doesn't match the expected format
-    },
-    formatDate(dateString) {
-      // Extract only the date part from the date string
-      return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
-    },
-    // releated to scrip master
-
-
-
-    async fetchFundLimit() {
-      try {
-        const { data } = await axios.get('http://localhost:3000/fundlimit');
-        this.fundLimits = data;
-        console.log('Fund Limits:', data);
-      } catch (error) {
-        console.error('Error fetching fund limit:', error);
-      }
-    },
-
-    async fetchPositions() {
-      try {
-        const response = await axios.get('http://localhost:3000/positions');
-        console.log('Fetched positions:', response.data); // Log the fetched data
-        this.positions = response.data; // Store the fetched data in the positions data property
-        console.log('Updated positions:', this.positions); // Log the updated positions data property
-      } catch (error) {
-        console.error('Error fetching positions:', error);
-        this.toastMessage = 'Failed to fetch positions';
-        this.showToast = true;
-      }
-    },
-    async fetchOrders() {
-      try {
-        const response = await axios.get('http://localhost:3000/getOrders');
-        this.orders = response.data; // Set the orders array
-        console.log('Orders:', response.data);
-
-        // Update positions based on the fetched orders
-        this.fetchPositions();
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        this.toastMessage = 'Error fetching orders';
-        this.showToast = true;
-      }
-    },
-    async toggleKillSwitch() {
-      const newStatus = this.killSwitchActive ? 'DEACTIVATE' : 'ACTIVATE';
-      try {
-        const response = await axios.post('http://localhost:3000/killSwitch', null, {
-          params: { killSwitchStatus: newStatus }
-        });
-        console.log(`Kill Switch ${newStatus.toLowerCase()}d:`, response.data);
-
-        // Handle different response messages
-        if (response.data.killSwitchStatus === 'Kill Switch Activated') {
-          this.toastMessage = 'Kill Switch activated successfully';
-          this.killSwitchActive = true;
-        } else if (response.data.killSwitchStatus === 'Kill Switch Deactivated') {
-          this.toastMessage = 'Kill Switch deactivated successfully';
-          this.killSwitchActive = false;
-        } else if (response.data.killSwitchStatus === 'Kill Switch is already activated') {
-          this.toastMessage = 'Kill Switch is already activated';
-        } else if (response.data.killSwitchStatus === 'Kill switch deactivate allowed only once a day.') {
-          this.toastMessage = 'Kill switch deactivate allowed only once a day.';
-        } else {
-          this.toastMessage = 'Unknown response from server';
-        }
-
-        this.showToast = true;
-      } catch (error) {
-        console.error(`Error ${newStatus.toLowerCase()}ing Kill Switch:`, error);
-        this.toastMessage = `Failed to ${newStatus.toLowerCase()} Kill Switch`;
-        this.showToast = true;
-      }
-    },
-    updateToastVisibility(value) {
-      this.showToast = value;
-    },
-    toggleBrokerClientIdVisibility() {
-      this.showBrokerClientId = !this.showBrokerClientId;
-    },
-    maskBrokerClientId(brokerClientId) {
-      if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
-
-      const length = brokerClientId.length;
-      if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
-
-      const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
-      const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
-      const endUnmaskedLength = length - startUnmaskedLength - maskLength;
-
-      const firstPart = brokerClientId.slice(0, startUnmaskedLength);
-      const lastPart = brokerClientId.slice(-endUnmaskedLength);
-      const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
-
-      return `${firstPart}${middleMask}${lastPart}`;
-    },
-    handleArrowKeys(event) {
-      if (!this.enableArrowKeys) return; // Exit if arrow keys are disabled
-
-      switch (event.key) {
-        case 'ArrowUp':
-          this.placeOrder('BUY', 'CALL');
-          break;
-        case 'ArrowDown':
-          this.placeOrder('BUY', 'PUT');
-          break;
-        case 'ArrowRight':
-          this.placeOrder('SELL', 'PUT');
-          break;
-        case 'ArrowLeft':
-          this.placeOrder('SELL', 'CALL');
-          break;
-      }
-    },
-
-
-    async placeOrder(transactionType, drvOptionType) {
-      try {
-        let selectedStrike;
-        if (drvOptionType === 'CALL') {
-          selectedStrike = this.selectedCallStrike;
-        } else if (drvOptionType === 'PUT') {
-          selectedStrike = this.selectedPutStrike;
-        }
-
-        if (!selectedStrike) {
-          throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not defined`);
-        }
-
-        if (!selectedStrike.tradingSymbol || !selectedStrike.securityId) {
-          throw new Error(`Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`);
-        }
-
-        let exchangeSegment;
-        if (this.selectedExchange === 'NSE') {
-          exchangeSegment = 'NSE_FNO';
-        } else if (this.selectedExchange === 'BSE') {
-          exchangeSegment = 'BSE_FNO';
-        } else {
-          throw new Error("Selected exchange is not valid");
-        }
-
-        const orderData = {
-          brokerClientId: this.selectedBroker.brokerClientId, // Use selectedBroker's brokerClientId
-          transactionType: transactionType,
-          exchangeSegment: exchangeSegment,
-          productType: this.selectedProductType,
-          orderType: this.selectedOrderType,
-          validity: 'DAY',
-          tradingSymbol: selectedStrike.tradingSymbol,
-          securityId: selectedStrike.securityId,
-          quantity: this.selectedQuantity,
-          price: this.selectedOrderType === 'LIMIT' ? this.limitPrice : 0, // Use limitPrice if order type is LIMIT
-          drvExpiryDate: this.selectedExpiry,
-          drvOptionType: drvOptionType
-        };
-
-        console.log("Placing order with data:", orderData);
-        const response = await axios.post('http://localhost:3000/placeOrder', orderData);
-        console.log("Order placed successfully:", response.data);
-        this.toastMessage = 'Order placed successfully';
-        this.showToast = true;
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
-          this.toastMessage = firstThreeWords;
-        } else {
-          this.toastMessage = 'Failed to place order';
-        }
-        this.showToast = true;
-      }
-    },
-
-    async closeAllPositions() {
-      try {
-        for (const position of this.positions) {
-          if (position.positionType !== 'CLOSED') {
-            const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
-            await this.placeOrderForPosition('SELL', optionType, position);
-          }
-        }
-        this.toastMessage = 'All positions closed successfully';
-        this.showToast = true;
-      } catch (error) {
-        console.error('Error closing positions:', error);
-        this.toastMessage = 'Failed to close all positions';
-        this.showToast = true;
-      }
-    },
-    async placeOrderForPosition(transactionType, drvOptionType, position) {
-      try {
-        const selectedStrike = {
-          tradingSymbol: position.tradingSymbol,
-          securityId: position.securityId,
-        };
-
-        const exchangeSegment = this.selectedExchange === 'NSE' ? 'NSE_FNO' : 'BSE_FNO';
-
-        const orderData = {
-          brokerClientId: this.brokerClientId,
-          transactionType: transactionType,
-          exchangeSegment: exchangeSegment,
-          productType: position.productType,
-          orderType: 'MARKET',
-          validity: 'DAY',
-          tradingSymbol: selectedStrike.tradingSymbol,
-          securityId: selectedStrike.securityId,
-          quantity: position.netQty,
-          price: 0,
-          drvExpiryDate: this.selectedExpiry,
-          drvOptionType: drvOptionType,
-        };
-
-        console.log("Placing order with data:", orderData);
-        const response = await axios.post('http://localhost:3000/placeOrder', orderData);
-        console.log("Order placed successfully:", response.data);
-      } catch (error) {
-        console.error('Failed to place order:', error);
-        throw error;
-      }
-    },
-    async cancelPendingOrders() {
-      const pendingOrders = this.orders.filter(order => order.orderStatus === 'PENDING');
-      const cancelPromises = pendingOrders.map(order => this.cancelOrder(order.orderId, order.orderStatus));
-
-      try {
-        await Promise.all(cancelPromises);
-        this.toastMessage = 'Pending orders canceled successfully';
-        this.showToast = true;
-        await this.fetchOrders(); // Refresh the orders list
-      } catch (error) {
-        console.error('Failed to cancel orders:', error);
-        this.toastMessage = 'Failed to cancel some orders';
-        this.showToast = true;
-      }
-    },
-    async cancelOrder(orderId, orderStatus) {
-      if (orderStatus !== 'PENDING') {
-        console.log(`Order ${orderId} is not pending and cannot be canceled.`);
-        return;
-      }
-
-      try {
-        await axios.delete('http://localhost:3000/cancelOrder', {
-          data: { orderId },
-        });
-        console.log(`Order ${orderId} canceled successfully.`);
-      } catch (error) {
-        console.error(`Failed to cancel order ${orderId}:`, error);
-        this.toastMessage = 'Failed to cancel order';
-        this.showToast = true;
-        throw error; // Rethrow to handle in cancelPendingOrders
-      }
-    },
-    setOrderDetails(transactionType, optionType) {
-      this.modalTransactionType = transactionType;
-      this.modalOptionType = optionType;
-      this.selectedOrderType = 'LIMIT'; // Set selectedOrderType to LIMIT
-    },
-    resetOrderTypeIfNeeded() {
-      if (this.previousOrderType === 'MARKET') {
-        this.resetOrderType();
-      }
-    },
-    resetOrderType() {
-      this.selectedOrderType = 'MARKET';
-    },
-  },
-
+    showToast.value = true;
+  }
 };
 </script>
