@@ -961,4 +961,84 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true;
   }
 };
+
+const placeOrderForPosition = async (transactionType, optionType, position) => {
+  try {
+    const orderData = {
+      brokerClientId: selectedBroker.value.brokerClientId,
+      transactionType: transactionType,
+      exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
+      productType: selectedProductType.value,
+      orderType: 'MARKET',
+      validity: 'DAY',
+      tradingSymbol: position.tradingSymbol,
+      securityId: position.securityId,
+      quantity: position.netQty,
+      price: 0,
+      drvExpiryDate: position.expiryDate,
+      drvOptionType: optionType
+    };
+
+    console.log("Placing order for position with data:", orderData);
+    const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+    console.log("Order placed successfully for position:", response.data);
+  } catch (error) {
+    console.error('Failed to place order for position:', error);
+    throw error;
+  }
+};
+
+const closeAllPositions = async () => {
+  try {
+    for (const position of positions.value) {
+      if (position.positionType !== 'CLOSED') {
+        const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
+        await placeOrderForPosition('SELL', optionType, position);
+      }
+    }
+    toastMessage.value = 'All positions closed successfully';
+    showToast.value = true;
+  } catch (error) {
+    console.error('Error closing positions:', error);
+    toastMessage.value = 'Failed to close all positions';
+    showToast.value = true;
+  }
+};
+
+
+const cancelOrder = async (orderId, orderStatus) => {
+  if (orderStatus !== 'PENDING') {
+    console.log(`Order ${orderId} is not pending and cannot be canceled.`);
+    return;
+  }
+
+  try {
+    await axios.delete('http://localhost:3000/cancelOrder', {
+      data: { orderId },
+    });
+    console.log(`Order ${orderId} canceled successfully.`);
+  } catch (error) {
+    console.error(`Failed to cancel order ${orderId}:`, error);
+    toastMessage.value = 'Failed to cancel order';
+    showToast.value = true;
+    throw error; // Rethrow to handle in cancelPendingOrders
+  }
+};
+
+const cancelPendingOrders = async () => {
+  const pendingOrders = orders.value.filter(order => order.orderStatus === 'PENDING');
+  const cancelPromises = pendingOrders.map(order => cancelOrder(order.orderId, order.orderStatus));
+
+  try {
+    await Promise.all(cancelPromises);
+    toastMessage.value = 'Pending orders canceled successfully';
+    showToast.value = true;
+    await fetchOrders(); // Refresh the orders list
+  } catch (error) {
+    console.error('Failed to cancel orders:', error);
+    toastMessage.value = 'Failed to cancel some orders';
+    showToast.value = true;
+  }
+};
+
 </script>
