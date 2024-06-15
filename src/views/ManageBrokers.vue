@@ -30,6 +30,13 @@ onMounted(() => {
   } else {
     statusMessage.value = localStorage.getItem('statusMessage') || '';
   }
+
+  // Add event listener for postMessage
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'authCode' && event.data.code) {
+      reqCode.value = event.data.code;
+    }
+  });
 });
 
 watch(reqCode, (newCode) => {
@@ -102,6 +109,7 @@ watch(reqCode, async (newCode) => {
     }
   }
 });
+
 const maskBrokerClientId = (brokerClientId) => {
   if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
 
