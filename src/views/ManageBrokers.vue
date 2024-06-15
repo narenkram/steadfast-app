@@ -22,26 +22,24 @@ const fetchBrokers = async () => {
 onMounted(() => {
   fetchBrokers();
 
-  const storedCode = localStorage.getItem('authCode');
+  const storedCode = localStorage.getItem('reqCode');
   if (storedCode) {
     reqCode.value = storedCode;
-    localStorage.removeItem('authCode');
-    localStorage.removeItem('statusMessage');
-  } else {
-    statusMessage.value = localStorage.getItem('statusMessage') || '';
   }
+  statusMessage.value = localStorage.getItem('statusMessage') || '';
 
   // Add event listener for postMessage
   window.addEventListener('message', (event) => {
-    if (event.data.type === 'authCode' && event.data.code) {
+    if (event.data.type === 'reqCode' && event.data.code) {
       reqCode.value = event.data.code;
+      localStorage.setItem('reqCode', event.data.code); // Update local storage with new reqCode
     }
   });
 });
 
 watch(reqCode, (newCode) => {
   if (newCode) {
-    statusMessage.value = `Received reqCode: ${newCode} Generated Token:` + token.value;
+    statusMessage.value = `Received reqCode: ${newCode}`;
     generateToken();
   }
 });
@@ -98,6 +96,7 @@ watch(reqCode, async (newCode) => {
         clearErrorMessage();
       } else {
         token.value = generatedToken;
+        localStorage.setItem('generatedToken', generatedToken); // Store the token in localStorage
         errorMessage.value = '';
         statusMessage.value = `Token generated successfully: ${generatedToken}`;
         console.log('Token generated successfully:', generatedToken);
@@ -137,9 +136,15 @@ const maskApiSecret = (apiSecret) => {
 
 const fundLimits = ref('');
 const getFundLimits = async () => {
-  const jKey = token.value;
-  const jData = JSON.stringify({ uid: 'FT014523', actid: 'FT014523' });
+  let jKey = localStorage.getItem('generatedToken') || token.value;
 
+  if (!jKey) {
+    errorMessage.value = 'Token is missing. Please generate a token first.';
+    clearErrorMessage();
+    return;
+  }
+
+  const jData = JSON.stringify({ uid: 'FT014523', actid: 'FT014523' });
   const payload = `jKey=${jKey}&jData=${jData}`;
 
   try {

@@ -7,9 +7,9 @@ const route = useRoute();
 onMounted(() => {
   const code = route.query.code;
   if (typeof code === 'string') {
-    localStorage.setItem('authCode', code);
+    localStorage.setItem('reqCode', code);
     localStorage.removeItem('statusMessage');
-    window.opener.postMessage({ type: 'authCode', code }, '*');
+    window.opener.postMessage({ type: 'reqCode', code }, '*');
     window.close();
   } else {
     console.error('No valid code found in the URL');
