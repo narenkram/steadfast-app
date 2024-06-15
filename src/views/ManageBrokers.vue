@@ -8,6 +8,7 @@ const reqCode = ref('');
 const token = ref('');
 const errorMessage = ref('');
 const statusMessage = ref('');
+const userTriggeredTokenGeneration = ref(false); // Flag to track user-triggered token generation
 
 const brokers = ref([]);
 const fetchBrokers = async () => {
@@ -38,7 +39,7 @@ onMounted(() => {
 });
 
 watch(reqCode, (newCode) => {
-  if (newCode) {
+  if (newCode && userTriggeredTokenGeneration.value) {
     statusMessage.value = `Received reqCode: ${newCode}`;
     generateToken();
   }
@@ -57,6 +58,8 @@ const clearErrorMessage = () => {
 };
 
 const generateToken = async (broker) => {
+  userTriggeredTokenGeneration.value = true; // Set the flag when user triggers token generation
+
   if (!broker) {
     errorMessage.value = 'Broker information is missing';
     clearErrorMessage();
@@ -77,7 +80,7 @@ const generateToken = async (broker) => {
 };
 
 watch(reqCode, async (newCode) => {
-  if (newCode) {
+  if (newCode && userTriggeredTokenGeneration.value) {
     const api_secret = APIKEY + newCode + secretKey;
     const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
     const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
