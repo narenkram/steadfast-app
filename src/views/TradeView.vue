@@ -43,7 +43,7 @@
         <!-- Total Funds -->
         <div class="col-3 text-center">
           <p class="mb-1"><b>Total Funds</b></p>
-          <p class="mb-0">₹ {{ fundLimits.availabelBalance || 0 }}</p>
+          <p class="mb-0">₹ {{ availableBalance || 0 }}</p>
         </div>
 
         <!-- Utilized Margin -->
@@ -930,6 +930,15 @@ const cancelPendingOrders = async () => {
 
 
 // Computed properties
+const availableBalance = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return fundLimits.value.availableBalance || 0;
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return fundLimits.value.cash || 0;
+  }
+  return 0;
+});
+
 const formattedDate = computed(() => {
   const today = new Date();
   const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
