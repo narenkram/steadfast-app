@@ -2,8 +2,8 @@
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-const APIKEY = 'e44ac8efec6f44de9dd8581fc7bd9281';
-const secretKey = '2024.f8792c44c9cd4366b56779cad79e49b015493894fe9eaf39';
+const FLATTRADE_APIKEY = 'e44ac8efec6f44de9dd8581fc7bd9281';
+const FLATTRADE_API_SECRET = '2024.f8792c44c9cd4366b56779cad79e49b015493894fe9eaf39';
 const reqCode = ref('');
 const token = ref('');
 const errorMessage = ref('');
@@ -47,7 +47,7 @@ watch(reqCode, (newCode) => {
 
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
-  const authUrl = `https://auth.flattrade.in/?app_key=${APIKEY}`;
+  const authUrl = `https://auth.flattrade.in/?app_key=${FLATTRADE_APIKEY}`;
   window.open(authUrl, '_blank');
 };
 
@@ -81,12 +81,12 @@ const generateToken = async (broker) => {
 
 watch(reqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
-    const api_secret = APIKEY + newCode + secretKey;
+    const api_secret = FLATTRADE_APIKEY + newCode +FLATTRADE_API_SECRET;
     const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
     const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
 
     const payload = {
-      api_key: APIKEY,
+      api_key: FLATTRADE_APIKEY,
       request_code: newCode,
       api_secret: apiSecretHex,
     };
@@ -138,7 +138,7 @@ const maskApiSecret = (apiSecret) => {
 };
 
 const fundLimits = ref('');
-const getFundLimits = async () => {
+const flattradeFundLimits = async () => {
   let jKey = localStorage.getItem('generatedToken') || token.value;
 
   if (!jKey) {
@@ -227,6 +227,6 @@ const getFundLimits = async () => {
     </div>
   </section>
 
-  <button @click="getFundLimits">Get Fund Limits</button>
+  <button @click="flattradeFundLimits">Get Fund Limits</button>
   {{ fundLimits }}
 </template>

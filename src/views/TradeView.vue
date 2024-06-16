@@ -513,6 +513,7 @@ const fetchBrokers = async () => {
     brokers.value = response.data;
     if (brokers.value.length > 0) {
       selectedBroker.value = brokers.value[0];
+      fetchFundLimit(); // Fetch fund limits after setting the selected broker
     }
   } catch (error) {
     console.error('Failed to fetch brokers:', error);
@@ -712,7 +713,24 @@ const updatePositions = async () => {
 const fundLimits = ref({});
 const fetchFundLimit = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/fundLimit');
+    if (!selectedBroker.value) {
+      throw new Error('No broker selected');
+    }
+
+    let response;
+    if (selectedBroker.value.brokerName === 'Dhan') {
+      response = await axios.get('http://localhost:3000/dhanFundLimit');
+    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      const generatedToken = localStorage.getItem('generatedToken'); // Retrieve the token from local storage
+      if (!generatedToken) {
+        throw new Error('Generated token is missing');
+      }
+      response = await axios.post('http://localhost:3000/flattradeFundLimit', null, {
+        params: { generatedToken }
+      });
+    } else {
+      throw new Error('Unsupported broker');
+    }
     fundLimits.value = response.data;
   } catch (error) {
     console.error('Failed to fetch fund limits:', error);
@@ -939,7 +957,6 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 // Lifecycle hooks
 onMounted(() => {
   fetchBrokers();
-  fetchFundLimit();
   fetchPositions();
   fetchTradingData().then(() => {
     updateAvailableQuantities();
@@ -971,6 +988,12 @@ onBeforeUnmount(() => {
 
 
 // Watchers
+watch(selectedBroker, (newBroker) => {
+  if (newBroker) {
+    fetchFundLimit();
+  }
+});
+
 watch(selectedExpiry, (newExpiry) => {
   updateStrikesForExpiry(newExpiry);
 });
