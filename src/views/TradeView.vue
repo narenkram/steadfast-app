@@ -43,7 +43,7 @@
         <!-- Total Funds -->
         <div class="col-3 text-center">
           <p class="mb-1"><b>Total Funds</b></p>
-          <p class="mb-0">₹ {{ availableBalance || 0 }}</p>
+          <p class="mb-0">₹ {{ availableBalance || null }}</p>
         </div>
 
         <!-- Utilized Margin -->
@@ -932,7 +932,7 @@ const cancelPendingOrders = async () => {
 // Computed properties
 const availableBalance = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return fundLimits.value.availableBalance || 0;
+    return fundLimits.value.availabelBalance || 0; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return fundLimits.value.cash || 0;
   }
