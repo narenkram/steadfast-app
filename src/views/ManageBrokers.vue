@@ -2,8 +2,9 @@
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-const FLATTRADE_APIKEY = 'e44ac8efec6f44de9dd8581fc7bd9281';
-const FLATTRADE_API_SECRET = '2024.f8792c44c9cd4366b56779cad79e49b015493894fe9eaf39';
+const FLATTRADE_APIKEY = ref('');
+const FLATTRADE_API_SECRET = ref('');
+
 const reqCode = ref('');
 const token = ref('');
 const errorMessage = ref('');
@@ -20,8 +21,30 @@ const fetchBrokers = async () => {
   }
 };
 
+const fetchFlattradeCredentials = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/flattrade-credentials');
+    FLATTRADE_APIKEY.value = response.data.apiKey;
+    FLATTRADE_API_SECRET.value = response.data.apiSecret;
+
+    // Store the API key and secret in localStorage
+    localStorage.setItem('FLATTRADE_APIKEY', FLATTRADE_APIKEY.value);
+    localStorage.setItem('FLATTRADE_API_SECRET', FLATTRADE_API_SECRET.value);
+
+    return {
+      apiKey: FLATTRADE_APIKEY.value,
+      apiSecret: FLATTRADE_API_SECRET.value
+    };
+  } catch (error) {
+    console.error('Failed to fetch Flattrade credentials:', error);
+    return null;
+  }
+};
+
+
 onMounted(() => {
   fetchBrokers();
+  fetchFlattradeCredentials();
 
   const storedCode = localStorage.getItem('reqCode');
   if (storedCode) {
@@ -47,7 +70,15 @@ watch(reqCode, (newCode) => {
 
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
-  const authUrl = `https://auth.flattrade.in/?app_key=${FLATTRADE_APIKEY}`;
+  const storedFlattradeApiKey = localStorage.getItem('FLATTRADE_APIKEY');
+
+  if (!storedFlattradeApiKey) {
+    errorMessage.value = 'API key is missing';
+    clearErrorMessage();
+    return;
+  }
+
+  const authUrl = `https://auth.flattrade.in/?app_key=${storedFlattradeApiKey}`;
   window.open(authUrl, '_blank');
 };
 
@@ -81,12 +112,21 @@ const generateToken = async (broker) => {
 
 watch(reqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
-    const api_secret = FLATTRADE_APIKEY + newCode +FLATTRADE_API_SECRET;
+    const storedApiKey = localStorage.getItem('FLATTRADE_APIKEY');
+    const storedApiSecret = localStorage.getItem('FLATTRADE_API_SECRET');
+
+    if (!storedApiKey || !storedApiSecret) {
+      errorMessage.value = 'API key or secret is missing';
+      clearErrorMessage();
+      return;
+    }
+
+    const api_secret = storedApiKey + newCode + storedApiSecret;
     const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
     const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
 
     const payload = {
-      api_key: FLATTRADE_APIKEY,
+      api_key: storedApiKey,
       request_code: newCode,
       api_secret: apiSecretHex,
     };
