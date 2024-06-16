@@ -518,17 +518,6 @@ const fetchBrokers = async () => {
     console.error('Failed to fetch brokers:', error);
   }
 };
-const brokerClientId = ref(null);
-const fetchBrokerClientId = async () => {
-  try {
-    const { data } = await axios.get('http://localhost:3000/brokerClientId');
-    brokerClientId.value = data.brokerClientId;
-    console.log('Dhan Client ID:', data.brokerClientId);
-  } catch (error) {
-    console.error('Error fetching Dhan Client ID:', error);
-  }
-};
-
 
 const selectedExchange = ref('NSE');
 const selectedMasterSymbol = ref('NIFTY');
@@ -951,7 +940,6 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 onMounted(() => {
   fetchBrokers();
   fetchFundLimit();
-  fetchBrokerClientId();
   fetchPositions();
   fetchTradingData().then(() => {
     updateAvailableQuantities();
