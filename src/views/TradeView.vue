@@ -810,12 +810,23 @@ const placeOrder = async (transactionType, drvOptionType) => {
     }
 
     let exchangeSegment;
-    if (selectedExchange.value === 'NSE') {
-      exchangeSegment = 'NSE_FNO';
-    } else if (selectedExchange.value === 'BSE') {
-      exchangeSegment = 'BSE_FNO';
-    } else {
-      throw new Error("Selected exchange is not valid");
+
+    if (selectedBroker.value.brokerName === 'Dhan') {
+      if (selectedExchange.value === 'NSE') {
+        exchangeSegment = 'NSE_FNO';
+      } else if (selectedExchange.value === 'BSE') {
+        exchangeSegment = 'BSE_FNO';
+      } else {
+        throw new Error("Selected exchange is not valid for Dhan");
+      }
+    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      if (selectedExchange.value === 'NSE') {
+        exchangeSegment = 'NSE';
+      } else if (selectedExchange.value === 'BSE') {
+        exchangeSegment = 'BSE';
+      } else {
+        throw new Error("Selected exchange is not valid for Flattrade");
+      }
     }
 
     const orderData = {
