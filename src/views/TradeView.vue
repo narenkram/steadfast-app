@@ -834,7 +834,15 @@ const placeOrder = async (transactionType, drvOptionType) => {
     };
 
     console.log("Placing order with data:", orderData);
-    const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+    let response;
+    if (selectedBroker.value.brokerName === 'Dhan') {
+      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
+    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      response = await axios.post('http://localhost:3000/flattradePlaceOrder', orderData, {
+        params: { generatedToken: localStorage.getItem('generatedToken') }
+      });
+    }
+
     console.log("Order placed successfully:", response.data);
     toastMessage.value = 'Order placed successfully';
     showToast.value = true;
