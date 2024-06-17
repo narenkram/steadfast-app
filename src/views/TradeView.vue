@@ -49,7 +49,7 @@
         <!-- Utilized Margin -->
         <div class="col-2 text-center">
           <p class="mb-1"><b>Utilized Margin</b></p>
-          <p>₹ {{ fundLimits.utilizedAmount || 0 }}</p>
+          <p>₹ {{ usedAmount || null }}</p>
         </div>
 
         <!-- Today's date -->
@@ -932,9 +932,18 @@ const cancelPendingOrders = async () => {
 // Computed properties
 const availableBalance = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return fundLimits.value.availabelBalance || 0; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
+    return fundLimits.value.availabelBalance; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return fundLimits.value.cash || 0;
+    return fundLimits.value.cash;
+  }
+  return 0;
+});
+// Computed property to get the correct utilized amount based on the selected broker
+const usedAmount = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return fundLimits.value.utilizedAmount;
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return fundLimits.value.marginused;
   }
   return 0;
 });
@@ -950,13 +959,13 @@ const totalNetQty = computed(() => positions.value.reduce((total, position) => t
 const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
 
 const totalCapitalPercentage = computed(() => {
-  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.utilizedAmount || 0);
+  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.usedAmount || 0);
   return (totalProfit.value / totalMoney) * 100;
 });
 
 const deployedCapitalPercentage = computed(() => {
-  const utilizedAmount = fundLimits.value.utilizedAmount || 0;
-  return utilizedAmount ? (totalProfit.value / utilizedAmount) * 100 : 0;
+  const usedAmount = fundLimits.value.usedAmount || 0;
+  return usedAmount ? (totalProfit.value / usedAmount) * 100 : 0;
 });
 
 const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
