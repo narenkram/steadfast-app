@@ -959,13 +959,13 @@ const totalNetQty = computed(() => positions.value.reduce((total, position) => t
 const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
 
 const totalCapitalPercentage = computed(() => {
-  const totalMoney = (fundLimits.value.availabelBalance || 0) + (fundLimits.value.usedAmount || 0);
+  const totalMoney = (availableBalance.value || 0) + (usedAmount.value || 0);
   return (totalProfit.value / totalMoney) * 100;
 });
 
 const deployedCapitalPercentage = computed(() => {
-  const usedAmount = fundLimits.value.usedAmount || 0;
-  return usedAmount ? (totalProfit.value / usedAmount) * 100 : 0;
+  const totalUsedAmount = usedAmount.value || 0;
+  return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
 });
 
 const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
