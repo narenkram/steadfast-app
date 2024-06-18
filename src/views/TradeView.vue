@@ -1,4 +1,5 @@
 <template>
+  <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <section class="row py-3">
     <div class="col-12">
 
@@ -62,6 +63,8 @@
 
     </div>
   </section>
+
+  <!-- Total Profit & Net PNL -->
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
@@ -88,6 +91,7 @@
 
   <hr />
 
+  <!-- Place Order Form -->
   <section class="row py-2">
     <form @submit.prevent>
       <div class="row">
@@ -205,6 +209,7 @@
         </div>
       </div>
 
+      <!-- Trading Symbols & Buy/Sell Buttons -->
       <div class="row mt-2 align-items-center justify-content-between">
         <!-- Call Strike Selection -->
         <div class="col-3">
@@ -251,6 +256,7 @@
           </div>
         </div>
 
+        <!-- Close All Positions & Cancel Pending Orders -->
         <div class="col-3 text-center">
           <br />
           <br />
@@ -307,9 +313,11 @@
           </div>
         </div>
       </div>
+
     </form>
   </section>
 
+  <!-- Positions & Trades -->
   <section class="row py-3">
     <div class="col-12">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -416,9 +424,8 @@
     </div>
   </section>
 
+  <!-- Toast Alert -->
   <ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
-
-
 
   <!-- Limit Price Input Modal (conditionally rendered) -->
   <div class="modal fade" id="PlaceLimitOrderWindow" tabindex="-1" aria-labelledby="PlaceLimitOrderWindowLabel"
