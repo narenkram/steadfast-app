@@ -456,6 +456,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
+import qs from 'qs';
 
 const showToast = ref(false);
 const toastMessage = ref('');
@@ -512,7 +513,7 @@ const fetchBrokers = async () => {
     const response = await axios.get('http://localhost:3000/brokers');
     brokers.value = response.data;
     if (brokers.value.length > 0) {
-      selectedBroker.value = brokers.value[0];
+      selectedBroker.value = brokers.value[1];
       fetchFundLimit(); // Fetch fund limits after setting the selected broker
     }
   } catch (error) {
@@ -792,6 +793,65 @@ const productTypes = ref(['INTRADAY', 'MARGIN']);
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
+const getExchangeSegment = () => {
+  if (!selectedBroker.value || !selectedExchange.value) {
+    throw new Error("Broker or exchange not selected");
+  }
+
+  if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedExchange.value === 'NSE') {
+      return 'NSE_FNO';
+    } else if (selectedExchange.value === 'BSE') {
+      return 'BSE_FNO';
+    } else {
+      throw new Error("Selected exchange is not valid for Dhan");
+    }
+  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+    if (selectedExchange.value === 'NSE') {
+      return 'NFO';
+    } else if (selectedExchange.value === 'BSE') {
+      return 'BFO';
+    } else {
+      throw new Error("Selected exchange is not valid for Flattrade");
+    }
+  } else {
+    throw new Error("Unsupported broker");
+  }
+};
+const getOrderData = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
+  if (selectedBroker.value.brokerName === 'Dhan') {
+    return {
+      brokerClientId: selectedBroker.value.brokerClientId,
+      transactionType: transactionType,
+      exchangeSegment: exchangeSegment,
+      productType: selectedProductType.value,
+      orderType: selectedOrderType.value,
+      validity: 'DAY',
+      tradingSymbol: selectedStrike.tradingSymbol,
+      securityId: selectedStrike.securityId,
+      quantity: selectedQuantity.value,
+      price: selectedOrderType.value === 'LIMIT' ? limitPrice.value : 0,
+      drvExpiryDate: selectedExpiry.value,
+      drvOptionType: drvOptionType
+    };
+  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+    return {
+      uid: "FT014523",
+      actid: "FT014523",
+      exch: "NFO",
+      tsym: "BANKNIFTY19JUN24C50800",
+      qty: 15,
+      prc: 0,
+      prd: "M",
+      trantype: "B",
+      prctyp: "MKT",
+      ret: "DAY"
+      // Add any additional fields specific to Flattrade here
+    };
+  } else {
+    throw new Error("Unsupported broker");
+  }
+};
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -809,48 +869,21 @@ const placeOrder = async (transactionType, drvOptionType) => {
       throw new Error(`Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`);
     }
 
-    let exchangeSegment;
-
-    if (selectedBroker.value.brokerName === 'Dhan') {
-      if (selectedExchange.value === 'NSE') {
-        exchangeSegment = 'NSE_FNO';
-      } else if (selectedExchange.value === 'BSE') {
-        exchangeSegment = 'BSE_FNO';
-      } else {
-        throw new Error("Selected exchange is not valid for Dhan");
-      }
-    } else if (selectedBroker.value.brokerName === 'Flattrade') {
-      if (selectedExchange.value === 'NSE') {
-        exchangeSegment = 'NSE';
-      } else if (selectedExchange.value === 'BSE') {
-        exchangeSegment = 'BSE';
-      } else {
-        throw new Error("Selected exchange is not valid for Flattrade");
-      }
-    }
-
-    const orderData = {
-      brokerClientId: selectedBroker.value.brokerClientId, // Use selectedBroker's brokerClientId
-      transactionType: transactionType,
-      exchangeSegment: exchangeSegment,
-      productType: selectedProductType.value,
-      orderType: selectedOrderType.value,
-      validity: 'DAY',
-      tradingSymbol: selectedStrike.tradingSymbol,
-      securityId: selectedStrike.securityId,
-      quantity: selectedQuantity.value,
-      price: selectedOrderType.value === 'LIMIT' ? limitPrice.value : 0, // Use limitPrice if order type is LIMIT
-      drvExpiryDate: selectedExpiry.value,
-      drvOptionType: drvOptionType
-    };
+    const exchangeSegment = getExchangeSegment();
+    const orderData = getOrderData(transactionType, drvOptionType, selectedStrike, exchangeSegment);
 
     console.log("Placing order with data:", orderData);
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
     } else if (selectedBroker.value.brokerName === 'Flattrade') {
-      response = await axios.post('http://localhost:3000/flattradePlaceOrder', orderData, {
-        params: { generatedToken: localStorage.getItem('generatedToken') }
+      const generatedToken = localStorage.getItem('generatedToken');
+      const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
+      response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
+        headers: {
+          'Authorization': `Bearer ${generatedToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
     }
 
