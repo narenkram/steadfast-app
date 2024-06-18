@@ -216,7 +216,7 @@
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
             <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ formatTradingSymbol(strike.tradingSymbol) }}
+              {{ dhanFormatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -273,7 +273,7 @@
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
             <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ formatTradingSymbol(strike.tradingSymbol) }}
+              {{ dhanFormatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -479,6 +479,7 @@ const setActiveTab = (tab) => {
   activeTab.value = tab;
 };
 
+// Kill Switch - Only Broker Dhan Supports it for now.
 const killSwitchActive = ref(false);
 const toggleKillSwitch = async () => {
   const newStatus = killSwitchActive.value ? 'DEACTIVATE' : 'ACTIVATE';
@@ -511,10 +512,9 @@ const toggleKillSwitch = async () => {
   }
 };
 
-
+// Fetch brokers and set selectedBroker
 const brokers = ref([]);
 const selectedBroker = ref(null);
-// Fetch brokers and set selectedBroker
 const fetchBrokers = async () => {
   try {
     const response = await axios.get('http://localhost:3000/brokers');
@@ -528,8 +528,9 @@ const fetchBrokers = async () => {
   }
 };
 
+// Fetch trading symbols and strikes
 const selectedExchange = ref('NSE');
-const selectedMasterSymbol = ref('NIFTY');
+const selectedMasterSymbol = ref('BANKNIFTY');
 const selectedQuantity = ref(null);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
@@ -573,7 +574,7 @@ const fetchTradingData = async () => {
   updateStrikesForExpiry(selectedExpiry.value);
 };
 
-const formatTradingSymbol = (symbol) => {
+const dhanFormatTradingSymbol = (symbol) => {
   // Split the symbol by '-' and remove the date part and the last part after the strike price
   let parts = symbol.split('-');
   if (parts.length > 3) {
