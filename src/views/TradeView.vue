@@ -807,8 +807,17 @@ const resetOrderType = () => {
   selectedOrderType.value = orderTypes.value[0]; // Set selectedOrderType to MARKET or MKT based on broker
 };
 
-const selectedProductType = ref('MARGIN');
-const productTypes = ref(['INTRADAY', 'MARGIN']);
+const productTypes = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return ['INTRADAY', 'MARGIN'];
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['I', 'M'];
+  }
+  return [];
+});
+
+const selectedProductType = ref(productTypes.value[1]); // Default to 'MARGIN' or 'M'
+
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
@@ -864,7 +873,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       tsym: "BANKNIFTY26JUN24C40900",
       qty: 15,
       prc: 0,
-      prd: "M",
+      prd: selectedProductType.value,
       trantype: "B",
       prctyp: selectedOrderType.value,
       ret: "DAY"
@@ -1084,6 +1093,9 @@ onBeforeUnmount(() => {
 // Watchers
 watch(selectedBroker, (newBroker) => {
   if (newBroker) {
+    selectedOrderType.value = orderTypes.value[0];
+    previousOrderType.value = orderTypes.value[0];
+    selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
   }
 });
@@ -1119,14 +1131,6 @@ watch(selectedExchange, (newExchange) => {
 
 watch(selectedOrderType, (newValue, oldValue) => {
   previousOrderType.value = oldValue;
-});
-
-// Watcher to set default order type when a broker is selected
-watch(selectedBroker, (newBroker) => {
-  if (newBroker) {
-    selectedOrderType.value = orderTypes.value[0];
-    previousOrderType.value = orderTypes.value[0];
-  }
 });
 
 watch(activeTab, (newTab) => {
