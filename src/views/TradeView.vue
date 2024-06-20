@@ -780,27 +780,39 @@ const quantities = ref({
   SENSEX50: [25]
 });
 const availableQuantities = ref([]);
-const selectedOrderType = ref('MARKET');
-const previousOrderType = ref('MARKET');
+
+const orderTypes = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return ['MARKET', 'LIMIT'];
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['MKT', 'LMT'];
+  }
+  return [];
+});
+const selectedOrderType = ref(orderTypes.value[0]);
+const previousOrderType = ref(orderTypes.value[0]);
+
 const setOrderDetails = (transactionType, optionType) => {
   modalTransactionType.value = transactionType;
   modalOptionType.value = optionType;
-  selectedOrderType.value = 'LIMIT'; // Set selectedOrderType to LIMIT
+  selectedOrderType.value = orderTypes.value[1]; // Set selectedOrderType to LIMIT or LMT based on broker
 };
 const resetOrderTypeIfNeeded = () => {
-  if (previousOrderType.value === 'MARKET') {
+  if (previousOrderType.value === orderTypes.value[0]) { // Check if previousOrderType is MARKET or MKT
     resetOrderType();
   }
 };
+
 const resetOrderType = () => {
-  selectedOrderType.value = 'MARKET';
+  selectedOrderType.value = orderTypes.value[0]; // Set selectedOrderType to MARKET or MKT based on broker
 };
-const orderTypes = ref(['MARKET', 'LIMIT']);
+
 const selectedProductType = ref('MARGIN');
 const productTypes = ref(['INTRADAY', 'MARGIN']);
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
+// Get Exchange Segment for Dhan or Flattrade
 const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
     throw new Error("Broker or exchange not selected");
@@ -826,7 +838,9 @@ const getExchangeSegment = () => {
     throw new Error("Unsupported broker");
   }
 };
-const getOrderData = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
+
+// Prepare Order Payload for Dhan or Flattrade
+const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   if (selectedBroker.value.brokerName === 'Dhan') {
     return {
       brokerClientId: selectedBroker.value.brokerClientId,
@@ -847,7 +861,7 @@ const getOrderData = (transactionType, drvOptionType, selectedStrike, exchangeSe
       uid: "FT014523",
       actid: "FT014523",
       exch: "NFO",
-      tsym: "BANKNIFTY19JUN24C50800",
+      tsym: "BANKNIFTY26JUN24C40900",
       qty: 15,
       prc: 0,
       prd: "M",
@@ -860,6 +874,8 @@ const getOrderData = (transactionType, drvOptionType, selectedStrike, exchangeSe
     throw new Error("Unsupported broker");
   }
 };
+
+// Place Order for Dhan or Flattrade
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -878,7 +894,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
     }
 
     const exchangeSegment = getExchangeSegment();
-    const orderData = getOrderData(transactionType, drvOptionType, selectedStrike, exchangeSegment);
+    const orderData = prepareOrderPayload(transactionType, drvOptionType, selectedStrike, exchangeSegment);
 
     console.log("Placing order with data:", orderData);
     let response;
@@ -1103,6 +1119,14 @@ watch(selectedExchange, (newExchange) => {
 
 watch(selectedOrderType, (newValue, oldValue) => {
   previousOrderType.value = oldValue;
+});
+
+// Watcher to set default order type when a broker is selected
+watch(selectedBroker, (newBroker) => {
+  if (newBroker) {
+    selectedOrderType.value = orderTypes.value[0];
+    previousOrderType.value = orderTypes.value[0];
+  }
 });
 
 watch(activeTab, (newTab) => {
