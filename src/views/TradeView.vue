@@ -866,7 +866,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       prc: 0,
       prd: "M",
       trantype: "B",
-      prctyp: "MKT",
+      prctyp: selectedOrderType.value,
       ret: "DAY"
       // Add any additional fields specific to Flattrade here
     };
