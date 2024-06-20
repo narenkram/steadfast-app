@@ -858,8 +858,8 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     };
   } else if (selectedBroker.value.brokerName === 'Flattrade') {
     return {
-      uid: "FT014523",
-      actid: "FT014523",
+      uid: selectedBroker.value.brokerClientId,
+      actid: selectedBroker.value.brokerClientId,
       exch: "NFO",
       tsym: "BANKNIFTY26JUN24C40900",
       qty: 15,
