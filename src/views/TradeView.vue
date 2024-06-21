@@ -878,7 +878,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
-      exch: "NFO",
+      exch: exchangeSegment,
       tsym: "BANKNIFTY26JUN24C40900",
       qty: 15,
       prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
