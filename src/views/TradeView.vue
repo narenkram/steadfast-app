@@ -767,6 +767,7 @@ const fetchDhanOrdersTradesBook = async () => {
 };
 const flatOrderBook = ref('');
 const flatTradeBook = ref('');
+const token = ref('');
 
 const flattradeTrades = async () => {
   let jKey = localStorage.getItem('generatedToken') || token.value;
