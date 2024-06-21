@@ -216,7 +216,8 @@
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
             <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ dhanFormatTradingSymbol(strike.tradingSymbol) }}
+              {{ selectedBroker?.brokerName === 'Dhan' ? dhanFormatTradingSymbol(strike.tradingSymbol) :
+                flattradeFormatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -273,7 +274,8 @@
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
             <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ dhanFormatTradingSymbol(strike.tradingSymbol) }}
+              {{ selectedBroker?.brokerName === 'Dhan' ? dhanFormatTradingSymbol(strike.tradingSymbol) :
+                flattradeFormatTradingSymbol(strike.tradingSymbol) }}
             </option>
           </select>
           <div>
@@ -692,6 +694,15 @@ const dhanFormatTradingSymbol = (symbol) => {
     // return `${parts[0]} ${parts[2]} ${parts[3]}`; DO NOT REMOVE THIS
     // this displays only the strike for easy selection
     return `${parts[2]}`;
+  }
+  return symbol; // Return the original symbol if it doesn't match the expected format
+};
+
+const flattradeFormatTradingSymbol = (symbol) => {
+  // Extract the strike price which is after 'C' in callStrikes and after 'P' in putStrikes
+  const match = symbol.match(/C(\d+)|P(\d+)/);
+  if (match) {
+    return match[1] || match[2]; // Return the matched strike price
   }
   return symbol; // Return the original symbol if it doesn't match the expected format
 };
