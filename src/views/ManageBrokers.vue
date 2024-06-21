@@ -263,13 +263,14 @@ const flattradePositionBook = async () => {
       }
     });
 
-    if (positionBookRes.data.stat === 'Ok') {
+    if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
       flatPositionBook.value = positionBookRes.data;
       console.log('Position Book:', positionBookRes.data);
     } else {
-      errorMessage.value = `Error fetching position book: ${positionBookRes.data.emsg}`;
+      const errorMsg = positionBookRes.data.emsg || 'Unknown error';
+      errorMessage.value = `Error fetching position book: ${errorMsg}`;
       clearErrorMessage();
-      console.error('Error fetching position book:', positionBookRes.data.emsg);
+      console.error('Error fetching position book:', errorMsg);
     }
   } catch (error) {
     errorMessage.value = 'Error fetching position book: ' + error.message;

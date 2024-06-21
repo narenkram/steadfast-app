@@ -350,7 +350,8 @@
               <p class="mb-0"><b>Total Sell Value: </b>x</p>
             </div>
           </div>
-          <table class="table table-hover">
+          <!-- Dhan Positions -->
+          <table class="table table-hover" v-if="activeFetchFunction === 'fetchPositions'">
             <thead>
               <tr>
                 <th scope="col">Symbol Name</th>
@@ -379,6 +380,32 @@
               </tr>
             </tbody>
           </table>
+          <!-- Flattrade Positions -->
+          <div v-if="activeFetchFunction === 'flattradePositionBook' && flatTradePositionBook.length">
+            <table class="table table-hover" v-if="flatTradePositionBook.length">
+              <thead>
+                <tr>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Average Price</th>
+                  <th scope="col">Current Price</th>
+                  <th scope="col">Profit/Loss</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="position in flatTradePositionBook" :key="position.tsym">
+                  <td>{{ position.tsym }}</td>
+                  <td>{{ position.netqty }}</td>
+                  <td>{{ position.netavgprc }}</td>
+                  <td>{{ position.lp }}</td>
+                  <td>{{ position.rpnl }}</td>
+                </tr>
+                <tr v-if="flatTradePositionBook.length === 0">
+                  <td colspan="5" class="text-center">No positions available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           <!-- Dhan Trades -->
@@ -448,6 +475,7 @@
                 </tr>
               </tbody>
             </table>
+            <div v-else class="text-center">No trades found</div>
           </div>
         </div>
         <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
@@ -731,7 +759,7 @@ const fetchOrders = async () => {
   try {
     const response = await axios.get('http://localhost:3000/getOrders');
     orders.value = response.data; // Set the orders array
-    console.log('Orders:', response.data);
+    console.log('Dhan Order Book:', response.data);
   } catch (error) {
     console.error('Error fetching orders:', error);
     toastMessage.value = 'Error fetching orders';
@@ -761,7 +789,7 @@ const flattradeTrades = async () => {
       }
     });
     flatOrderBook.value = orderBookRes.data;
-    console.log('Order Book:', orderBookRes.data);
+    console.log('Flattrade Order Book:', orderBookRes.data);
 
     // Fetch Trade Book
     const tradeBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/TradeBook', tradeBookPayload, {
@@ -770,7 +798,7 @@ const flattradeTrades = async () => {
       }
     });
     flatTradeBook.value = tradeBookRes.data;
-    console.log('Trade Book:', tradeBookRes.data);
+    console.log('Flattrade Trade Book:', tradeBookRes.data);
   } catch (error) {
     toastMessage.value = 'Error fetching trades: ' + error.message;
     showToast.value = true;
@@ -782,9 +810,8 @@ const positions = ref([]);
 const fetchPositions = async () => {
   try {
     const response = await axios.get('http://localhost:3000/positions');
-    console.log('Fetched positions:', response.data); // Log the fetched data
     positions.value = response.data; // Store the fetched data in the positions ref
-    console.log('Updated positions:', positions.value); // Log the updated positions ref
+    console.log('Dhan Position Book:', positions.value); // Log the updated positions ref
   } catch (error) {
     console.error('Error fetching positions:', error);
     toastMessage.value = 'Failed to fetch positions';
@@ -795,9 +822,44 @@ const updatePositions = async () => {
   try {
     const response = await axios.get('http://localhost:3000/positions');
     positions.value = response.data;
-    console.log('Updated positions:', positions.value);
+    console.log('Updated Dhan Position Book:', positions.value);
   } catch (error) {
     console.error('Failed to update positions:', error);
+  }
+};
+const flatTradePositionBook = ref([]);
+
+const flattradePositionBook = async () => {
+  let jKey = localStorage.getItem('generatedToken') || token.value;
+
+  if (!jKey) {
+    toastMessage.value = 'Token is missing. Please generate a token first.';
+    showToast.value = true;
+    return;
+  }
+
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+
+  try {
+    const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
+      flatTradePositionBook.value = positionBookRes.data;
+      console.log('Flattrade Position Book:', positionBookRes.data);
+    } else {
+      const errorMsg = positionBookRes.data.emsg || 'Unknown error';
+      toastMessage.value = `Error fetching position book: ${errorMsg}`;
+      showToast.value = true;
+      console.error('Error fetching position book:', errorMsg);
+    }
+  } catch (error) {
+    toastMessage.value = 'Error fetching position book: ' + error.message;
+    showToast.value = true;
+    console.error('Error fetching position book:', error);
   }
 };
 
@@ -961,7 +1023,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
       exch: exchangeSegment,
-      tsym: "BANKNIFTY26JUN24C40900",
+      tsym: "BANKNIFTY26JUN24P52000",
       qty: 15,
       prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
       prd: selectedProductType.value,
@@ -1151,7 +1213,6 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 // Lifecycle hooks
 onMounted(() => {
   fetchBrokers();
-  fetchPositions();
   fetchTradingData().then(() => {
     updateAvailableQuantities();
   });
@@ -1160,9 +1221,15 @@ onMounted(() => {
 
   // Initialize with the default active tab
   if (activeTab.value === 'positions') {
-    fetchPositions();
-    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-    activeFetchFunction.value = 'fetchPositions';
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      flattradePositionBook();
+      fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
+      activeFetchFunction.value = 'flattradePositionBook';
+    } else {
+      fetchPositions();
+      fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+      activeFetchFunction.value = 'fetchPositions';
+    }
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       flattradeTrades();
@@ -1206,7 +1273,17 @@ watch(selectedBroker, (newBroker) => {
     }
 
     // Update activeFetchFunction and set new interval based on the new broker
-    if (activeTab.value === 'trades') {
+    if (activeTab.value === 'positions') {
+      if (newBroker.brokerName === 'Flattrade') {
+        activeFetchFunction.value = 'flattradePositionBook';
+        flattradePositionBook();
+        fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
+      } else {
+        activeFetchFunction.value = 'fetchPositions';
+        fetchPositions();
+        fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+      }
+    } else if (activeTab.value === 'trades') {
       if (newBroker.brokerName === 'Flattrade') {
         activeFetchFunction.value = 'flattradeTrades';
         flattradeTrades();
@@ -1260,9 +1337,15 @@ watch(activeTab, (newTab) => {
       clearInterval(fetchOrdersInterval.value);
       fetchOrdersInterval.value = null;
     }
-    fetchPositions();
-    fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-    activeFetchFunction.value = 'fetchPositions'; // Set active fetch function
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      flattradePositionBook();
+      fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
+      activeFetchFunction.value = 'flattradePositionBook'; // Set active fetch function
+    } else {
+      fetchPositions();
+      fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+      activeFetchFunction.value = 'fetchPositions'; // Set active fetch function
+    }
   } else if (newTab === 'trades') {
     if (fetchPositionsInterval.value) {
       clearInterval(fetchPositionsInterval.value);
