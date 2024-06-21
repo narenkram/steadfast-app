@@ -381,7 +381,8 @@
           </table>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
-          <table class="table">
+          <!-- Dhan Trades -->
+          <table class="table table-hover" v-if="activeFetchFunction === 'fetchOrders'">
             <thead>
               <tr>
                 <th>Order ID</th>
@@ -402,10 +403,52 @@
                 <td>{{ order.orderStatus }}</td>
               </tr>
               <tr v-if="orders.length === 0">
-                <td colspan="5" class="text-center">No orders available</td>
+                <td colspan="5" class="text-center">No Dhan orders or trades available</td>
               </tr>
             </tbody>
           </table>
+          <!-- Flattrade Trades -->
+          <div v-if="activeFetchFunction === 'flattradeTrades'">
+            <table class="table table-hover" v-if="flatOrderBook.length || flatTradeBook.length">
+              <thead>
+                <tr>
+                  <th scope="col">Type</th>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Trade ID</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="order in flatOrderBook" :key="order.norenordno">
+                  <td>Order</td>
+                  <td>{{ order.norenordno }}</td>
+                  <td>N/A</td>
+                  <td>{{ order.tsym }}</td>
+                  <td>{{ order.qty }}</td>
+                  <td>{{ order.prc }}</td>
+                  <td>{{ order.norentm }}</td>
+                  <td>{{ order.status }}</td>
+                  <td>{{ order.rejreason }}</td>
+                </tr>
+                <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
+                  <td>Trade</td>
+                  <td>{{ trade.norenordno }}</td>
+                  <td>{{ trade.norenordno }}</td>
+                  <td>{{ trade.tsym }}</td>
+                  <td>{{ trade.qty }}</td>
+                  <td>{{ trade.prc }}</td>
+                  <td>{{ trade.norentm }}</td>
+                  <td>{{ trade.status }}</td>
+                  <td>{{ trade.rejreason }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
           tabindex="0">
@@ -693,6 +736,45 @@ const fetchOrders = async () => {
     console.error('Error fetching orders:', error);
     toastMessage.value = 'Error fetching orders';
     showToast.value = true;
+  }
+};
+const flatOrderBook = ref('');
+const flatTradeBook = ref('');
+
+const flattradeTrades = async () => {
+  let jKey = localStorage.getItem('generatedToken') || token.value;
+
+  if (!jKey) {
+    toastMessage.value = 'Token is missing. Please generate a token first.';
+    showToast.value = true;
+    return;
+  }
+
+  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', prd: 'M' })}`;
+  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+
+  try {
+    // Fetch Order Book
+    const orderBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/OrderBook', orderBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    flatOrderBook.value = orderBookRes.data;
+    console.log('Order Book:', orderBookRes.data);
+
+    // Fetch Trade Book
+    const tradeBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/TradeBook', tradeBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    flatTradeBook.value = tradeBookRes.data;
+    console.log('Trade Book:', tradeBookRes.data);
+  } catch (error) {
+    toastMessage.value = 'Error fetching trades: ' + error.message;
+    showToast.value = true;
+    console.error('Error fetching trades:', error);
   }
 };
 
@@ -1076,14 +1158,18 @@ onMounted(() => {
 
   window.addEventListener('keydown', handleArrowKeys);
 
-
   // Initialize with the default active tab
   if (activeTab.value === 'positions') {
     fetchPositions();
     fetchPositionsInterval.value = setInterval(updatePositions, 1000);
   } else if (activeTab.value === 'trades') {
-    fetchOrders();
-    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      flattradeTrades();
+      fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
+    } else {
+      fetchOrders();
+      fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+    }
   }
 });
 
@@ -1142,6 +1228,7 @@ watch(selectedOrderType, (newValue, oldValue) => {
   previousOrderType.value = oldValue;
 });
 
+const activeFetchFunction = ref(null);
 watch(activeTab, (newTab) => {
   if (newTab === 'positions') {
     if (fetchOrdersInterval.value) {
@@ -1150,13 +1237,21 @@ watch(activeTab, (newTab) => {
     }
     fetchPositions();
     fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+    activeFetchFunction.value = 'fetchPositions'; // Set active fetch function
   } else if (newTab === 'trades') {
     if (fetchPositionsInterval.value) {
       clearInterval(fetchPositionsInterval.value);
       fetchPositionsInterval.value = null;
     }
-    fetchOrders();
-    fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      flattradeTrades();
+      fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
+      activeFetchFunction.value = 'flattradeTrades'; // Set active fetch function
+    } else {
+      fetchOrders();
+      fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+      activeFetchFunction.value = 'fetchOrders'; // Set active fetch function
+    }
   }
 });
 
