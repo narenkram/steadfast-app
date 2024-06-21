@@ -351,7 +351,7 @@
             </div>
           </div>
           <!-- Dhan Positions -->
-          <table class="table table-hover" v-if="activeFetchFunction === 'fetchPositions'">
+          <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanPositions'">
             <thead>
               <tr>
                 <th scope="col">Symbol Name</th>
@@ -837,9 +837,9 @@ const flattradeTrades = async () => {
 };
 
 const positions = ref([]);
-const fetchPositions = async () => {
+const fetchDhanPositions = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/positions');
+    const response = await axios.get('http://localhost:3000/dhanPositions');
     positions.value = response.data; // Store the fetched data in the positions ref
     console.log('Dhan Position Book:', positions.value); // Log the updated positions ref
   } catch (error) {
@@ -850,7 +850,7 @@ const fetchPositions = async () => {
 };
 const updatePositions = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/positions');
+    const response = await axios.get('http://localhost:3000/dhanPositions');
     positions.value = response.data;
     console.log('Updated Dhan Position Book:', positions.value);
   } catch (error) {
@@ -1257,9 +1257,9 @@ onMounted(() => {
       fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
       activeFetchFunction.value = 'flattradePositionBook';
     } else {
-      fetchPositions();
+      fetchDhanPositions();
       fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-      activeFetchFunction.value = 'fetchPositions';
+      activeFetchFunction.value = 'fetchDhanPositions';
     }
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -1311,8 +1311,8 @@ watch(selectedBroker, (newBroker) => {
         flattradePositionBook();
         fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
       } else {
-        activeFetchFunction.value = 'fetchPositions';
-        fetchPositions();
+        activeFetchFunction.value = 'fetchDhanPositions';
+        fetchDhanPositions();
         fetchPositionsInterval.value = setInterval(updatePositions, 1000);
       }
     } else if (activeTab.value === 'trades') {
@@ -1374,9 +1374,9 @@ watch(activeTab, (newTab) => {
       fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
       activeFetchFunction.value = 'flattradePositionBook'; // Set active fetch function
     } else {
-      fetchPositions();
+      fetchDhanPositions();
       fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-      activeFetchFunction.value = 'fetchPositions'; // Set active fetch function
+      activeFetchFunction.value = 'fetchDhanPositions'; // Set active fetch function
     }
   } else if (newTab === 'trades') {
     if (fetchPositionsInterval.value) {
