@@ -1162,13 +1162,16 @@ onMounted(() => {
   if (activeTab.value === 'positions') {
     fetchPositions();
     fetchPositionsInterval.value = setInterval(updatePositions, 1000);
+    activeFetchFunction.value = 'fetchPositions';
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       flattradeTrades();
       fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
+      activeFetchFunction.value = 'flattradeTrades';
     } else {
       fetchOrders();
       fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+      activeFetchFunction.value = 'fetchOrders';
     }
   }
 });
@@ -1183,7 +1186,6 @@ onBeforeUnmount(() => {
     clearInterval(fetchPositionsInterval.value);
   }
 });
-
 
 // Watchers
 watch(selectedBroker, (newBroker) => {
