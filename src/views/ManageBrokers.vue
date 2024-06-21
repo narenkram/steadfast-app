@@ -243,6 +243,40 @@ const flattradeTrades = async () => {
     console.error('Error fetching trades:', error);
   }
 };
+const flatPositionBook = ref([]);
+
+const flattradePositionBook = async () => {
+  let jKey = localStorage.getItem('generatedToken') || token.value;
+
+  if (!jKey) {
+    errorMessage.value = 'Token is missing. Please generate a token first.';
+    clearErrorMessage();
+    return;
+  }
+
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+
+  try {
+    const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (positionBookRes.data.stat === 'Ok') {
+      flatPositionBook.value = positionBookRes.data;
+      console.log('Position Book:', positionBookRes.data);
+    } else {
+      errorMessage.value = `Error fetching position book: ${positionBookRes.data.emsg}`;
+      clearErrorMessage();
+      console.error('Error fetching position book:', positionBookRes.data.emsg);
+    }
+  } catch (error) {
+    errorMessage.value = 'Error fetching position book: ' + error.message;
+    clearErrorMessage();
+    console.error('Error fetching position book:', error);
+  }
+};
 </script>
 
 <template>
@@ -353,4 +387,29 @@ const flattradeTrades = async () => {
       </tr>
     </tbody>
   </table>
+
+
+  <button @click="flattradePositionBook">Get Position Book</button>
+  <div v-if="flatPositionBook.length">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Symbol</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Average Price</th>
+          <th scope="col">Current Price</th>
+          <th scope="col">Profit/Loss</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="position in flatPositionBook" :key="position.tsym">
+          <td>{{ position.tsym }}</td>
+          <td>{{ position.netqty }}</td>
+          <td>{{ position.netavgprc }}</td>
+          <td>{{ position.lp }}</td>
+          <td>{{ position.rpnl }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
