@@ -1192,6 +1192,17 @@ watch(selectedBroker, (newBroker) => {
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
+
+    // Update activeFetchFunction based on the new broker
+    if (activeTab.value === 'trades') {
+      if (newBroker.brokerName === 'Flattrade') {
+        activeFetchFunction.value = 'flattradeTrades';
+        flattradeTrades();
+      } else {
+        activeFetchFunction.value = 'fetchOrders';
+        fetchOrders();
+      }
+    }
   }
 });
 
