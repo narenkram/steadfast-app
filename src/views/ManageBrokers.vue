@@ -204,6 +204,45 @@ const flattradeFundLimits = async () => {
     console.error('Error fetching fund limits:', error);
   }
 };
+const flatOrderBook = ref('');
+const flatTradeBook = ref('');
+
+const flattradeTrades = async () => {
+  let jKey = localStorage.getItem('generatedToken') || token.value;
+
+  if (!jKey) {
+    errorMessage.value = 'Token is missing. Please generate a token first.';
+    clearErrorMessage();
+    return;
+  }
+
+  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', prd: 'M' })}`;
+  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+
+  try {
+    // Fetch Order Book
+    const orderBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/OrderBook', orderBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    flatOrderBook.value = orderBookRes.data;
+    console.log('Order Book:', orderBookRes.data);
+
+    // Fetch Trade Book
+    const tradeBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/TradeBook', tradeBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    flatTradeBook.value = tradeBookRes.data;
+    console.log('Trade Book:', tradeBookRes.data);
+  } catch (error) {
+    errorMessage.value = 'Error fetching trades: ' + error.message;
+    clearErrorMessage();
+    console.error('Error fetching trades:', error);
+  }
+};
 </script>
 
 <template>
@@ -269,4 +308,49 @@ const flattradeFundLimits = async () => {
 
   <button @click="flattradeFundLimits">Get Fund Limits</button>
   {{ fundLimits }}
+  <!-- <button @click="flattradeOrderBook">Get Order Book</button>
+  {{ flatOrderBook }}
+  <button @click="flattradeTradeBook">Get Trade Book</button>
+  {{ flatTradeBook }} -->
+  <button @click="flattradeTrades">Get Trades</button>
+
+  <table class="table table-hover" v-if="flatOrderBook.length || flatTradeBook.length">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+        <th scope="col">Order ID</th>
+        <th scope="col">Trade ID</th>
+        <th scope="col">Symbol</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Price</th>
+        <th scope="col">Date</th>
+        <th scope="col">Status</th>
+        <th scope="col">Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="order in flatOrderBook" :key="order.norenordno">
+        <td>Order</td>
+        <td>{{ order.norenordno }}</td>
+        <td>N/A</td>
+        <td>{{ order.tsym }}</td>
+        <td>{{ order.qty }}</td>
+        <td>{{ order.prc }}</td>
+        <td>{{ order.norentm }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.rejreason }}</td>
+      </tr>
+      <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
+        <td>Trade</td>
+        <td>{{ trade.norenordno }}</td>
+        <td>{{ trade.norenordno }}</td>
+        <td>{{ trade.tsym }}</td>
+        <td>{{ trade.qty }}</td>
+        <td>{{ trade.prc }}</td>
+        <td>{{ trade.norentm }}</td>
+        <td>{{ trade.status }}</td>
+        <td>{{ trade.rejreason }}</td>
+      </tr>
+    </tbody>
+  </table>
 </template>
