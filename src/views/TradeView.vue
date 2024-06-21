@@ -793,7 +793,7 @@ const selectedOrderType = ref(orderTypes.value[0]);
 const previousOrderType = ref(orderTypes.value[0]);
 
 const setOrderDetails = (transactionType, optionType) => {
-  modalTransactionType.value = transactionType;
+  modalTransactionType.value = getTransactionType(transactionType); // Use getTransactionType to set modalTransactionType
   modalOptionType.value = optionType;
   selectedOrderType.value = orderTypes.value[1]; // Set selectedOrderType to LIMIT or LMT based on broker
 };
@@ -881,7 +881,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       exch: "NFO",
       tsym: "BANKNIFTY26JUN24C40900",
       qty: 15,
-      prc: 0,
+      prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
       prd: selectedProductType.value,
       trantype: transactionType,
       prctyp: selectedOrderType.value,
