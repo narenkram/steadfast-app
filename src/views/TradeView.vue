@@ -617,7 +617,15 @@ const putStrikes = ref([]);
 const expiryDates = ref([]);
 const synchronizeOnLoad = ref(true);
 const fetchTradingData = async () => {
-  const response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+  let response;
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+  } else {
+    throw new Error('Unsupported broker');
+  }
+
   const data = await response.json();
 
   const today = new Date();
@@ -694,9 +702,14 @@ const synchronizeStrikes = () => {
 
 const synchronizeCallStrikes = () => {
   if (selectedPutStrike.value) {
-    const baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
+    let baseSymbol;
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      // baseSymbol write new function
+    }
     const matchingCallStrike = callStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-CE')
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-CE' : 'CE')
     );
     if (matchingCallStrike) {
       selectedCallStrike.value = matchingCallStrike;
@@ -709,9 +722,14 @@ const synchronizeCallStrikes = () => {
 
 const synchronizePutStrikes = () => {
   if (selectedCallStrike.value) {
-    const baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
+    let baseSymbol;
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      // baseSymbol write new function
+    }
     const matchingPutStrike = putStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith('-PE')
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-PE' : 'PE')
     );
     if (matchingPutStrike) {
       selectedPutStrike.value = matchingPutStrike;
@@ -1261,7 +1279,7 @@ watch(selectedBroker, (newBroker) => {
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
-
+    fetchTradingData();
     // Clear existing intervals
     if (fetchOrdersInterval.value) {
       clearInterval(fetchOrdersInterval.value);
