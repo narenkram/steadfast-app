@@ -648,10 +648,20 @@ const fetchTradingData = async () => {
   }
 
   const data = await response.json();
-
+  console.log('Data:', data);
   const today = new Date();
   expiryDates.value = data.expiryDates
-    .filter(date => new Date(date.split(' ')[0]) >= today)
+    .filter(date => {
+      let dateToCompare;
+      if (selectedBroker.value?.brokerName === 'Dhan') {
+        dateToCompare = new Date(date.split(' ')[0]);
+      } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+        dateToCompare = new Date(date.split('T')[0]); // Remove the time part for Flattrade
+      } else {
+        dateToCompare = new Date(date);
+      }
+      return dateToCompare >= today;
+    })
     .sort((a, b) => new Date(a) - new Date(b));
 
   callStrikes.value = data.callStrikes.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol));
@@ -1304,7 +1314,7 @@ watch(selectedBroker, (newBroker) => {
     fetchFundLimit();
     updateExchangeSymbols();
     setDefaultExchangeAndMasterSymbol();
-    fetchTradingData(); 
+    fetchTradingData();
     // Clear existing intervals
     if (fetchOrdersInterval.value) {
       clearInterval(fetchOrdersInterval.value);
