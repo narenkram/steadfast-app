@@ -224,8 +224,8 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== 'LIMIT' && placeOrder('BUY', 'CALL')"
-              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
+              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬆️</span>
               Buy CE
             </button>
@@ -240,8 +240,8 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-              @click="selectedOrderType !== 'LIMIT' && placeOrder('SELL', 'CALL')"
-              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
+              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬅️</span>
               Sell CE
             </button>
@@ -281,8 +281,8 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== 'LIMIT' && placeOrder('BUY', 'PUT')"
-              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
+              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">⬇️</span>
               Buy PE
             </button>
@@ -297,8 +297,8 @@
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-              @click="selectedOrderType !== 'LIMIT' && placeOrder('SELL', 'PUT')"
-              v-bind="selectedOrderType === 'LIMIT' ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
+              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
               <span v-if="enableArrowKeys">➡️</span>
               Sell PE
             </button>
@@ -818,6 +818,15 @@ const productTypes = computed(() => {
 
 const selectedProductType = ref(productTypes.value[1]); // Default to 'MARGIN' or 'M'
 
+const getTransactionType = (type) => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return type;
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return type === 'BUY' ? 'B' : 'S';
+  }
+  return type;
+};
+
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
@@ -874,7 +883,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       qty: 15,
       prc: 0,
       prd: selectedProductType.value,
-      trantype: "B",
+      trantype: transactionType,
       prctyp: selectedOrderType.value,
       ret: "DAY"
       // Add any additional fields specific to Flattrade here
