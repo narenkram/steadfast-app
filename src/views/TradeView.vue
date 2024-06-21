@@ -608,10 +608,21 @@ const selectedCallStrike = ref({});
 const selectedPutStrike = ref({});
 const defaultCallSecurityId = ref(null);
 const defaultPutSecurityId = ref(null);
-const exchangeSymbols = ref({
-  NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-  BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
-});
+const exchangeSymbols = ref({});
+
+const updateExchangeSymbols = () => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    exchangeSymbols.value = {
+      NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+      BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
+    };
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    exchangeSymbols.value = {
+      NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+      BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
+    };
+  }
+};
 const callStrikes = ref([]);
 const putStrikes = ref([]);
 const expiryDates = ref([]);
@@ -622,6 +633,7 @@ const fetchTradingData = async () => {
     response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    console.log('Flattrade Symbols:', response);
   } else {
     throw new Error('Unsupported broker');
   }
@@ -1231,6 +1243,7 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 // Lifecycle hooks
 onMounted(() => {
   fetchBrokers();
+  updateExchangeSymbols();
   fetchTradingData().then(() => {
     updateAvailableQuantities();
   });
@@ -1280,6 +1293,7 @@ watch(selectedBroker, (newBroker) => {
     selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
     fetchTradingData();
+    updateExchangeSymbols();
     // Clear existing intervals
     if (fetchOrdersInterval.value) {
       clearInterval(fetchOrdersInterval.value);
