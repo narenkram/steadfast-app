@@ -1193,14 +1193,26 @@ watch(selectedBroker, (newBroker) => {
     selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
 
-    // Update activeFetchFunction based on the new broker
+    // Clear existing intervals
+    if (fetchOrdersInterval.value) {
+      clearInterval(fetchOrdersInterval.value);
+      fetchOrdersInterval.value = null;
+    }
+    if (fetchPositionsInterval.value) {
+      clearInterval(fetchPositionsInterval.value);
+      fetchPositionsInterval.value = null;
+    }
+
+    // Update activeFetchFunction and set new interval based on the new broker
     if (activeTab.value === 'trades') {
       if (newBroker.brokerName === 'Flattrade') {
         activeFetchFunction.value = 'flattradeTrades';
         flattradeTrades();
+        fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
       } else {
         activeFetchFunction.value = 'fetchOrders';
         fetchOrders();
+        fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
       }
     }
   }
