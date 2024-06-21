@@ -409,7 +409,7 @@
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           <!-- Dhan Trades -->
-          <table class="table table-hover" v-if="activeFetchFunction === 'fetchOrders'">
+          <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
             <thead>
               <tr>
                 <th>Order ID</th>
@@ -755,7 +755,7 @@ const handleArrowKeys = (event) => {
 };
 
 const orders = ref([]);
-const fetchOrders = async () => {
+const fetchDhanOrdersTradesBook = async () => {
   try {
     const response = await axios.get('http://localhost:3000/getOrders');
     orders.value = response.data; // Set the orders array
@@ -1157,7 +1157,7 @@ const cancelPendingOrders = async () => {
     await Promise.all(cancelPromises);
     toastMessage.value = 'Pending orders canceled successfully';
     showToast.value = true;
-    await fetchOrders(); // Refresh the orders list
+    await fetchDhanOrdersTradesBook(); // Refresh the orders list
   } catch (error) {
     console.error('Failed to cancel orders:', error);
     toastMessage.value = 'Failed to cancel some orders';
@@ -1236,9 +1236,9 @@ onMounted(() => {
       fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
       activeFetchFunction.value = 'flattradeTrades';
     } else {
-      fetchOrders();
-      fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
-      activeFetchFunction.value = 'fetchOrders';
+      fetchDhanOrdersTradesBook();
+      fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
+      activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
   }
 });
@@ -1289,9 +1289,9 @@ watch(selectedBroker, (newBroker) => {
         flattradeTrades();
         fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
       } else {
-        activeFetchFunction.value = 'fetchOrders';
-        fetchOrders();
-        fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
+        activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
+        fetchDhanOrdersTradesBook();
+        fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
       }
     }
   }
@@ -1356,9 +1356,9 @@ watch(activeTab, (newTab) => {
       fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
       activeFetchFunction.value = 'flattradeTrades'; // Set active fetch function
     } else {
-      fetchOrders();
-      fetchOrdersInterval.value = setInterval(fetchOrders, 1000);
-      activeFetchFunction.value = 'fetchOrders'; // Set active fetch function
+      fetchDhanOrdersTradesBook();
+      fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
+      activeFetchFunction.value = 'fetchDhanOrdersTradesBook'; // Set active fetch function
     }
   }
 });
