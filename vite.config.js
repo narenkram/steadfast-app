@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/symbols': 'http://localhost:3000',
+      '/dhanSymbols': 'http://localhost:3000',
       '/flattradeApi': {
         target: 'https://authapi.flattrade.in',
         changeOrigin: true,

@@ -617,7 +617,7 @@ const putStrikes = ref([]);
 const expiryDates = ref([]);
 const synchronizeOnLoad = ref(true);
 const fetchTradingData = async () => {
-  const response = await fetch(`http://localhost:3000/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+  const response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
   const data = await response.json();
 
   const today = new Date();
