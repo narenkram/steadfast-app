@@ -737,19 +737,18 @@ const updateAvailableQuantities = () => {
 const enableArrowKeys = ref(false);
 const handleArrowKeys = (event) => {
   if (!enableArrowKeys.value) return;
-
   switch (event.key) {
     case 'ArrowUp':
-      placeOrder('BUY', 'CALL');
+      placeOrder(getTransactionType('BUY'), 'CALL');
       break;
     case 'ArrowDown':
-      placeOrder('BUY', 'PUT');
+      placeOrder(getTransactionType('BUY'), 'PUT');
       break;
     case 'ArrowRight':
-      placeOrder('SELL', 'PUT');
+      placeOrder(getTransactionType('SELL'), 'PUT');
       break;
     case 'ArrowLeft':
-      placeOrder('SELL', 'CALL');
+      placeOrder(getTransactionType('SELL'), 'CALL');
       break;
   }
 };
