@@ -1049,9 +1049,9 @@ const getExchangeSegment = () => {
       throw new Error("Selected exchange is not valid for Dhan");
     }
   } else if (selectedBroker.value.brokerName === 'Flattrade') {
-    if (selectedExchange.value === 'NSE') {
+    if (selectedExchange.value === 'NFO') {
       return 'NFO';
-    } else if (selectedExchange.value === 'BSE') {
+    } else if (selectedExchange.value === 'BFO') {
       return 'BFO';
     } else {
       throw new Error("Selected exchange is not valid for Flattrade");
@@ -1083,7 +1083,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
       exch: exchangeSegment,
-      tsym: "BANKNIFTY26JUN24P52000",
+      tsym: selectedStrike.tradingSymbol,
       qty: 15,
       prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
       prd: selectedProductType.value,
@@ -1137,11 +1137,12 @@ const placeOrder = async (transactionType, drvOptionType) => {
     toastMessage.value = 'Order placed successfully';
     showToast.value = true;
   } catch (error) {
+    console.error("Error placing order:", error); // Log the full error
     if (error.response && error.response.data && error.response.data.message) {
       const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
       toastMessage.value = firstThreeWords;
     } else {
-      toastMessage.value = 'Failed to place order';
+      toastMessage.value = 'Failed to place order unfortunately';
     }
     showToast.value = true;
   }
