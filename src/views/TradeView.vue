@@ -601,7 +601,7 @@ const fetchBrokers = async () => {
 
 // Fetch trading symbols and strikes
 const selectedExchange = ref('NSE');
-const selectedMasterSymbol = ref('BANKNIFTY');
+const selectedMasterSymbol = ref('');
 const selectedQuantity = ref(null);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
@@ -621,6 +621,15 @@ const updateExchangeSymbols = () => {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
       BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
     };
+  }
+};
+const setDefaultExchangeAndMasterSymbol = () => {
+  const exchanges = Object.keys(exchangeSymbols.value);
+  if (exchanges.length > 0) {
+    selectedExchange.value = exchanges[0];
+    if (exchangeSymbols.value[selectedExchange.value].length > 0) {
+      selectedMasterSymbol.value = exchangeSymbols.value[selectedExchange.value][0];
+    }
   }
 };
 const callStrikes = ref([]);
@@ -1244,6 +1253,7 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 onMounted(() => {
   fetchBrokers();
   updateExchangeSymbols();
+  setDefaultExchangeAndMasterSymbol();
   fetchTradingData().then(() => {
     updateAvailableQuantities();
   });
@@ -1292,8 +1302,9 @@ watch(selectedBroker, (newBroker) => {
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
     fetchFundLimit();
-    fetchTradingData();
     updateExchangeSymbols();
+    setDefaultExchangeAndMasterSymbol();
+    fetchTradingData(); 
     // Clear existing intervals
     if (fetchOrdersInterval.value) {
       clearInterval(fetchOrdersInterval.value);
@@ -1349,6 +1360,7 @@ watch(selectedMasterSymbol, () => {
   updateAvailableQuantities();
 });
 
+// Watch for changes in selectedExchange to update selectedMasterSymbol
 watch(selectedExchange, (newExchange) => {
   if (exchangeSymbols.value[newExchange].length > 0) {
     selectedMasterSymbol.value = exchangeSymbols.value[newExchange][0];
