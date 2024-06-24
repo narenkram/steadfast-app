@@ -664,7 +664,7 @@ const fetchTradingData = async () => {
       if (selectedBroker.value?.brokerName === 'Dhan') {
         dateToCompare = new Date(date.split(' ')[0]);
       } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-        dateToCompare = new Date(date.split('T')[0]); // Remove the time part for Flattrade
+        dateToCompare = new Date(date); // No need to split for Flattrade
       } else {
         dateToCompare = new Date(date);
       }
@@ -672,8 +672,25 @@ const fetchTradingData = async () => {
     })
     .sort((a, b) => new Date(a) - new Date(b));
 
-  callStrikes.value = data.callStrikes.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol));
-  putStrikes.value = data.putStrikes.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol));
+  callStrikes.value = data.callStrikes.sort((a, b) => {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      // For Flattrade, expiryDate is not present in callStrikes, so we sort by tradingSymbol
+      return a.tradingSymbol.localeCompare(b.tradingSymbol);
+    }
+    return 0;
+  });
+
+  putStrikes.value = data.putStrikes.sort((a, b) => {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      // For Flattrade, expiryDate is not present in putStrikes, so we sort by tradingSymbol
+      return a.tradingSymbol.localeCompare(b.tradingSymbol);
+    }
+    return 0;
+  });
 
   if (callStrikes.value.length > 0) {
     selectedCallStrike.value = callStrikes.value[0];
@@ -717,8 +734,14 @@ const flattradeFormatTradingSymbol = (symbol) => {
 };
 
 const formatDate = (dateString) => {
-  // Extract only the date part from the date string
-  return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    // Extract only the date part from the date string for Dhan
+    return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    // Return the date string as is for Flattrade
+    return dateString;
+  }
+  return dateString; // Default case, return the original date string
 };
 
 const updateStrikesForExpiry = (expiryDate) => {
