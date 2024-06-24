@@ -1326,11 +1326,11 @@ const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 
 // Lifecycle hooks
 onMounted(async () => {
-  await fetchBrokers(); // Wait for fetchBrokers to complete
-  updateExchangeSymbols();
-  setDefaultExchangeAndMasterSymbol();
-  await fetchTradingData(); // Wait for fetchTradingData to complete
-  updateAvailableQuantities();
+  await fetchBrokers()
+    .then(() => updateExchangeSymbols())
+    .then(() => setDefaultExchangeAndMasterSymbol())
+    .then(() => fetchTradingData())
+    .then(() => updateAvailableQuantities());
 
   window.addEventListener('keydown', handleArrowKeys);
 
