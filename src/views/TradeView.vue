@@ -1091,7 +1091,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       actid: selectedBroker.value.brokerClientId,
       exch: exchangeSegment,
       tsym: selectedStrike.tradingSymbol,
-      qty: 15,
+      qty: selectedQuantity.value,
       prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
       prd: selectedProductType.value,
       trantype: transactionType,
