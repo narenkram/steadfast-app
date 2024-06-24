@@ -697,27 +697,6 @@ const fetchTradingData = async () => {
   updateStrikesForExpiry(selectedExpiry.value);
 };
 
-const dhanFormatTradingSymbol = (symbol) => {
-  // Split the symbol by '-' and remove the date part and the last part after the strike price
-  let parts = symbol.split('-');
-  if (parts.length > 3) {
-    // Rejoin the parts excluding the date and the last segment
-    // return `${parts[0]} ${parts[2]} ${parts[3]}`; DO NOT REMOVE THIS
-    // this displays only the strike for easy selection
-    return `${parts[2]}`;
-  }
-  return symbol; // Return the original symbol if it doesn't match the expected format
-};
-
-const flattradeFormatTradingSymbol = (symbol) => {
-  // Extract the strike price which is after 'C' in callStrikes and after 'P' in putStrikes
-  const match = symbol.match(/C(\d+)|P(\d+)/);
-  if (match) {
-    return match[1] || match[2]; // Return the matched strike price
-  }
-  return symbol; // Return the original symbol if it doesn't match the expected format
-};
-
 const formatDate = (dateString) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     // Extract only the date part from the date string for Dhan
