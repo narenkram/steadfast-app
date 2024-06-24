@@ -1275,13 +1275,12 @@ const totalBrokerage = computed(() => orders.value.filter(order => order.orderSt
 const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 
 // Lifecycle hooks
-onMounted(() => {
-  fetchBrokers();
+onMounted(async () => {
+  await fetchBrokers(); // Wait for fetchBrokers to complete
   updateExchangeSymbols();
   setDefaultExchangeAndMasterSymbol();
-  fetchTradingData().then(() => {
-    updateAvailableQuantities();
-  });
+  await fetchTradingData(); // Wait for fetchTradingData to complete
+  updateAvailableQuantities();
 
   window.addEventListener('keydown', handleArrowKeys);
 
