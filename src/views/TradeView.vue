@@ -671,12 +671,15 @@ const fetchTradingData = async () => {
 
   if (callStrikes.value.length > 0) {
     selectedCallStrike.value = callStrikes.value[0];
+    console.log('Selected Call Strike:', selectedCallStrike.value);
   }
   if (putStrikes.value.length > 0) {
     selectedPutStrike.value = putStrikes.value[0];
+    console.log('Selected Put Strike:', selectedPutStrike.value);
   }
   if (expiryDates.value.length > 0) {
     selectedExpiry.value = expiryDates.value[0];
+    console.log('Selected Expiry:', selectedExpiry.value);
   }
 
   defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
@@ -743,15 +746,15 @@ const synchronizeStrikes = () => {
 };
 
 const synchronizeCallStrikes = () => {
-  if (selectedPutStrike.value) {
+  if (selectedPutStrike.value && selectedPutStrike.value.tradingSymbol) {
     let baseSymbol;
     if (selectedBroker.value?.brokerName === 'Dhan') {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      // baseSymbol write new function
+      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, ''); // Adjust regex as needed
     }
     const matchingCallStrike = callStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-CE' : 'CE')
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-CE' : 'C')
     );
     if (matchingCallStrike) {
       selectedCallStrike.value = matchingCallStrike;
@@ -763,15 +766,15 @@ const synchronizeCallStrikes = () => {
 };
 
 const synchronizePutStrikes = () => {
-  if (selectedCallStrike.value) {
+  if (selectedCallStrike.value && selectedCallStrike.value.tradingSymbol) {
     let baseSymbol;
     if (selectedBroker.value?.brokerName === 'Dhan') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      // baseSymbol write new function
+      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, ''); // Adjust regex as needed
     }
     const matchingPutStrike = putStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-PE' : 'PE')
+      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-PE' : 'P')
     );
     if (matchingPutStrike) {
       selectedPutStrike.value = matchingPutStrike;
