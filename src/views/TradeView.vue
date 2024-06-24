@@ -216,8 +216,7 @@
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
             <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ selectedBroker?.brokerName === 'Dhan' ? dhanFormatTradingSymbol(strike.tradingSymbol) :
-                flattradeFormatTradingSymbol(strike.tradingSymbol) }}
+              {{ strike.strikePrice }}
             </option>
           </select>
           <div>
@@ -277,8 +276,7 @@
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
             <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ selectedBroker?.brokerName === 'Dhan' ? dhanFormatTradingSymbol(strike.tradingSymbol) :
-                flattradeFormatTradingSymbol(strike.tradingSymbol) }}
+              {{ strike.strikePrice }}
             </option>
           </select>
           <div>
