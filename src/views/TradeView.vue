@@ -223,6 +223,9 @@
           <div>
             Selected Security ID: {{ defaultCallSecurityId }}
           </div>
+          <div>
+            Selected Call Strike: {{ selectedCallStrike.tradingSymbol }}
+          </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
               @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
@@ -280,6 +283,9 @@
           </select>
           <div>
             Selected Security ID: {{ defaultPutSecurityId }}
+          </div>
+          <div>
+            Selected Put Strike: {{ selectedPutStrike.tradingSymbol }}
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
@@ -733,6 +739,9 @@ const updateStrikesForExpiry = (expiryDate) => {
   } else {
     selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
   }
+
+  console.log('Update Strike for expiry, Selected Call Strike:', selectedCallStrike.value);
+  console.log('Update Strike for expiry, Selected Put Strike:', selectedPutStrike.value);
 
   if (synchronizeOnLoad.value) {
     synchronizeStrikes();
