@@ -663,7 +663,8 @@ const fetchTradingData = async () => {
       let dateToCompare;
       if (selectedBroker.value?.brokerName === 'Dhan') {
         dateToCompare = new Date(date.split(' ')[0]);
-      } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      } 
+      else if (selectedBroker.value?.brokerName === 'Flattrade') {
         dateToCompare = new Date(date); // No need to split for Flattrade
       } else {
         dateToCompare = new Date(date);
@@ -758,10 +759,8 @@ const updateStrikesForExpiry = (expiryDate) => {
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
     console.log('before filtering Flattrade Call Strikes:', callStrikes.value);
     console.log('before filtering Flattrade Put Strikes:', putStrikes.value);
-    // formattedExpiryDate is the one causing problem for flattrade, because the formatting is wrong
-    const formattedExpiryDate = expiryDate.replace(/-/g, '').slice(2, 8); // Convert "2024-06-26" to "240626"
-    filteredCallStrikes = callStrikes.value.filter(strike => strike.tradingSymbol.includes(formattedExpiryDate));
-    filteredPutStrikes = putStrikes.value.filter(strike => strike.tradingSymbol.includes(formattedExpiryDate));
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
 
   console.log('Filtered Call Strikes:', filteredCallStrikes);
