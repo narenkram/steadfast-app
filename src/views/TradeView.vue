@@ -670,25 +670,14 @@ const fetchTradingData = async () => {
     })
     .sort((a, b) => new Date(a) - new Date(b));
 
-  callStrikes.value = data.callStrikes.sort((a, b) => {
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      // For Flattrade, expiryDate is not present in callStrikes, so we sort by tradingSymbol
-      return a.tradingSymbol.localeCompare(b.tradingSymbol);
-    }
-    return 0;
-  });
+  callStrikes.value = data.callStrikes
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice)) // Sort by strikePrice
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) })); // Remove decimals
 
-  putStrikes.value = data.putStrikes.sort((a, b) => {
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      return new Date(a.expiryDate) - new Date(b.expiryDate) || a.tradingSymbol.localeCompare(b.tradingSymbol);
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      // For Flattrade, expiryDate is not present in putStrikes, so we sort by tradingSymbol
-      return a.tradingSymbol.localeCompare(b.tradingSymbol);
-    }
-    return 0;
-  });
+  putStrikes.value = data.putStrikes
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice)) // Sort by strikePrice
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) })); // Remove decimals
+
 
   if (expiryDates.value.length > 0) {
     selectedExpiry.value = expiryDates.value[0];
