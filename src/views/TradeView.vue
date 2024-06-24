@@ -750,9 +750,14 @@ const updateStrikesForExpiry = (expiryDate) => {
   let filteredCallStrikes, filteredPutStrikes;
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
+    console.log('before filtering Dhan Call Strikes:', callStrikes.value);
+    console.log('before filtering Dhan Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  } 
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    console.log('before filtering Flattrade Call Strikes:', callStrikes.value);
+    console.log('before filtering Flattrade Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.tradingSymbol.includes(expiryDate.replace(/-/g, '').slice(2, 8)));
     filteredPutStrikes = putStrikes.value.filter(strike => strike.tradingSymbol.includes(expiryDate.replace(/-/g, '').slice(2, 8)));
   }
