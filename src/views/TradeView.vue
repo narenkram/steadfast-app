@@ -663,8 +663,7 @@ const fetchTradingData = async () => {
       let dateToCompare;
       if (selectedBroker.value?.brokerName === 'Dhan') {
         dateToCompare = new Date(date.split(' ')[0]);
-      }
-      else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      } else if (selectedBroker.value?.brokerName === 'Flattrade') {
         dateToCompare = new Date(date); // No need to split for Flattrade
       } else {
         dateToCompare = new Date(date);
@@ -693,23 +692,7 @@ const fetchTradingData = async () => {
     return 0;
   });
 
-  if (callStrikes.value.length > 0) {
-    selectedCallStrike.value = callStrikes.value[0];
-    console.log('Selected Call Strike:', selectedCallStrike.value);
-  }
-  if (putStrikes.value.length > 0) {
-    selectedPutStrike.value = putStrikes.value[0];
-    console.log('Selected Put Strike:', selectedPutStrike.value);
-  }
-  if (expiryDates.value.length > 0) {
-    selectedExpiry.value = expiryDates.value[0];
-    console.log('Selected Expiry:', selectedExpiry.value);
-  }
-
-  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
-  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
-
-  synchronizeOnLoad.value = true;
+  updateStrikesForExpiry(expiryDates.value[0]);
 };
 
 const dhanFormatTradingSymbol = (symbol) => {
@@ -754,8 +737,7 @@ const updateStrikesForExpiry = (expiryDate) => {
     console.log('before filtering Dhan Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
-  }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     console.log('before filtering Flattrade Call Strikes:', callStrikes.value);
     console.log('before filtering Flattrade Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
@@ -765,20 +747,9 @@ const updateStrikesForExpiry = (expiryDate) => {
   console.log('Filtered Call Strikes:', filteredCallStrikes);
   console.log('Filtered Put Strikes:', filteredPutStrikes);
 
-  const foundCallStrike = filteredCallStrikes.find(strike => strike.tradingSymbol === selectedCallStrike.value.tradingSymbol);
-  const foundPutStrike = filteredPutStrikes.find(strike => strike.tradingSymbol === selectedPutStrike.value.tradingSymbol);
-
-  if (foundCallStrike) {
-    selectedCallStrike.value = foundCallStrike;
-  } else {
-    selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
-  }
-
-  if (foundPutStrike) {
-    selectedPutStrike.value = foundPutStrike;
-  } else {
-    selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
-  }
+  selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
+  selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+  selectedExpiry.value = expiryDates.value[0];
 
   console.log('Update Strike for expiry, Selected Call Strike:', selectedCallStrike.value);
   console.log('Update Strike for expiry, Selected Put Strike:', selectedPutStrike.value);
@@ -787,6 +758,9 @@ const updateStrikesForExpiry = (expiryDate) => {
     synchronizeStrikes();
     synchronizeOnLoad.value = false;
   }
+
+  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
+  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
 
 const synchronizeStrikes = () => {
