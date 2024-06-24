@@ -215,8 +215,8 @@
         <div class="col-3">
           <label for="CallStrike" class="form-label mb-0">Call Strike</label>
           <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
-            <option v-for="strike in uniqueSortedCallStrikes" :key="strike" :value="strike">
-              {{ strike }}
+            <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
+              {{ strike.strikePrice }}
             </option>
           </select>
           <div>
@@ -275,8 +275,8 @@
         <div class="col-3">
           <label for="PutStrike" class="form-label mb-0">Put Strike</label>
           <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
-            <option v-for="strike in uniqueSortedPutStrikes" :key="strike" :value="strike">
-              {{ strike }}
+            <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
+              {{ strike.strikePrice }}
             </option>
           </select>
           <div>
@@ -696,16 +696,6 @@ const fetchTradingData = async () => {
 
   updateStrikesForExpiry(selectedExpiry.value);
 };
-
-const uniqueSortedCallStrikes = computed(() => {
-  const uniqueStrikes = [...new Set(callStrikes.value.map(strike => Math.floor(strike.strikePrice)))];
-  return uniqueStrikes.sort((a, b) => a - b);
-});
-
-const uniqueSortedPutStrikes = computed(() => {
-  const uniqueStrikes = [...new Set(putStrikes.value.map(strike => Math.floor(strike.strikePrice)))];
-  return uniqueStrikes.sort((a, b) => a - b);
-});
 
 const formatDate = (dateString) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
