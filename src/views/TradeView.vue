@@ -663,7 +663,7 @@ const fetchTradingData = async () => {
       let dateToCompare;
       if (selectedBroker.value?.brokerName === 'Dhan') {
         dateToCompare = new Date(date.split(' ')[0]);
-      } 
+      }
       else if (selectedBroker.value?.brokerName === 'Flattrade') {
         dateToCompare = new Date(date); // No need to split for Flattrade
       } else {
@@ -710,7 +710,6 @@ const fetchTradingData = async () => {
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 
   synchronizeOnLoad.value = true;
-  updateStrikesForExpiry(selectedExpiry.value);
 };
 
 const dhanFormatTradingSymbol = (symbol) => {
@@ -836,6 +835,7 @@ const synchronizePutStrikes = () => {
 };
 
 const updateSecurityIds = () => {
+  console.log('Updating Security IDs');
   defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
@@ -1419,12 +1419,14 @@ watch(selectedExpiry, (newExpiry) => {
 });
 
 watch(selectedCallStrike, (newStrike, oldStrike) => {
+  console.log('Selected Call Strike changed:', newStrike);
   if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
     updateSecurityIds();
   }
 });
 
 watch(selectedPutStrike, (newStrike, oldStrike) => {
+  console.log('Selected Put Strike changed:', newStrike);
   if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
     updateSecurityIds();
   }
