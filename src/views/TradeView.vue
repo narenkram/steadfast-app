@@ -692,7 +692,11 @@ const fetchTradingData = async () => {
     return 0;
   });
 
-  updateStrikesForExpiry(expiryDates.value[0]);
+  if (expiryDates.value.length > 0) {
+    selectedExpiry.value = expiryDates.value[0];
+  }
+
+  updateStrikesForExpiry(selectedExpiry.value);
 };
 
 const dhanFormatTradingSymbol = (symbol) => {
@@ -749,7 +753,6 @@ const updateStrikesForExpiry = (expiryDate) => {
 
   selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
   selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
-  selectedExpiry.value = expiryDates.value[0];
 
   console.log('Update Strike for expiry, Selected Call Strike:', selectedCallStrike.value);
   console.log('Update Strike for expiry, Selected Put Strike:', selectedPutStrike.value);
