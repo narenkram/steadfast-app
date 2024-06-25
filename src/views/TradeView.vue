@@ -352,8 +352,7 @@
               <p class="mb-0"><b>Net Qty: </b>{{ totalNetQty }}</p>
             </div>
             <div class="col-6 text-center py-2">
-              <p class="mb-0"><b>Total Buy Value: </b>x</p>
-              <p class="mb-0"><b>Total Sell Value: </b>x</p>
+              <p class="mb-0"><b>MTM Trailing: </b></p>
             </div>
           </div>
           <!-- Dhan Positions -->
@@ -391,10 +390,13 @@
             <table class="table table-hover" v-if="flatTradePositionBook.length">
               <thead>
                 <tr>
-                  <th scope="col">Symbol</th>
-                  <th scope="col">Quantity</th>
-                  <th scope="col">Average Price</th>
+                  <th scope="col">Symbol Name</th>
+                  <th scope="col">Net Qty</th>
+                  <th scope="col">Position Type</th>
+                  <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
+                  <th scope="col">Buy Avg</th>
+                  <th scope="col">Sell Avg</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
                 </tr>
@@ -403,8 +405,11 @@
                 <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
                   <td>{{ flattradePosition.tsym }}</td>
                   <td>{{ flattradePosition.netqty }}</td>
-                  <td>{{ flattradePosition.netavgprc }}</td>
+                  <td>B/S</td>
+                  <td>{{ flattradePosition.prd }}</td>
                   <td>{{ flattradePosition.lp }}</td>
+                  <td>{{ flattradePosition.cfbuyavgprc }}</td>
+                  <td>{{ flattradePosition.cfsellavgprc }}</td>
                   <td>{{ flattradePosition.rpnl }}</td>
                   <td>{{ flattradePosition.urmtom }}</td>
                 </tr>
