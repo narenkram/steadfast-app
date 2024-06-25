@@ -382,18 +382,19 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="position in dhanPositionBook" :key="position.securityId">
-                <td>{{ position.tradingSymbol }}</td>
-                <td>{{ position.positionType }}</td>
-                <td>{{ position.productType }}</td>
-                <td>{{ position.netQty }}</td>
-                <td>{{ position.buyAvg }}</td>
-                <td>{{ position.sellAvg }}</td>
-                <td>{{ position.realizedProfit }}</td>
-                <td>{{ position.unrealizedProfit }}</td>
+              <tr v-for="dhanPosition in dhanPositionBook" :key="dhanPosition.securityId">
+                <td>{{ dhanPosition.tradingSymbol }}</td>
+                <td>{{ dhanPosition.positionType }}</td>
+                <td>{{ dhanPosition.productType }}</td>
+                <td>{{ dhanPosition.netQty }}</td>
+                <td>{{ dhanPosition.buyAvg }}</td>
+                <td>{{ dhanPosition.sellAvg }}</td>
+                <td>{{ dhanPosition.realizedProfit }}</td>
+                <td>{{ dhanPosition.unrealizedProfit }}</td>
               </tr>
               <tr v-if="dhanPositionBook.length === 0">
-                <td colspan="8" class="text-center">No positions available</td>
+                <td colspan="8" class="text-center">No positions on selected broker {{ selectedBroker.brokerName
+                  }}</td>
               </tr>
             </tbody>
           </table>
@@ -426,7 +427,8 @@
                   <td>{{ flattradePosition.urmtom }}</td>
                 </tr>
                 <tr v-if="flatTradePositionBook.length === 0">
-                  <td colspan="5" class="text-center">No positions available</td>
+                  <td colspan="5" class="text-center">No positions on selected broker {{ selectedBroker.brokerName
+                    }}</td>
                 </tr>
               </tbody>
             </table>
@@ -455,7 +457,8 @@
                 <td>{{ order.orderStatus }}</td>
               </tr>
               <tr v-if="orders.length === 0">
-                <td colspan="5" class="text-center">No Dhan orders or trades available</td>
+                <td colspan="5" class="text-center">No orders or trades on selected broker {{ selectedBroker.brokerName
+                  }}</td>
               </tr>
             </tbody>
           </table>
@@ -500,7 +503,7 @@
                 </tr>
               </tbody>
             </table>
-            <div v-else class="text-center">No trades found</div>
+            <div v-else class="text-center">No orders or trades on selected broker {{ selectedBroker.brokerName }}</div>
           </div>
         </div>
         <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
