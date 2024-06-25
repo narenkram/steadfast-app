@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const FLATTRADE_APIKEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
+const FLATTRADE_CLIENT_ID = ref('');
 
 const reqCode = ref('');
 const token = ref('');
@@ -26,14 +27,17 @@ const fetchFlattradeCredentials = async () => {
     const response = await axios.get('http://localhost:3000/api/flattrade-credentials');
     FLATTRADE_APIKEY.value = response.data.apiKey;
     FLATTRADE_API_SECRET.value = response.data.apiSecret;
+    FLATTRADE_CLIENT_ID.value = response.data.clientId;
 
     // Store the API key and secret in localStorage
     localStorage.setItem('FLATTRADE_APIKEY', FLATTRADE_APIKEY.value);
     localStorage.setItem('FLATTRADE_API_SECRET', FLATTRADE_API_SECRET.value);
+    localStorage.setItem('FLATTRADE_CLIENT_ID', FLATTRADE_CLIENT_ID.value);
 
     return {
       apiKey: FLATTRADE_APIKEY.value,
-      apiSecret: FLATTRADE_API_SECRET.value
+      apiSecret: FLATTRADE_API_SECRET.value,
+      clientId: FLATTRADE_CLIENT_ID.value
     };
   } catch (error) {
     console.error('Failed to fetch Flattrade credentials:', error);
@@ -187,7 +191,7 @@ const flattradeFundLimits = async () => {
     return;
   }
 
-  const jData = JSON.stringify({ uid: 'FT014523', actid: 'FT014523' });
+  const jData = JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value });
   const payload = `jKey=${jKey}&jData=${jData}`;
 
   try {
@@ -216,8 +220,8 @@ const flattradeTrades = async () => {
     return;
   }
 
-  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', prd: 'M' })}`;
-  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, prd: 'M' })}`;
+  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value })}`;
 
   try {
     // Fetch Order Book
@@ -254,7 +258,7 @@ const flattradePositionBook = async () => {
     return;
   }
 
-  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value })}`;
 
   try {
     const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {

@@ -845,8 +845,8 @@ const flattradeTrades = async () => {
     return;
   }
 
-  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', prd: 'M' })}`;
-  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), prd: 'M' })}`;
+  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), actid: localStorage.getItem('FLATTRADE_CLIENT_ID') })}`;
 
   try {
     // Fetch Order Book
@@ -896,7 +896,7 @@ const fetchFlattradePositions = async () => {
     return;
   }
 
-  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: 'FT014523', actid: 'FT014523' })}`;
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), actid: localStorage.getItem('FLATTRADE_CLIENT_ID') })}`;
 
   try {
     const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {
