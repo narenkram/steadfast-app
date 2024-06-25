@@ -382,7 +382,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="position in positions" :key="position.securityId">
+              <tr v-for="position in dhanPositionBook" :key="position.securityId">
                 <td>{{ position.tradingSymbol }}</td>
                 <td>{{ position.positionType }}</td>
                 <td>{{ position.productType }}</td>
@@ -392,13 +392,13 @@
                 <td>{{ position.realizedProfit }}</td>
                 <td>{{ position.unrealizedProfit }}</td>
               </tr>
-              <tr v-if="positions.length === 0">
+              <tr v-if="dhanPositionBook.length === 0">
                 <td colspan="8" class="text-center">No positions available</td>
               </tr>
             </tbody>
           </table>
           <!-- Flattrade Positions -->
-          <div v-if="activeFetchFunction === 'flattradePositionBook' && flatTradePositionBook.length">
+          <div v-if="activeFetchFunction === 'fetchFlattradePositions' && flatTradePositionBook.length">
             <table class="table table-hover" v-if="flatTradePositionBook.length">
               <thead>
                 <tr>
@@ -569,8 +569,6 @@ const updateToastVisibility = (value) => {
 };
 
 
-const fetchOrdersInterval = ref(null);
-const fetchPositionsInterval = ref(null);
 const activeTab = ref('positions');
 const setActiveTab = (tab) => {
   activeTab.value = tab;
@@ -882,30 +880,21 @@ const flattradeTrades = async () => {
   }
 };
 
-const positions = ref([]);
+const dhanPositionBook = ref([]);
 const fetchDhanPositions = async () => {
   try {
     const response = await axios.get('http://localhost:3000/dhanPositions');
-    positions.value = response.data; // Store the fetched data in the positions ref
-    console.log('Dhan Position Book:', positions.value); // Log the updated positions ref
+    dhanPositionBook.value = response.data;
+    console.log('Dhan Position Book:', dhanPositionBook.value);
   } catch (error) {
-    console.error('Error fetching positions:', error);
-    toastMessage.value = 'Failed to fetch positions';
+    console.error('Error fetching dhanPositionBook:', error);
+    toastMessage.value = 'Failed to fetch dhanPositionBook';
     showToast.value = true;
   }
 };
-const updatePositions = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/dhanPositions');
-    positions.value = response.data;
-    console.log('Updated Dhan Position Book:', positions.value);
-  } catch (error) {
-    console.error('Failed to update positions:', error);
-  }
-};
-const flatTradePositionBook = ref([]);
 
-const flattradePositionBook = async () => {
+const flatTradePositionBook = ref([]);
+const fetchFlattradePositions = async () => {
   let jKey = localStorage.getItem('generatedToken') || token.value;
 
   if (!jKey) {
@@ -1192,17 +1181,17 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
 
 const closeAllPositions = async () => {
   try {
-    for (const position of positions.value) {
+    for (const position of dhanPositionBook.value) {
       if (position.positionType !== 'CLOSED') {
         const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
         await placeOrderForPosition('SELL', optionType, position);
       }
     }
-    toastMessage.value = 'All positions closed successfully';
+    toastMessage.value = 'All dhanPositionBook closed successfully';
     showToast.value = true;
   } catch (error) {
-    console.error('Error closing positions:', error);
-    toastMessage.value = 'Failed to close all positions';
+    console.error('Error closing dhanPositionBook:', error);
+    toastMessage.value = 'Failed to close all dhanPositionBook';
     showToast.value = true;
   }
 };
@@ -1271,7 +1260,7 @@ const formattedDate = computed(() => {
 
 const totalNetQty = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return positions.value.reduce((total, position) => total + position.netQty, 0);
+    return dhanPositionBook.value.reduce((total, position) => total + position.netQty, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
   }
@@ -1280,7 +1269,7 @@ const totalNetQty = computed(() => {
 
 const totalProfit = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
+    return dhanPositionBook.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((acc, position) => acc + parseFloat(position.urmtom) + parseFloat(position.rpnl), 0);
   }
@@ -1289,7 +1278,7 @@ const totalProfit = computed(() => {
 
 const profitData = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return positions.value.map(position => position.unrealizedProfit + position.realizedProfit);
+    return dhanPositionBook.value.map(position => position.unrealizedProfit + position.realizedProfit);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.map(position => parseFloat(position.urmtom) + parseFloat(position.rpnl));
   }
@@ -1331,22 +1320,18 @@ onMounted(async () => {
   // Initialize with the default active tab
   if (activeTab.value === 'positions') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      flattradePositionBook();
-      fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
-      activeFetchFunction.value = 'flattradePositionBook';
+      fetchFlattradePositions();
+      activeFetchFunction.value = 'fetchFlattradePositions';
     } else {
       fetchDhanPositions();
-      fetchPositionsInterval.value = setInterval(updatePositions, 1000);
       activeFetchFunction.value = 'fetchDhanPositions';
     }
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       flattradeTrades();
-      fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
       activeFetchFunction.value = 'flattradeTrades';
     } else {
       fetchDhanOrdersTradesBook();
-      fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
   }
@@ -1355,12 +1340,6 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleArrowKeys);
 
-  if (fetchOrdersInterval.value) {
-    clearInterval(fetchOrdersInterval.value);
-  }
-  if (fetchPositionsInterval.value) {
-    clearInterval(fetchPositionsInterval.value);
-  }
 });
 
 // Watchers
@@ -1373,38 +1352,6 @@ watch(selectedBroker, (newBroker) => {
     updateExchangeSymbols();
     setDefaultExchangeAndMasterSymbol();
     fetchTradingData();
-    // Clear existing intervals
-    if (fetchOrdersInterval.value) {
-      clearInterval(fetchOrdersInterval.value);
-      fetchOrdersInterval.value = null;
-    }
-    if (fetchPositionsInterval.value) {
-      clearInterval(fetchPositionsInterval.value);
-      fetchPositionsInterval.value = null;
-    }
-
-    // Update activeFetchFunction and set new interval based on the new broker
-    if (activeTab.value === 'positions') {
-      if (newBroker.brokerName === 'Flattrade') {
-        activeFetchFunction.value = 'flattradePositionBook';
-        flattradePositionBook();
-        fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
-      } else {
-        activeFetchFunction.value = 'fetchDhanPositions';
-        fetchDhanPositions();
-        fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-      }
-    } else if (activeTab.value === 'trades') {
-      if (newBroker.brokerName === 'Flattrade') {
-        activeFetchFunction.value = 'flattradeTrades';
-        flattradeTrades();
-        fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
-      } else {
-        activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
-        fetchDhanOrdersTradesBook();
-        fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
-      }
-    }
   }
 });
 
@@ -1445,37 +1392,26 @@ watch(selectedOrderType, (newValue, oldValue) => {
 });
 
 const activeFetchFunction = ref(null);
+
 watch(activeTab, (newTab) => {
-  if (newTab === 'positions') {
-    if (fetchOrdersInterval.value) {
-      clearInterval(fetchOrdersInterval.value);
-      fetchOrdersInterval.value = null;
-    }
+  // Update activeFetchFunction based on the new broker
+  if (activeTab.value === 'positions') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      flattradePositionBook();
-      fetchPositionsInterval.value = setInterval(flattradePositionBook, 1000);
-      activeFetchFunction.value = 'flattradePositionBook'; // Set active fetch function
+      activeFetchFunction.value = 'fetchFlattradePositions';
+      fetchFlattradePositions();
     } else {
+      activeFetchFunction.value = 'fetchDhanPositions';
       fetchDhanPositions();
-      fetchPositionsInterval.value = setInterval(updatePositions, 1000);
-      activeFetchFunction.value = 'fetchDhanPositions'; // Set active fetch function
     }
-  } else if (newTab === 'trades') {
-    if (fetchPositionsInterval.value) {
-      clearInterval(fetchPositionsInterval.value);
-      fetchPositionsInterval.value = null;
-    }
+  } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
+      activeFetchFunction.value = 'flattradeTrades';
       flattradeTrades();
-      fetchOrdersInterval.value = setInterval(flattradeTrades, 1000);
-      activeFetchFunction.value = 'flattradeTrades'; // Set active fetch function
     } else {
+      activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
       fetchDhanOrdersTradesBook();
-      fetchOrdersInterval.value = setInterval(fetchDhanOrdersTradesBook, 1000);
-      activeFetchFunction.value = 'fetchDhanOrdersTradesBook'; // Set active fetch function
     }
   }
 });
-
 
 </script>
