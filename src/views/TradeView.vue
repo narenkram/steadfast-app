@@ -394,17 +394,19 @@
                   <th scope="col">Symbol</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Average Price</th>
-                  <th scope="col">Current Price</th>
-                  <th scope="col">Profit/Loss</th>
+                  <th scope="col">LTP</th>
+                  <th scope="col">Realized</th>
+                  <th scope="col">Unrealized</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="position in flatTradePositionBook" :key="position.tsym">
-                  <td>{{ position.tsym }}</td>
-                  <td>{{ position.netqty }}</td>
-                  <td>{{ position.netavgprc }}</td>
-                  <td>{{ position.lp }}</td>
-                  <td>{{ position.rpnl }}</td>
+                <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
+                  <td>{{ flattradePosition.tsym }}</td>
+                  <td>{{ flattradePosition.netqty }}</td>
+                  <td>{{ flattradePosition.netavgprc }}</td>
+                  <td>{{ flattradePosition.lp }}</td>
+                  <td>{{ flattradePosition.rpnl }}</td>
+                  <td>{{ flattradePosition.urmtom }}</td>
                 </tr>
                 <tr v-if="flatTradePositionBook.length === 0">
                   <td colspan="5" class="text-center">No positions available</td>
@@ -1249,9 +1251,23 @@ const formattedDate = computed(() => {
   return today.toLocaleDateString('en-US', options).replace(/,/g, '');
 });
 
-const totalNetQty = computed(() => positions.value.reduce((total, position) => total + position.netQty, 0));
+const totalNetQty = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return positions.value.reduce((total, position) => total + position.netQty, 0);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
+  }
+  return 0;
+});
 
-const totalProfit = computed(() => positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0));
+const totalProfit = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return positions.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((acc, position) => acc + parseFloat(position.urmtom) + parseFloat(position.rpnl), 0);
+  }
+  return 0;
+});
 
 const totalCapitalPercentage = computed(() => {
   const totalMoney = (availableBalance.value || 0) + (usedAmount.value || 0);
@@ -1263,7 +1279,15 @@ const deployedCapitalPercentage = computed(() => {
   return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
 });
 
-const totalBrokerage = computed(() => orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0));
+const totalBrokerage = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatOrderBook.value.filter(order => order.status === 'TRADED').reduce((total) => total + 0, 0);
+  }
+  return 0;
+});
+
 
 const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 
