@@ -1288,7 +1288,7 @@ const totalBrokerage = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatOrderBook.value.filter(order => order.status === 'TRADED').reduce((total) => total + 0, 0);
+    return 0;
   }
   return 0;
 });
