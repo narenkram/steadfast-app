@@ -64,24 +64,35 @@
     </div>
   </section>
 
+  <section class="row py-3">
+    <div class="col-12">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="toggleLineChart" v-model="showLineChart">
+        <label class="form-check-label" for="toggleLineChart">
+          Show MTM Chart
+        </label>
+      </div>
+      <LineChart v-if="showLineChart" :profitData="profitData" />
+    </div>
+  </section>
+
   <!-- Total Profit & Net PNL -->
   <section class="row py-3">
-    <div class="col-lg-5">
+    <div class="col-5">
       <div class="Card">
-        <LineChart :profitData="profitData" />
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
           ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
         </small>
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-5">
       <div class="Card">
         <blockquote class="fs-3">{{ totalCapitalPercentage.toFixed(2) }}% <small> on Total Capital</small></blockquote>
         <small>{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
-    <div class="col-lg-2 d-flex justify-content-center align-items-center">
+    <div class="col-2 d-flex justify-content-center align-items-center">
       <div class="Card">
         <button class="btn btn-primary shadow fs-3" @click="toggleKillSwitch">
           Kill Switch
@@ -221,10 +232,10 @@
             </option>
           </select>
           <div>
-            Selected Security ID: {{ defaultCallSecurityId }}
+            Security ID: {{ defaultCallSecurityId }}
           </div>
           <div>
-            Selected Call Strike: {{ selectedCallStrike.tradingSymbol }}
+            {{ selectedCallStrike.tradingSymbol }}
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
@@ -281,10 +292,10 @@
             </option>
           </select>
           <div>
-            Selected Security ID: {{ defaultPutSecurityId }}
+            Security ID: {{ defaultPutSecurityId }}
           </div>
           <div>
-            Selected Put Strike: {{ selectedPutStrike.tradingSymbol }}
+            {{ selectedPutStrike.tradingSymbol }}
           </div>
           <div class="btn-group w-100">
             <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
@@ -550,7 +561,7 @@ import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import LineChart from '../components/LineChart.vue';
-
+const showLineChart = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
 const updateToastVisibility = (value) => {
