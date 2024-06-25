@@ -1396,7 +1396,7 @@ watch(selectedOrderType, (newValue, oldValue) => {
 
 const activeFetchFunction = ref(null);
 
-watch(activeTab, (newTab) => {
+watch(activeTab, () => {
   // Update activeFetchFunction based on the new broker
   if (activeTab.value === 'positions') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
