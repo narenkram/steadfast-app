@@ -682,7 +682,8 @@ const fetchTradingData = async () => {
       let dateToCompare;
       if (selectedBroker.value?.brokerName === 'Dhan') {
         dateToCompare = new Date(date.split(' ')[0]);
-      } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      }
+      else if (selectedBroker.value?.brokerName === 'Flattrade') {
         dateToCompare = new Date(date); // No need to split for Flattrade
       } else {
         dateToCompare = new Date(date);
