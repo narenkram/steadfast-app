@@ -481,10 +481,10 @@
                   <td>{{ trade.norenordno }}</td>
                   <td>{{ trade.tsym }}</td>
                   <td>{{ trade.qty }}</td>
-                  <td>{{ trade.prc }}</td>
+                  <td>{{ trade.flprc }}</td>
                   <td>{{ trade.norentm }}</td>
-                  <td>{{ trade.status }}</td>
-                  <td>{{ trade.rejreason }}</td>
+                  <td>{{ trade.stat }}</td>
+                  <td>N/A</td>
                 </tr>
               </tbody>
             </table>
