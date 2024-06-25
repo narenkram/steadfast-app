@@ -68,6 +68,7 @@
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
+        <LineChart />
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
           ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
@@ -548,6 +549,7 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
+import LineChart from '../components/LineChart.vue';
 
 const showToast = ref(false);
 const toastMessage = ref('');
