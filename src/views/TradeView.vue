@@ -676,18 +676,21 @@ const fetchTradingData = async () => {
 
   const data = await response.json();
   console.log('Data:', data);
-  expiryDates.value = data.expiryDates
+  expiryDates.value = data.expiryDates;
 
+  // Filter by selected expiry date before sorting and mapping
   callStrikes.value = data.callStrikes
-    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice)) // Sort by strikePrice
-    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) })); // Remove decimals
+    .filter(strike => strike.expiryDate === selectedExpiry.value)
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
 
   putStrikes.value = data.putStrikes
-    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice)) // Sort by strikePrice
-    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) })); // Remove decimals
+    .filter(strike => strike.expiryDate === selectedExpiry.value)
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
 
-
-  if (expiryDates.value.length > 0) {
+  // Only set selectedExpiry if it is not already defined
+  if (!selectedExpiry.value && expiryDates.value.length > 0) {
     selectedExpiry.value = expiryDates.value[0];
   }
 
@@ -1345,7 +1348,9 @@ watch(selectedBroker, (newBroker) => {
   }
 });
 
-watch(selectedExpiry, (newExpiry) => {
+// Watcher for selectedExpiry to repopulate strike prices
+watch(selectedExpiry, async (newExpiry) => {
+  await fetchTradingData();
   updateStrikesForExpiry(newExpiry);
 });
 
