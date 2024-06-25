@@ -676,21 +676,7 @@ const fetchTradingData = async () => {
 
   const data = await response.json();
   console.log('Data:', data);
-  const today = new Date();
   expiryDates.value = data.expiryDates
-    .filter(date => {
-      let dateToCompare;
-      if (selectedBroker.value?.brokerName === 'Dhan') {
-        dateToCompare = new Date(date.split(' ')[0]);
-      }
-      else if (selectedBroker.value?.brokerName === 'Flattrade') {
-        dateToCompare = new Date(date); // No need to split for Flattrade
-      } else {
-        dateToCompare = new Date(date);
-      }
-      return dateToCompare >= today;
-    })
-    .sort((a, b) => new Date(a) - new Date(b));
 
   callStrikes.value = data.callStrikes
     .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice)) // Sort by strikePrice
