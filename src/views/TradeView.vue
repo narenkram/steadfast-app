@@ -68,7 +68,7 @@
   <section class="row py-3">
     <div class="col-lg-5">
       <div class="Card">
-        <LineChart />
+        <LineChart :profitData="profitData" />
         <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
         <small>
           ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
@@ -1274,6 +1274,15 @@ const totalProfit = computed(() => {
     return flatTradePositionBook.value.reduce((acc, position) => acc + parseFloat(position.urmtom) + parseFloat(position.rpnl), 0);
   }
   return 0;
+});
+
+const profitData = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return positions.value.map(position => position.unrealizedProfit + position.realizedProfit);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.map(position => parseFloat(position.urmtom) + parseFloat(position.rpnl));
+  }
+  return [];
 });
 
 const totalCapitalPercentage = computed(() => {
