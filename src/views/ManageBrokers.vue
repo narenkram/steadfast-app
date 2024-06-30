@@ -2,9 +2,11 @@
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-const FLATTRADE_APIKEY = ref('');
+const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
 const FLATTRADE_CLIENT_ID = ref('');
+const DHAN_API_TOKEN = ref('');
+const DHAN_CLIENT_ID = ref('');
 
 const reqCode = ref('');
 const token = ref('');
@@ -17,6 +19,8 @@ const fetchBrokers = async () => {
   try {
     const response = await axios.get('http://localhost:3000/brokers');
     brokers.value = response.data;
+    await fetchFlattradeCredentials(); // Fetch Flattrade credentials
+    await fetchDhanCredentials(); // Fetch Dhan credentials
   } catch (error) {
     console.error('Failed to fetch brokers:', error);
   }
@@ -25,17 +29,17 @@ const fetchBrokers = async () => {
 const fetchFlattradeCredentials = async () => {
   try {
     const response = await axios.get('http://localhost:3000/api/flattrade-credentials');
-    FLATTRADE_APIKEY.value = response.data.apiKey;
+    FLATTRADE_API_KEY.value = response.data.apiKey;
     FLATTRADE_API_SECRET.value = response.data.apiSecret;
     FLATTRADE_CLIENT_ID.value = response.data.clientId;
 
     // Store the API key and secret in localStorage
-    localStorage.setItem('FLATTRADE_APIKEY', FLATTRADE_APIKEY.value);
+    localStorage.setItem('FLATTRADE_API_KEY', FLATTRADE_API_KEY.value);
     localStorage.setItem('FLATTRADE_API_SECRET', FLATTRADE_API_SECRET.value);
     localStorage.setItem('FLATTRADE_CLIENT_ID', FLATTRADE_CLIENT_ID.value);
 
     return {
-      apiKey: FLATTRADE_APIKEY.value,
+      apiKey: FLATTRADE_API_KEY.value,
       apiSecret: FLATTRADE_API_SECRET.value,
       clientId: FLATTRADE_CLIENT_ID.value
     };
@@ -45,10 +49,28 @@ const fetchFlattradeCredentials = async () => {
   }
 };
 
+const fetchDhanCredentials = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/dhan-credentials');
+    DHAN_API_TOKEN.value = response.data.apiToken;
+    DHAN_CLIENT_ID.value = response.data.clientId;
+
+    // Store the API key and secret in localStorage
+    localStorage.setItem('DHAN_API_TOKEN', DHAN_API_TOKEN.value);
+    localStorage.setItem('DHAN_CLIENT_ID', DHAN_CLIENT_ID.value);
+
+    return {
+      apiToken: DHAN_API_TOKEN.value,
+      clientId: DHAN_CLIENT_ID.value
+    };
+  } catch (error) {
+    console.error('Failed to fetch Dhan credentials:', error);
+    return null;
+  }
+};
 
 onMounted(() => {
   fetchBrokers();
-  fetchFlattradeCredentials();
 
   const storedCode = localStorage.getItem('reqCode');
   if (storedCode) {
@@ -74,7 +96,7 @@ watch(reqCode, (newCode) => {
 
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
-  const storedFlattradeApiKey = localStorage.getItem('FLATTRADE_APIKEY');
+  const storedFlattradeApiKey = localStorage.getItem('FLATTRADE_API_KEY');
 
   if (!storedFlattradeApiKey) {
     errorMessage.value = 'API key is missing';
@@ -116,7 +138,7 @@ const generateToken = async (broker) => {
 
 watch(reqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
-    const storedApiKey = localStorage.getItem('FLATTRADE_APIKEY');
+    const storedApiKey = localStorage.getItem('FLATTRADE_API_KEY');
     const storedApiSecret = localStorage.getItem('FLATTRADE_API_SECRET');
 
     if (!storedApiKey || !storedApiSecret) {
@@ -208,89 +230,16 @@ const flattradeFundLimits = async () => {
     console.error('Error fetching fund limits:', error);
   }
 };
-const flatOrderBook = ref('');
-const flatTradeBook = ref('');
-
-const flattradeTrades = async () => {
-  let jKey = localStorage.getItem('generatedToken') || token.value;
-
-  if (!jKey) {
-    errorMessage.value = 'Token is missing. Please generate a token first.';
-    clearErrorMessage();
-    return;
-  }
-
-  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, prd: 'M' })}`;
-  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value })}`;
-
-  try {
-    // Fetch Order Book
-    const orderBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/OrderBook', orderBookPayload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-    flatOrderBook.value = orderBookRes.data;
-    console.log('Order Book:', orderBookRes.data);
-
-    // Fetch Trade Book
-    const tradeBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/TradeBook', tradeBookPayload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-    flatTradeBook.value = tradeBookRes.data;
-    console.log('Trade Book:', tradeBookRes.data);
-  } catch (error) {
-    errorMessage.value = 'Error fetching trades: ' + error.message;
-    clearErrorMessage();
-    console.error('Error fetching trades:', error);
-  }
-};
-const flatPositionBook = ref([]);
-
-const flattradePositionBook = async () => {
-  let jKey = localStorage.getItem('generatedToken') || token.value;
-
-  if (!jKey) {
-    errorMessage.value = 'Token is missing. Please generate a token first.';
-    clearErrorMessage();
-    return;
-  }
-
-  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value })}`;
-
-  try {
-    const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-
-    if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
-      flatPositionBook.value = positionBookRes.data;
-      console.log('Position Book:', positionBookRes.data);
-    } else {
-      const errorMsg = positionBookRes.data.emsg || 'Unknown error';
-      errorMessage.value = `Error fetching position book: ${errorMsg}`;
-      clearErrorMessage();
-      console.error('Error fetching position book:', errorMsg);
-    }
-  } catch (error) {
-    errorMessage.value = 'Error fetching position book: ' + error.message;
-    clearErrorMessage();
-    console.error('Error fetching position book:', error);
-  }
-};
 </script>
 
 <template>
   <section class="row py-5">
     <div class="col-6 text-start">
-      <RouterLink to="/add-broker">
+      <!-- <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
-      </RouterLink>
-      <button class="ms-3 btn btn-outline-secondary" @click="fetchBrokers">Refresh Broker List</button>
+      </RouterLink> -->
+      <p>Add your API Key details in <code>.env</code> file and click Refresh</p>
+      <button class="ms-0 btn btn-outline-success" @click="fetchBrokers">Refresh Broker List</button>
     </div>
     <div class="col-6 text-end">
       <RouterLink to="/">
@@ -309,12 +258,8 @@ const flattradePositionBook = async () => {
             <th scope="col">Broker</th>
             <th scope="col">Broker Client ID</th>
             <th scope="col">App ID</th>
-            <th scope="col">App Secret Key</th>
-            <th scope="col">Status</th>
-            <th scope="col">Last Token Generated At</th>
+            <th scope="col">App Token</th>
             <th scope="col">Generate Token</th>
-            <th scope="col">Action</th>
-            <th scope="col">Added At</th>
           </tr>
         </thead>
         <tbody>
@@ -324,14 +269,13 @@ const flattradePositionBook = async () => {
               <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
             </td>
             <td>{{ broker.appId }}</td>
-            <td>{{ maskApiSecret(broker.appSecretKey) }}</td>
-            <td>{{ broker.status }}</td>
-            <td>{{ broker.lastTokenGeneratedAt }}</td>
-            <td><a class="link" @click.prevent="generateToken(broker)">Generate Token</a></td>
-            <td>
-              <!-- Add any additional actions here -->
+            <td>{{ maskApiSecret(broker.appToken) }}</td>
+            <td v-if="broker.brokerName !== 'Dhan'">
+              <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
             </td>
-            <td>{{ broker.addedAt }}</td>
+            <td v-else>
+              -
+            </td>
           </tr>
         </tbody>
       </table>
@@ -345,76 +289,4 @@ const flattradePositionBook = async () => {
     </div>
   </section>
 
-  <button @click="flattradeFundLimits">Get Fund Limits</button>
-  {{ fundLimits }}
-  <!-- <button @click="flattradeOrderBook">Get Order Book</button>
-  {{ flatOrderBook }}
-  <button @click="flattradeTradeBook">Get Trade Book</button>
-  {{ flatTradeBook }} -->
-  <button @click="flattradeTrades">Get Trades</button>
-
-  <table class="table table-hover" v-if="flatOrderBook.length || flatTradeBook.length">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-        <th scope="col">Order ID</th>
-        <th scope="col">Trade ID</th>
-        <th scope="col">Symbol</th>
-        <th scope="col">Quantity</th>
-        <th scope="col">Price</th>
-        <th scope="col">Date</th>
-        <th scope="col">Status</th>
-        <th scope="col">Reason</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="order in flatOrderBook" :key="order.norenordno">
-        <td>Order</td>
-        <td>{{ order.norenordno }}</td>
-        <td>N/A</td>
-        <td>{{ order.tsym }}</td>
-        <td>{{ order.qty }}</td>
-        <td>{{ order.prc }}</td>
-        <td>{{ order.norentm }}</td>
-        <td>{{ order.status }}</td>
-        <td>{{ order.rejreason }}</td>
-      </tr>
-      <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
-        <td>Trade</td>
-        <td>{{ trade.norenordno }}</td>
-        <td>{{ trade.norenordno }}</td>
-        <td>{{ trade.tsym }}</td>
-        <td>{{ trade.qty }}</td>
-        <td>{{ trade.prc }}</td>
-        <td>{{ trade.norentm }}</td>
-        <td>{{ trade.status }}</td>
-        <td>{{ trade.rejreason }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-
-  <button @click="flattradePositionBook">Get Position Book</button>
-  <div v-if="flatPositionBook.length">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col">Symbol</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Average Price</th>
-          <th scope="col">Current Price</th>
-          <th scope="col">Profit/Loss</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="position in flatPositionBook" :key="position.tsym">
-          <td>{{ position.tsym }}</td>
-          <td>{{ position.netqty }}</td>
-          <td>{{ position.netavgprc }}</td>
-          <td>{{ position.lp }}</td>
-          <td>{{ position.rpnl }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 </template>

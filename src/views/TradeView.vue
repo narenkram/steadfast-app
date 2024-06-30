@@ -28,7 +28,9 @@
 
         <!-- Broker Name and Status with Broker ID -->
         <div class="col-2">
-          <p class="mb-1"><b>Broker</b> <span class="badge bg-success">Connected</span></p>
+          <p class="mb-1"><b>Broker</b> <span
+              :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected' }">{{
+              brokerStatus }}</span></p>
           <p class="mb-0">
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
               {{ selectedBroker?.brokerClientId || 'N/A' }}
@@ -64,7 +66,7 @@
     </div>
   </section>
 
-  <section class="row py-3">
+  <!-- <section class="row py-3">
     <div class="col-12">
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="toggleLineChart" v-model="showLineChart">
@@ -74,7 +76,7 @@
       </div>
       <LineChart v-if="showLineChart" :profitData="profitData" />
     </div>
-  </section>
+  </section> -->
 
   <!-- Total Profit & Net PNL -->
   <section class="row py-3">
@@ -570,7 +572,20 @@ const toastMessage = ref('');
 const updateToastVisibility = (value) => {
   showToast.value = value;
 };
+const brokerStatus = computed(() => {
+  const dhanClientId = localStorage.getItem('DHAN_CLIENT_ID');
+  const dhanApiToken = localStorage.getItem('DHAN_API_TOKEN');
+  const flattradeClientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
+  const flattradeApiKey = localStorage.getItem('FLATTRADE_API_KEY');
+  const flattradeApiSecret = localStorage.getItem('FLATTRADE_API_SECRET');
 
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flattradeClientId && flattradeApiKey && flattradeApiSecret ? 'Connected' : 'Not Connected';
+  }
+  return 'Not Connected';
+});
 
 const activeTab = ref('positions');
 const setActiveTab = (tab) => {
