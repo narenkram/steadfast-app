@@ -565,8 +565,8 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
-import LineChart from '../components/LineChart.vue';
-const showLineChart = ref(false);
+// import LineChart from '../components/LineChart.vue';
+// const showLineChart = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
 const updateToastVisibility = (value) => {
@@ -1283,14 +1283,14 @@ const totalProfit = computed(() => {
   return 0;
 });
 
-const profitData = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.map(position => position.unrealizedProfit + position.realizedProfit);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.map(position => parseFloat(position.urmtom) + parseFloat(position.rpnl));
-  }
-  return [];
-});
+// const profitData = computed(() => {
+//   if (selectedBroker.value?.brokerName === 'Dhan') {
+//     return dhanPositionBook.value.map(position => position.unrealizedProfit + position.realizedProfit);
+//   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+//     return flatTradePositionBook.value.map(position => parseFloat(position.urmtom) + parseFloat(position.rpnl));
+//   }
+//   return [];
+// });
 
 const totalCapitalPercentage = computed(() => {
   const totalMoney = (availableBalance.value || 0) + (usedAmount.value || 0);
