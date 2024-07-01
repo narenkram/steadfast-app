@@ -576,13 +576,12 @@ const brokerStatus = computed(() => {
   const dhanClientId = localStorage.getItem('DHAN_CLIENT_ID');
   const dhanApiToken = localStorage.getItem('DHAN_API_TOKEN');
   const flattradeClientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
-  const flattradeApiKey = localStorage.getItem('FLATTRADE_API_KEY');
-  const flattradeApiSecret = localStorage.getItem('FLATTRADE_API_SECRET');
+  const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flattradeClientId && flattradeApiKey && flattradeApiSecret ? 'Connected' : 'Not Connected';
+    return flattradeClientId && flattradeApiToken ? 'Connected' : 'Not Connected';
   }
   return 'Not Connected';
 });
