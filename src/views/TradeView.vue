@@ -852,7 +852,7 @@ const flatTradeBook = ref('');
 const token = ref('');
 
 const flattradeTrades = async () => {
-  let jKey = localStorage.getItem('generatedToken') || token.value;
+  let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
   if (!jKey) {
     toastMessage.value = 'Token is missing. Please generate a token first.';
@@ -903,7 +903,7 @@ const fetchDhanPositions = async () => {
 
 const flatTradePositionBook = ref([]);
 const fetchFlattradePositions = async () => {
-  let jKey = localStorage.getItem('generatedToken') || token.value;
+  let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
   if (!jKey) {
     toastMessage.value = 'Token is missing. Please generate a token first.';
@@ -947,12 +947,12 @@ const fetchFundLimit = async () => {
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.get('http://localhost:3000/dhanFundLimit');
     } else if (selectedBroker.value.brokerName === 'Flattrade') {
-      const generatedToken = localStorage.getItem('generatedToken'); // Retrieve the token from local storage
-      if (!generatedToken) {
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN'); // Retrieve the token from local storage
+      if (!FLATTRADE_API_TOKEN) {
         throw new Error('Generated token is missing');
       }
       response = await axios.post('http://localhost:3000/flattradeFundLimit', null, {
-        params: { generatedToken }
+        params: { FLATTRADE_API_TOKEN }
       });
     } else {
       throw new Error('Unsupported broker');
@@ -1136,11 +1136,11 @@ const placeOrder = async (transactionType, drvOptionType) => {
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
     } else if (selectedBroker.value.brokerName === 'Flattrade') {
-      const generatedToken = localStorage.getItem('generatedToken');
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
         headers: {
-          'Authorization': `Bearer ${generatedToken}`,
+          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });

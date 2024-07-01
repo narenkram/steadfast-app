@@ -5,6 +5,7 @@ import axios from 'axios';
 const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
 const FLATTRADE_CLIENT_ID = ref('');
+const FLATTRADE_API_TOKEN = ref(localStorage.getItem('FLATTRADE_API_TOKEN') || ''); // Initialize from localStorage
 const DHAN_API_TOKEN = ref('');
 const DHAN_CLIENT_ID = ref('');
 
@@ -94,6 +95,15 @@ watch(reqCode, (newCode) => {
   }
 });
 
+// Watch for changes in FLATTRADE_API_TOKEN and update localStorage
+watch(FLATTRADE_API_TOKEN, (newToken) => {
+  if (newToken) {
+    localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
+  } else {
+    localStorage.removeItem('FLATTRADE_API_TOKEN');
+  }
+});
+
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
   const storedFlattradeApiKey = localStorage.getItem('FLATTRADE_API_KEY');
@@ -159,16 +169,15 @@ watch(reqCode, async (newCode) => {
 
     try {
       const res = await axios.post('/flattradeApi/trade/apitoken', payload);
-      const generatedToken = res.data.token;
-      if (!generatedToken) {
+      const token = res.data.token;
+      if (!token) {
         errorMessage.value = "Token generation failed";
         clearErrorMessage();
       } else {
-        token.value = generatedToken;
-        localStorage.setItem('generatedToken', generatedToken); // Store the token in localStorage
+        FLATTRADE_API_TOKEN.value = token; // Store the token in the reactive reference
         errorMessage.value = '';
-        statusMessage.value = `Token generated successfully: ${generatedToken}`;
-        console.log('Token generated successfully:', generatedToken);
+        statusMessage.value = `Token generated successfully: ${token}`;
+        console.log('Token generated successfully:', token);
       }
     } catch (error) {
       errorMessage.value = 'Error generating token: ' + error.message;
@@ -178,8 +187,16 @@ watch(reqCode, async (newCode) => {
   }
 });
 
-const maskBrokerClientId = (brokerClientId) => {
-  if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
+function maskBrokerClientId(brokerClientId) {
+  const placeholders = [
+    "Your_Dhan_Client_ID",
+    "Your_Dhan_API_Token",
+    "Your_Flattrade_Client_ID",
+    "Your_Flattrade_API_Key",
+    "Your_Flattrade_API_Secret"
+  ];
+
+  if (!brokerClientId || placeholders.includes(brokerClientId)) return brokerClientId; // Ensure brokerClientId is defined and not a placeholder
 
   const length = brokerClientId.length;
   if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
@@ -193,19 +210,34 @@ const maskBrokerClientId = (brokerClientId) => {
   const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
 
   return `${firstPart}${middleMask}${lastPart}`;
+}
+const placeholders = [
+  "Your_Dhan_Client_ID",
+  "Your_Dhan_API_Token",
+  "Your_Flattrade_Client_ID",
+  "Your_Flattrade_API_Key",
+  "Your_Flattrade_API_Secret"
+];
+const getStatus = (broker) => {
+  if (placeholders.includes(broker.brokerClientId) || placeholders.includes(broker.apiToken)) {
+    return 'API details missing';
+  }
+  return 'Active'; // or any other status you want to set when details are present
 };
 
-const maskApiSecret = (apiSecret) => {
-  if (!apiSecret || apiSecret.length < 10) return '******'; // Ensure there are enough characters to mask
-  if (!apiSecret || apiSecret.length < 10) return '******';
+function maskTokenSecret(apiSecret) {
+
+  if (!apiSecret || apiSecret.length < 10 || placeholders.includes(apiSecret)) return apiSecret; // Ensure there are enough characters to mask and not a placeholder
+
   const start = apiSecret.slice(0, 3);
   const end = apiSecret.slice(-3);
   return `${start}******${end}`;
-};
+}
+
 
 const fundLimits = ref('');
 const flattradeFundLimits = async () => {
-  let jKey = localStorage.getItem('generatedToken') || token.value;
+  let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
   if (!jKey) {
     errorMessage.value = 'Token is missing. Please generate a token first.';
@@ -257,9 +289,9 @@ const flattradeFundLimits = async () => {
           <tr>
             <th scope="col">Broker</th>
             <th scope="col">Broker Client ID</th>
-            <th scope="col">App ID</th>
-            <th scope="col">App Token</th>
+            <th scope="col">API Token</th>
             <th scope="col">Generate Token</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -268,13 +300,19 @@ const flattradeFundLimits = async () => {
             <td>
               <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
             </td>
-            <td>{{ broker.appId }}</td>
-            <td>{{ maskApiSecret(broker.appToken) }}</td>
+            <td>
+              <span v-if="broker.brokerName === 'Flattrade' && FLATTRADE_API_TOKEN">{{
+                maskTokenSecret(FLATTRADE_API_TOKEN) }}</span>
+              <span v-else>{{ maskTokenSecret(broker.apiToken) }}</span>
+            </td>
             <td v-if="broker.brokerName !== 'Dhan'">
               <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
             </td>
             <td v-else>
               -
+            </td>
+            <td>
+              {{ getStatus(broker) }}
             </td>
           </tr>
         </tbody>
