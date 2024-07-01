@@ -948,7 +948,7 @@ const fetchFundLimit = async () => {
     } else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN'); // Retrieve the token from local storage
       if (!FLATTRADE_API_TOKEN) {
-        throw new Error('Generated token is missing');
+        throw new Error('Flattrade API Token is missing');
       }
       response = await axios.post('http://localhost:3000/flattradeFundLimit', null, {
         params: { FLATTRADE_API_TOKEN }
