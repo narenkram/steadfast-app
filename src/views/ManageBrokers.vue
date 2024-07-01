@@ -277,8 +277,8 @@ const flattradeFundLimits = async () => {
       <!-- <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink> -->
-      <p>Add your API Key details in <code>.env</code> file and click Refresh</p>
-      <button class="ms-0 btn btn-outline-success" @click="fetchBrokers">Refresh Broker List</button>
+      <blockquote class="blockquote">Add your API Key details in <code class="bg-light"><b>.env</b></code> file <br /> and Restart API Server
+      </blockquote>
     </div>
     <div class="col-6 text-end">
       <RouterLink to="/">
