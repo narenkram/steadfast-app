@@ -219,10 +219,17 @@ const placeholders = [
   "Your_Flattrade_API_Secret"
 ];
 const getStatus = (broker) => {
+  let status = 'Active';
+
   if (placeholders.includes(broker.brokerClientId) || placeholders.includes(broker.apiToken)) {
-    return 'API details missing';
+    status = 'API details & Token missing';
   }
-  return 'Active'; // or any other status you want to set when details are present
+
+  if (broker.brokerName === 'Flattrade' && !FLATTRADE_API_TOKEN.value) {
+    status = status === 'API details & Token missing' ? 'API details & Token missing' : 'Token missing, Click generate';
+  }
+
+  return status;
 };
 
 function maskTokenSecret(apiSecret) {
