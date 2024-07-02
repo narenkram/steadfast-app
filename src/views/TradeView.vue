@@ -154,7 +154,7 @@
         <div class="col-2">
           <label for="ProductType" class="form-label mb-0">Product Type</label>
           <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
-            <option v-for="productType in productTypes" :key="productType" :value="productType">{{
+            <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">{{
               productType }}
             </option>
           </select>
@@ -1025,14 +1025,23 @@ const resetOrderType = () => {
 
 const productTypes = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return ['INTRADAY', 'MARGIN'];
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return ['I', 'M'];
+    return ['Intraday', 'Margin'];
+  }
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['Intraday', 'Margin'];
   }
   return [];
 });
+const getProductTypeValue = (productType) => {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return productType.toUpperCase();
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return productType === 'Intraday' ? 'I' : 'M';
+  }
+  return productType;
+};
 
-const selectedProductType = ref(productTypes.value[1]); // Default to 'MARGIN' or 'M'
+const selectedProductType = ref(''); // Initialize with an empty string
 
 const getTransactionType = (type) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
@@ -1354,7 +1363,7 @@ watch(selectedBroker, (newBroker) => {
   if (newBroker) {
     selectedOrderType.value = orderTypes.value[0];
     previousOrderType.value = orderTypes.value[0];
-    selectedProductType.value = productTypes.value[1]; // Default to 'MARGIN' or 'M'
+    selectedProductType.value = getProductTypeValue(productTypes.value[1]); // Default to 'Margin' or 'M'
     fetchFundLimit();
     updateExchangeSymbols();
     setDefaultExchangeAndMasterSymbol();
@@ -1385,6 +1394,13 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
 watch(selectedMasterSymbol, () => {
   updateAvailableQuantities();
 });
+
+// Watch productTypes to set the default selectedProductType
+watch(productTypes, (newProductTypes) => {
+  if (newProductTypes.length > 0) {
+    selectedProductType.value = getProductTypeValue(newProductTypes[1]); // Default to 'Margin' or 'M'
+  }
+}, { immediate: true });
 
 // Watch for changes in selectedExchange to update selectedMasterSymbol
 watch(selectedExchange, (newExchange) => {
