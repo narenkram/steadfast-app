@@ -286,11 +286,11 @@
             <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
             <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
-              Close all Positions
+              Close Positions
             </button>
             <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
-              Cancel Order
+              Cancel Orders
             </button>
           </div>
 
