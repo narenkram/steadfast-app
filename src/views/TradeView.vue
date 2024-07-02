@@ -465,7 +465,7 @@
             </tbody>
           </table>
           <!-- Flattrade Trades -->
-          <div v-if="activeFetchFunction === 'flattradeTrades'">
+          <div v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
             <table class="table table-hover" v-if="flatOrderBook.length || flatTradeBook.length">
               <thead>
                 <tr>
@@ -837,7 +837,7 @@ const handleArrowKeys = (event) => {
 const orders = ref([]);
 const fetchDhanOrdersTradesBook = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/getOrders');
+    const response = await axios.get('http://localhost:3000/dhanGetOrders');
     orders.value = response.data; // Set the orders array
     console.log('Dhan Order Book:', response.data);
   } catch (error) {
@@ -850,36 +850,28 @@ const flatOrderBook = ref('');
 const flatTradeBook = ref('');
 const token = ref('');
 
-const flattradeTrades = async () => {
+const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
+  let clientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
 
-  if (!jKey) {
-    toastMessage.value = 'Token is missing. Please generate a token first.';
+  if (!jKey || !clientId) {
+    toastMessage.value = 'Token or Client ID is missing. Please generate a token first.';
     showToast.value = true;
     return;
   }
 
-  const orderBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), prd: 'M' })}`;
-  const tradeBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), actid: localStorage.getItem('FLATTRADE_CLIENT_ID') })}`;
-
   try {
-    // Fetch Order Book
-    const orderBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/OrderBook', orderBookPayload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+    const response = await axios.get('http://localhost:3000/flattradeGetOrdersAndTrades', {
+      params: {
+        FLATTRADE_API_TOKEN: jKey,
+        FLATTRADE_CLIENT_ID: clientId
       }
     });
-    flatOrderBook.value = orderBookRes.data;
-    console.log('Flattrade Order Book:', orderBookRes.data);
 
-    // Fetch Trade Book
-    const tradeBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/TradeBook', tradeBookPayload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-    flatTradeBook.value = tradeBookRes.data;
-    console.log('Flattrade Trade Book:', tradeBookRes.data);
+    flatOrderBook.value = response.data.orderBook;
+    flatTradeBook.value = response.data.tradeBook;
+    console.log('Flattrade Order Book:', response.data.orderBook);
+    console.log('Flattrade Trade Book:', response.data.tradeBook);
   } catch (error) {
     toastMessage.value = 'Error fetching trades: ' + error.message;
     showToast.value = true;
@@ -1408,8 +1400,8 @@ onMounted(async () => {
     }
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      flattradeTrades();
-      activeFetchFunction.value = 'flattradeTrades';
+      fetchFlattradeOrdersTradesBook();
+      activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
     } else {
       fetchDhanOrdersTradesBook();
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
@@ -1494,8 +1486,8 @@ watch(activeTab, () => {
     }
   } else if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      activeFetchFunction.value = 'flattradeTrades';
-      flattradeTrades();
+      activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
+      fetchFlattradeOrdersTradesBook();
     } else {
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
       fetchDhanOrdersTradesBook();
