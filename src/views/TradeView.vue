@@ -96,8 +96,11 @@
     </div>
     <div class="col-2 d-flex justify-content-center align-items-center">
       <div class="Card">
-        <button class="btn btn-primary shadow fs-3" @click="toggleKillSwitch">
-          Kill Switch
+        <div class="card-title">
+          <h5>Kill Switch</h5>
+        </div>
+        <button :class="killSwitchButtonClass" @click="toggleKillSwitch">
+          {{ killSwitchButtonText }}
         </button>
       </div>
     </div>
@@ -108,232 +111,234 @@
   <!-- Place Order Form -->
   <section class="row py-2">
     <form @submit.prevent>
-      <div class="row">
-        <!-- Exchange Selection -->
-        <div class="col-2">
-          <label for="Exchange" class="form-label mb-0">Exchange</label>
-          <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
-            @change="fetchTradingData">
-            <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
-              exchange }}
-            </option>
-          </select>
+      <fieldset :disabled="isFormDisabled">
+        <div class="row">
+          <!-- Exchange Selection -->
+          <div class="col-2">
+            <label for="Exchange" class="form-label mb-0">Exchange</label>
+            <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
+              @change="fetchTradingData">
+              <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
+                exchange }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Segment Selection -->
+          <div class="col-2">
+            <label for="Segment" class="form-label mb-0">Segment</label>
+            <select id="Segment" class="form-select" aria-label="Segment">
+              <option value="Options" selected>Options</option>
+              <option value="Futures">Futures</option>
+            </select>
+          </div>
+
+          <!-- Master Symbol Selection -->
+          <div class="col-2">
+            <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
+            <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
+              @change="fetchTradingData">
+              <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">{{
+                symbol }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Expiry Date Selection -->
+          <div class="col-2">
+            <label for="Expiry" class="form-label mb-0">Expiry Date</label>
+            <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
+              <option v-for="date in expiryDates" :key="date" :value="date">
+                {{ formatDate(date) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Product Type Selection -->
+          <div class="col-2">
+            <label for="ProductType" class="form-label mb-0">Product Type</label>
+            <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
+              <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">
+                {{
+                  productType }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Quantity Selection -->
+          <div class="col-2">
+            <label for="Quantity" class="form-label mb-0">Quantity</label>
+            <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
+              <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
+              </option>
+            </select>
+          </div>
+
         </div>
 
-        <!-- Segment Selection -->
-        <div class="col-2">
-          <label for="Segment" class="form-label mb-0">Segment</label>
-          <select id="Segment" class="form-select" aria-label="Segment">
-            <option value="Options" selected>Options</option>
-            <option value="Futures">Futures</option>
-          </select>
-        </div>
-
-        <!-- Master Symbol Selection -->
-        <div class="col-2">
-          <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
-          <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
-            @change="fetchTradingData">
-            <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">{{
-              symbol }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Expiry Date Selection -->
-        <div class="col-2">
-          <label for="Expiry" class="form-label mb-0">Expiry Date</label>
-          <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
-            <option v-for="date in expiryDates" :key="date" :value="date">
-              {{ formatDate(date) }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Product Type Selection -->
-        <div class="col-2">
-          <label for="ProductType" class="form-label mb-0">Product Type</label>
-          <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
-            <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">{{
-              productType }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Quantity Selection -->
-        <div class="col-2">
-          <label for="Quantity" class="form-label mb-0">Quantity</label>
-          <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
-            <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
-            </option>
-          </select>
-        </div>
-
-      </div>
-
-      <div class="row mt-3">
-        <!-- Order Type -->
-        <div class="col-2">
-          <label for="OrderType" class="form-label mb-0">Order Type</label>
-          <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType">
-            <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
-            </option>
-          </select>
-        </div>
-        <!-- Market Protection Order %-->
-        <div class="col-3">
-          <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
-          <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %">
-            <option value="1">1%</option>
-            <option value="2">2%</option>
-            <option value="3">3%</option>
-            <option value="4">4%</option>
-            <option value="5">5%</option>
-          </select>
-        </div>
-        <!-- Stoploss -->
-        <div class="col-2">
-          <label for="Stoploss" class="form-label mb-0">Stoploss</label>
-          <div class="input-group mb-3">
-            <div class="input-group-text">
-              <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss">
+        <div class="row mt-3">
+          <!-- Order Type -->
+          <div class="col-2">
+            <label for="OrderType" class="form-label mb-0">Order Type</label>
+            <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType">
+              <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
+              </option>
+            </select>
+          </div>
+          <!-- Market Protection Order %-->
+          <div class="col-3">
+            <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
+            <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %">
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+              <option value="3">3%</option>
+              <option value="4">4%</option>
+              <option value="5">5%</option>
+            </select>
+          </div>
+          <!-- Stoploss -->
+          <div class="col-2">
+            <label for="Stoploss" class="form-label mb-0">Stoploss</label>
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss">
+              </div>
+              <input type="number" class="form-control" aria-label="Stoploss" value="75">
             </div>
-            <input type="number" class="form-control" aria-label="Stoploss" value="75">
           </div>
-        </div>
-        <!-- Target -->
-        <div class="col-2">
-          <label for="Target" class="form-label mb-0">Target</label>
-          <div class="input-group mb-3">
-            <div class="input-group-text">
-              <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target">
+          <!-- Target -->
+          <div class="col-2">
+            <label for="Target" class="form-label mb-0">Target</label>
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target">
+              </div>
+              <input type="number" class="form-control" aria-label="Target" value="75">
             </div>
-            <input type="number" class="form-control" aria-label="Target" value="75">
           </div>
-        </div>
-        <!-- 1 Click Arrow Keys -->
-        <div class="col-3">
-          <div class="d-flex align-items-center float-end h-100">
-            <label class="ToggleSwitch">
-              <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
-              <span class="ToggleSlider SliderRound"></span>
-            </label>
-            <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Trading Symbols & Buy/Sell Buttons -->
-      <div class="row mt-2 align-items-center justify-content-between">
-        <!-- Call Strike Selection -->
-        <div class="col-3">
-          <label for="CallStrike" class="form-label mb-0">Call Strike</label>
-          <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
-            <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.strikePrice }}
-            </option>
-          </select>
-          <div>
-            Security ID: {{ defaultCallSecurityId }}
-          </div>
-          <div>
-            {{ selectedCallStrike.tradingSymbol }}
-          </div>
-          <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-              <span v-if="enableArrowKeys">⬆️</span>
-              Buy CE
-            </button>
-            <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
-                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-            </ul>
-          </div>
-          <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-              <span v-if="enableArrowKeys">⬅️</span>
-              Sell CE
-            </button>
-            <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
-              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
-                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-            </ul>
+          <!-- 1 Click Arrow Keys -->
+          <div class="col-3">
+            <div class="d-flex align-items-center float-end h-100">
+              <label class="ToggleSwitch">
+                <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
+                <span class="ToggleSlider SliderRound"></span>
+              </label>
+              <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
+            </div>
           </div>
         </div>
 
-        <!-- Close All Positions & Cancel Pending Orders -->
-        <div class="col-3 text-center">
-          <br />
-          <br />
-          <p class="mb-0">Nifty Bank</p>
-          <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">Close all
-            Positions</button>
-          <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel
-            Order</button>
-        </div>
+        <!-- Trading Symbols & Buy/Sell Buttons -->
+        <div class="row mt-2 align-items-center justify-content-between">
+          <!-- Call Strike Selection -->
+          <div class="col-3">
+            <label for="CallStrike" class="form-label mb-0">Call Strike</label>
+            <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
+              <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
+                {{ strike.strikePrice }}
+              </option>
+            </select>
+            <div>
+              Security ID: {{ defaultCallSecurityId }}
+            </div>
+            <div>
+              {{ selectedCallStrike.tradingSymbol }}
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableArrowKeys">⬆️</span>
+                Buy CE
+              </button>
+              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableArrowKeys">⬅️</span>
+                Sell CE
+              </button>
+              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+          </div>
 
-        <!-- Put Strike Selection -->
-        <div class="col-3">
-          <label for="PutStrike" class="form-label mb-0">Put Strike</label>
-          <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
-            <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-              {{ strike.strikePrice }}
-            </option>
-          </select>
-          <div>
-            Security ID: {{ defaultPutSecurityId }}
+          <!-- Close All Positions & Cancel Pending Orders -->
+          <div class="col-3 text-center">
+            <br />
+            <br />
+            <p class="mb-0">Nifty Bank</p>
+            <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+            <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">Close all
+              Positions</button>
+            <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel
+              Order</button>
           </div>
-          <div>
-            {{ selectedPutStrike.tradingSymbol }}
-          </div>
-          <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-              <span v-if="enableArrowKeys">⬇️</span>
-              Buy PE
-            </button>
-            <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
-                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-            </ul>
-          </div>
-          <div class="btn-group w-100">
-            <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-              <span v-if="enableArrowKeys">➡️</span>
-              Sell PE
-            </button>
-            <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
-              data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
-                  data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-            </ul>
+
+          <!-- Put Strike Selection -->
+          <div class="col-3">
+            <label for="PutStrike" class="form-label mb-0">Put Strike</label>
+            <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
+              <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
+                {{ strike.strikePrice }}
+              </option>
+            </select>
+            <div>
+              Security ID: {{ defaultPutSecurityId }}
+            </div>
+            <div>
+              {{ selectedPutStrike.tradingSymbol }}
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableArrowKeys">⬇️</span>
+                Buy PE
+              </button>
+              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableArrowKeys">➡️</span>
+                Sell PE
+              </button>
+              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-
+      </fieldset>
     </form>
   </section>
 
@@ -591,38 +596,43 @@ const setActiveTab = (tab) => {
   activeTab.value = tab;
 };
 
-// Kill Switch - Only Broker Dhan Supports it for now.
-const killSwitchActive = ref(false);
-const toggleKillSwitch = async () => {
-  const newStatus = killSwitchActive.value ? 'DEACTIVATE' : 'ACTIVATE';
-  try {
-    const response = await axios.post('http://localhost:3000/killSwitch', null, {
-      params: { killSwitchStatus: newStatus }
-    });
-    console.log(`Kill Switch ${newStatus.toLowerCase()}d:`, response.data);
+// Kill Switch - Client Side
+const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
+const isFormDisabled = computed(() => killSwitchActive.value);
 
-    // Handle different response messages
-    if (response.data.killSwitchStatus === 'Kill Switch Activated') {
-      toastMessage.value = 'Kill Switch activated successfully';
-      killSwitchActive.value = true;
-    } else if (response.data.killSwitchStatus === 'Kill Switch Deactivated') {
-      toastMessage.value = 'Kill Switch deactivated successfully';
-      killSwitchActive.value = false;
-    } else if (response.data.killSwitchStatus === 'Kill Switch is already activated') {
-      toastMessage.value = 'Kill Switch is already activated';
-    } else if (response.data.killSwitchStatus === 'Kill switch deactivate allowed only once a day.') {
-      toastMessage.value = 'Kill switch deactivate allowed only once a day.';
-    } else {
-      toastMessage.value = 'Unknown response from server';
+const toggleKillSwitch = () => {
+  const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
+
+  if (newStatus === 'DEACTIVATED') {
+    const activationTime = localStorage.getItem('KillSwitchActivationTime');
+    const currentTime = new Date().getTime();
+    const twelveHoursInMillis = 12 * 60 * 60 * 1000;
+
+    if (activationTime && (currentTime - activationTime < twelveHoursInMillis)) {
+      toastMessage.value = 'Kill Switch cannot be deactivated within 12 hours of activation';
+      showToast.value = true;
+      return;
     }
-
-    showToast.value = true;
-  } catch (error) {
-    console.error(`Error ${newStatus.toLowerCase()}ing Kill Switch:`, error);
-    toastMessage.value = `Failed to ${newStatus.toLowerCase()} Kill Switch`;
-    showToast.value = true;
   }
+
+  // Handle different response messages
+  if (newStatus === 'ACTIVATED') {
+    toastMessage.value = 'Kill Switch activated successfully';
+    killSwitchActive.value = true;
+    localStorage.setItem('KillSwitchStatus', 'true');
+    localStorage.setItem('KillSwitchActivationTime', new Date().getTime());
+  } else if (newStatus === 'DEACTIVATED') {
+    toastMessage.value = 'Kill Switch deactivated successfully';
+    killSwitchActive.value = false;
+    localStorage.setItem('KillSwitchStatus', 'false');
+    localStorage.removeItem('KillSwitchActivationTime');
+  }
+
+  showToast.value = true;
 };
+
+const killSwitchButtonText = computed(() => killSwitchActive.value ? 'Deactivate' : 'Activate');
+const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-sm btn-danger shadow fs-5' : 'btn btn-sm btn-success shadow fs-5');
 
 // Fetch brokers and set selectedBroker
 const brokers = ref([]);
