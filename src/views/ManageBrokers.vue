@@ -220,16 +220,19 @@ const placeholders = [
 ];
 const getStatus = (broker) => {
   let status = 'Active';
+  let statusClass = 'bg-success';
 
   if (placeholders.includes(broker.brokerClientId) || placeholders.includes(broker.apiToken)) {
     status = 'API details & Token missing';
+    statusClass = 'bg-danger';
   }
 
   if (broker.brokerName === 'Flattrade' && !FLATTRADE_API_TOKEN.value) {
     status = status === 'API details & Token missing' ? 'API details & Token missing' : 'Token missing, Click generate';
+    statusClass = status === 'API details & Token missing' ? 'bg-danger' : 'bg-warning text-dark';
   }
 
-  return status;
+  return { status, statusClass };
 };
 
 function maskTokenSecret(apiSecret) {
@@ -277,7 +280,8 @@ const flattradeFundLimits = async () => {
       <!-- <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink> -->
-      <blockquote class="blockquote">Add your API Key details in <code class="bg-light"><b>.env</b></code> file <br /> and Restart API Server
+      <blockquote class="blockquote">Add your API Key details in <code class="bg-light"><b>.env</b></code> file <br />
+        and Restart API Server
       </blockquote>
     </div>
     <div class="col-6 text-end">
@@ -297,6 +301,7 @@ const flattradeFundLimits = async () => {
             <th scope="col">Broker</th>
             <th scope="col">Broker Client ID</th>
             <th scope="col">API Token</th>
+            <th scope="col">Validity</th>
             <th scope="col">Generate Token</th>
             <th scope="col">Status</th>
           </tr>
@@ -312,6 +317,9 @@ const flattradeFundLimits = async () => {
                 maskTokenSecret(FLATTRADE_API_TOKEN) }}</span>
               <span v-else>{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
+            <td>
+              24 Hours
+            </td>
             <td v-if="broker.brokerName !== 'Dhan'">
               <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
             </td>
@@ -319,7 +327,7 @@ const flattradeFundLimits = async () => {
               -
             </td>
             <td>
-              {{ getStatus(broker) }}
+              <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
             </td>
           </tr>
         </tbody>
