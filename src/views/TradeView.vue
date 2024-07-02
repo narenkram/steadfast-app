@@ -1168,26 +1168,62 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true;
   }
 };
-
+// Place Order for Dhan or Flattrade for each position
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
-    const orderData = {
-      brokerClientId: selectedBroker.value.brokerClientId,
-      transactionType: transactionType,
-      exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
-      productType: selectedProductType.value,
-      orderType: 'MARKET',
-      validity: 'DAY',
-      tradingSymbol: position.tradingSymbol,
-      securityId: position.securityId,
-      quantity: position.netQty,
-      price: 0,
-      drvExpiryDate: position.expiryDate,
-      drvOptionType: optionType
-    };
+    const quantity = Math.abs(Number(position.netQty || position.netqty));
+
+    if (quantity === 0) {
+      console.log('Quantity is zero, no order will be placed.');
+      return;
+    }
+
+    let orderData;
+    if (selectedBroker.value.brokerName === 'Dhan') {
+      orderData = {
+        brokerClientId: selectedBroker.value.brokerClientId,
+        transactionType: transactionType,
+        exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
+        productType: selectedProductType.value,
+        orderType: 'MARKET',
+        validity: 'DAY',
+        tradingSymbol: position.tradingSymbol,
+        securityId: position.securityId,
+        quantity: position.netQty,
+        price: 0,
+        drvExpiryDate: position.expiryDate,
+        drvOptionType: optionType
+      };
+    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      orderData = {
+        uid: selectedBroker.value.brokerClientId,
+        actid: selectedBroker.value.brokerClientId,
+        exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
+        tsym: position.tsym,
+        qty: position.netqty,
+        prc: 0,
+        prd: position.prd,
+        trantype: transactionType,
+        prctyp: 'MKT',
+        ret: "DAY"
+      };
+    }
 
     console.log("Placing order for position with data:", orderData);
-    const response = await axios.post('http://localhost:3000/placeOrder', orderData);
+    let response;
+    if (selectedBroker.value.brokerName === 'Dhan') {
+      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
+    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
+      const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
+      response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
+        headers: {
+          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+    }
+
     console.log("Order placed successfully for position:", response.data);
   } catch (error) {
     console.error('Failed to place order for position:', error);
@@ -1195,19 +1231,47 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
   }
 };
 
+// Close all positions for Dhan or Flattrade
 const closeAllPositions = async () => {
   try {
-    for (const position of dhanPositionBook.value) {
-      if (position.positionType !== 'CLOSED') {
-        const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
-        await placeOrderForPosition('SELL', optionType, position);
+    let positionsClosed = false;
+
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      for (const position of dhanPositionBook.value) {
+        const netQty = Number(position.netQty); // Ensure netQty is treated as a number
+        if (netQty !== 0) {
+          const transactionType = netQty > 0 ? 'SELL' : 'BUY';
+          const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
+          await placeOrderForPosition(transactionType, optionType, position);
+          positionsClosed = true;
+        }
+      }
+      if (positionsClosed) {
+        toastMessage.value = 'All Dhan positions closed successfully';
+      } else {
+        toastMessage.value = 'No positions to close for Dhan';
+      }
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      for (const position of flatTradePositionBook.value) {
+        const netqty = Number(position.netqty); // Ensure netqty is treated as a number
+        if (netqty !== 0) {
+          const transactionType = netqty > 0 ? 'S' : 'B';
+          const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
+          await placeOrderForPosition(transactionType, optionType, position);
+          positionsClosed = true;
+        }
+      }
+      if (positionsClosed) {
+        toastMessage.value = 'All Flattrade positions closed successfully';
+      } else {
+        toastMessage.value = 'No positions to close for Flattrade';
       }
     }
-    toastMessage.value = 'All dhanPositionBook closed successfully';
+
     showToast.value = true;
   } catch (error) {
-    console.error('Error closing dhanPositionBook:', error);
-    toastMessage.value = 'Failed to close all dhanPositionBook';
+    console.error('Error closing positions:', error);
+    toastMessage.value = 'Failed to close all positions';
     showToast.value = true;
   }
 };
