@@ -1312,6 +1312,13 @@ const cancelOrder = async (order) => {
 const cancelPendingOrders = async () => {
   console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);
 
+  // Fetch orders based on the selected broker
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    await fetchDhanOrdersTradesBook();
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    await fetchFlattradeOrdersTradesBook();
+  }
+
   const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
     ? dhanOrders.value.filter(order => order.orderStatus === 'PENDING')
     : flatOrderBook.value.filter(order => order.status === 'OPEN');
