@@ -450,17 +450,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.orderId">
-                <td>{{ order.orderId }}</td>
-                <td>{{ order.tradingSymbol }}</td>
-                <td>{{ order.quantity }}</td>
-                <td>{{ order.price }}</td>
-                <td>{{ order.createTime }}</td>
-                <td>{{ order.orderStatus }}</td>
+              <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
+                <td>{{ dhanOrder.orderId }}</td>
+                <td>{{ dhanOrder.tradingSymbol }}</td>
+                <td>{{ dhanOrder.quantity }}</td>
+                <td>{{ dhanOrder.price }}</td>
+                <td>{{ dhanOrder.createTime }}</td>
+                <td>{{ dhanOrder.orderStatus }}</td>
               </tr>
-              <tr v-if="orders.length === 0">
-                <td colspan="5" class="text-center">No orders or trades on selected broker {{ selectedBroker.brokerName
-                  }}</td>
+              <tr v-if="dhanOrders.length === 0">
+                <td colspan="5" class="text-center">No orders or trades on selected broker {{
+                  selectedBroker.brokerName }}</td>
               </tr>
             </tbody>
           </table>
@@ -834,11 +834,11 @@ const handleArrowKeys = (event) => {
   }
 };
 
-const orders = ref([]);
+const dhanOrders = ref([]);
 const fetchDhanOrdersTradesBook = async () => {
   try {
     const response = await axios.get('http://localhost:3000/dhanGetOrders');
-    orders.value = response.data; // Set the orders array
+    dhanOrders.value = response.data; // Set the orders array
     console.log('Dhan Order Book:', response.data);
   } catch (error) {
     console.error('Error fetching orders:', error);
