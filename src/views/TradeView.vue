@@ -1313,7 +1313,7 @@ const cancelPendingOrders = async () => {
   console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);
 
   const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
-    ? orders.value.filter(order => order.orderStatus === 'PENDING')
+    ? dhanOrders.value.filter(order => order.orderStatus === 'PENDING')
     : flatOrderBook.value.filter(order => order.status === 'OPEN');
 
   console.log(`Pending orders:`, pendingOrders);
@@ -1404,7 +1404,7 @@ const deployedCapitalPercentage = computed(() => {
 
 const totalBrokerage = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return orders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0);
+    return dhanOrders.value.filter(order => order.orderStatus === 'TRADED').reduce((total) => total + 20, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return 0;
   }
