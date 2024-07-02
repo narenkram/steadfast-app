@@ -30,7 +30,7 @@
         <div class="col-2">
           <p class="mb-1"><b>Broker</b> <span
               :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected' }">{{
-              brokerStatus }}</span></p>
+                brokerStatus }}</span></p>
           <p class="mb-0">
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
               {{ selectedBroker?.brokerClientId || 'N/A' }}
@@ -420,7 +420,7 @@
                 <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
                   <td>{{ flattradePosition.tsym }}</td>
                   <td>{{ flattradePosition.netqty }}</td>
-                  <td>B/S</td>
+                  <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                   <td>{{ flattradePosition.prd }}</td>
                   <td>{{ flattradePosition.lp }}</td>
                   <td>{{ flattradePosition.cfbuyavgprc }}</td>
