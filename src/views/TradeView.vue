@@ -539,7 +539,11 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">Limit order</h1>
+          <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">
+            {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{ selectedStrike.strikePrice }}
+            {{
+              selectedStrike.expiryDate }}
+          </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
             @click="resetOrderType"></button>
         </div>
@@ -1010,10 +1014,12 @@ const orderTypes = computed(() => {
 const selectedOrderType = ref(orderTypes.value[0]);
 const previousOrderType = ref(orderTypes.value[0]);
 
+const selectedStrike = ref({});
 const setOrderDetails = (transactionType, optionType) => {
   modalTransactionType.value = getTransactionType(transactionType); // Use getTransactionType to set modalTransactionType
   modalOptionType.value = optionType;
   selectedOrderType.value = orderTypes.value[1]; // Set selectedOrderType to LIMIT or LMT based on broker
+  selectedStrike.value = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
 };
 const resetOrderTypeIfNeeded = () => {
   if (previousOrderType.value === orderTypes.value[0]) { // Check if previousOrderType is MARKET or MKT
