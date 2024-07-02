@@ -1268,16 +1268,38 @@ const closeAllPositions = async () => {
   }
 };
 
-const cancelOrder = async (orderId, orderStatus) => {
-  if (orderStatus !== 'PENDING') {
-    console.log(`Order ${orderId} is not pending and cannot be canceled.`);
+const cancelOrder = async (order) => {
+  const orderId = selectedBroker.value?.brokerName === 'Dhan' ? order.Id : order.norenordno;
+  const orderStatus = selectedBroker.value?.brokerName === 'Dhan' ? order.orderStatus : order.status;
+
+  console.log(`Attempting to cancel order ${orderId} with status ${orderStatus}`);
+  console.log(`Broker: ${selectedBroker.value?.brokerName}`);
+
+  if ((selectedBroker.value?.brokerName === 'Dhan' && orderStatus !== 'PENDING') ||
+    (selectedBroker.value?.brokerName === 'Flattrade' && orderStatus !== 'OPEN')) {
+    console.log(`Order ${orderId} is not in a cancellable state and cannot be canceled.`);
     return;
   }
 
   try {
-    await axios.delete('http://localhost:3000/cancelOrder', {
-      data: { orderId },
-    });
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      console.log(`Sending request to cancel Dhan order ${orderId}`);
+      await axios.delete('http://localhost:3000/dhanCancelOrder', {
+        data: { orderId },
+      });
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
+      const clientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
+      console.log(`Sending request to cancel Flattrade order ${orderId}`);
+      await axios.post('http://localhost:3000/flattradeCancelOrder', {
+        norenordno: orderId,
+        uid: clientId
+      }, {
+        params: {
+          FLATTRADE_API_TOKEN: jKey
+        }
+      });
+    }
     console.log(`Order ${orderId} canceled successfully.`);
   } catch (error) {
     console.error(`Failed to cancel order ${orderId}:`, error);
@@ -1288,14 +1310,27 @@ const cancelOrder = async (orderId, orderStatus) => {
 };
 
 const cancelPendingOrders = async () => {
-  const pendingOrders = orders.value.filter(order => order.orderStatus === 'PENDING');
-  const cancelPromises = pendingOrders.map(order => cancelOrder(order.orderId, order.orderStatus));
+  console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);
+
+  const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
+    ? orders.value.filter(order => order.orderStatus === 'PENDING')
+    : flatOrderBook.value.filter(order => order.status === 'OPEN');
+
+  console.log(`Pending orders:`, pendingOrders);
+
+  const cancelPromises = pendingOrders.map(order => cancelOrder(order));
 
   try {
     await Promise.all(cancelPromises);
     toastMessage.value = 'Pending orders canceled successfully';
     showToast.value = true;
-    await fetchDhanOrdersTradesBook(); // Refresh the orders list
+
+    // Refresh the orders list based on the selected broker
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      await fetchDhanOrdersTradesBook();
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      await fetchFlattradeOrdersTradesBook();
+    }
   } catch (error) {
     console.error('Failed to cancel orders:', error);
     toastMessage.value = 'Failed to cancel some orders';
