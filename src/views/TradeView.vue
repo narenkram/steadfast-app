@@ -252,7 +252,7 @@
                 Buy CE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
               <ul class="dropdown-menu">
@@ -312,7 +312,7 @@
                 Buy PE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
               <ul class="dropdown-menu">

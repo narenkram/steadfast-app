@@ -148,3 +148,7 @@ th {
   transform: translateX(-50%);
   left: 50%;
 }
+
+.dropdown-menu {
+  width: 100%;
+}
