@@ -220,10 +220,10 @@
           <div class="col-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
-                <input class="ToggleInput" type="checkbox" id="enableArrowKeys" v-model="enableArrowKeys">
+                <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys">
                 <span class="ToggleSlider SliderRound"></span>
               </label>
-              <label class="ToggleLabel" for="enableArrowKeys"><b> 1 Click <br /> Arrow Keys</b></label>
+              <label class="ToggleLabel" for="enableHotKeys"><b> 1 Click <br /> Arrow Keys</b></label>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                <span v-if="enableArrowKeys">⬆️</span>
+                <span v-if="enableHotKeys">⬆️</span>
                 Buy CE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
@@ -264,7 +264,7 @@
               <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                <span v-if="enableArrowKeys">⬅️</span>
+                <span v-if="enableHotKeys">⬅️</span>
                 Sell CE
               </button>
               <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
@@ -284,10 +284,14 @@
             <br />
             <p class="mb-0">Nifty Bank</p>
             <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-            <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">Close all
-              Positions</button>
-            <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">Cancel
-              Order</button>
+            <button class="btn btn-lg btn-outline-secondary fs-5 w-100 my-2" @click="closeAllPositions">
+              <span v-if="enableHotKeys">F6 / </span>
+              Close all Positions
+            </button>
+            <button class="btn btn-lg btn-outline-secondary fs-5 w-100" @click="cancelPendingOrders">
+              <span v-if="enableHotKeys">F7 / </span>
+              Cancel Order
+            </button>
           </div>
 
           <!-- Put Strike Selection -->
@@ -308,7 +312,7 @@
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                <span v-if="enableArrowKeys">⬇️</span>
+                <span v-if="enableHotKeys">⬇️</span>
                 Buy PE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
@@ -324,7 +328,7 @@
               <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                <span v-if="enableArrowKeys">➡️</span>
+                <span v-if="enableHotKeys">➡️</span>
                 Sell PE
               </button>
               <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
@@ -540,7 +544,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">
-            {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{ selectedStrike.strikePrice }}
+            {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{ selectedStrike.strikePrice
+            }}
             {{
               selectedStrike.expiryDate }}
           </h1>
@@ -829,9 +834,21 @@ const updateAvailableQuantities = () => {
   }
 };
 
-const enableArrowKeys = ref(false);
-const handleArrowKeys = (event) => {
-  if (!enableArrowKeys.value) return;
+const enableHotKeys = ref(false);
+const handleHotKeys = (event) => {
+  if (!enableHotKeys.value) return;
+
+  switch (event.key) {
+    case 'ArrowUp':
+    case 'ArrowDown':
+    case 'ArrowRight':
+    case 'ArrowLeft':
+    case 'F6':
+    case 'F7':
+      event.preventDefault(); // Prevent default browser action
+      break;
+  }
+
   switch (event.key) {
     case 'ArrowUp':
       placeOrder(getTransactionType('BUY'), 'CALL');
@@ -844,6 +861,12 @@ const handleArrowKeys = (event) => {
       break;
     case 'ArrowLeft':
       placeOrder(getTransactionType('SELL'), 'CALL');
+      break;
+    case 'F6':
+      closeAllPositions();
+      break;
+    case 'F7':
+      cancelPendingOrders();
       break;
   }
 };
@@ -1445,7 +1468,7 @@ onMounted(async () => {
     .then(() => fetchTradingData())
     .then(() => updateAvailableQuantities());
 
-  window.addEventListener('keydown', handleArrowKeys);
+  window.addEventListener('keydown', handleHotKeys);
 
   // Initialize with the default active tab
   if (activeTab.value === 'positions') {
@@ -1468,7 +1491,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleArrowKeys);
+  window.removeEventListener('keydown', handleHotKeys);
 
 });
 
