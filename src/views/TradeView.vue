@@ -1269,7 +1269,7 @@ const closeAllPositions = async () => {
 };
 
 const cancelOrder = async (order) => {
-  const orderId = selectedBroker.value?.brokerName === 'Dhan' ? order.Id : order.norenordno;
+  const orderId = selectedBroker.value?.brokerName === 'Dhan' ? order.orderId : order.norenordno;
   const orderStatus = selectedBroker.value?.brokerName === 'Dhan' ? order.orderStatus : order.status;
 
   console.log(`Attempting to cancel order ${orderId} with status ${orderStatus}`);
