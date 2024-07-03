@@ -156,3 +156,8 @@ th {
 .dropdown-menu {
   width: 100%;
 }
+
+.disabled-form {
+  cursor: not-allowed;
+  pointer-events: all;
+}

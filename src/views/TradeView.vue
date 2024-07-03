@@ -114,13 +114,13 @@
   <!-- Place Order Form -->
   <section class="row py-2">
     <form @submit.prevent>
-      <fieldset :disabled="isFormDisabled">
+      <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
         <div class="row">
           <!-- Exchange Selection -->
           <div class="col-2">
             <label for="Exchange" class="form-label mb-0">Exchange</label>
             <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
-              @change="fetchTradingData">
+              @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
                 exchange }}
               </option>
@@ -130,7 +130,7 @@
           <!-- Segment Selection -->
           <div class="col-2">
             <label for="Segment" class="form-label mb-0">Segment</label>
-            <select id="Segment" class="form-select" aria-label="Segment">
+            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }">
               <option value="Options" selected>Options</option>
               <option value="Futures">Futures</option>
             </select>
@@ -140,7 +140,7 @@
           <div class="col-2">
             <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
             <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
-              @change="fetchTradingData">
+              @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">{{
                 symbol }}
               </option>
@@ -150,7 +150,8 @@
           <!-- Expiry Date Selection -->
           <div class="col-2">
             <label for="Expiry" class="form-label mb-0">Expiry Date</label>
-            <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry">
+            <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="date in expiryDates" :key="date" :value="date">
                 {{ formatDate(date) }}
               </option>
@@ -160,10 +161,10 @@
           <!-- Product Type Selection -->
           <div class="col-2">
             <label for="ProductType" class="form-label mb-0">Product Type</label>
-            <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType">
+            <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">
-                {{
-                  productType }}
+                {{ productType }}
               </option>
             </select>
           </div>
@@ -171,7 +172,8 @@
           <!-- Quantity Selection -->
           <div class="col-2">
             <label for="Quantity" class="form-label mb-0">Quantity</label>
-            <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity">
+            <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
               </option>
             </select>
@@ -183,7 +185,8 @@
           <!-- Order Type -->
           <div class="col-2">
             <label for="OrderType" class="form-label mb-0">Order Type</label>
-            <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType">
+            <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
               </option>
             </select>
@@ -191,7 +194,8 @@
           <!-- Market Protection Order %-->
           <div class="col-3">
             <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
-            <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %">
+            <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option value="1">1%</option>
               <option value="2">2%</option>
               <option value="3">3%</option>
@@ -204,9 +208,11 @@
             <label for="Stoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss">
+                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss"
+                  :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" aria-label="Stoploss" value="75">
+              <input type="number" class="form-control" aria-label="Stoploss" value="75"
+                :class="{ 'disabled-form': isFormDisabled }">
             </div>
           </div>
           <!-- Target -->
@@ -214,19 +220,23 @@
             <label for="Target" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target">
+                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target"
+                  :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" aria-label="Target" value="75">
+              <input type="number" class="form-control" aria-label="Target" value="75"
+                :class="{ 'disabled-form': isFormDisabled }">
             </div>
           </div>
           <!-- 1 Click Keys -->
           <div class="col-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
-                <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys">
-                <span class="ToggleSlider SliderRound"></span>
+                <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
+                  :class="{ 'disabled-form': isFormDisabled }">
+                <span class="ToggleSlider SliderRound" :class="{ 'disabled-form': isFormDisabled }"></span>
               </label>
-              <label class="ToggleLabel" for="enableHotKeys"><b> 1 Click <br /> Keys ⌨️</b></label>
+              <label class="ToggleLabel" for="enableHotKeys" :class="{ 'disabled-form': isFormDisabled }"><b> 1 Click
+                  <br /> Keys ⌨️</b></label>
             </div>
           </div>
         </div>
@@ -236,7 +246,8 @@
           <!-- Call Strike Selection -->
           <div class="col-3">
             <label for="CallStrike" class="form-label mb-0">Call Strike</label>
-            <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
+            <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
                 {{ strike.strikePrice }}
               </option>
@@ -258,7 +269,8 @@
           <!-- Put Strike Selection -->
           <div class="col-3">
             <label for="PutStrike" class="form-label mb-0">Put Strike</label>
-            <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
+            <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
+              :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                 {{ strike.strikePrice }}
               </option>
