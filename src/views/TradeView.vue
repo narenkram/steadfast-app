@@ -1197,7 +1197,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
       await fetchDhanOrdersTradesBook();
-    } 
+    }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
@@ -1270,7 +1270,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
       await fetchDhanOrdersTradesBook();
-    } 
+    }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
@@ -1418,8 +1418,9 @@ const cancelPendingOrders = async () => {
 const availableBalance = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return fundLimits.value.availabelBalance; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return fundLimits.value.cash;
+  } 
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return Math.floor(fundLimits.value.cash - fundLimits.value.marginused);
   }
   return 0;
 });
@@ -1467,10 +1468,9 @@ const totalProfit = computed(() => {
 // });
 
 const totalCapitalPercentage = computed(() => {
-  const totalMoney = (availableBalance.value || 0) + (usedAmount.value || 0);
-  return (totalProfit.value / totalMoney) * 100;
+  const totalMoney = Number(availableBalance.value) + Number(usedAmount.value);
+  return totalMoney ? (Number(totalProfit.value) / totalMoney) * 100 : 0;
 });
-
 const deployedCapitalPercentage = computed(() => {
   const totalUsedAmount = usedAmount.value || 0;
   return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
