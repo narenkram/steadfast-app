@@ -1196,7 +1196,9 @@ const placeOrder = async (transactionType, drvOptionType) => {
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
-    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      await fetchDhanOrdersTradesBook();
+    } 
+    else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
@@ -1205,6 +1207,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
+      await fetchFlattradeOrdersTradesBook();
     }
 
     console.log("Order placed successfully:", response.data);
@@ -1266,7 +1269,9 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
-    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+      await fetchDhanOrdersTradesBook();
+    } 
+    else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
@@ -1275,6 +1280,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
+      await fetchFlattradeOrdersTradesBook();
     }
 
     console.log("Order placed successfully for position:", response.data);
