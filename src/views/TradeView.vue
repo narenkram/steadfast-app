@@ -860,7 +860,7 @@ const updateAvailableQuantities = () => {
   }
 };
 
-const enableHotKeys = ref(false);
+const enableHotKeys = ref(true);
 const handleHotKeys = (event) => {
   if (!enableHotKeys.value) return;
 
