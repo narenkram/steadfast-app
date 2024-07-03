@@ -7,7 +7,7 @@
 
         <!-- Change Broker -->
         <div class="col-2">
-          <label for="ChangeBroker" class="form-label mb-0"><b>Change Broker</b></label>
+          <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
             <select class="form-select" aria-label="Change Broker" v-model="selectedBroker">
               <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
@@ -22,7 +22,7 @@
           <p class="mb-1"><b>Broker</b> <span
               :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected' }">{{
                 brokerStatus }}</span></p>
-          <p class="mb-0">
+          <p class="mb-0 d-flex align-items-center justify-content-center">
             <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
               <span>⚙️</span>
             </RouterLink>
@@ -40,19 +40,19 @@
         <!-- Total Funds -->
         <div class="col-3 text-center">
           <p class="mb-1"><b>Total Funds</b></p>
-          <p class="mb-0">₹ {{ availableBalance || null }}</p>
+          <p class="mt-2 mb-0">₹ {{ availableBalance || null }}</p>
         </div>
 
         <!-- Utilized Margin -->
         <div class="col-2 text-center">
           <p class="mb-1"><b>Utilized Margin</b></p>
-          <p>₹ {{ usedAmount || null }}</p>
+          <p class="mt-2 mb-0">₹ {{ usedAmount || null }}</p>
         </div>
 
         <!-- Today's date -->
         <div class="col-2 text-end">
           <p class="mb-1"><b>Today's date</b></p>
-          <p>{{ formattedDate }}</p>
+          <p class="mt-2 mb-0">{{ formattedDate }}</p>
         </div>
 
       </div>
