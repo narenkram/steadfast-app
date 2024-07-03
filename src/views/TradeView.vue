@@ -88,22 +88,24 @@
         </small>
       </div>
     </div>
-    <div class="col-5">
+    <div class="col-4">
       <div class="Card">
-        <blockquote class="fs-3"
+        <blockquote class="fs-3 text-center"
           :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : 'text-dark'">
-          {{ totalCapitalPercentage.toFixed(2) }}% <small> on Total Capital</small>
+          {{ totalCapitalPercentage.toFixed(2) }}%
+          <br />
+          <small> on Total Capital</small>
         </blockquote>
         <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
-    <div class="col-2 d-flex justify-content-center align-items-center">
+    <div class="col-3 d-flex justify-content-center align-items-center">
       <div class="Card">
         <div class="card-title">
           <h5>Kill Switch</h5>
         </div>
         <button :class="killSwitchButtonClass" @click="toggleKillSwitch">
-          {{ killSwitchButtonText }}
+          {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
         </button>
       </div>
     </div>
@@ -657,6 +659,9 @@ const isFormDisabled = computed(() => killSwitchActive.value);
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
 const toggleKillSwitch = () => {
+  if (killSwitchActive.value) {
+    cycleClockEmoji();
+  }
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
 
   if (newStatus === 'DEACTIVATED') {
@@ -1513,6 +1518,29 @@ const setDefaultExpiry = () => {
   if (expiryDates.value.length > 0) {
     selectedExpiry.value = expiryDates.value[0];
   }
+};
+
+const clockEmojis = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚'];
+const currentClockEmoji = ref(clockEmojis[new Date().getHours() % clockEmojis.length]);
+
+const cycleClockEmoji = () => {
+  const currentHour = new Date().getHours();
+  let index = currentHour % clockEmojis.length;
+  let cycles = 0;
+
+  const interval = setInterval(() => {
+    currentClockEmoji.value = clockEmojis[index];
+    index = (index + 1) % clockEmojis.length;
+
+    if (index === currentHour % clockEmojis.length) {
+      cycles += 1;
+    }
+
+    if (cycles === 1 && index === currentHour % clockEmojis.length) { // Complete one full cycle
+      clearInterval(interval);
+      currentClockEmoji.value = clockEmojis[currentHour % clockEmojis.length]; // Ensure it ends at the current hour
+    }
+  }, 100); // Adjust the interval time for desired speed
 };
 
 // Lifecycle hooks
