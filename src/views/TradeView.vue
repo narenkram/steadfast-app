@@ -82,16 +82,25 @@
   <section class="row py-3">
     <div class="col-5">
       <div class="Card">
-        <blockquote class="fs-3">₹ {{ totalProfit.toFixed(2) }}</blockquote>
+        <blockquote class="fs-3"
+          :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : 'text-dark'">
+          ₹ {{ totalProfit.toFixed(2) }}
+        </blockquote>
         <small>
-          ₹ {{ netPnl.toFixed(2) }} Estimated Net PNL (after brokerage)
+          <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : 'text-dark'">
+            ₹ {{ netPnl.toFixed(2) }}
+          </span>
+          Estimated Net PNL (after brokerage)
         </small>
       </div>
     </div>
     <div class="col-5">
       <div class="Card">
-        <blockquote class="fs-3">{{ totalCapitalPercentage.toFixed(2) }}% <small> on Total Capital</small></blockquote>
-        <small>{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
+        <blockquote class="fs-3"
+          :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : 'text-dark'">
+          {{ totalCapitalPercentage.toFixed(2) }}% <small> on Total Capital</small>
+        </blockquote>
+        <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
     <div class="col-2 d-flex justify-content-center align-items-center">
@@ -390,7 +399,12 @@
           tabindex="0">
           <div class="row align-items-center">
             <div class="col-6 text-center py-2">
-              <p class="mb-0"><b>Net Qty: </b>{{ totalNetQty }}</p>
+              <p class="mb-0">
+                <b>Net Qty: </b>
+                <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : 'text-dark'">
+                  {{ totalNetQty }}
+                </span>
+              </p>
             </div>
             <div class="col-6 text-center py-2">
               <p class="mb-0"><b>MTM Trailing: </b></p>
@@ -415,7 +429,10 @@
                 <td>{{ dhanPosition.tradingSymbol }}</td>
                 <td>{{ dhanPosition.positionType }}</td>
                 <td>{{ dhanPosition.productType }}</td>
-                <td>{{ dhanPosition.netQty }}</td>
+                <td
+                  :class="dhanPosition.netQty > 0 ? 'text-success' : dhanPosition.netQty < 0 ? 'text-danger' : 'text-dark'">
+                  {{ dhanPosition.netQty }}
+                </td>
                 <td>{{ dhanPosition.buyAvg }}</td>
                 <td>{{ dhanPosition.sellAvg }}</td>
                 <td>{{ dhanPosition.realizedProfit }}</td>
@@ -447,7 +464,10 @@
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
                     <td>{{ flattradePosition.tsym }}</td>
-                    <td>{{ flattradePosition.netqty }}</td>
+                    <td
+                      :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                      {{ flattradePosition.netqty }}
+                    </td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td>{{ flattradePosition.lp }}</td>
@@ -1418,7 +1438,7 @@ const cancelPendingOrders = async () => {
 const availableBalance = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return fundLimits.value.availabelBalance; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
-  } 
+  }
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return Math.floor(fundLimits.value.cash - fundLimits.value.marginused);
   }
