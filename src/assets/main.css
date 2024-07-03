@@ -7,18 +7,6 @@
     color: #000000;
     background-color: #ffffff;
   }
-
-  small {
-    color: rgb(29, 29, 29);
-  }
-
-  .feed-list a {
-    color: inherit !important;
-  }
-
-  .nav-link {
-    color: #000000 !important;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,18 +15,6 @@
   body {
     color: #ffffff;
     background-color: #000000;
-  }
-
-  small {
-    color: #fff;
-  }
-
-  .feed-list a {
-    color: #ffffff !important;
-  }
-
-  .nav-link {
-    color: #ffffff !important;
   }
 }
 
@@ -160,4 +136,8 @@ th {
 .disabled-form {
   cursor: not-allowed;
   pointer-events: all;
+}
+
+.nav-link {
+  color: unset !important;
 }

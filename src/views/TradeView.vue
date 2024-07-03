@@ -90,9 +90,11 @@
     </div>
     <div class="col-4">
       <div class="Card">
-        <blockquote class="fs-3 text-center m-0"
-          :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : 'text-dark'">
-          {{ totalCapitalPercentage.toFixed(2) }}%
+        <blockquote class="fs-3 text-center m-0">
+          <span
+            :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : 'text-dark'">
+            {{ totalCapitalPercentage.toFixed(2) }}%
+          </span>
           <br />
           <small> on Total Capital</small>
         </blockquote>
