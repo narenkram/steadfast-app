@@ -410,8 +410,8 @@
             </tbody>
           </table>
           <!-- Flattrade Positions -->
-          <div v-if="activeFetchFunction === 'fetchFlattradePositions' && flatTradePositionBook.length">
-            <table class="table table-hover" v-if="flatTradePositionBook.length">
+          <div v-if="activeFetchFunction === 'fetchFlattradePositions'">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
@@ -426,20 +426,22 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
-                  <td>{{ flattradePosition.tsym }}</td>
-                  <td>{{ flattradePosition.netqty }}</td>
-                  <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
-                  <td>{{ flattradePosition.prd }}</td>
-                  <td>{{ flattradePosition.lp }}</td>
-                  <td>{{ flattradePosition.cfbuyavgprc }}</td>
-                  <td>{{ flattradePosition.cfsellavgprc }}</td>
-                  <td>{{ flattradePosition.rpnl }}</td>
-                  <td>{{ flattradePosition.urmtom }}</td>
-                </tr>
-                <tr v-if="flatTradePositionBook.length === 0">
-                  <td colspan="5" class="text-center">No positions on selected broker {{ selectedBroker.brokerName
-                    }}</td>
+                <template v-if="flatTradePositionBook.length">
+                  <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
+                    <td>{{ flattradePosition.tsym }}</td>
+                    <td>{{ flattradePosition.netqty }}</td>
+                    <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
+                    <td>{{ flattradePosition.prd }}</td>
+                    <td>{{ flattradePosition.lp }}</td>
+                    <td>{{ flattradePosition.cfbuyavgprc }}</td>
+                    <td>{{ flattradePosition.cfsellavgprc }}</td>
+                    <td>{{ flattradePosition.rpnl }}</td>
+                    <td>{{ flattradePosition.urmtom }}</td>
+                  </tr>
+                </template>
+                <tr v-else>
+                  <td colspan="9" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -468,14 +470,14 @@
                 <td>{{ dhanOrder.orderStatus }}</td>
               </tr>
               <tr v-if="dhanOrders.length === 0">
-                <td colspan="5" class="text-center">No orders or trades on selected broker {{
+                <td colspan="6" class="text-center">No orders or trades on selected broker {{
                   selectedBroker.brokerName }}</td>
               </tr>
             </tbody>
           </table>
           <!-- Flattrade Trades -->
           <div v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
-            <table class="table table-hover" v-if="flatOrderBook.length || flatTradeBook.length">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col">Type</th>
@@ -490,31 +492,37 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="order in flatOrderBook" :key="order.norenordno">
-                  <td>Order</td>
-                  <td>{{ order.norenordno }}</td>
-                  <td>N/A</td>
-                  <td>{{ order.tsym }}</td>
-                  <td>{{ order.qty }}</td>
-                  <td>{{ order.prc }}</td>
-                  <td>{{ order.norentm }}</td>
-                  <td>{{ order.status }}</td>
-                  <td>{{ order.rejreason }}</td>
-                </tr>
-                <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
-                  <td>Trade</td>
-                  <td>{{ trade.norenordno }}</td>
-                  <td>{{ trade.norenordno }}</td>
-                  <td>{{ trade.tsym }}</td>
-                  <td>{{ trade.qty }}</td>
-                  <td>{{ trade.flprc }}</td>
-                  <td>{{ trade.norentm }}</td>
-                  <td>{{ trade.stat }}</td>
-                  <td>N/A</td>
+                <template v-if="flatOrderBook.length || flatTradeBook.length">
+                  <tr v-for="order in flatOrderBook" :key="order.norenordno">
+                    <td>Order</td>
+                    <td>{{ order.norenordno }}</td>
+                    <td>N/A</td>
+                    <td>{{ order.tsym }}</td>
+                    <td>{{ order.qty }}</td>
+                    <td>{{ order.prc }}</td>
+                    <td>{{ order.norentm }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.rejreason }}</td>
+                  </tr>
+                  <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
+                    <td>Trade</td>
+                    <td>{{ trade.norenordno }}</td>
+                    <td>{{ trade.norenordno }}</td>
+                    <td>{{ trade.tsym }}</td>
+                    <td>{{ trade.qty }}</td>
+                    <td>{{ trade.flprc }}</td>
+                    <td>{{ trade.norentm }}</td>
+                    <td>{{ trade.stat }}</td>
+                    <td>N/A</td>
+                  </tr>
+                </template>
+                <tr v-else>
+                  <td colspan="9" class="text-center">No orders or trades on selected broker {{
+                    selectedBroker.brokerName }}
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div v-else class="text-center">No orders or trades on selected broker {{ selectedBroker.brokerName }}</div>
           </div>
         </div>
         <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
@@ -951,19 +959,20 @@ const fetchFlattradePositions = async () => {
     if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
       flatTradePositionBook.value = positionBookRes.data;
       console.log('Flattrade Position Book:', positionBookRes.data);
+    } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
+      // Handle "no data" case
+      flatTradePositionBook.value = [];
+      console.log('No positions in Flattrade Position Book');
     } else {
       const errorMsg = positionBookRes.data.emsg || 'Unknown error';
-      toastMessage.value = `Error fetching position book: ${errorMsg}`;
-      showToast.value = true;
       console.error('Error fetching position book:', errorMsg);
+      flatTradePositionBook.value = []; // Set to empty array on error
     }
   } catch (error) {
-    toastMessage.value = 'Error fetching position book: ' + error.message;
-    showToast.value = true;
     console.error('Error fetching position book:', error);
+    flatTradePositionBook.value = []; // Set to empty array on error
   }
 };
-
 const fundLimits = ref({});
 const fetchFundLimit = async () => {
   try {
