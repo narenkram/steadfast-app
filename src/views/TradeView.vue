@@ -231,137 +231,131 @@
           </div>
         </div>
 
-        <!-- Trading Symbols & Buy/Sell Buttons -->
-        <div class="row mt-2">
-          <div class="row align-items-center justify-content-between">
-            <!-- Call Strike Selection -->
-            <div class="col-3">
-              <label for="CallStrike" class="form-label mb-0">Call Strike</label>
-              <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
-                <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-                  {{ strike.strikePrice }}
-                </option>
-              </select>
-              <div>
-                Security ID: {{ defaultCallSecurityId }}
-              </div>
-              <div>
-                {{ selectedCallStrike.tradingSymbol }}
-              </div>
+        <!-- Trading Symbols & Strikes -->
+        <div class="row align-items-center justify-content-between">
+          <!-- Call Strike Selection -->
+          <div class="col-3">
+            <label for="CallStrike" class="form-label mb-0">Call Strike</label>
+            <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike">
+              <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
+                {{ strike.strikePrice }}
+              </option>
+            </select>
+            <div>
+              Security ID: {{ defaultCallSecurityId }}
             </div>
-
-            <!-- Live Underlying Price -->
-            <div class="col-6 text-center">
-              <p class="mb-0">Nifty Bank</p>
-              <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-            </div>
-
-            <!-- Put Strike Selection -->
-            <div class="col-3">
-              <label for="PutStrike" class="form-label mb-0">Put Strike</label>
-              <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
-                <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-                  {{ strike.strikePrice }}
-                </option>
-              </select>
-              <div>
-                Security ID: {{ defaultPutSecurityId }}
-              </div>
-              <div>
-                {{ selectedPutStrike.tradingSymbol }}
-              </div>
+            <div>
+              {{ selectedCallStrike.tradingSymbol }}
             </div>
           </div>
 
-          <div class="row">
-            <!-- Call Strike Buy/Sell Buttons -->
-            <div class="col-3">
-              <div class="btn-group w-100">
-                <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-                  @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
-                  v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                  <span v-if="enableHotKeys">⬆️</span>
-                  Buy CE
-                </button>
-                <button type="button"
-                  class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-                  data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
-                  <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
-                      data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-                </ul>
-              </div>
-              <div class="btn-group w-100">
-                <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-                  @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
-                  v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                  <span v-if="enableHotKeys">⬅️</span>
-                  Sell CE
-                </button>
-                <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
-                  data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-                  <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
-                      data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-                </ul>
-              </div>
-            </div>
+          <!-- Live Underlying Price -->
+          <div class="col-6 text-center">
+            <p class="mb-0">Nifty Bank</p>
+            <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+          </div>
 
-            <!-- Close & Cancel Buttons -->
-            <div class="col-6 text-center">
-              <button class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
-                <span v-if="enableHotKeys">F6 / </span>
-                Close Positions
-              </button>
-              <button class="btn btn-lg btn-outline-dark fs-5 w-75" @click="cancelPendingOrders">
-                <span v-if="enableHotKeys">F7 / </span>
-                Cancel Orders
-              </button>
+          <!-- Put Strike Selection -->
+          <div class="col-3">
+            <label for="PutStrike" class="form-label mb-0">Put Strike</label>
+            <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike">
+              <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
+                {{ strike.strikePrice }}
+              </option>
+            </select>
+            <div>
+              Security ID: {{ defaultPutSecurityId }}
             </div>
+            <div>
+              {{ selectedPutStrike.tradingSymbol }}
+            </div>
+          </div>
+        </div>
 
-            <!-- Put Strike Buy/Sell Buttons -->
-            <div class="col-3">
-              <div class="btn-group w-100">
-                <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-                  @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
-                  v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                  <span v-if="enableHotKeys">⬇️</span>
-                  Buy PE
-                </button>
-                <button type="button"
-                  class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
-                  data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
-                  <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
-                      data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-                </ul>
-              </div>
-              <div class="btn-group w-100">
-                <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-                  @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
-                  v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
-                  <span v-if="enableHotKeys">➡️</span>
-                  Sell PE
-                </button>
-                <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
-                  data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
-                  <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
-                      data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
-                </ul>
-              </div>
+        <div class="row">
+          <!-- Call Strike Buy/Sell Buttons -->
+          <div class="col-3">
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableHotKeys">⬆️</span>
+                Buy CE
+              </button>
+              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableHotKeys">⬅️</span>
+                Sell CE
+              </button>
+              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
             </div>
           </div>
 
+          <!-- Close & Cancel Buttons -->
+          <div class="col-6 text-center">
+            <button class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
+              <span v-if="enableHotKeys">F6 / </span>
+              Close Positions
+            </button>
+            <button class="btn btn-lg btn-outline-dark fs-5 w-75" @click="cancelPendingOrders">
+              <span v-if="enableHotKeys">F7 / </span>
+              Cancel Orders
+            </button>
+          </div>
 
+          <!-- Put Strike Buy/Sell Buttons -->
+          <div class="col-3">
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableHotKeys">⬇️</span>
+                Buy PE
+              </button>
+              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+            <div class="btn-group w-100">
+              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                <span v-if="enableHotKeys">➡️</span>
+                Sell PE
+              </button>
+              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </fieldset>
     </form>
