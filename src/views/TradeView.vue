@@ -1505,15 +1505,34 @@ onBeforeUnmount(() => {
 });
 
 // Watchers
-watch(selectedBroker, (newBroker) => {
+watch(selectedBroker, async (newBroker) => {
   if (newBroker) {
     selectedOrderType.value = orderTypes.value[0];
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = getProductTypeValue(productTypes.value[1]); // Default to 'Margin' or 'M'
-    fetchFundLimit();
+    await fetchFundLimit();
     updateExchangeSymbols();
     setDefaultExchangeAndMasterSymbol();
-    fetchTradingData();
+    await fetchTradingData();
+
+    // Update the table based on the active tab
+    if (activeTab.value === 'positions') {
+      if (newBroker.brokerName === 'Flattrade') {
+        activeFetchFunction.value = 'fetchFlattradePositions';
+        await fetchFlattradePositions();
+      } else {
+        activeFetchFunction.value = 'fetchDhanPositions';
+        await fetchDhanPositions();
+      }
+    } else if (activeTab.value === 'trades') {
+      if (newBroker.brokerName === 'Flattrade') {
+        activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
+        await fetchFlattradeOrdersTradesBook();
+      } else {
+        activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
+        await fetchDhanOrdersTradesBook();
+      }
+    }
   }
 });
 
