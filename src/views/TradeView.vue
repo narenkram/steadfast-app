@@ -225,14 +225,14 @@
               <input type="number" class="form-control" aria-label="Target" value="75">
             </div>
           </div>
-          <!-- 1 Click Arrow Keys -->
+          <!-- 1 Click Keys -->
           <div class="col-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
                 <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys">
                 <span class="ToggleSlider SliderRound"></span>
               </label>
-              <label class="ToggleLabel" for="enableHotKeys"><b> 1 Click <br /> Arrow Keys</b></label>
+              <label class="ToggleLabel" for="enableHotKeys"><b> 1 Click <br /> Keys ⌨️</b></label>
             </div>
           </div>
         </div>
@@ -654,6 +654,7 @@ const setActiveTab = (tab) => {
 // Kill Switch - Client Side
 const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
 const isFormDisabled = computed(() => killSwitchActive.value);
+const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
 const toggleKillSwitch = () => {
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
@@ -676,6 +677,7 @@ const toggleKillSwitch = () => {
     killSwitchActive.value = true;
     localStorage.setItem('KillSwitchStatus', 'true');
     localStorage.setItem('KillSwitchActivationTime', new Date().getTime());
+    enableHotKeys.value = false;
   } else if (newStatus === 'DEACTIVATED') {
     toastMessage.value = 'Kill Switch deactivated successfully';
     killSwitchActive.value = false;
@@ -875,7 +877,6 @@ const updateAvailableQuantities = () => {
   }
 };
 
-const enableHotKeys = ref(true);
 const handleHotKeys = (event) => {
   if (!enableHotKeys.value) return;
 
@@ -1543,6 +1544,7 @@ onMounted(async () => {
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
   }
+  enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 });
 
 onBeforeUnmount(() => {
@@ -1654,4 +1656,8 @@ watch(activeTab, () => {
   }
 });
 
+// Watcher to update localStorage when enableHotKeys changes
+watch(enableHotKeys, (newValue) => {
+  localStorage.setItem('EnableHotKeys', newValue.toString());
+});
 </script>

@@ -122,6 +122,10 @@ input:focus {
   transform: translateX(26px);
 }
 
+.ToggleInput:disabled+.ToggleSlider {
+  background-color: #e9ecef;
+}
+
 /* Rounded ToggleSliders */
 .ToggleSlider.SliderRound {
   border-radius: 34px;
