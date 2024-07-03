@@ -748,11 +748,6 @@ const fetchTradingData = async () => {
     .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
     .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
 
-  // Only set selectedExpiry if it is not already defined
-  if (!selectedExpiry.value && expiryDates.value.length > 0) {
-    selectedExpiry.value = expiryDates.value[0];
-  }
-
   updateStrikesForExpiry(selectedExpiry.value);
 };
 
@@ -1487,13 +1482,20 @@ const totalBrokerage = computed(() => {
 
 const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 
+const setDefaultExpiry = () => {
+  if (expiryDates.value.length > 0) {
+    selectedExpiry.value = expiryDates.value[0];
+  }
+};
+
 // Lifecycle hooks
 onMounted(async () => {
   await fetchBrokers()
     .then(() => updateExchangeSymbols())
     .then(() => setDefaultExchangeAndMasterSymbol())
     .then(() => fetchTradingData())
-    .then(() => updateAvailableQuantities());
+    .then(() => updateAvailableQuantities())
+    .then(() => setDefaultExpiry());
 
   window.addEventListener('keydown', handleHotKeys);
 
@@ -1532,6 +1534,7 @@ watch(selectedBroker, async (newBroker) => {
     updateExchangeSymbols();
     setDefaultExchangeAndMasterSymbol();
     await fetchTradingData();
+    setDefaultExpiry();
 
     // Update the table based on the active tab
     if (activeTab.value === 'positions') {
@@ -1574,8 +1577,11 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
   }
 });
 
-watch(selectedMasterSymbol, () => {
+watch(selectedMasterSymbol, async () => {
+  console.log('selectedMasterSymbol changed:', selectedMasterSymbol.value);
   updateAvailableQuantities();
+  await fetchTradingData(); // Ensure trading data is fetched before setting expiry
+  setDefaultExpiry();
 });
 
 // Watch productTypes to set the default selectedProductType
