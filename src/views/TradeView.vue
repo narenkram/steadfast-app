@@ -660,11 +660,17 @@ const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true'
 const isFormDisabled = computed(() => killSwitchActive.value);
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
-const toggleKillSwitch = () => {
-  if (killSwitchActive.value) {
+const toggleKillSwitch = async () => {
+  const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
+
+  if (newStatus === 'ACTIVATED') {
+    await closeAllPositions(); // Wait for closeAllPositions to complete
+
+    // Add a small delay to ensure the toast message is displayed
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     cycleClockEmoji();
   }
-  const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
 
   if (newStatus === 'DEACTIVATED') {
     const activationTime = localStorage.getItem('KillSwitchActivationTime');
