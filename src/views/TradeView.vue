@@ -4,15 +4,6 @@
     <div class="col-12">
 
       <div class="row">
-        <!-- Brokers Page -->
-        <div class="col-1">
-          <div class="d-flex align-items-center justify-content-start h-100">
-            <RouterLink class="fs-2 text-decoration-none" to="/manage-brokers">
-              <span>⚙️</span>
-            </RouterLink>
-          </div>
-        </div>
-
 
         <!-- Change Broker -->
         <div class="col-2">
@@ -27,11 +18,14 @@
         </div>
 
         <!-- Broker Name and Status with Broker ID -->
-        <div class="col-2">
+        <div class="col-3 text-center">
           <p class="mb-1"><b>Broker</b> <span
               :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected' }">{{
                 brokerStatus }}</span></p>
           <p class="mb-0">
+            <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
+              <span>⚙️</span>
+            </RouterLink>
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
               {{ selectedBroker?.brokerClientId || 'N/A' }}
               <span>👀</span>
