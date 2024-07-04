@@ -266,9 +266,8 @@
 
           <!-- Live Underlying Price -->
           <div class="col-6 text-center">
-            <p class="mb-0">Nifty Bank</p>
-            <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
-            <p>Last Price: {{ lastPrice }}</p>
+            <p class="mb-0">Nifty 50</p>
+            <p class="mb-0">Last Price: <b>{{ lastPrice }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
