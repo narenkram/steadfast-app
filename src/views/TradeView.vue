@@ -410,14 +410,20 @@
           <div class="row align-items-center">
             <div class="col-6 text-center py-2">
               <p class="mb-0">
-                <b>Net Qty: </b>
-                <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : 'text-dark'">
-                  {{ totalNetQty }}
-                </span>
+                <b>Net Qty:
+                  <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : 'text-dark'">
+                    {{ totalNetQty }}
+                  </span>
+                </b>
               </p>
             </div>
             <div class="col-6 text-center py-2">
-              <p class="mb-0"><b>MTM Trailing: </b></p>
+              <p class="mb-0">
+                <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
+                <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
+              </p>
+              <p class="mb-0">
+              </p>
             </div>
           </div>
           <!-- Dhan Positions -->
@@ -467,8 +473,8 @@
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
-                  <th scope="col">Buy Avg</th>
-                  <th scope="col">Sell Avg</th>
+                  <th scope="col">Buy Value</th>
+                  <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
                 </tr>
@@ -484,8 +490,8 @@
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td>{{ flattradePosition.lp }}</td>
-                    <td>{{ flattradePosition.cfbuyavgprc }}</td>
-                    <td>{{ flattradePosition.cfsellavgprc }}</td>
+                    <td>{{ flattradePosition.daybuyamt }}</td>
+                    <td>{{ flattradePosition.daysellamt }}</td>
                     <td
                       :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : 'text-dark'">
                       {{ flattradePosition.rpnl }}
@@ -1654,6 +1660,19 @@ const unsubscribeAndSubscribe = (oldCallId, oldPutId, newCallId, newPutId) => {
   }
 };
 
+const totalBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+
+const totalSellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
 
 // Lifecycle hooks
 onMounted(async () => {
