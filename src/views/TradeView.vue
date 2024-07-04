@@ -268,6 +268,7 @@
           <div class="col-6 text-center">
             <p class="mb-0">Nifty Bank</p>
             <p class="mb-0"><b>51700 <span class="text-success">(152/0.8%)</span></b></p>
+            <p>Last Price: {{ lastPrice }}</p>
           </div>
 
           <!-- Put Strike Selection -->
@@ -1551,6 +1552,10 @@ const cycleClockEmoji = () => {
   }, 100); // Adjust the interval time for desired speed
 };
 
+const latestQuote = ref('No quote data yet');
+const lastPrice = ref('N/A');
+let socket;
+
 // Lifecycle hooks
 onMounted(async () => {
   await fetchBrokers()
@@ -1581,10 +1586,25 @@ onMounted(async () => {
     }
   }
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
+
+  socket = new WebSocket('ws://localhost:8765');
+
+  socket.onmessage = (event) => {
+    const quoteData = JSON.parse(event.data);
+    if (quoteData.lp) {
+      lastPrice.value = quoteData.lp;
+    }
+  };
+  socket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleHotKeys);
+  if (socket) {
+    socket.close();
+  }
 });
 
 // Watchers
