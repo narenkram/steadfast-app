@@ -722,12 +722,15 @@ const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-s
 // Fetch brokers and set selectedBroker
 const brokers = ref([]);
 const selectedBroker = ref(null);
+// Function to set selected broker and save to localStorage
+const setSelectedBroker = (broker) => {
+  localStorage.setItem('selectedBroker', JSON.stringify(broker));
+};
 const fetchBrokers = async () => {
   try {
     const response = await axios.get('http://localhost:3000/brokers');
     brokers.value = response.data;
     if (brokers.value.length > 0) {
-      selectedBroker.value = brokers.value[1];
       fetchFundLimit(); // Fetch fund limits after setting the selected broker
     }
   } catch (error) {
@@ -1583,14 +1586,14 @@ const setFlattradeCredentials = async () => {
 watch([
   () => defaultCallSecurityId.value,
   () => defaultPutSecurityId.value
-], 
-([newCallId, newPutId], [oldCallId, oldPutId]) => {
-  if (newCallId !== oldCallId || newPutId !== oldPutId) {
-    unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
-    setFlattradeCredentials();
-  }
-}, 
-{ deep: true }
+],
+  ([newCallId, newPutId], [oldCallId, oldPutId]) => {
+    if (newCallId !== oldCallId || newPutId !== oldPutId) {
+      unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
+      setFlattradeCredentials();
+    }
+  },
+  { deep: true }
 );
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
@@ -1655,6 +1658,16 @@ const unsubscribeAndSubscribe = (oldCallId, oldPutId, newCallId, newPutId) => {
 // Lifecycle hooks
 onMounted(async () => {
   await fetchBrokers()
+    .then(() => {
+      // Retrieve selected broker from localStorage
+      const storedBroker = localStorage.getItem('selectedBroker');
+      if (storedBroker) {
+        selectedBroker.value = JSON.parse(storedBroker);
+      } else if (brokers.value.length > 0) {
+        toastMessage.value = 'Select a broker to trade';
+        showToast.value = true;
+      }
+    })
     .then(() => updateExchangeSymbols())
     .then(() => setDefaultExchangeAndMasterSymbol())
     .then(() => fetchTradingData())
@@ -1696,6 +1709,7 @@ onBeforeUnmount(() => {
 // Watchers
 watch(selectedBroker, async (newBroker) => {
   if (newBroker) {
+    setSelectedBroker(newBroker); // Save to localStorage
     selectedOrderType.value = orderTypes.value[0];
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = getProductTypeValue(productTypes.value[1]); // Default to 'Margin' or 'M'
