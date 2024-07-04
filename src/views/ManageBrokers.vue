@@ -99,6 +99,7 @@ watch(reqCode, (newCode) => {
 watch(FLATTRADE_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
+    sendCredentialsToBackend();
   } else {
     localStorage.removeItem('FLATTRADE_API_TOKEN');
   }
@@ -272,6 +273,21 @@ const flattradeFundLimits = async () => {
     console.error('Error fetching fund limits:', error);
   }
 };
+
+const sendCredentialsToBackend = async () => {
+  try {
+    const credentials = {
+      usersession: FLATTRADE_API_TOKEN.value,
+      userid: FLATTRADE_CLIENT_ID.value
+    };
+
+    await axios.post('http://localhost:3000/api/set-flattrade-credentials', credentials);
+    console.log('Credentials sent to backend successfully');
+  } catch (error) {
+    console.error('Failed to send credentials to backend:', error);
+  }
+};
+
 </script>
 
 <template>

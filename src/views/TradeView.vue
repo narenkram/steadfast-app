@@ -1585,7 +1585,6 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleHotKeys);
-
 });
 
 // Watchers
