@@ -445,7 +445,10 @@
                 </td>
                 <td>{{ dhanPosition.buyAvg }}</td>
                 <td>{{ dhanPosition.sellAvg }}</td>
-                <td>{{ dhanPosition.realizedProfit }}</td>
+                <td
+                  :class="dhanPosition.realizedProfit > 0 ? 'text-success' : dhanPosition.realizedProfit < 0 ? 'text-danger' : 'text-dark'">
+                  {{ dhanPosition.realizedProfit }}
+                </td>
                 <td>{{ dhanPosition.unrealizedProfit }}</td>
               </tr>
               <tr v-if="dhanPositionBook.length === 0">
@@ -483,8 +486,14 @@
                     <td>{{ flattradePosition.lp }}</td>
                     <td>{{ flattradePosition.cfbuyavgprc }}</td>
                     <td>{{ flattradePosition.cfsellavgprc }}</td>
-                    <td>{{ flattradePosition.rpnl }}</td>
-                    <td>{{ flattradePosition.urmtom }}</td>
+                    <td
+                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : 'text-dark'">
+                      {{ flattradePosition.rpnl }}
+                    </td>
+                    <td
+                      :class="flattradePosition.urmtom > 0 ? 'text-success' : flattradePosition.urmtom < 0 ? 'text-danger' : 'text-dark'">
+                      {{ flattradePosition.urmtom }}
+                    </td>
                   </tr>
                 </template>
                 <tr v-else>
