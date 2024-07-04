@@ -1575,26 +1575,22 @@ const setFlattradeCredentials = async () => {
       defaultPutSecurityId: defaultPutSecurityId.value
     });
     console.log('Credentials and security IDs set successfully:', response.data);
-
-    // After setting the credentials, send the updated data to the WebSocket
     sendWebSocketData();
   } catch (error) {
     console.error('Error setting credentials and security IDs:', error);
   }
 };
 watch([
-  () => localStorage.getItem('FLATTRADE_API_TOKEN'),
-  () => localStorage.getItem('FLATTRADE_CLIENT_ID'),
   () => defaultCallSecurityId.value,
   () => defaultPutSecurityId.value
-],
-  (newValues, oldValues) => {
-    // Check if any of the values have changed
-    if (newValues.some((value, index) => value !== oldValues[index])) {
-      setFlattradeCredentials();
-    }
-  },
-  { deep: true, immediate: true }
+], 
+([newCallId, newPutId], [oldCallId, oldPutId]) => {
+  if (newCallId !== oldCallId || newPutId !== oldPutId) {
+    unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
+    setFlattradeCredentials();
+  }
+}, 
+{ deep: true }
 );
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
@@ -1636,6 +1632,22 @@ const sendWebSocketData = () => {
       defaultPutSecurityId: defaultPutSecurityId.value
     };
     socket.send(JSON.stringify(data));
+  }
+};
+
+const unsubscribeAndSubscribe = (oldCallId, oldPutId, newCallId, newPutId) => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    const unsubscribeData = {
+      action: 'unsubscribe',
+      symbols: [`NFO|${oldCallId}`, `NFO|${oldPutId}`].filter(Boolean)
+    };
+    socket.send(JSON.stringify(unsubscribeData));
+
+    const subscribeData = {
+      action: 'subscribe',
+      symbols: [`NFO|${newCallId}`, `NFO|${newPutId}`].filter(Boolean)
+    };
+    socket.send(JSON.stringify(subscribeData));
   }
 };
 
