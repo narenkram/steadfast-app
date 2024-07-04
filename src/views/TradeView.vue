@@ -262,6 +262,9 @@
             <div>
               {{ selectedCallStrike.tradingSymbol }}
             </div>
+            <div>
+              {{ latestCallLTP }}
+            </div>
           </div>
 
           <!-- Live Underlying Price -->
@@ -284,6 +287,9 @@
             </div>
             <div>
               {{ selectedPutStrike.tradingSymbol }}
+            </div>
+            <div>
+              {{ latestPutLTP }}
             </div>
           </div>
         </div>
@@ -1551,9 +1557,79 @@ const cycleClockEmoji = () => {
   }, 100); // Adjust the interval time for desired speed
 };
 
-const latestQuote = ref('No quote data yet');
+const setFlattradeCredentials = async () => {
+  try {
+    const response = await axios.post('http://localhost:3000/api/set-flattrade-credentials', {
+      usersession: localStorage.getItem('FLATTRADE_API_TOKEN'),
+      userid: localStorage.getItem('FLATTRADE_CLIENT_ID'),
+      defaultCallSecurityId: defaultCallSecurityId.value,
+      defaultPutSecurityId: defaultPutSecurityId.value
+    });
+    console.log('Credentials and security IDs set successfully:', response.data);
+
+    // After setting the credentials, send the updated data to the WebSocket
+    sendWebSocketData();
+  } catch (error) {
+    console.error('Error setting credentials and security IDs:', error);
+  }
+};
+watch([
+  () => localStorage.getItem('FLATTRADE_API_TOKEN'),
+  () => localStorage.getItem('FLATTRADE_CLIENT_ID'),
+  () => defaultCallSecurityId.value,
+  () => defaultPutSecurityId.value
+],
+  (newValues, oldValues) => {
+    // Check if any of the values have changed
+    if (newValues.some((value, index) => value !== oldValues[index])) {
+      setFlattradeCredentials();
+    }
+  },
+  { deep: true, immediate: true }
+);
+const latestCallLTP = ref('N/A');
+const latestPutLTP = ref('N/A');
 const lastPrice = ref('N/A');
 let socket;
+
+const connectWebSocket = () => {
+  socket = new WebSocket('ws://localhost:8765');
+
+  socket.onmessage = (event) => {
+    const quoteData = JSON.parse(event.data);
+    if (quoteData.lp) {
+      if (quoteData.tk === '26000') {
+        lastPrice.value = quoteData.lp;
+      } else if (quoteData.tk === defaultCallSecurityId.value) {
+        latestCallLTP.value = quoteData.lp;
+      } else if (quoteData.tk === defaultPutSecurityId.value) {
+        latestPutLTP.value = quoteData.lp;
+      }
+    }
+  };
+
+  socket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+  };
+
+  socket.onopen = () => {
+    console.log('WebSocket connected');
+    sendWebSocketData();
+  };
+};
+
+const sendWebSocketData = () => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    const data = {
+      usersession: localStorage.getItem('FLATTRADE_API_TOKEN'),
+      userid: localStorage.getItem('FLATTRADE_CLIENT_ID'),
+      defaultCallSecurityId: defaultCallSecurityId.value,
+      defaultPutSecurityId: defaultPutSecurityId.value
+    };
+    socket.send(JSON.stringify(data));
+  }
+};
+
 
 // Lifecycle hooks
 onMounted(async () => {
@@ -1586,17 +1662,7 @@ onMounted(async () => {
   }
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
-  socket = new WebSocket('ws://localhost:8765');
-
-  socket.onmessage = (event) => {
-    const quoteData = JSON.parse(event.data);
-    if (quoteData.lp) {
-      lastPrice.value = quoteData.lp;
-    }
-  };
-  socket.onerror = (error) => {
-    console.error('WebSocket Error:', error);
-  };
+  connectWebSocket();
 });
 
 onBeforeUnmount(() => {
@@ -1657,6 +1723,11 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
   if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
     updateSecurityIds();
   }
+});
+
+// Add watchers for defaultCallSecurityId and defaultPutSecurityId
+watch([defaultCallSecurityId, defaultPutSecurityId], () => {
+  sendWebSocketData();
 });
 
 watch(selectedMasterSymbol, async () => {
