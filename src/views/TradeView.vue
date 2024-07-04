@@ -434,8 +434,8 @@
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
                 <th scope="col">Net Qty</th>
-                <th scope="col">Buy Avg</th>
-                <th scope="col">Sell Avg</th>
+                <th scope="col">Buy Value</th>
+                <th scope="col">Sell Value</th>
                 <th scope="col">Realized Profit</th>
                 <th scope="col">Unrealized Profit</th>
               </tr>
@@ -449,8 +449,8 @@
                   :class="dhanPosition.netQty > 0 ? 'text-success' : dhanPosition.netQty < 0 ? 'text-danger' : 'text-dark'">
                   {{ dhanPosition.netQty }}
                 </td>
-                <td>{{ dhanPosition.buyAvg }}</td>
-                <td>{{ dhanPosition.sellAvg }}</td>
+                <td>{{ dhanPosition.dayBuyValue }}</td>
+                <td>{{ dhanPosition.daySellValue }}</td>
                 <td
                   :class="dhanPosition.realizedProfit > 0 ? 'text-success' : dhanPosition.realizedProfit < 0 ? 'text-danger' : 'text-dark'">
                   {{ dhanPosition.realizedProfit }}
@@ -1664,12 +1664,18 @@ const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
   }
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return dhanPositionBook.value.reduce((total, position) => total + position.dayBuyValue, 0);
+  }
   return 0;
 });
 
 const totalSellValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return dhanPositionBook.value.reduce((total, position) => total + position.daySellValue, 0);
   }
   return 0;
 });
