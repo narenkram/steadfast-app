@@ -602,7 +602,8 @@
                   <h5>Smart Automations for Risk Management.</h5>
                   <li>if deployment value higher than 25% of total capital, positions will be force closed.</li>
                   <li>if loss higher than 3% of total capital, activates kill switch to halt trading.</li>
-                  <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value</li>
+                  <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value
+                  </li>
                 </small>
               </p>
             </div>
@@ -1608,18 +1609,7 @@ const setFlattradeCredentials = async () => {
     console.error('Error setting credentials and security IDs:', error);
   }
 };
-watch([
-  () => defaultCallSecurityId.value,
-  () => defaultPutSecurityId.value
-],
-  ([newCallId, newPutId], [oldCallId, oldPutId]) => {
-    if (newCallId !== oldCallId || newPutId !== oldPutId) {
-      unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
-      setFlattradeCredentials();
-    }
-  },
-  { deep: true }
-);
+
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
 const lastPrice = ref('N/A');
@@ -1794,10 +1784,22 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
   }
 });
 
-// Add watchers for defaultCallSecurityId and defaultPutSecurityId
-watch([defaultCallSecurityId, defaultPutSecurityId], () => {
-  sendWebSocketData();
-});
+// Watchers for defaultCallSecurityId and defaultPutSecurityId
+// This watcher handles unsubscribing and subscribing to new security IDs,
+// setting Flattrade credentials, and sending WebSocket data when either ID changes.
+watch([
+  () => defaultCallSecurityId.value,
+  () => defaultPutSecurityId.value
+],
+  ([newCallId, newPutId], [oldCallId, oldPutId]) => {
+    if (newCallId !== oldCallId || newPutId !== oldPutId) {
+      unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
+      setFlattradeCredentials();
+    }
+    sendWebSocketData();
+  },
+  { deep: true }
+);
 
 watch(selectedMasterSymbol, async () => {
   console.log('selectedMasterSymbol changed:', selectedMasterSymbol.value);
