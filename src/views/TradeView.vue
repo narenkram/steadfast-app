@@ -390,18 +390,21 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
             type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
-            @click="setActiveTab('positions')">💸
-            Positions</button>
+            @click="setActiveTab('positions')">
+            💸 Positions
+          </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
-            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="setActiveTab('trades')">📄
-            Trades</button>
+            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="setActiveTab('trades')">
+            📄 Trades
+          </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="ai-automation-tab" data-bs-toggle="tab" data-bs-target="#ai-automation-tab-pane"
-            type="button" role="tab" aria-controls="ai-automation-tab-pane" aria-selected="false">🤖 AI
-            Automation</button>
+          <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation-tab-pane"
+            type="button" role="tab" aria-controls="automation-tab-pane" aria-selected="false">
+            🤖 Automations
+          </button>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -588,14 +591,19 @@
             </table>
           </div>
         </div>
-        <div class="tab-pane fade" id="ai-automation-tab-pane" role="tabpanel" aria-labelledby="ai-automation-tab"
+        <div class="tab-pane fade" id="automation-tab-pane" role="tabpanel" aria-labelledby="automation-tab"
           tabindex="0">
 
           <div class="card text-center py-3">
-            <div class="card-body text-danger">
+            <div class="card-body text-start">
               <p class="fs-5">
-                AI Automation
-                <small>To be determined</small>
+                <span class="text-danger">Coming Soon</span>
+                <small class="text-secondary">
+                  <h5>Smart Automations for Risk Management.</h5>
+                  <li>if deployment value higher than 25% of total capital, positions will be force closed.</li>
+                  <li>if loss higher than 3% of total capital, activates kill switch to halt trading.</li>
+                  <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value</li>
+                </small>
               </p>
             </div>
           </div>
