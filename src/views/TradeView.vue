@@ -9,7 +9,7 @@
         <div class="col-2">
           <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
-            <select class="form-select" aria-label="Change Broker" v-model="selectedBroker">
+            <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBroker">
               <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
                 {{ broker.brokerName }}
               </option>
@@ -209,25 +209,25 @@
           </div>
           <!-- Stoploss -->
           <div class="col-2">
-            <label for="Stoploss" class="form-label mb-0">Stoploss</label>
+            <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Stoploss"
+                <input class="form-check-input mt-0" type="checkbox" id="enableStoploss" aria-label="Enable Stoploss"
                   :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" aria-label="Stoploss" value="75"
+              <input type="number" class="form-control" id="stoplossValue" aria-label="Stoploss" value="75"
                 :class="{ 'disabled-form': isFormDisabled }">
             </div>
           </div>
           <!-- Target -->
           <div class="col-2">
-            <label for="Target" class="form-label mb-0">Target</label>
+            <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Enable Target"
+                <input class="form-check-input mt-0" type="checkbox" id="enableTarget" aria-label="Enable Target"
                   :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" aria-label="Target" value="75"
+              <input type="number" class="form-control" id="targetValue" aria-label="Target" value="75"
                 :class="{ 'disabled-form': isFormDisabled }">
             </div>
           </div>
