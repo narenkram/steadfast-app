@@ -1494,9 +1494,11 @@ const availableBalance = computed(() => {
 // Computed property to get the correct utilized amount based on the selected broker
 const usedAmount = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return fundLimits.value.utilizedAmount;
+    const utilizedAmount = Number(fundLimits.value.utilizedAmount) || 0;
+    return utilizedAmount;
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return fundLimits.value.marginused;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    return marginUsed;
   }
   return 0;
 });
