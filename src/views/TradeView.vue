@@ -1604,7 +1604,7 @@ const setFlattradeCredentials = async () => {
       defaultPutSecurityId: defaultPutSecurityId.value
     });
     console.log('Credentials and security IDs set successfully:', response.data);
-    sendWebSocketData();
+    // Removed sendWebSocketData() from here
   } catch (error) {
     console.error('Error setting credentials and security IDs:', error);
   }
@@ -1637,17 +1637,19 @@ const connectWebSocket = () => {
 
   socket.onopen = () => {
     console.log('WebSocket connected');
-    sendWebSocketData();
+    subscribeToSymbols(); // Subscribe to symbols when WebSocket is connected
   };
 };
 
-const sendWebSocketData = () => {
+const subscribeToSymbols = () => {
   if (socket && socket.readyState === WebSocket.OPEN) {
     const data = {
-      usersession: localStorage.getItem('FLATTRADE_API_TOKEN'),
-      userid: localStorage.getItem('FLATTRADE_CLIENT_ID'),
-      defaultCallSecurityId: defaultCallSecurityId.value,
-      defaultPutSecurityId: defaultPutSecurityId.value
+      action: 'subscribe',
+      symbols: [
+        `NFO|${defaultCallSecurityId.value}`,
+        `NFO|${defaultPutSecurityId.value}`,
+        'NFO|26000' // Assuming '26000' is the symbol for Nifty 50
+      ].filter(Boolean)
     };
     socket.send(JSON.stringify(data));
   }
@@ -1796,7 +1798,7 @@ watch([
       unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
       setFlattradeCredentials();
     }
-    sendWebSocketData();
+    // Removed sendWebSocketData() from here
   },
   { deep: true }
 );
