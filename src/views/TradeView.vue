@@ -737,6 +737,13 @@ const fetchBrokers = async () => {
     const response = await axios.get('http://localhost:3000/brokers');
     brokers.value = response.data;
     if (brokers.value.length > 0) {
+      // Ensure a broker is selected before fetching fund limits
+      const storedBroker = localStorage.getItem('selectedBroker');
+      if (storedBroker) {
+        selectedBroker.value = JSON.parse(storedBroker);
+      } else {
+        selectedBroker.value = brokers.value[0]; // Default to the first broker if none is stored
+      }
       fetchFundLimit(); // Fetch fund limits after setting the selected broker
     }
   } catch (error) {
@@ -1478,7 +1485,9 @@ const availableBalance = computed(() => {
     return fundLimits.value.availabelBalance; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
   }
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return Math.floor(fundLimits.value.cash - fundLimits.value.marginused);
+    const cash = Number(fundLimits.value.cash) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    return Math.floor(cash - marginUsed);
   }
   return 0;
 });
@@ -1683,16 +1692,6 @@ const totalSellValue = computed(() => {
 // Lifecycle hooks
 onMounted(async () => {
   await fetchBrokers()
-    .then(() => {
-      // Retrieve selected broker from localStorage
-      const storedBroker = localStorage.getItem('selectedBroker');
-      if (storedBroker) {
-        selectedBroker.value = JSON.parse(storedBroker);
-      } else if (brokers.value.length > 0) {
-        toastMessage.value = 'Select a broker to trade';
-        showToast.value = true;
-      }
-    })
     .then(() => updateExchangeSymbols())
     .then(() => setDefaultExchangeAndMasterSymbol())
     .then(() => fetchTradingData())
