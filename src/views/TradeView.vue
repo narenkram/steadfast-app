@@ -767,8 +767,6 @@ const selectedQuantity = ref(null);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
 const selectedPutStrike = ref({});
-const defaultCallSecurityId = ref(null);
-const defaultPutSecurityId = ref(null);
 const exchangeSymbols = ref({});
 
 const updateExchangeSymbols = () => {
@@ -1609,40 +1607,44 @@ const setFlattradeCredentials = async () => {
     console.error('Error setting credentials and security IDs:', error);
   }
 };
-
+const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
 const lastPrice = ref('N/A');
-let socket;
+const defaultCallSecurityId = ref(null);
+const defaultPutSecurityId = ref(null);
 
 const connectWebSocket = () => {
-  socket = new WebSocket('ws://localhost:8765');
+  socket.value = new WebSocket('ws://localhost:8765');
 
-  socket.onmessage = (event) => {
+  socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
+    console.log('Received data:', quoteData);
     if (quoteData.lp) {
       if (quoteData.tk === '26000') {
         lastPrice.value = quoteData.lp;
       } else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
+        console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
+        console.log('Updated Put LTP:', latestPutLTP.value);
       }
     }
   };
 
-  socket.onerror = (error) => {
+  socket.value.onerror = (error) => {
     console.error('WebSocket Error:', error);
   };
 
-  socket.onopen = () => {
+  socket.value.onopen = () => {
     console.log('WebSocket connected');
     subscribeToSymbols(); // Subscribe to symbols when WebSocket is connected
   };
 };
 
 const subscribeToSymbols = () => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const data = {
       action: 'subscribe',
       symbols: [
@@ -1651,25 +1653,36 @@ const subscribeToSymbols = () => {
         'NSE|26000'
       ].filter(Boolean)
     };
-    socket.send(JSON.stringify(data));
+    console.log('Sending subscribe data:', data);
+    socket.value.send(JSON.stringify(data));
   }
 };
 
-const unsubscribeAndSubscribe = (oldCallId, oldPutId, newCallId, newPutId) => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
+const unsubscribeAndSubscribe = async (oldCallId, oldPutId, newCallId, newPutId) => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const unsubscribeData = {
       action: 'unsubscribe',
       symbols: [`NFO|${oldCallId}`, `NFO|${oldPutId}`].filter(Boolean)
     };
-    socket.send(JSON.stringify(unsubscribeData));
+    console.log('Sending unsubscribe data:', unsubscribeData);
+    socket.value.send(JSON.stringify(unsubscribeData));
+
+    // Increased wait time to ensure unsubscribe is processed
+    await new Promise(resolve => setTimeout(resolve, 200));
 
     const subscribeData = {
       action: 'subscribe',
       symbols: [`NFO|${newCallId}`, `NFO|${newPutId}`].filter(Boolean)
     };
-    socket.send(JSON.stringify(subscribeData));
+    console.log('Sending subscribe data:', subscribeData);
+    socket.value.send(JSON.stringify(subscribeData));
+
+    // Reset LTP values when subscribing to new symbols
+    latestCallLTP.value = 'N/A';
+    latestPutLTP.value = 'N/A';
   }
 };
+
 
 const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -1727,8 +1740,8 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleHotKeys);
-  if (socket) {
-    socket.close();
+  if (socket.value) {
+    socket.value.close();
   }
 });
 
@@ -1789,16 +1802,18 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
 // Watchers for defaultCallSecurityId and defaultPutSecurityId
 // This watcher handles unsubscribing and subscribing to new security IDs,
 // setting Flattrade credentials, and sending WebSocket data when either ID changes.
-watch([
-  () => defaultCallSecurityId.value,
-  () => defaultPutSecurityId.value
-],
+watch(
+  [
+    () => defaultCallSecurityId.value,
+    () => defaultPutSecurityId.value
+  ],
   ([newCallId, newPutId], [oldCallId, oldPutId]) => {
     if (newCallId !== oldCallId || newPutId !== oldPutId) {
-      unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
-      setFlattradeCredentials();
+      if (newCallId && newPutId) {
+        unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
+        setFlattradeCredentials();
+      }
     }
-    // Removed sendWebSocketData() from here
   },
   { deep: true }
 );
