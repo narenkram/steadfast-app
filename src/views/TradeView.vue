@@ -1648,7 +1648,7 @@ const subscribeToSymbols = () => {
       symbols: [
         `NFO|${defaultCallSecurityId.value}`,
         `NFO|${defaultPutSecurityId.value}`,
-        'NFO|26000' // Assuming '26000' is the symbol for Nifty 50
+        'NSE|26000'
       ].filter(Boolean)
     };
     socket.send(JSON.stringify(data));
