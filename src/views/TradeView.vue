@@ -263,7 +263,7 @@
               {{ selectedCallStrike.tradingSymbol }}
             </div>
             <div>
-              {{ latestCallLTP }}
+              Call LTP: <b>{{ latestCallLTP }}</b>
             </div>
           </div>
 
@@ -289,7 +289,7 @@
               {{ selectedPutStrike.tradingSymbol }}
             </div>
             <div>
-              {{ latestPutLTP }}
+              Put LTP: <b>{{ latestPutLTP }}</b>
             </div>
           </div>
         </div>
