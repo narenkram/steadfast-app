@@ -20,7 +20,7 @@
         <!-- Broker Name and Status with Broker ID -->
         <div class="col-3 text-center">
           <p class="mb-1"><b>Broker</b> <span
-              :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected' }">{{
+              :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected', 'badge bg-warning text-dark': brokerStatus === 'Token Expired' }">{{
                 brokerStatus }}</span></p>
           <p class="mb-0 d-flex align-items-center justify-content-center">
             <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
@@ -666,6 +666,7 @@ const toastMessage = ref('');
 const updateToastVisibility = (value) => {
   showToast.value = value;
 };
+const flattradeTokenStatus = ref('Unknown');
 const brokerStatus = computed(() => {
   const dhanClientId = localStorage.getItem('DHAN_CLIENT_ID');
   const dhanApiToken = localStorage.getItem('DHAN_API_TOKEN');
@@ -675,7 +676,10 @@ const brokerStatus = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flattradeClientId && flattradeApiToken ? 'Connected' : 'Not Connected';
+    if (flattradeClientId && flattradeApiToken) {
+      return flattradeTokenStatus.value === 'Expired' ? 'Token Expired' : 'Connected';
+    }
+    return 'Not Connected';
   }
   return 'Not Connected';
 });
@@ -1043,19 +1047,29 @@ const fetchFlattradePositions = async () => {
 
     if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
       flatTradePositionBook.value = positionBookRes.data;
+      flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
-      // Handle "no data" case
       flatTradePositionBook.value = [];
+      flattradeTokenStatus.value = 'Valid';
       console.log('No positions in Flattrade Position Book');
     } else {
       const errorMsg = positionBookRes.data.emsg || 'Unknown error';
       console.error('Error fetching position book:', errorMsg);
-      flatTradePositionBook.value = []; // Set to empty array on error
+      flatTradePositionBook.value = [];
+      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
+        flattradeTokenStatus.value = 'Expired';
+      }
     }
   } catch (error) {
     console.error('Error fetching position book:', error);
-    flatTradePositionBook.value = []; // Set to empty array on error
+    flatTradePositionBook.value = [];
+    if (error.response && error.response.data && error.response.data.emsg) {
+      const errorMsg = error.response.data.emsg;
+      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
+        flattradeTokenStatus.value = 'Expired';
+      }
+    }
   }
 };
 const fundLimits = ref({});
