@@ -789,11 +789,25 @@ const updateExchangeSymbols = () => {
 const setDefaultExchangeAndMasterSymbol = () => {
   const exchanges = Object.keys(exchangeSymbols.value);
   if (exchanges.length > 0) {
-    selectedExchange.value = exchanges[0];
+    // Set the exchange
+    const savedExchange = localStorage.getItem('selectedExchange');
+    selectedExchange.value = savedExchange && exchanges.includes(savedExchange)
+      ? savedExchange
+      : exchanges[0];
+
+    // Set the master symbol
     if (exchangeSymbols.value[selectedExchange.value].length > 0) {
-      selectedMasterSymbol.value = exchangeSymbols.value[selectedExchange.value][0];
+      const savedMasterSymbol = localStorage.getItem('selectedMasterSymbol');
+      selectedMasterSymbol.value = savedMasterSymbol && exchangeSymbols.value[selectedExchange.value].includes(savedMasterSymbol)
+        ? savedMasterSymbol
+        : exchangeSymbols.value[selectedExchange.value][0];
     }
   }
+};
+// New function to save user's choice
+const saveUserChoice = () => {
+  localStorage.setItem('selectedExchange', selectedExchange.value);
+  localStorage.setItem('selectedMasterSymbol', selectedMasterSymbol.value);
 };
 const callStrikes = ref([]);
 const putStrikes = ref([]);
@@ -1832,10 +1846,12 @@ watch(
   { deep: true }
 );
 
-watch(selectedMasterSymbol, async () => {
-  console.log('selectedMasterSymbol changed:', selectedMasterSymbol.value);
+// Modify the watcher for selectedMasterSymbol
+watch(selectedMasterSymbol, async (newValue) => {
+  console.log('selectedMasterSymbol changed:', newValue);
+  saveUserChoice(); // Save the user's choice
   updateAvailableQuantities();
-  await fetchTradingData(); // Ensure trading data is fetched before setting expiry
+  await fetchTradingData();
   setDefaultExpiry();
 });
 
@@ -1846,10 +1862,14 @@ watch(productTypes, (newProductTypes) => {
   }
 }, { immediate: true });
 
-// Watch for changes in selectedExchange to update selectedMasterSymbol
-watch(selectedExchange, (newExchange) => {
-  if (exchangeSymbols.value[newExchange].length > 0) {
-    selectedMasterSymbol.value = exchangeSymbols.value[newExchange][0];
+// Add a watcher for selectedExchange
+watch(selectedExchange, (newValue) => {
+  saveUserChoice(); // Save the user's choice
+  if (exchangeSymbols.value[newValue].length > 0) {
+    const savedMasterSymbol = localStorage.getItem('selectedMasterSymbol');
+    selectedMasterSymbol.value = savedMasterSymbol && exchangeSymbols.value[newValue].includes(savedMasterSymbol)
+      ? savedMasterSymbol
+      : exchangeSymbols.value[newValue][0];
   } else {
     selectedMasterSymbol.value = null;
   }
