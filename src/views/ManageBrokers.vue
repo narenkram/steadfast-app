@@ -292,15 +292,29 @@ const sendCredentialsToBackend = async () => {
 
 <template>
   <section class="row py-5">
-    <div class="col-6 text-start">
+    <div class="col-8 text-start">
       <!-- <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink> -->
-      <blockquote class="blockquote">Add your API Key details in <code class="bg-light"><b>.env</b></code> file <br />
-        and Restart API Server
-      </blockquote>
+      <ul>
+        <li>
+          <blockquote class="blockquote">
+            Add your API Key details in <code class="bg-light"><b>.env</b></code> file
+            and Stop CMDs and Start again using <code><b>start-all.bat</b></code>
+          </blockquote>
+        </li>
+        <li>
+          <blockquote class="blockquote">
+            Also Stop and Start again using <code><b>start-all.bat</b></code>, if you have a
+            <badge class="badge bg-warning text-dark">
+              Token Expired
+            </badge>
+          </blockquote>
+        </li>
+      </ul>
+
     </div>
-    <div class="col-6 text-end">
+    <div class="col-4 text-end">
       <RouterLink to="/">
         <button class="btn btn-primary">
           Open 1 Click Trade View
