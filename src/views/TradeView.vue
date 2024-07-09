@@ -269,8 +269,9 @@
 
           <!-- Live Underlying Price -->
           <div class="col-6 text-center">
-            <p class="mb-0">Nifty 50</p>
-            <p class="mb-0">Last Price: <b>{{ lastPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">Nifty 50: <b>{{ niftyPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
@@ -1638,7 +1639,9 @@ const setFlattradeCredentials = async () => {
 const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
-const lastPrice = ref('N/A');
+const niftyPrice = ref('N/A');
+const bankNiftyPrice = ref('N/A');
+const finniftyPrice = ref('N/A');
 const defaultCallSecurityId = ref(null);
 const defaultPutSecurityId = ref(null);
 
@@ -1649,9 +1652,16 @@ const connectWebSocket = () => {
     const quoteData = JSON.parse(event.data);
     console.log('Received data:', quoteData);
     if (quoteData.lp) {
-      if (quoteData.tk === '26000') {
-        lastPrice.value = quoteData.lp;
-      } else if (quoteData.tk === defaultCallSecurityId.value) {
+      if (quoteData.tk === '26000' && selectedMasterSymbol.value === 'NIFTY') {
+        niftyPrice.value = quoteData.lp;
+      }
+      else if (quoteData.tk === '26009' && selectedMasterSymbol.value === 'BANKNIFTY') {
+        bankNiftyPrice.value = quoteData.lp;
+      }
+      else if (quoteData.tk === '26037' && selectedMasterSymbol.value === 'FINNIFTY') {
+        finniftyPrice.value = quoteData.lp;
+      }
+      else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
         console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
@@ -1678,7 +1688,9 @@ const subscribeToSymbols = () => {
       symbols: [
         `NFO|${defaultCallSecurityId.value}`,
         `NFO|${defaultPutSecurityId.value}`,
-        'NSE|26000'
+        'NSE|26000',
+        'NSE|26009',
+        'NSE|26037'
       ].filter(Boolean)
     };
     console.log('Sending subscribe data:', data);
