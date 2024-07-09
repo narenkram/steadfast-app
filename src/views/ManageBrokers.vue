@@ -305,10 +305,11 @@ const sendCredentialsToBackend = async () => {
         </li>
         <li>
           <blockquote class="blockquote">
-            Also Stop and Start again using <code><b>start-all.bat</b></code>, if you have a
+            If you have a
             <badge class="badge bg-warning text-dark">
               Token Expired
             </badge>
+            Generate a new Token, And Stop & Start again using <code><b>start-all.bat</b></code>,
           </blockquote>
         </li>
       </ul>
