@@ -888,40 +888,42 @@ const updateStrikesForExpiry = (expiryDate) => {
   console.log('Filtered Call Strikes:', filteredCallStrikes);
   console.log('Filtered Put Strikes:', filteredPutStrikes);
 
-  // Get the current underlying price based on the selected master symbol
-  let currentPrice;
-  if (selectedMasterSymbol.value === 'NIFTY') {
-    currentPrice = parseFloat(niftyPrice.value);
-  } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
-    currentPrice = parseFloat(bankNiftyPrice.value);
-  } else if (selectedMasterSymbol.value === 'FINNIFTY') {
-    currentPrice = parseFloat(finniftyPrice.value);
+  // Only set initial strikes if they haven't been set yet or if the expiry date has changed
+  if (!selectedCallStrike.value.securityId || !selectedPutStrike.value.securityId || selectedCallStrike.value.expiryDate !== expiryDate) {
+    // Get the current underlying price based on the selected master symbol
+    let currentPrice;
+    if (selectedMasterSymbol.value === 'NIFTY') {
+      currentPrice = parseFloat(niftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
+      currentPrice = parseFloat(bankNiftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'FINNIFTY') {
+      currentPrice = parseFloat(finniftyPrice.value);
+    }
+
+    if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
+      const nearestStrike = filteredCallStrikes.reduce((prev, curr) =>
+        Math.abs(curr.strikePrice - currentPrice) < Math.abs(prev.strikePrice - currentPrice) ? curr : prev
+      );
+
+      selectedCallStrike.value = nearestStrike;
+      selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
+    } else {
+      selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
+      selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+    }
+
+    console.log('Selected Call Strike:', selectedCallStrike.value);
+    console.log('Selected Put Strike:', selectedPutStrike.value);
+
+    if (synchronizeOnLoad.value) {
+      synchronizeStrikes();
+      synchronizeOnLoad.value = false;
+    }
+
+    defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
+    defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
   }
-
-  if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
-    const nearestStrike = filteredCallStrikes.reduce((prev, curr) =>
-      Math.abs(curr.strikePrice - currentPrice) < Math.abs(prev.strikePrice - currentPrice) ? curr : prev
-    );
-
-    selectedCallStrike.value = nearestStrike;
-    selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
-  } else {
-    selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
-    selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
-  }
-
-  console.log('Selected Call Strike:', selectedCallStrike.value);
-  console.log('Selected Put Strike:', selectedPutStrike.value);
-
-  if (synchronizeOnLoad.value) {
-    synchronizeStrikes();
-    synchronizeOnLoad.value = false;
-  }
-
-  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
-  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
-
 const synchronizeStrikes = () => {
   synchronizeCallStrikes();
   synchronizePutStrikes();
@@ -1858,15 +1860,15 @@ watch(selectedExpiry, async (newExpiry) => {
 
 watch(selectedCallStrike, (newStrike, oldStrike) => {
   console.log('Selected Call Strike changed:', newStrike);
-  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
-    updateSecurityIds();
+  if (newStrike !== oldStrike) {
+    defaultCallSecurityId.value = newStrike.securityId || 'N/A';
   }
 });
 
 watch(selectedPutStrike, (newStrike, oldStrike) => {
   console.log('Selected Put Strike changed:', newStrike);
-  if (newStrike !== oldStrike && !synchronizeOnLoad.value) {
-    updateSecurityIds();
+  if (newStrike !== oldStrike) {
+    defaultPutSecurityId.value = newStrike.securityId || 'N/A';
   }
 });
 
