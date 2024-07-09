@@ -907,10 +907,7 @@ const updateStrikesForExpiry = (expiryDate) => {
 
       selectedCallStrike.value = nearestStrike;
       selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
-    } else {
-      selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
-      selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
-    }
+    } 
 
     console.log('Selected Call Strike:', selectedCallStrike.value);
     console.log('Selected Put Strike:', selectedPutStrike.value);
