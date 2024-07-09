@@ -860,13 +860,9 @@ const updateStrikesForExpiry = (expiryDate) => {
   let filteredCallStrikes, filteredPutStrikes;
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    console.log('before filtering Dhan Call Strikes:', callStrikes.value);
-    console.log('before filtering Dhan Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    console.log('before filtering Flattrade Call Strikes:', callStrikes.value);
-    console.log('before filtering Flattrade Put Strikes:', putStrikes.value);
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
@@ -874,11 +870,33 @@ const updateStrikesForExpiry = (expiryDate) => {
   console.log('Filtered Call Strikes:', filteredCallStrikes);
   console.log('Filtered Put Strikes:', filteredPutStrikes);
 
-  selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
-  selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+  // Get the current underlying price based on the selected master symbol
+  let currentPrice;
+  if (selectedMasterSymbol.value === 'NIFTY') {
+    currentPrice = parseFloat(niftyPrice.value);
+  } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
+    currentPrice = parseFloat(bankNiftyPrice.value);
+  } else if (selectedMasterSymbol.value === 'FINNIFTY') {
+    currentPrice = parseFloat(finniftyPrice.value);
+  }
 
-  console.log('Update Strike for expiry, Selected Call Strike:', selectedCallStrike.value);
-  console.log('Update Strike for expiry, Selected Put Strike:', selectedPutStrike.value);
+  if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
+    // Find the nearest strike price
+    const nearestStrike = filteredCallStrikes.reduce((prev, curr) => 
+      Math.abs(curr.strikePrice - currentPrice) < Math.abs(prev.strikePrice - currentPrice) ? curr : prev
+    );
+
+    // Set the selected strikes
+    selectedCallStrike.value = nearestStrike;
+    selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
+  } else {
+    // Fallback to the first strike if we can't determine the current price or if the array is empty
+    selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
+    selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
+  }
+
+  console.log('Selected Call Strike:', selectedCallStrike.value);
+  console.log('Selected Put Strike:', selectedPutStrike.value);
 
   if (synchronizeOnLoad.value) {
     synchronizeStrikes();
