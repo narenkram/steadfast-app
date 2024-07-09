@@ -814,6 +814,14 @@ const callStrikes = ref([]);
 const putStrikes = ref([]);
 const expiryDates = ref([]);
 const synchronizeOnLoad = ref(true);
+const niftyPrice = ref('N/A');
+const bankNiftyPrice = ref('N/A');
+const finniftyPrice = ref('N/A');
+// Add a new function to get the initial price
+const getInitialPrice = (symbol) => {
+  const strike = callStrikes.value.find(s => s.tradingSymbol.startsWith(symbol));
+  return strike ? parseFloat(strike.strikePrice) : null;
+};
 const fetchTradingData = async () => {
   let response;
   if (selectedBroker.value?.brokerName === 'Dhan') {
@@ -840,9 +848,19 @@ const fetchTradingData = async () => {
     .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
     .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
 
+  // After fetching and setting callStrikes and putStrikes
+  if (niftyPrice.value === 'N/A') niftyPrice.value = getInitialPrice('NIFTY');
+  if (bankNiftyPrice.value === 'N/A') bankNiftyPrice.value = getInitialPrice('BANKNIFTY');
+  if (finniftyPrice.value === 'N/A') finniftyPrice.value = getInitialPrice('FINNIFTY');
+
   updateStrikesForExpiry(selectedExpiry.value);
 };
-
+// Add watchers for the price values
+watch([niftyPrice, bankNiftyPrice, finniftyPrice], () => {
+  if (selectedExpiry.value) {
+    updateStrikesForExpiry(selectedExpiry.value);
+  }
+});
 const formatDate = (dateString) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     // Extract only the date part from the date string for Dhan
@@ -881,16 +899,13 @@ const updateStrikesForExpiry = (expiryDate) => {
   }
 
   if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
-    // Find the nearest strike price
-    const nearestStrike = filteredCallStrikes.reduce((prev, curr) => 
+    const nearestStrike = filteredCallStrikes.reduce((prev, curr) =>
       Math.abs(curr.strikePrice - currentPrice) < Math.abs(prev.strikePrice - currentPrice) ? curr : prev
     );
 
-    // Set the selected strikes
     selectedCallStrike.value = nearestStrike;
     selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
   } else {
-    // Fallback to the first strike if we can't determine the current price or if the array is empty
     selectedCallStrike.value = filteredCallStrikes.length > 0 ? filteredCallStrikes[0] : {};
     selectedPutStrike.value = filteredPutStrikes.length > 0 ? filteredPutStrikes[0] : {};
   }
@@ -1657,9 +1672,7 @@ const setFlattradeCredentials = async () => {
 const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
-const niftyPrice = ref('N/A');
-const bankNiftyPrice = ref('N/A');
-const finniftyPrice = ref('N/A');
+
 const defaultCallSecurityId = ref(null);
 const defaultPutSecurityId = ref(null);
 
