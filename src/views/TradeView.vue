@@ -7,7 +7,7 @@
 
         <!-- Change Broker -->
         <div class="col-2">
-          <label for="ChangeBroker" class="form-label mb-1"><b>CHANGE BROKER</b></label>
+          <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
             <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBroker">
               <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
@@ -19,7 +19,7 @@
 
         <!-- Broker Name and Status with Broker ID -->
         <div class="col-3 text-center">
-          <p class="mb-1"><b>BROKER</b> <span
+          <p class="mb-1"><b>Broker</b> <span
               :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected', 'badge bg-warning text-dark': brokerStatus === 'Token Expired' }">{{
                 brokerStatus }}</span></p>
           <p class="mb-0 d-flex align-items-center justify-content-center">
@@ -39,19 +39,19 @@
 
         <!-- Total Funds -->
         <div class="col-3 text-center">
-          <p class="mb-1"><b>TOTAL FUNDS</b></p>
+          <p class="mb-1"><b>Total Funds</b></p>
           <p class="mt-2 mb-0">₹ {{ availableBalance || null }}</p>
         </div>
 
         <!-- Utilized Margin -->
         <div class="col-2 text-center">
-          <p class="mb-1"><b>UTILIZED MARGIN</b></p>
+          <p class="mb-1"><b>Utilized Margin</b></p>
           <p class="mt-2 mb-0">₹ {{ usedAmount || null }}</p>
         </div>
 
         <!-- Today's date -->
         <div class="col-2 text-end">
-          <p class="mb-1"><b>TODAY'S DATE</b></p>
+          <p class="mb-1"><b>Today's date</b></p>
           <p class="mt-2 mb-0">{{ formattedDate }}</p>
         </div>
 
@@ -84,7 +84,7 @@
           <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : 'text-dark'">
             ₹ {{ netPnl.toFixed(2) }}
           </span>
-          ESTIMATED NET PNL (AFTER BROKERAGE)
+          Estimated Net PNL (after brokerage)
         </small>
       </div>
     </div>
@@ -96,7 +96,7 @@
             {{ totalCapitalPercentage.toFixed(2) }}%
           </span>
           <br />
-          <small> ON TOTAL CAPITAL</small>
+          <small> on Total Capital</small>
         </blockquote>
         <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
@@ -104,7 +104,7 @@
     <div class="col-3 d-flex justify-content-center align-items-center">
       <div class="Card">
         <div class="card-title">
-          <h5>KILL SWITCH</h5>
+          <h5>Kill Switch</h5>
         </div>
         <button :class="killSwitchButtonClass" @click="toggleKillSwitch">
           {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
@@ -122,7 +122,7 @@
         <div class="row">
           <!-- Exchange Selection -->
           <div class="col-2">
-            <label for="Exchange" class="form-label mb-0">EXCHANGE</label>
+            <label for="Exchange" class="form-label mb-0">Exchange</label>
             <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
@@ -133,7 +133,7 @@
 
           <!-- Segment Selection -->
           <div class="col-2">
-            <label for="Segment" class="form-label mb-0">SEGMENT</label>
+            <label for="Segment" class="form-label mb-0">Segment</label>
             <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }">
               <option value="Options" selected>Options</option>
               <option value="Futures">Futures</option>
@@ -142,7 +142,7 @@
 
           <!-- Master Symbol Selection -->
           <div class="col-2">
-            <label for="MasterSymbol" class="form-label mb-0">MASTER SYMBOL</label>
+            <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
             <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">{{
@@ -153,7 +153,7 @@
 
           <!-- Expiry Date Selection -->
           <div class="col-2">
-            <label for="Expiry" class="form-label mb-0">EXPIRY DATE</label>
+            <label for="Expiry" class="form-label mb-0">Expiry Date</label>
             <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="date in expiryDates" :key="date" :value="date">
@@ -164,7 +164,7 @@
 
           <!-- Product Type Selection -->
           <div class="col-2">
-            <label for="ProductType" class="form-label mb-0">PRODUCT TYPE</label>
+            <label for="ProductType" class="form-label mb-0">Product Type</label>
             <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">
@@ -175,7 +175,7 @@
 
           <!-- Quantity Selection -->
           <div class="col-2">
-            <label for="Quantity" class="form-label mb-0">QUANTITY</label>
+            <label for="Quantity" class="form-label mb-0">Quantity</label>
             <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
@@ -188,7 +188,7 @@
         <div class="row mt-3">
           <!-- Order Type -->
           <div class="col-2">
-            <label for="OrderType" class="form-label mb-0">ORDER TYPE</label>
+            <label for="OrderType" class="form-label mb-0">Order Type</label>
             <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
@@ -197,7 +197,7 @@
           </div>
           <!-- Market Protection Order %-->
           <div class="col-3">
-            <label for="MarketProtection" class="form-label mb-0">MARKET PROTECTION ORDER %</label>
+            <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
             <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %"
               :class="{ 'disabled-form': isFormDisabled }">
               <option value="1">1%</option>
@@ -209,7 +209,7 @@
           </div>
           <!-- Stoploss -->
           <div class="col-2">
-            <label for="enableStoploss" class="form-label mb-0">STOPLOSS</label>
+            <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableStoploss" aria-label="Enable Stoploss"
@@ -221,7 +221,7 @@
           </div>
           <!-- Target -->
           <div class="col-2">
-            <label for="enableTarget" class="form-label mb-0">TARGET</label>
+            <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableTarget" aria-label="Enable Target"
@@ -239,8 +239,8 @@
                   :class="{ 'disabled-form': isFormDisabled }">
                 <span class="ToggleSlider SliderRound" :class="{ 'disabled-form': isFormDisabled }"></span>
               </label>
-              <label class="ToggleLabel" for="enableHotKeys" :class="{ 'disabled-form': isFormDisabled }"><b> 1 CLICK
-                  <br /> KEYS ⌨️</b></label>
+              <label class="ToggleLabel" for="enableHotKeys" :class="{ 'disabled-form': isFormDisabled }"><b> 1 Click
+                  <br /> Keys ⌨️</b></label>
             </div>
           </div>
         </div>
@@ -249,7 +249,7 @@
         <div class="row align-items-center justify-content-between">
           <!-- Call Strike Selection -->
           <div class="col-3">
-            <label for="CallStrike" class="form-label mb-0">CALL STRIKE</label>
+            <label for="CallStrike" class="form-label mb-0">Call Strike</label>
             <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
@@ -257,26 +257,26 @@
               </option>
             </select>
             <div>
-              <span style="text-transform: uppercase;">Security ID:</span> {{ defaultCallSecurityId }}
+              Security ID: {{ defaultCallSecurityId }}
             </div>
             <div>
               {{ selectedCallStrike.tradingSymbol }}
             </div>
             <div>
-              CALL LTP: <b>{{ latestCallLTP }}</b>
+              Call LTP: <b>{{ latestCallLTP }}</b>
             </div>
           </div>
 
           <!-- Live Underlying Price -->
           <div class="col-6 text-center">
-            <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">NIFTY 50: <b>{{ niftyPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">BANK NIFTY: <b>{{ bankNiftyPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">FIN NIFTY: <b>{{ finniftyPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">Nifty 50: <b>{{ niftyPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
           <div class="col-3">
-            <label for="PutStrike" class="form-label mb-0">PUT STRIKE</label>
+            <label for="PutStrike" class="form-label mb-0">Put Strike</label>
             <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
@@ -284,13 +284,13 @@
               </option>
             </select>
             <div>
-              <span style="text-transform: uppercase;">Security ID:</span> {{ defaultCallSecurityId }}
+              Security ID: {{ defaultPutSecurityId }}
             </div>
             <div>
               {{ selectedPutStrike.tradingSymbol }}
             </div>
             <div>
-              PUT LTP: <b>{{ latestPutLTP }}</b>
+              Put LTP: <b>{{ latestPutLTP }}</b>
             </div>
           </div>
         </div>
@@ -303,7 +303,7 @@
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬆️</span>
-                BUY CE
+                Buy CE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
@@ -319,7 +319,7 @@
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬅️</span>
-                SELL CE
+                Sell CE
               </button>
               <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
@@ -336,11 +336,11 @@
           <div class="col-6 text-center">
             <button class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
-              CLOSE POSITIONS
+              Close Positions
             </button>
             <button class="btn btn-lg btn-outline-dark fs-5 w-75" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
-              CANCEL ORDERS
+              Cancel Orders
             </button>
           </div>
 
@@ -351,7 +351,7 @@
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬇️</span>
-                BUY PE
+                Buy PE
               </button>
               <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
@@ -367,7 +367,7 @@
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">➡️</span>
-                SELL PE
+                Sell PE
               </button>
               <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
@@ -392,19 +392,19 @@
           <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
             type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
             @click="setActiveTab('positions')">
-            💸 POSITIONS
+            💸 Positions
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
             role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="setActiveTab('trades')">
-            📄 TRADES
+            📄 Trades
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation-tab-pane"
             type="button" role="tab" aria-controls="automation-tab-pane" aria-selected="false">
-            🤖 AUTOMATIONS
+            🤖 Automations
           </button>
         </li>
       </ul>
@@ -423,8 +423,8 @@
             </div>
             <div class="col-6 text-center py-2">
               <p class="mb-0">
-                <span>TOTAL BUY VALUE: <b> | ₹ {{ totalBuyValue.toFixed(2) }} |</b></span>
-                <span class="ms-3">TOTAL SELL VALUE: <b>| ₹ {{ totalSellValue.toFixed(2) }} |</b></span>
+                <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
+                <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
               </p>
               <p class="mb-0">
               </p>
@@ -434,14 +434,14 @@
           <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanPositions'">
             <thead>
               <tr>
-                <th scope="col">SYMBOL NAME</th>
-                <th scope="col">POSITION TYPE</th>
-                <th scope="col">PRODUCT TYPE</th>
-                <th scope="col">NET QTY</th>
-                <th scope="col">BUY VALUE</th>
-                <th scope="col">SELL VALUE</th>
-                <th scope="col">REALIZED PROFIT</th>
-                <th scope="col">UNREALIZED PROFIT</th>
+                <th scope="col">Symbol Name</th>
+                <th scope="col">Position Type</th>
+                <th scope="col">Product Type</th>
+                <th scope="col">Net Qty</th>
+                <th scope="col">Buy Value</th>
+                <th scope="col">Sell Value</th>
+                <th scope="col">Realized Profit</th>
+                <th scope="col">Unrealized Profit</th>
               </tr>
             </thead>
             <tbody>
@@ -472,15 +472,15 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">SYMBOL NAME</th>
-                  <th scope="col">NET QTY</th>
-                  <th scope="col">POSITION TYPE</th>
-                  <th scope="col">PRODUCT TYPE</th>
+                  <th scope="col">Symbol Name</th>
+                  <th scope="col">Net Qty</th>
+                  <th scope="col">Position Type</th>
+                  <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
-                  <th scope="col">BUY VALUE</th>
-                  <th scope="col">SELL VALUE</th>
-                  <th scope="col">REALIZED</th>
-                  <th scope="col">UNREALIZED</th>
+                  <th scope="col">Buy Value</th>
+                  <th scope="col">Sell Value</th>
+                  <th scope="col">Realized</th>
+                  <th scope="col">Unrealized</th>
                 </tr>
               </thead>
               <tbody>
@@ -519,21 +519,17 @@
           <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
             <thead>
               <tr>
-                <th>SIDE</th>
-				<th>Order ID</th>
-                <th>PRODUCT TYPE</th>
-				<th>SYMBOL</th>
-                <th>QUANTITY</th>
-                <th>PRICE</th>
-                <th>EXECUTION TIME</th>
-                <th>STATUS</th>
+                <th>Order ID</th>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Execution Time</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
-                <td>{{ dhanOrder.transactionType }}</td>
-				<td>{{ dhanOrder.orderId }}</td>
-				<td>{{ dhanOrder.productType }}</td>
+                <td>{{ dhanOrder.orderId }}</td>
                 <td>{{ dhanOrder.tradingSymbol }}</td>
                 <td>{{ dhanOrder.quantity }}</td>
                 <td>{{ dhanOrder.price }}</td>
@@ -551,31 +547,27 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">TYPE</th>
-                  <th scope="col">SIDE</th>
-                  <th scope="col">ORDER ID</th>
-                  <th scope="col">TRADE ID</th>
-				  <th scope="col">PRODUCT TYPE</th>
-                  <th scope="col">SYMBOL</th>
-                  <th scope="col">QUANTITY</th>
-                  <th scope="col">PRICE</th>
-                  <th scope="col">DATE</th>
-                  <th scope="col">STATUS</th>
-                  <th scope="col">REASON</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Trade ID</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Reason</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="combinedOrdersAndTrades.length">
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr>
-                      <td>ORDER</td>
-					  <td>{{item.order.trantype}}</td>
+                      <td>Order</td>
                       <td>{{ item.order.norenordno }}</td>
                       <td>-</td>
-                      <td>{{ item.order.prd }}</td>
                       <td>{{ item.order.tsym }}</td>
                       <td>{{ item.order.qty }}</td>
-					  <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
@@ -587,11 +579,9 @@
                       <td>{{ item.order.rejreason }}</td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
-                      <td>TRADE</td>
-					  <td>{{item.trade.trantype}}</td>
+                      <td>Trade</td>
                       <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
-					  <td>{{ item.trade.prd }}</td>
                       <td>{{ item.trade.tsym }}</td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
