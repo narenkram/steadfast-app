@@ -605,16 +605,17 @@
 
           <div class="card text-center py-3">
             <div class="card-body text-start">
-              <p class="fs-5">
-                <span class="text-danger">Coming Soon</span>
-                <small class="text-secondary">
-                  <h5>Smart Automations for Risk Management.</h5>
-                  <li>if deployment value higher than 25% of total capital, positions will be force closed.</li>
-                  <li>if loss higher than 3% of total capital, activates kill switch to halt trading.</li>
-                  <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value
-                  </li>
-                </small>
-              </p>
+              <span class="fs-5 text-danger">Coming Soon</span>
+              <h5>Smart Automations for Risk Management.</h5>
+              <ul class="text-secondary">
+                <li>if deployment value higher than 25% of total capital, positions will be force closed.</li>
+                <li>if loss higher than 3% of total capital, activates kill switch to halt trading.</li>
+                <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value
+                </li>
+              </ul>
+              <span class="p-1 rounded bg-warning text-dark">This is a rough draft and will be updated in the next
+                release.
+              </span>
             </div>
           </div>
         </div>
