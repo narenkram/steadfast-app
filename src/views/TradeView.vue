@@ -1036,8 +1036,8 @@ const fetchDhanOrdersTradesBook = async () => {
     showToast.value = true;
   }
 };
-const flatOrderBook = ref('');
-const flatTradeBook = ref('');
+const flatOrderBook = ref([]);
+const flatTradeBook = ref([]);
 const token = ref('');
 
 const fetchFlattradeOrdersTradesBook = async () => {
@@ -1071,19 +1071,25 @@ const fetchFlattradeOrdersTradesBook = async () => {
 
 const combinedOrdersAndTrades = computed(() => {
   const combined = {};
-
-  flatOrderBook.value.forEach(order => {
-    combined[order.norenordno] = { order, trade: null };
-  });
-
-  flatTradeBook.value.forEach(trade => {
-    if (combined[trade.norenordno]) {
-      combined[trade.norenordno].trade = trade;
-    } else {
-      combined[trade.norenordno] = { order: null, trade };
-    }
-  });
-
+  
+  // Check if flatOrderBook.value is an array before using forEach
+  if (Array.isArray(flatOrderBook.value)) {
+    flatOrderBook.value.forEach(order => {
+      combined[order.norenordno] = { order, trade: null };
+    });
+  }
+  
+  // Check if flatTradeBook.value is an array before using forEach
+  if (Array.isArray(flatTradeBook.value)) {
+    flatTradeBook.value.forEach(trade => {
+      if (combined[trade.norenordno]) {
+        combined[trade.norenordno].trade = trade;
+      } else {
+        combined[trade.norenordno] = { order: null, trade };
+      }
+    });
+  }
+  
   return Object.values(combined).sort((a, b) => {
     const aTime = a.order?.norentm || a.trade?.norentm;
     const bTime = b.order?.norentm || b.trade?.norentm;
