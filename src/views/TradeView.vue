@@ -423,8 +423,8 @@
             </div>
             <div class="col-6 text-center py-2">
               <p class="mb-0">
-                <span>TOTAL BUY VALUE: <b> | ₹ {{ totalBuyValue.toFixed(2) }} |</b></span>
-                <span class="ms-3">TOTAL SELL VALUE: <b>| ₹ {{ totalSellValue.toFixed(2) }} |</b></span>
+                <span>Total Buy Value: <b> | ₹ {{ totalBuyValue.toFixed(2) }} |</b></span>
+                <span class="ms-3">Total Sell Value: <b>| ₹ {{ totalSellValue.toFixed(2) }} |</b></span>
               </p>
               <p class="mb-0">
               </p>
@@ -439,7 +439,7 @@
                 <th scope="col">Product Type</th>
                 <th scope="col">Net QTY</th>
                 <th scope="col">Buy Value</th>
-                <th scope="col">SELL Value</th>
+                <th scope="col">Sell Value</th>
                 <th scope="col">Realized Profit</th>
                 <th scope="col">Unrealized ProfiT</th>
               </tr>
