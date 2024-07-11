@@ -437,11 +437,11 @@
                 <th scope="col">Symbol Name</th>
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
-                <th scope="col">Net QTY</th>
+                <th scope="col">Net Qty</th>
                 <th scope="col">Buy Value</th>
                 <th scope="col">Sell Value</th>
                 <th scope="col">Realized Profit</th>
-                <th scope="col">Unrealized ProfiT</th>
+                <th scope="col">Unrealized Profit</th>
               </tr>
             </thead>
             <tbody>
@@ -473,7 +473,7 @@
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
-                  <th scope="col">Net QTY</th>
+                  <th scope="col">Net Qty</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
