@@ -423,8 +423,8 @@
             </div>
             <div class="col-6 text-center py-2">
               <p class="mb-0">
-                <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
-                <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
+                <span>TOTAL BUY VALUE: <b> | ₹ {{ totalBuyValue.toFixed(2) }} |</b></span>
+                <span class="ms-3">TOTAL SELL VALUE: <b>| ₹ {{ totalSellValue.toFixed(2) }} |</b></span>
               </p>
               <p class="mb-0">
               </p>
@@ -437,11 +437,11 @@
                 <th scope="col">Symbol Name</th>
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
-                <th scope="col">Net Qty</th>
+                <th scope="col">Net QTY</th>
                 <th scope="col">Buy Value</th>
-                <th scope="col">Sell Value</th>
+                <th scope="col">SELL Value</th>
                 <th scope="col">Realized Profit</th>
-                <th scope="col">Unrealized Profit</th>
+                <th scope="col">Unrealized ProfiT</th>
               </tr>
             </thead>
             <tbody>
@@ -473,7 +473,7 @@
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
-                  <th scope="col">Net Qty</th>
+                  <th scope="col">Net QTY</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
@@ -519,8 +519,10 @@
           <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
             <thead>
               <tr>
-                <th>Order ID</th>
-                <th>Symbol</th>
+                <th>Side</th>
+				<th>Order ID</th>
+                <th>Product Type</th>
+				<th>Symbol</th>
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Execution Time</th>
@@ -529,7 +531,9 @@
             </thead>
             <tbody>
               <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
-                <td>{{ dhanOrder.orderId }}</td>
+                <td>{{ dhanOrder.transactionType }}</td>
+				<td>{{ dhanOrder.orderId }}</td>
+				<td>{{ dhanOrder.productType }}</td>
                 <td>{{ dhanOrder.tradingSymbol }}</td>
                 <td>{{ dhanOrder.quantity }}</td>
                 <td>{{ dhanOrder.price }}</td>
@@ -548,8 +552,10 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
+                  <th scope="col">Side</th>
                   <th scope="col">Order ID</th>
                   <th scope="col">Trade ID</th>
+				  <th scope="col">Product Type</th>
                   <th scope="col">Symbol</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
@@ -563,11 +569,13 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr>
                       <td>Order</td>
+					  <td>{{item.order.trantype}}</td>
                       <td>{{ item.order.norenordno }}</td>
                       <td>-</td>
+                      <td>{{ item.order.prd }}</td>
                       <td>{{ item.order.tsym }}</td>
                       <td>{{ item.order.qty }}</td>
-                      <td>{{ item.order.prc }}</td>
+					  <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
@@ -580,8 +588,10 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
+					  <td>{{item.trade.trantype}}</td>
                       <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
+					  <td>{{ item.trade.prd }}</td>
                       <td>{{ item.trade.tsym }}</td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
@@ -620,7 +630,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -1675,7 +1684,7 @@ const deployedCapitalPercentage = computed(() => {
   return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
 });
 
-const totalBrokerage = computed(() => {
+const totalCharges = computed(() => {
   let total = 0;
 
   // Calculate totalValue based on totalBuyValue and totalSellValue
@@ -1689,10 +1698,10 @@ const totalBrokerage = computed(() => {
     const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);                       // Adjusted rate for Dhan
     const sttCharge = Math.round(totalSellValue.value * 0.000625 *100) / 100;               // Adjusted rate for Dhan
 
-    // Accumulate brokerage for Dhan
+    // Accumulate charges for Dhan
     for (const order of dhanOrders.value) {
       if (order.orderStatus === 'TRADED') {
-        total += 23.6; // Accumulate brokerage total
+        total += 23.6; // Accumulate charges total
       }
     }
 
@@ -1716,7 +1725,7 @@ const totalBrokerage = computed(() => {
 });
 
 
-const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
+const netPnl = computed(() => totalProfit.value - totalCharges.value);
 
 const setDefaultExpiry = () => {
   if (expiryDates.value.length > 0) {
