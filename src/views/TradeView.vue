@@ -828,7 +828,12 @@ const bankNiftyPrice = ref('N/A');
 const finniftyPrice = ref('N/A');
 // Add a new function to get the initial price
 const getInitialPrice = (symbol) => {
-  const strike = callStrikes.value.find(s => s.tradingSymbol.startsWith(symbol));
+  const strike = callStrikes.value.find(s =>
+    s.tradingSymbol.includes(symbol) &&
+    (selectedBroker.value?.brokerName === 'Dhan' ?
+      s.tradingSymbol.endsWith('-CE') :
+      /C\d+$/.test(s.tradingSymbol))
+  );
   return strike ? parseFloat(strike.strikePrice) : null;
 };
 const fetchTradingData = async () => {
@@ -941,10 +946,13 @@ const synchronizeCallStrikes = () => {
     if (selectedBroker.value?.brokerName === 'Dhan') {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, ''); // Adjust regex as needed
+      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
     }
     const matchingCallStrike = callStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-CE' : 'C')
+      strike.tradingSymbol.startsWith(baseSymbol) &&
+      (selectedBroker.value?.brokerName === 'Dhan' ?
+        strike.tradingSymbol.endsWith('-CE') :
+        /C\d+$/.test(strike.tradingSymbol))
     );
     if (matchingCallStrike) {
       selectedCallStrike.value = matchingCallStrike;
@@ -961,10 +969,13 @@ const synchronizePutStrikes = () => {
     if (selectedBroker.value?.brokerName === 'Dhan') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, ''); // Adjust regex as needed
+      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
     }
     const matchingPutStrike = putStrikes.value.find(strike =>
-      strike.tradingSymbol.startsWith(baseSymbol) && strike.tradingSymbol.endsWith(selectedBroker.value?.brokerName === 'Dhan' ? '-PE' : 'P')
+      strike.tradingSymbol.startsWith(baseSymbol) &&
+      (selectedBroker.value?.brokerName === 'Dhan' ?
+        strike.tradingSymbol.endsWith('-PE') :
+        /P\d+$/.test(strike.tradingSymbol))
     );
     if (matchingPutStrike) {
       selectedPutStrike.value = matchingPutStrike;
@@ -1071,14 +1082,14 @@ const fetchFlattradeOrdersTradesBook = async () => {
 
 const combinedOrdersAndTrades = computed(() => {
   const combined = {};
-  
+
   // Check if flatOrderBook.value is an array before using forEach
   if (Array.isArray(flatOrderBook.value)) {
     flatOrderBook.value.forEach(order => {
       combined[order.norenordno] = { order, trade: null };
     });
   }
-  
+
   // Check if flatTradeBook.value is an array before using forEach
   if (Array.isArray(flatTradeBook.value)) {
     flatTradeBook.value.forEach(trade => {
@@ -1089,7 +1100,7 @@ const combinedOrdersAndTrades = computed(() => {
       }
     });
   }
-  
+
   return Object.values(combined).sort((a, b) => {
     const aTime = a.order?.norentm || a.trade?.norentm;
     const bTime = b.order?.norentm || b.trade?.norentm;
@@ -1936,7 +1947,7 @@ watch(
 // Modify the watcher for selectedMasterSymbol
 watch(selectedMasterSymbol, async (newValue, oldValue) => {
   console.log('selectedMasterSymbol changed:', newValue);
-  saveUserChoice(); // Save the user's choice
+  saveUserChoice();
   updateAvailableQuantities();
   await fetchTradingData();
   setDefaultExpiry();
@@ -1968,9 +1979,12 @@ watch(selectedMasterSymbol, async (newValue, oldValue) => {
         }));
       }
     }
+
+    // Force re-synchronization of strikes
+    synchronizeCallStrikes();
+    synchronizePutStrikes();
   }
 });
-
 // Watch productTypes to set the default selectedProductType
 watch(productTypes, (newProductTypes) => {
   if (newProductTypes.length > 0) {
