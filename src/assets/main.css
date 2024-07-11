@@ -141,3 +141,27 @@ th {
 .nav-link {
   color: unset !important;
 }
+
+.nested-trade-row {
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+  /* Light gray background */
+}
+
+tr:hover+.nested-trade-row,
+.nested-trade-row:hover {
+  background-color: #e9ecef;
+  /* Slightly darker on hover */
+}
+
+.nested-trade-row td {
+  padding-left: calc(2rem - 3px);
+}
+
+.nested-trade-row td:first-child::before {
+  content: "↳";
+  /* Add an arrow or any other symbol to indicate nesting */
+  margin-right: 0.5rem;
+  color: #6c757d;
+  /* Subdued color for the arrow */
+}

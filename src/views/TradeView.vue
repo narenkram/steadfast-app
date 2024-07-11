@@ -578,7 +578,7 @@
                       </td>
                       <td>{{ item.order.rejreason }}</td>
                     </tr>
-                    <tr v-if="item.trade">
+                    <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
                       <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
