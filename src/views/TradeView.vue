@@ -559,29 +559,31 @@
                 </tr>
               </thead>
               <tbody>
-                <template v-if="flatOrderBook.length || flatTradeBook.length">
-                  <tr v-for="order in flatOrderBook" :key="order.norenordno">
-                    <td>Order</td>
-                    <td>{{ order.norenordno }}</td>
-                    <td>N/A</td>
-                    <td>{{ order.tsym }}</td>
-                    <td>{{ order.qty }}</td>
-                    <td>{{ order.prc }}</td>
-                    <td>{{ order.norentm }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>{{ order.rejreason }}</td>
-                  </tr>
-                  <tr v-for="trade in flatTradeBook" :key="trade.norenordno">
-                    <td>Trade</td>
-                    <td>{{ trade.norenordno }}</td>
-                    <td>{{ trade.norenordno }}</td>
-                    <td>{{ trade.tsym }}</td>
-                    <td>{{ trade.qty }}</td>
-                    <td>{{ trade.flprc }}</td>
-                    <td>{{ trade.norentm }}</td>
-                    <td>{{ trade.stat }}</td>
-                    <td>N/A</td>
-                  </tr>
+                <template v-if="combinedOrdersAndTrades.length">
+                  <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
+                    <tr>
+                      <td>Order</td>
+                      <td>{{ item.order.norenordno }}</td>
+                      <td>-</td>
+                      <td>{{ item.order.tsym }}</td>
+                      <td>{{ item.order.qty }}</td>
+                      <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.norentm }}</td>
+                      <td>{{ item.order.status }}</td>
+                      <td>{{ item.order.rejreason }}</td>
+                    </tr>
+                    <tr v-if="item.trade">
+                      <td>Trade</td>
+                      <td>-</td>
+                      <td>{{ item.trade.norenordno }}</td>
+                      <td>{{ item.trade.tsym }}</td>
+                      <td>{{ item.trade.qty }}</td>
+                      <td>{{ item.trade.flprc }}</td>
+                      <td>{{ item.trade.norentm }}</td>
+                      <td>{{ item.trade.stat }}</td>
+                      <td>-</td>
+                    </tr>
+                  </template>
                 </template>
                 <tr v-else>
                   <td colspan="9" class="text-center">No orders or trades on selected broker {{
@@ -907,7 +909,7 @@ const updateStrikesForExpiry = (expiryDate) => {
 
       selectedCallStrike.value = nearestStrike;
       selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
-    } 
+    }
 
     console.log('Selected Call Strike:', selectedCallStrike.value);
     console.log('Selected Put Strike:', selectedPutStrike.value);
@@ -1059,6 +1061,28 @@ const fetchFlattradeOrdersTradesBook = async () => {
     console.error('Error fetching trades:', error);
   }
 };
+
+const combinedOrdersAndTrades = computed(() => {
+  const combined = {};
+
+  flatOrderBook.value.forEach(order => {
+    combined[order.norenordno] = { order, trade: null };
+  });
+
+  flatTradeBook.value.forEach(trade => {
+    if (combined[trade.norenordno]) {
+      combined[trade.norenordno].trade = trade;
+    } else {
+      combined[trade.norenordno] = { order: null, trade };
+    }
+  });
+
+  return Object.values(combined).sort((a, b) => {
+    const aTime = a.order?.norentm || a.trade?.norentm;
+    const bTime = b.order?.norentm || b.trade?.norentm;
+    return new Date(bTime) - new Date(aTime); // Sort in descending order (most recent first)
+  });
+});
 
 const dhanPositionBook = ref([]);
 const fetchDhanPositions = async () => {
