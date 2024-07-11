@@ -669,6 +669,7 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
+import { debounce } from 'lodash';
 // import LineChart from '../components/LineChart.vue';
 // const showLineChart = ref(false);
 const showToast = ref(false);
@@ -1757,8 +1758,11 @@ const connectWebSocket = () => {
     console.log('WebSocket connected');
     initializeSubscriptions();
   };
+  socket.value.onclose = () => {
+    console.log('WebSocket disconnected. Attempting to reconnect...');
+    setTimeout(connectWebSocket, 5000);
+  };
 };
-
 const currentSubscriptions = ref({
   masterSymbol: null,
   callOption: null,
@@ -1821,14 +1825,19 @@ const unsubscribeFromSymbols = (symbols) => {
     socket.value.send(JSON.stringify(data));
   }
 };
+
 const updateSubscriptions = () => {
   const symbolsToUnsubscribe = [];
 
   // Check if master symbol has changed
   if (currentSubscriptions.value.masterSymbol !== selectedMasterSymbol.value) {
-    if (currentSubscriptions.value.masterSymbol === 'NIFTY') symbolsToUnsubscribe.push('NSE|26000');
-    else if (currentSubscriptions.value.masterSymbol === 'BANKNIFTY') symbolsToUnsubscribe.push('NSE|26009');
-    else if (currentSubscriptions.value.masterSymbol === 'FINNIFTY') symbolsToUnsubscribe.push('NSE|26037');
+    if (currentSubscriptions.value.masterSymbol) {
+      let oldSymbol;
+      if (currentSubscriptions.value.masterSymbol === 'NIFTY') oldSymbol = 'NSE|26000';
+      else if (currentSubscriptions.value.masterSymbol === 'BANKNIFTY') oldSymbol = 'NSE|26009';
+      else if (currentSubscriptions.value.masterSymbol === 'FINNIFTY') oldSymbol = 'NSE|26037';
+      if (oldSymbol) symbolsToUnsubscribe.push(oldSymbol);
+    }
   }
 
   // Check if options have changed
@@ -1840,7 +1849,9 @@ const updateSubscriptions = () => {
   }
 
   // Unsubscribe from old symbols
-  unsubscribeFromSymbols(symbolsToUnsubscribe);
+  if (symbolsToUnsubscribe.length > 0) {
+    unsubscribeFromSymbols(symbolsToUnsubscribe);
+  }
 
   // Subscribe to new symbols
   subscribeToMasterSymbol();
@@ -1850,6 +1861,7 @@ const initializeSubscriptions = () => {
   subscribeToMasterSymbol();
   subscribeToOptions();
 };
+const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300);
 
 const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -1977,7 +1989,7 @@ watch(
   ],
   ([newCallId, newPutId], [oldCallId, oldPutId]) => {
     if (newCallId !== oldCallId || newPutId !== oldPutId) {
-      updateSubscriptions();
+      debouncedUpdateSubscriptions();
 
       // Reset LTP values when subscribing to new symbols
       latestCallLTP.value = 'N/A';
@@ -1988,6 +2000,7 @@ watch(
   },
   { deep: true }
 );
+
 // Modify the watcher for selectedMasterSymbol
 watch(selectedMasterSymbol, async (newValue, oldValue) => {
   console.log('selectedMasterSymbol changed:', newValue);
@@ -2003,8 +2016,9 @@ watch(selectedMasterSymbol, async (newValue, oldValue) => {
   synchronizePutStrikes();
 
   // Update subscriptions
-  updateSubscriptions();
+  debouncedUpdateSubscriptions();
 });
+
 
 // Watch productTypes to set the default selectedProductType
 watch(productTypes, (newProductTypes) => {
