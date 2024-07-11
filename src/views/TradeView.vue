@@ -899,8 +899,8 @@ const updateStrikesForExpiry = (expiryDate) => {
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
 
-  console.log('Filtered Call Strikes:', filteredCallStrikes);
-  console.log('Filtered Put Strikes:', filteredPutStrikes);
+  // console.log('Filtered Call Strikes:', filteredCallStrikes);
+  // console.log('Filtered Put Strikes:', filteredPutStrikes);
 
   // Only set initial strikes if they haven't been set yet or if the expiry date has changed
   if (!selectedCallStrike.value.securityId || !selectedPutStrike.value.securityId || selectedCallStrike.value.expiryDate !== expiryDate) {
@@ -1755,60 +1755,101 @@ const connectWebSocket = () => {
 
   socket.value.onopen = () => {
     console.log('WebSocket connected');
-    subscribeToSymbols(); // Subscribe to symbols when WebSocket is connected
+    initializeSubscriptions();
   };
 };
 
-const subscribeToSymbols = () => {
-  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    const symbolsToSubscribe = [
-      `NFO|${defaultCallSecurityId.value}`,
-      `NFO|${defaultPutSecurityId.value}`
-    ].filter(Boolean);
+const currentSubscriptions = ref({
+  masterSymbol: null,
+  callOption: null,
+  putOption: null
+});
 
-    // Add the selected master symbol
+const subscribeToMasterSymbol = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    let symbolToSubscribe;
     if (selectedMasterSymbol.value === 'NIFTY') {
-      symbolsToSubscribe.push('NSE|26000');
+      symbolToSubscribe = 'NSE|26000';
     } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
-      symbolsToSubscribe.push('NSE|26009');
+      symbolToSubscribe = 'NSE|26009';
     } else if (selectedMasterSymbol.value === 'FINNIFTY') {
-      symbolsToSubscribe.push('NSE|26037');
+      symbolToSubscribe = 'NSE|26037';
     }
 
+    if (symbolToSubscribe && symbolToSubscribe !== `NSE|${currentSubscriptions.value.masterSymbol}`) {
+      const data = {
+        action: 'subscribe',
+        symbols: [symbolToSubscribe]
+      };
+      console.log('Sending master symbol subscribe data:', data);
+      socket.value.send(JSON.stringify(data));
+      currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value;
+    }
+  }
+};
+
+const subscribeToOptions = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = [];
+
+    if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A' && defaultCallSecurityId.value !== currentSubscriptions.value.callOption) {
+      symbolsToSubscribe.push(`NFO|${defaultCallSecurityId.value}`);
+    }
+    if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A' && defaultPutSecurityId.value !== currentSubscriptions.value.putOption) {
+      symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
+    }
+
+    if (symbolsToSubscribe.length > 0) {
+      const data = {
+        action: 'subscribe',
+        symbols: symbolsToSubscribe
+      };
+      console.log('Sending options subscribe data:', data);
+      socket.value.send(JSON.stringify(data));
+      currentSubscriptions.value.callOption = defaultCallSecurityId.value;
+      currentSubscriptions.value.putOption = defaultPutSecurityId.value;
+    }
+  }
+};
+const unsubscribeFromSymbols = (symbols) => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN && symbols.length > 0) {
     const data = {
-      action: 'subscribe',
-      symbols: symbolsToSubscribe
+      action: 'unsubscribe',
+      symbols: symbols
     };
-    console.log('Sending subscribe data:', data);
+    console.log('Sending unsubscribe data:', data);
     socket.value.send(JSON.stringify(data));
   }
 };
+const updateSubscriptions = () => {
+  const symbolsToUnsubscribe = [];
 
-const unsubscribeAndSubscribe = async (oldCallId, oldPutId, newCallId, newPutId) => {
-  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    const unsubscribeData = {
-      action: 'unsubscribe',
-      symbols: [`NFO|${oldCallId}`, `NFO|${oldPutId}`].filter(Boolean)
-    };
-    console.log('Sending unsubscribe data:', unsubscribeData);
-    socket.value.send(JSON.stringify(unsubscribeData));
-
-    // Increased wait time to ensure unsubscribe is processed
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    const subscribeData = {
-      action: 'subscribe',
-      symbols: [`NFO|${newCallId}`, `NFO|${newPutId}`].filter(Boolean)
-    };
-    console.log('Sending subscribe data:', subscribeData);
-    socket.value.send(JSON.stringify(subscribeData));
-
-    // Reset LTP values when subscribing to new symbols
-    latestCallLTP.value = 'N/A';
-    latestPutLTP.value = 'N/A';
+  // Check if master symbol has changed
+  if (currentSubscriptions.value.masterSymbol !== selectedMasterSymbol.value) {
+    if (currentSubscriptions.value.masterSymbol === 'NIFTY') symbolsToUnsubscribe.push('NSE|26000');
+    else if (currentSubscriptions.value.masterSymbol === 'BANKNIFTY') symbolsToUnsubscribe.push('NSE|26009');
+    else if (currentSubscriptions.value.masterSymbol === 'FINNIFTY') symbolsToUnsubscribe.push('NSE|26037');
   }
-};
 
+  // Check if options have changed
+  if (currentSubscriptions.value.callOption && currentSubscriptions.value.callOption !== defaultCallSecurityId.value) {
+    symbolsToUnsubscribe.push(`NFO|${currentSubscriptions.value.callOption}`);
+  }
+  if (currentSubscriptions.value.putOption && currentSubscriptions.value.putOption !== defaultPutSecurityId.value) {
+    symbolsToUnsubscribe.push(`NFO|${currentSubscriptions.value.putOption}`);
+  }
+
+  // Unsubscribe from old symbols
+  unsubscribeFromSymbols(symbolsToUnsubscribe);
+
+  // Subscribe to new symbols
+  subscribeToMasterSymbol();
+  subscribeToOptions();
+};
+const initializeSubscriptions = () => {
+  subscribeToMasterSymbol();
+  subscribeToOptions();
+};
 
 const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -1928,6 +1969,7 @@ watch(selectedPutStrike, (newStrike, oldStrike) => {
 // Watchers for defaultCallSecurityId and defaultPutSecurityId
 // This watcher handles unsubscribing and subscribing to new security IDs,
 // setting Flattrade credentials, and sending WebSocket data when either ID changes.
+// Modify the watcher for defaultCallSecurityId and defaultPutSecurityId
 watch(
   [
     () => defaultCallSecurityId.value,
@@ -1935,56 +1977,35 @@ watch(
   ],
   ([newCallId, newPutId], [oldCallId, oldPutId]) => {
     if (newCallId !== oldCallId || newPutId !== oldPutId) {
-      if (newCallId && newPutId) {
-        unsubscribeAndSubscribe(oldCallId, oldPutId, newCallId, newPutId);
-        setFlattradeCredentials();
-      }
+      updateSubscriptions();
+
+      // Reset LTP values when subscribing to new symbols
+      latestCallLTP.value = 'N/A';
+      latestPutLTP.value = 'N/A';
+
+      setFlattradeCredentials();
     }
   },
   { deep: true }
 );
-
 // Modify the watcher for selectedMasterSymbol
 watch(selectedMasterSymbol, async (newValue, oldValue) => {
   console.log('selectedMasterSymbol changed:', newValue);
   saveUserChoice();
   updateAvailableQuantities();
+
+  // Fetch new trading data and update expiry
   await fetchTradingData();
   setDefaultExpiry();
 
-  // Handle WebSocket subscription changes
-  if (newValue !== oldValue) {
-    const symbolsToUnsubscribe = [];
-    const symbolsToSubscribe = [];
+  // Force re-synchronization of strikes
+  synchronizeCallStrikes();
+  synchronizePutStrikes();
 
-    if (oldValue === 'NIFTY') symbolsToUnsubscribe.push('NSE|26000');
-    else if (oldValue === 'BANKNIFTY') symbolsToUnsubscribe.push('NSE|26009');
-    else if (oldValue === 'FINNIFTY') symbolsToUnsubscribe.push('NSE|26037');
-
-    if (newValue === 'NIFTY') symbolsToSubscribe.push('NSE|26000');
-    else if (newValue === 'BANKNIFTY') symbolsToSubscribe.push('NSE|26009');
-    else if (newValue === 'FINNIFTY') symbolsToSubscribe.push('NSE|26037');
-
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-      if (symbolsToUnsubscribe.length > 0) {
-        socket.value.send(JSON.stringify({
-          action: 'unsubscribe',
-          symbols: symbolsToUnsubscribe
-        }));
-      }
-      if (symbolsToSubscribe.length > 0) {
-        socket.value.send(JSON.stringify({
-          action: 'subscribe',
-          symbols: symbolsToSubscribe
-        }));
-      }
-    }
-
-    // Force re-synchronization of strikes
-    synchronizeCallStrikes();
-    synchronizePutStrikes();
-  }
+  // Update subscriptions
+  updateSubscriptions();
 });
+
 // Watch productTypes to set the default selectedProductType
 watch(productTypes, (newProductTypes) => {
   if (newProductTypes.length > 0) {
