@@ -1750,15 +1750,23 @@ const connectWebSocket = () => {
 
 const subscribeToSymbols = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = [
+      `NFO|${defaultCallSecurityId.value}`,
+      `NFO|${defaultPutSecurityId.value}`
+    ].filter(Boolean);
+
+    // Add the selected master symbol
+    if (selectedMasterSymbol.value === 'NIFTY') {
+      symbolsToSubscribe.push('NSE|26000');
+    } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
+      symbolsToSubscribe.push('NSE|26009');
+    } else if (selectedMasterSymbol.value === 'FINNIFTY') {
+      symbolsToSubscribe.push('NSE|26037');
+    }
+
     const data = {
       action: 'subscribe',
-      symbols: [
-        `NFO|${defaultCallSecurityId.value}`,
-        `NFO|${defaultPutSecurityId.value}`,
-        'NSE|26000',
-        'NSE|26009',
-        'NSE|26037'
-      ].filter(Boolean)
+      symbols: symbolsToSubscribe
     };
     console.log('Sending subscribe data:', data);
     socket.value.send(JSON.stringify(data));
@@ -1926,12 +1934,41 @@ watch(
 );
 
 // Modify the watcher for selectedMasterSymbol
-watch(selectedMasterSymbol, async (newValue) => {
+watch(selectedMasterSymbol, async (newValue, oldValue) => {
   console.log('selectedMasterSymbol changed:', newValue);
   saveUserChoice(); // Save the user's choice
   updateAvailableQuantities();
   await fetchTradingData();
   setDefaultExpiry();
+
+  // Handle WebSocket subscription changes
+  if (newValue !== oldValue) {
+    const symbolsToUnsubscribe = [];
+    const symbolsToSubscribe = [];
+
+    if (oldValue === 'NIFTY') symbolsToUnsubscribe.push('NSE|26000');
+    else if (oldValue === 'BANKNIFTY') symbolsToUnsubscribe.push('NSE|26009');
+    else if (oldValue === 'FINNIFTY') symbolsToUnsubscribe.push('NSE|26037');
+
+    if (newValue === 'NIFTY') symbolsToSubscribe.push('NSE|26000');
+    else if (newValue === 'BANKNIFTY') symbolsToSubscribe.push('NSE|26009');
+    else if (newValue === 'FINNIFTY') symbolsToSubscribe.push('NSE|26037');
+
+    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+      if (symbolsToUnsubscribe.length > 0) {
+        socket.value.send(JSON.stringify({
+          action: 'unsubscribe',
+          symbols: symbolsToUnsubscribe
+        }));
+      }
+      if (symbolsToSubscribe.length > 0) {
+        socket.value.send(JSON.stringify({
+          action: 'subscribe',
+          symbols: symbolsToSubscribe
+        }));
+      }
+    }
+  }
 });
 
 // Watch productTypes to set the default selectedProductType
