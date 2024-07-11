@@ -569,7 +569,13 @@
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
-                      <td>{{ item.order.status }}</td>
+                      <td :class="{
+                        'text-danger': item.order.status === 'REJECTED',
+                        'text-success': item.order.status === 'COMPLETE',
+                        'text-warning': item.order.status === 'PENDING'
+                      }">
+                        {{ item.order.status }}
+                      </td>
                       <td>{{ item.order.rejreason }}</td>
                     </tr>
                     <tr v-if="item.trade">
@@ -580,7 +586,7 @@
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
-                      <td>{{ item.trade.stat }}</td>
+                      <td>{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                       <td>-</td>
                     </tr>
                   </template>
