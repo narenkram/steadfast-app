@@ -722,10 +722,10 @@ const toggleKillSwitch = async () => {
     // Add a small delay to ensure the toast message is displayed
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    cycleClockEmoji();
   }
 
   if (newStatus === 'DEACTIVATED') {
+    cycleClockEmoji();
     const activationTime = localStorage.getItem('KillSwitchActivationTime');
     const currentTime = new Date().getTime();
     const twelveHoursInMillis = 12 * 60 * 60 * 1000;
