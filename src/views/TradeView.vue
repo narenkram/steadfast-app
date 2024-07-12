@@ -474,6 +474,7 @@
                 <tr>
                   <th scope="col">Symbol Name</th>
                   <th scope="col">Net Qty</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
@@ -491,6 +492,7 @@
                       :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
                       {{ flattradePosition.netqty }}
                     </td>
+                    <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
@@ -1776,7 +1778,7 @@ const connectWebSocket = () => {
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
-    console.log('Received data:', quoteData);
+    // console.log('Received data:', quoteData);
     if (quoteData.lp) {
       if (quoteData.tk === '26000' && selectedMasterSymbol.value === 'NIFTY') {
         niftyPrice.value = quoteData.lp;
@@ -1789,10 +1791,10 @@ const connectWebSocket = () => {
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
-        console.log('Updated Call LTP:', latestCallLTP.value);
+        // console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
-        console.log('Updated Put LTP:', latestPutLTP.value);
+        // console.log('Updated Put LTP:', latestPutLTP.value);
       }
 
       // Update position LTPs
