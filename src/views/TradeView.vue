@@ -269,14 +269,14 @@
 
           <!-- Live Underlying Price -->
           <div class="col-6 text-center">
+		  
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">Nifty 50: <b>{{ niftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTYNXT50'">Nifty Next 50: <b>{{ niftynxt50Price }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">Nifty Mid Select: <b>{{ midcpniftyPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">Sensext: <b>{{ sensexPrice }}</b></p>		
-            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">Bankex: <b>{{ bankexPrice }}</b></p>		
-            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX50'">Sensex 50: <b>{{ sensex50Price }}</b></p>					
+            <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">Nifty Mid Select: <b>{{ midcpniftyPrice }}</b></p>			
+            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">Sensex: <b>{{ sensexPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">Bankex: <b>{{ bankexPrice }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
@@ -428,8 +428,8 @@
             </div>
             <div class="col-6 text-center py-2">
               <p class="mb-0">
-                <span>Total Buy Value: <b> | ₹ {{ totalBuyValue.toFixed(2) }} |</b></span>
-                <span class="ms-3">Total Sell Value: <b>| ₹ {{ totalSellValue.toFixed(2) }} |</b></span>
+                <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
+                <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
               </p>
               <p class="mb-0">
               </p>
@@ -442,11 +442,11 @@
                 <th scope="col">Symbol Name</th>
                 <th scope="col">Position Type</th>
                 <th scope="col">Product Type</th>
-                <th scope="col">Net QTY</th>
+                <th scope="col">Net Qty</th>
                 <th scope="col">Buy Value</th>
                 <th scope="col">Sell Value</th>
                 <th scope="col">Realized Profit</th>
-                <th scope="col">Unrealized Profi</th>
+                <th scope="col">Unrealized Profit</th>
               </tr>
             </thead>
             <tbody>
@@ -478,7 +478,8 @@
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
-                  <th scope="col">Net QTY</th>
+                  <th scope="col">Net Qty</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
@@ -496,6 +497,7 @@
                       :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
                       {{ flattradePosition.netqty }}
                     </td>
+                    <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
@@ -524,10 +526,8 @@
           <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
             <thead>
               <tr>
-                <th>Side</th>
-				<th>Order ID</th>
-                <th>Product Type</th>
-				<th>Symbol</th>
+                <th>Order ID</th>
+                <th>Symbol</th>
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Execution Time</th>
@@ -536,9 +536,7 @@
             </thead>
             <tbody>
               <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
-                <td>{{ dhanOrder.transactionType }}</td>
-				<td>{{ dhanOrder.orderId }}</td>
-				<td>{{ dhanOrder.productType }}</td>
+                <td>{{ dhanOrder.orderId }}</td>
                 <td>{{ dhanOrder.tradingSymbol }}</td>
                 <td>{{ dhanOrder.quantity }}</td>
                 <td>{{ dhanOrder.price }}</td>
@@ -557,10 +555,8 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
-                  <th scope="col">Side</th>
                   <th scope="col">Order ID</th>
                   <th scope="col">Trade ID</th>
-				  <th scope="col">Product Type</th>
                   <th scope="col">Symbol</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
@@ -574,13 +570,11 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr>
                       <td>Order</td>
-					  <td>{{item.order.trantype}}</td>
                       <td>{{ item.order.norenordno }}</td>
                       <td>-</td>
-                      <td>{{ item.order.prd }}</td>
                       <td>{{ item.order.tsym }}</td>
                       <td>{{ item.order.qty }}</td>
-					  <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
@@ -593,10 +587,8 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-					  <td>{{item.trade.trantype}}</td>
                       <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
-					  <td>{{ item.trade.prd }}</td>
                       <td>{{ item.trade.tsym }}</td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
@@ -635,6 +627,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -875,44 +868,46 @@ const fetchTradingData = async () => {
     response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
-    console.log('Flattrade Symbols:', response);
   } else {
     throw new Error('Unsupported broker');
   }
 
   const data = await response.json();
   console.log('Data:', data);
-  expiryDates.value = data.expiryDates;
 
-  // Filter by selected expiry date before sorting and mapping
-  callStrikes.value = data.callStrikes
-    .filter(strike => strike.expiryDate === selectedExpiry.value)
-    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
+  // Filter expiry dates to show only dates up to near 3 weeks
+  const today = new Date();
+  const threeWeeksLater = new Date(today.getTime() + (21 * 24 * 60 * 60 * 1000)); // 21 days in milliseconds
+  const filteredExpiryDates = data.expiryDates.filter(dateStr => {
+    const expiryDate = new Date(dateStr);
+    return expiryDate <= threeWeeksLater;
+  });
 
-  putStrikes.value = data.putStrikes
-    .filter(strike => strike.expiryDate === selectedExpiry.value)
-    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
-
-  // After fetching and setting callStrikes and putStrikes
-  if (niftyPrice.value === 'N/A') niftyPrice.value = getInitialPrice('NIFTY');
-  if (bankNiftyPrice.value === 'N/A') bankNiftyPrice.value = getInitialPrice('BANKNIFTY');
-  if (finniftyPrice.value === 'N/A') finniftyPrice.value = getInitialPrice('FINNIFTY');
-  if (niftynxt50Price.value === 'N/A') niftynxt50Price.value = getInitialPrice('NIFTYNXT50');
-  if (midcpniftyPrice.value === 'N/A') midcpniftyPrice.value = getInitialPrice('MIDCPNIFTY');
-  if (sensexPrice.value === 'N/A') sensexPrice.value = getInitialPrice('SENSEX');
-  if (bankexPrice.value === 'N/A') bankexPrice.value = getInitialPrice('BANKEX');
-  if (sensex50Price.value === 'N/A') sensex50Price.value = getInitialPrice('SENSEX50');
+  expiryDates.value = filteredExpiryDates;
   
+  // Filter and set callStrikes and putStrikes for selected expiry date
+  callStrikes.value = filterAndSortStrikes(data.callStrikes, selectedExpiry.value);
+  putStrikes.value = filterAndSortStrikes(data.putStrikes, selectedExpiry.value);
+
+  // Update strikes for the selected expiry value
   updateStrikesForExpiry(selectedExpiry.value);
 };
+
+// Function to filter and sort strikes by expiry date
+const filterAndSortStrikes = (strikes, selectedExpiryDate) => {
+  return strikes
+    .filter(strike => strike.expiryDate === selectedExpiryDate)
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
+};
+
 // Add watchers for the price values
 watch([niftyPrice, bankNiftyPrice, finniftyPrice, niftynxt50Price, midcpniftyPrice, sensexPrice, bankexPrice, sensex50Price], () => {
   if (selectedExpiry.value) {
     updateStrikesForExpiry(selectedExpiry.value);
   }
 });
+
 const formatDate = (dateString) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     // Extract only the date part from the date string for Dhan
@@ -923,6 +918,7 @@ const formatDate = (dateString) => {
   }
   return dateString; // Default case, return the original date string
 };
+
 
 const updateStrikesForExpiry = (expiryDate) => {
   console.log('Updating strikes for expiry:', expiryDate);
@@ -1193,7 +1189,8 @@ const fetchFlattradePositions = async () => {
       flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
       updatePositionSecurityIds();
-      subscribeToOptions();	  
+      subscribeToPositionLTPs(); // Add this line
+      subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
       flattradeTokenStatus.value = 'Valid';
@@ -1711,7 +1708,7 @@ const deployedCapitalPercentage = computed(() => {
   return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
 });
 
-const totalCharges = computed(() => {
+const totalBrokerage = computed(() => {
   let total = 0;
 
   // Calculate totalValue based on totalBuyValue and totalSellValue
@@ -1725,16 +1722,17 @@ const totalCharges = computed(() => {
     const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);                       // Adjusted rate for Dhan
     const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;               // Adjusted rate for Dhan
 
-    // Accumulate charges for Dhan
+    // Accumulate brokerage for Dhan
     for (const order of dhanOrders.value) {
       if (order.orderStatus === 'TRADED') {
-        total += 23.6; // Accumulate charges total
+        total += 23.6; // Accumulate brokerage total
       }
     }
 
     // Subtract charges from total for Dhan
-    total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);    
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
+
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     // Calculate charges for Flattrade
     const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;                   // Adjusted rate for Flattrade
     const ipftCharge = Math.round(totalValue * 0.000005 * 100) / 100;                       // Adjusted rate for Flattrade	
@@ -1751,7 +1749,7 @@ const totalCharges = computed(() => {
 });
 
 
-const netPnl = computed(() => totalProfit.value - totalCharges.value);
+const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
 
 const setDefaultExpiry = () => {
   if (expiryDates.value.length > 0) {
@@ -1809,7 +1807,7 @@ const connectWebSocket = () => {
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
-    console.log('Received data:', quoteData);
+    // console.log('Received data:', quoteData);
     if (quoteData.lp) {
       if (quoteData.tk === '26000' && selectedMasterSymbol.value === 'NIFTY') {
         niftyPrice.value = quoteData.lp;
@@ -1822,32 +1820,32 @@ const connectWebSocket = () => {
       }
       else if (quoteData.tk === '26013' && selectedMasterSymbol.value === 'NIFTYNXT50') {
         niftynxt50Price.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '26074' && selectedMasterSymbol.value === 'MIDCPNIFTY') {
         midcpniftyPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '1' && selectedMasterSymbol.value === 'SENSEX') {
         sensexPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '12' && selectedMasterSymbol.value === 'BANKEX') {
         bankexPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '47' && selectedMasterSymbol.value === 'SENSEX50') {
         sensex50Price.value = quoteData.lp;
-      }		  	  
+      }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
-        console.log('Updated Call LTP:', latestCallLTP.value);
+        // console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
-        console.log('Updated Put LTP:', latestPutLTP.value);
+        // console.log('Updated Put LTP:', latestPutLTP.value);
       }
 
       // Update position LTPs
       const positionTsym = Object.keys(positionSecurityIds.value).find(tsym => positionSecurityIds.value[tsym] === quoteData.tk);
       if (positionTsym) {
         positionLTPs.value[positionTsym] = quoteData.lp;
-      }	  
+      }
     }
   };
 
@@ -1873,10 +1871,11 @@ const currentSubscriptions = ref({
 // Add these new reactive variables
 const positionLTPs = ref({});
 const positionSecurityIds = ref({});
+
 const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     let symbolToSubscribe;
-    
+
     // Mapping for NSE symbols
     if (selectedMasterSymbol.value === 'NIFTY') {
       symbolToSubscribe = 'NSE|26000';
@@ -1889,7 +1888,7 @@ const subscribeToMasterSymbol = () => {
     } else if (selectedMasterSymbol.value === 'MIDCPNIFTY') {
       symbolToSubscribe = 'NSE|26074';
     }
-    
+
     // Mapping for BSE symbols
     else if (selectedMasterSymbol.value === 'SENSEX') {
       symbolToSubscribe = 'BSE|1';
@@ -1911,47 +1910,56 @@ const subscribeToMasterSymbol = () => {
   }
 };
 
-// Modify the existing subscribeToOptions function
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
+    const exchangeSegment = getExchangeSegment();
 
     // Add subscriptions for Call and Put options
     if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A' && defaultCallSecurityId.value !== currentSubscriptions.value.callOption) {
-      symbolsToSubscribe.push(`NFO|${defaultCallSecurityId.value}`);
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultCallSecurityId.value}`);
     }
     if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A' && defaultPutSecurityId.value !== currentSubscriptions.value.putOption) {
-      symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultPutSecurityId.value}`);
     }
-
-    // Add subscriptions for position LTPs
-    Object.entries(positionSecurityIds.value).forEach(([tsym, securityId]) => {
-      if (securityId && securityId !== 'N/A') {
-        symbolsToSubscribe.push(`NFO|${securityId}`);
-      }
-    });
 
     if (symbolsToSubscribe.length > 0) {
       const data = {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending options and positions subscribe data:', data);
+      console.log('Sending options subscribe data:', data);
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
     }
   }
-};
 
+  // Subscribe to position LTPs separately
+  subscribeToPositionLTPs();
+};
 // Add a new function to update position security IDs
 const updatePositionSecurityIds = () => {
   flatTradePositionBook.value.forEach(position => {
-    const strike = [...callStrikes.value, ...putStrikes.value].find(s => s.tradingSymbol === position.tsym);
-    if (strike) {
-      positionSecurityIds.value[position.tsym] = strike.securityId;
+    if (position.tsym && !positionSecurityIds.value[position.tsym]) {
+      positionSecurityIds.value[position.tsym] = position.token;
     }
   });
+};
+const subscribeToPositionLTPs = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
+      .map(([tsym, token]) => `NFO|${token}`);
+
+    if (symbolsToSubscribe.length > 0) {
+      const data = {
+        action: 'subscribe',
+        symbols: symbolsToSubscribe
+      };
+      console.log('Sending position LTPs subscribe data:', data);
+      socket.value.send(JSON.stringify(data));
+    }
+  }
 };
 // Add a watcher for flatTradePositionBook
 watch(flatTradePositionBook, () => {
@@ -1984,7 +1992,7 @@ const updateSubscriptions = () => {
       else if (currentSubscriptions.value.masterSymbol === 'MIDCPNIFTY') oldSymbol = 'NSE|26074';
       else if (currentSubscriptions.value.masterSymbol === 'SENSEX') oldSymbol = 'BSE|1';
       else if (currentSubscriptions.value.masterSymbol === 'BANKEX') oldSymbol = 'BSE|12';
-      else if (currentSubscriptions.value.masterSymbol === 'SENSEX50') oldSymbol = 'BSE|47';	  
+      else if (currentSubscriptions.value.masterSymbol === 'SENSEX50') oldSymbol = 'BSE|47';
       if (oldSymbol) symbolsToUnsubscribe.push(oldSymbol);
     }
   }
