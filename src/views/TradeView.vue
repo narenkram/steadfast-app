@@ -493,7 +493,7 @@
                     </td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
-                    <td>{{ flattradePosition.lp }}</td>
+                    <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td>{{ flattradePosition.daybuyamt }}</td>
                     <td>{{ flattradePosition.daysellamt }}</td>
                     <td
@@ -1158,6 +1158,8 @@ const fetchFlattradePositions = async () => {
       flatTradePositionBook.value = positionBookRes.data;
       flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
+      updatePositionSecurityIds();
+      subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
       flattradeTokenStatus.value = 'Valid';
@@ -1687,7 +1689,7 @@ const totalBrokerage = computed(() => {
     const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;                       // Adjusted rate for Dhan
     const gstCharge = Math.round((exchangeCharge + sebiCharge) * 18) / 100;                 // Adjusted rate for Dhan
     const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);                       // Adjusted rate for Dhan
-    const sttCharge = Math.round(totalSellValue.value * 0.000625 *100) / 100;               // Adjusted rate for Dhan
+    const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;               // Adjusted rate for Dhan
 
     // Accumulate brokerage for Dhan
     for (const order of dhanOrders.value) {
@@ -1698,7 +1700,7 @@ const totalBrokerage = computed(() => {
 
     // Subtract charges from total for Dhan
     total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
-    
+
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     // Calculate charges for Flattrade
     const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;                   // Adjusted rate for Flattrade
@@ -1771,6 +1773,7 @@ const defaultPutSecurityId = ref(null);
 const connectWebSocket = () => {
   socket.value = new WebSocket('ws://localhost:8765');
 
+  // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
     console.log('Received data:', quoteData);
@@ -1790,6 +1793,12 @@ const connectWebSocket = () => {
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
         console.log('Updated Put LTP:', latestPutLTP.value);
+      }
+
+      // Update position LTPs
+      const positionTsym = Object.keys(positionSecurityIds.value).find(tsym => positionSecurityIds.value[tsym] === quoteData.tk);
+      if (positionTsym) {
+        positionLTPs.value[positionTsym] = quoteData.lp;
       }
     }
   };
@@ -1812,6 +1821,9 @@ const currentSubscriptions = ref({
   callOption: null,
   putOption: null
 });
+// Add these new reactive variables
+const positionLTPs = ref({});
+const positionSecurityIds = ref({});
 
 const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
@@ -1836,10 +1848,12 @@ const subscribeToMasterSymbol = () => {
   }
 };
 
+// Modify the existing subscribeToOptions function
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
 
+    // Add subscriptions for Call and Put options
     if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A' && defaultCallSecurityId.value !== currentSubscriptions.value.callOption) {
       symbolsToSubscribe.push(`NFO|${defaultCallSecurityId.value}`);
     }
@@ -1847,18 +1861,40 @@ const subscribeToOptions = () => {
       symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
     }
 
+    // Add subscriptions for position LTPs
+    Object.entries(positionSecurityIds.value).forEach(([tsym, securityId]) => {
+      if (securityId && securityId !== 'N/A') {
+        symbolsToSubscribe.push(`NFO|${securityId}`);
+      }
+    });
+
     if (symbolsToSubscribe.length > 0) {
       const data = {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending options subscribe data:', data);
+      console.log('Sending options and positions subscribe data:', data);
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
     }
   }
 };
+// Add a new function to update position security IDs
+const updatePositionSecurityIds = () => {
+  flatTradePositionBook.value.forEach(position => {
+    const strike = [...callStrikes.value, ...putStrikes.value].find(s => s.tradingSymbol === position.tsym);
+    if (strike) {
+      positionSecurityIds.value[position.tsym] = strike.securityId;
+    }
+  });
+};
+// Add a watcher for flatTradePositionBook
+watch(flatTradePositionBook, () => {
+  updatePositionSecurityIds();
+  subscribeToOptions();
+}, { deep: true });
+
 const unsubscribeFromSymbols = (symbols) => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN && symbols.length > 0) {
     const data = {
