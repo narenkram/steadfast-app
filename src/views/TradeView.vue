@@ -1911,13 +1911,14 @@ const subscribeToMasterSymbol = () => {
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
+    const exchangeSegment = getExchangeSegment();
 
     // Add subscriptions for Call and Put options
     if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A' && defaultCallSecurityId.value !== currentSubscriptions.value.callOption) {
-      symbolsToSubscribe.push(`NFO|${defaultCallSecurityId.value}`);
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultCallSecurityId.value}`);
     }
     if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A' && defaultPutSecurityId.value !== currentSubscriptions.value.putOption) {
-      symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultPutSecurityId.value}`);
     }
 
     if (symbolsToSubscribe.length > 0) {
