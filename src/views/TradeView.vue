@@ -1161,6 +1161,7 @@ const fetchFlattradePositions = async () => {
       flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
       updatePositionSecurityIds();
+      subscribeToPositionLTPs(); // Add this line
       subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
@@ -1863,33 +1864,43 @@ const subscribeToOptions = () => {
       symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
     }
 
-    // Add subscriptions for position LTPs
-    Object.entries(positionSecurityIds.value).forEach(([tsym, securityId]) => {
-      if (securityId && securityId !== 'N/A') {
-        symbolsToSubscribe.push(`NFO|${securityId}`);
-      }
-    });
+    if (symbolsToSubscribe.length > 0) {
+      const data = {
+        action: 'subscribe',
+        symbols: symbolsToSubscribe
+      };
+      console.log('Sending options subscribe data:', data);
+      socket.value.send(JSON.stringify(data));
+      currentSubscriptions.value.callOption = defaultCallSecurityId.value;
+      currentSubscriptions.value.putOption = defaultPutSecurityId.value;
+    }
+  }
+
+  // Subscribe to position LTPs separately
+  subscribeToPositionLTPs();
+};
+// Add a new function to update position security IDs
+const updatePositionSecurityIds = () => {
+  flatTradePositionBook.value.forEach(position => {
+    if (position.tsym && !positionSecurityIds.value[position.tsym]) {
+      positionSecurityIds.value[position.tsym] = position.token;
+    }
+  });
+};
+const subscribeToPositionLTPs = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
+      .map(([tsym, token]) => `NFO|${token}`);
 
     if (symbolsToSubscribe.length > 0) {
       const data = {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending options and positions subscribe data:', data);
+      console.log('Sending position LTPs subscribe data:', data);
       socket.value.send(JSON.stringify(data));
-      currentSubscriptions.value.callOption = defaultCallSecurityId.value;
-      currentSubscriptions.value.putOption = defaultPutSecurityId.value;
     }
   }
-};
-// Add a new function to update position security IDs
-const updatePositionSecurityIds = () => {
-  flatTradePositionBook.value.forEach(position => {
-    const strike = [...callStrikes.value, ...putStrikes.value].find(s => s.tradingSymbol === position.tsym);
-    if (strike) {
-      positionSecurityIds.value[position.tsym] = strike.securityId;
-    }
-  });
 };
 // Add a watcher for flatTradePositionBook
 watch(flatTradePositionBook, () => {
