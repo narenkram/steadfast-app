@@ -273,10 +273,11 @@
             <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTYNXT50'">Nifty Next 50: <b>{{ niftynxt50Price }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">Nifty Mid Select: <b>{{ midcpniftyPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">Sensext: <b>{{ sensexPrice }}</b></p>		
-            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">Bankex: <b>{{ bankexPrice }}</b></p>		
-            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX50'">Sensex 50: <b>{{ sensex50Price }}</b></p>					
+            <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">Nifty Mid Select: <b>{{ midcpniftyPrice }}</b>
+            </p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">Sensex: <b>{{ sensexPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">Bankex: <b>{{ bankexPrice }}</b></p>
+            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX50'">Sensex 50: <b>{{ sensex50Price }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
@@ -500,7 +501,7 @@
                     <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
-                    <td>{{ flattradePosition.lp }}</td>
+                    <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td>{{ flattradePosition.daybuyamt }}</td>
                     <td>{{ flattradePosition.daysellamt }}</td>
                     <td
@@ -897,7 +898,7 @@ const fetchTradingData = async () => {
   if (sensexPrice.value === 'N/A') sensexPrice.value = getInitialPrice('SENSEX');
   if (bankexPrice.value === 'N/A') bankexPrice.value = getInitialPrice('BANKEX');
   if (sensex50Price.value === 'N/A') sensex50Price.value = getInitialPrice('SENSEX50');
-  
+
   updateStrikesForExpiry(selectedExpiry.value);
 };
 // Add watchers for the price values
@@ -1717,7 +1718,7 @@ const totalBrokerage = computed(() => {
     const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;                       // Adjusted rate for Dhan
     const gstCharge = Math.round((exchangeCharge + sebiCharge) * 18) / 100;                 // Adjusted rate for Dhan
     const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);                       // Adjusted rate for Dhan
-    const sttCharge = Math.round(totalSellValue.value * 0.000625 *100) / 100;               // Adjusted rate for Dhan
+    const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;               // Adjusted rate for Dhan
 
     // Accumulate brokerage for Dhan
     for (const order of dhanOrders.value) {
@@ -1728,7 +1729,7 @@ const totalBrokerage = computed(() => {
 
     // Subtract charges from total for Dhan
     total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
-    
+
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     // Calculate charges for Flattrade
     const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;                   // Adjusted rate for Flattrade
@@ -1817,19 +1818,19 @@ const connectWebSocket = () => {
       }
       else if (quoteData.tk === '26013' && selectedMasterSymbol.value === 'NIFTYNXT50') {
         niftynxt50Price.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '26074' && selectedMasterSymbol.value === 'MIDCPNIFTY') {
         midcpniftyPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '1' && selectedMasterSymbol.value === 'SENSEX') {
         sensexPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '12' && selectedMasterSymbol.value === 'BANKEX') {
         bankexPrice.value = quoteData.lp;
-      }	  
+      }
       else if (quoteData.tk === '47' && selectedMasterSymbol.value === 'SENSEX50') {
         sensex50Price.value = quoteData.lp;
-      }		  	  
+      }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
         // console.log('Updated Call LTP:', latestCallLTP.value);
@@ -1872,7 +1873,7 @@ const positionSecurityIds = ref({});
 const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     let symbolToSubscribe;
-    
+
     // Mapping for NSE symbols
     if (selectedMasterSymbol.value === 'NIFTY') {
       symbolToSubscribe = 'NSE|26000';
@@ -1885,7 +1886,7 @@ const subscribeToMasterSymbol = () => {
     } else if (selectedMasterSymbol.value === 'MIDCPNIFTY') {
       symbolToSubscribe = 'NSE|26074';
     }
-    
+
     // Mapping for BSE symbols
     else if (selectedMasterSymbol.value === 'SENSEX') {
       symbolToSubscribe = 'BSE|1';
@@ -1907,7 +1908,6 @@ const subscribeToMasterSymbol = () => {
   }
 };
 
-// Modify the existing subscribeToOptions function
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
@@ -1920,19 +1920,12 @@ const subscribeToOptions = () => {
       symbolsToSubscribe.push(`NFO|${defaultPutSecurityId.value}`);
     }
 
-    // Add subscriptions for position LTPs
-    Object.entries(positionSecurityIds.value).forEach(([tsym, securityId]) => {
-      if (securityId && securityId !== 'N/A') {
-        symbolsToSubscribe.push(`NFO|${securityId}`);
-      }
-    });
-
     if (symbolsToSubscribe.length > 0) {
       const data = {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending options and positions subscribe data:', data);
+      console.log('Sending options subscribe data:', data);
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
@@ -1996,7 +1989,7 @@ const updateSubscriptions = () => {
       else if (currentSubscriptions.value.masterSymbol === 'MIDCPNIFTY') oldSymbol = 'NSE|26074';
       else if (currentSubscriptions.value.masterSymbol === 'SENSEX') oldSymbol = 'BSE|1';
       else if (currentSubscriptions.value.masterSymbol === 'BANKEX') oldSymbol = 'BSE|12';
-      else if (currentSubscriptions.value.masterSymbol === 'SENSEX50') oldSymbol = 'BSE|47';	  
+      else if (currentSubscriptions.value.masterSymbol === 'SENSEX50') oldSymbol = 'BSE|47';
       if (oldSymbol) symbolsToUnsubscribe.push(oldSymbol);
     }
   }
