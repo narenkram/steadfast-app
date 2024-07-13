@@ -1840,14 +1840,27 @@ const cycleClockEmoji = () => {
 
 const setFlattradeCredentials = async () => {
   try {
+    if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+      toastMessage.value = 'Realtime LTP data only available for Flattrade';
+      showToast.value = true;
+      return;
+    }
+
+    const clientId = selectedBroker.value.clientId;
+    const apiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
+
+    if (!clientId || !apiToken) {
+      console.error('Flattrade client ID or API token is missing');
+      return;
+    }
+
     const response = await axios.post('http://localhost:3000/api/set-flattrade-credentials', {
-      usersession: localStorage.getItem('FLATTRADE_API_TOKEN'),
-      userid: localStorage.getItem('FLATTRADE_CLIENT_ID'),
+      usersession: apiToken,
+      userid: clientId,
       defaultCallSecurityId: defaultCallSecurityId.value,
       defaultPutSecurityId: defaultPutSecurityId.value
     });
     console.log('Credentials and security IDs set successfully:', response.data);
-    // Removed sendWebSocketData() from here
   } catch (error) {
     console.error('Error setting credentials and security IDs:', error);
   }

@@ -274,9 +274,17 @@ const flattradeFundLimits = async () => {
 
 const sendCredentialsToBackend = async () => {
   try {
+    const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+    const clientId = flattradeDetails.clientId;
+
+    if (!clientId) {
+      console.error('Flattrade client ID not found in broker details');
+      return;
+    }
+
     const credentials = {
       usersession: FLATTRADE_API_TOKEN.value,
-      userid: FLATTRADE_CLIENT_ID.value
+      userid: clientId
     };
 
     await axios.post('http://localhost:3000/api/set-flattrade-credentials', credentials);
