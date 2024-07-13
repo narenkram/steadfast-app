@@ -1481,7 +1481,11 @@ const placeOrder = async (transactionType, drvOptionType) => {
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-      const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
+      const payload = qs.stringify({
+        ...orderData,
+        uid: selectedBroker.value.clientId,
+        actid: selectedBroker.value.clientId
+      });
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
         headers: {
           'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
@@ -1518,7 +1522,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     let orderData;
     if (selectedBroker.value.brokerName === 'Dhan') {
       orderData = {
-        brokerClientId: selectedBroker.value.brokerClientId,
+        brokerClientId: selectedBroker.value.clientId,
         transactionType: transactionType,
         exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
         productType: selectedProductType.value,
@@ -1533,8 +1537,8 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       };
     } else if (selectedBroker.value.brokerName === 'Flattrade') {
       orderData = {
-        uid: selectedBroker.value.brokerClientId,
-        actid: selectedBroker.value.brokerClientId,
+        uid: selectedBroker.value.clientId,
+        actid: selectedBroker.value.clientId,
         exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
         tsym: position.tsym,
         qty: position.netqty,
@@ -1554,7 +1558,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-      const payload = qs.stringify(orderData); // Convert orderData to URL-encoded string
+      const payload = qs.stringify(orderData); // orderData already includes uid and actid
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
         headers: {
           'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
