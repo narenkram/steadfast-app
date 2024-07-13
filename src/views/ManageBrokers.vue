@@ -94,13 +94,7 @@ onMounted(() => {
       localStorage.setItem('flattradeReqCode', event.data.code); // Update local storage with new flattradeReqCode
     }
   });
-});
-
-watch(flattradeReqCode, (newCode) => {
-  if (newCode && userTriggeredTokenGeneration.value) {
-    statusMessage.value = `Received flattradeReqCode: ${newCode}`;
-    generateToken();
-  }
+  checkAllTokens();
 });
 
 // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
@@ -108,6 +102,7 @@ watch(FLATTRADE_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
     sendCredentialsToBackend();
+    validateToken({ brokerName: 'Flattrade' });
   } else {
     localStorage.removeItem('FLATTRADE_API_TOKEN');
   }
@@ -159,6 +154,8 @@ const generateToken = async (broker) => {
 
 watch(flattradeReqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
+    statusMessage.value = `Received flattradeReqCode: ${newCode}`;
+
     const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
     const storedApiKey = flattradeDetails.apiKey;
     const storedApiSecret = flattradeDetails.apiSecret;
@@ -186,7 +183,7 @@ watch(flattradeReqCode, async (newCode) => {
         errorMessage.value = "Token generation failed";
         clearErrorMessage();
       } else {
-        FLATTRADE_API_TOKEN.value = token; // Store the token in the reactive reference
+        FLATTRADE_API_TOKEN.value = token;
         errorMessage.value = '';
         statusMessage.value = `Token generated successfully: ${token}`;
         console.log('Token generated successfully:', token);
@@ -216,14 +213,24 @@ function maskBrokerClientId(brokerClientId) {
 
   return `${firstPart}${middleMask}${lastPart}`;
 }
+const tokenStatus = ref({
+  Flattrade: 'unknown',
+  Dhan: 'unknown',
+  Shoonya: 'unknown'
+});
 
 const getStatus = (broker) => {
   let status = 'Active';
   let statusClass = 'bg-success';
 
-  if (broker.brokerName === 'Flattrade' && !FLATTRADE_API_TOKEN.value) {
-    status = 'Token missing, Click generate';
-    statusClass = 'bg-warning text-dark';
+  if (broker.brokerName === 'Flattrade') {
+    if (!FLATTRADE_API_TOKEN.value) {
+      status = 'Token missing, Click generate';
+      statusClass = 'bg-warning text-dark';
+    } else if (tokenStatus.value.Flattrade === 'invalid') {
+      status = 'Token Expried, Click generate';
+      statusClass = 'bg-warning text-dark';
+    }
   }
 
   if (broker.brokerName === 'Dhan' && !DHAN_API_TOKEN.value) {
@@ -313,9 +320,7 @@ const flattradeFundLimits = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
   if (!jKey) {
-    errorMessage.value = 'Token is missing. Please generate a token first.';
-    clearErrorMessage();
-    return;
+    throw new Error('Token is missing. Please generate a token first.');
   }
 
   const jData = JSON.stringify({ uid: FLATTRADE_CLIENT_ID.value, actid: FLATTRADE_CLIENT_ID.value });
@@ -330,12 +335,31 @@ const flattradeFundLimits = async () => {
     fundLimits.value = res.data;
     console.log(res.data);
   } catch (error) {
-    errorMessage.value = 'Error fetching fund limits: ' + error.message;
-    clearErrorMessage();
-    console.error('Error fetching fund limits:', error);
+    throw new Error('Error fetching fund limits: ' + error.message);
   }
 };
-
+const validateToken = async (broker) => {
+  if (broker.brokerName === 'Flattrade') {
+    try {
+      await flattradeFundLimits();
+      tokenStatus.value.Flattrade = 'valid';
+    } catch (error) {
+      const errorMsg = error.message;
+      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
+        tokenStatus.value.Flattrade = 'expired';
+      } else {
+        tokenStatus.value.Flattrade = 'invalid';
+      }
+    }
+  }
+  // Add similar checks for Dhan and Shoonya when you have their validation endpoints
+};
+// Call this function when the component mounts or when you want to check token status
+const checkAllTokens = async () => {
+  for (const broker of brokers.value) {
+    await validateToken(broker);
+  }
+};
 const sendCredentialsToBackend = async () => {
   try {
     const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
