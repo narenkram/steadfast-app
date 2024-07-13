@@ -13,6 +13,11 @@ const SHOONYA_CLIENT_ID = ref('');
 const SHOONYA_API_TOKEN = ref('');
 
 const flattradeReqCode = ref('');
+const shoonyaReqCode = ref('');
+const shoonyaBrokerUserId = ref('');
+const shoonyaBrokerPassword = ref('');
+const shoonyaOneTimePassword = ref('');
+
 const token = ref('');
 const errorMessage = ref('');
 const statusMessage = ref('');
@@ -366,10 +371,20 @@ const deleteBroker = (broker) => {
               <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
             <td>24 Hours</td>
-            <td v-if="broker.brokerName !== 'Dhan'">
-              <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
+            <td>
+              <template v-if="broker.brokerName === 'Shoonya'">
+                <button class="btn btn-outline-primary btn-sm w-50" data-bs-toggle="modal"
+                  data-bs-target="#ShoonyaLogin">
+                  Login
+                </button>
+              </template>
+              <template v-else-if="broker.brokerName !== 'Dhan'">
+                <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
+              </template>
+              <template v-else>
+                -
+              </template>
             </td>
-            <td v-else>-</td>
             <td>
               <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
             </td>
@@ -391,4 +406,40 @@ const deleteBroker = (broker) => {
     </div>
   </section>
 
+  <!-- Shoonya Login -->
+  <div class="modal fade" id="ShoonyaLogin" tabindex="-1" aria-labelledby="ShoonyaLoginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
+            Shoonya Login
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-12">
+            <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
+            <input type="text" id="ShoonyaBrokerUserId" class="form-control" v-model="shoonyaBrokerUserId"
+              placeholder="Enter Broker User ID">
+
+            <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
+            <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
+              placeholder="Enter Broker Password">
+
+            <label for="ShoonyaOneTimePassword" class="form-label mb-0">One time password</label>
+            <input type="password" id="ShoonyaOneTimePassword" class="form-control" v-model="shoonyaOneTimePassword"
+              placeholder="Enter One time password">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
