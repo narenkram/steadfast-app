@@ -1751,6 +1751,13 @@ const availableBalance = computed(() => {
     console.log('Flattrade Available Balance:', balance);
     return balance || null;
   }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    const cash = Number(fundLimits.value.cash) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    const balance = Math.floor(cash - marginUsed);
+    console.log('Flattrade Available Balance:', balance);
+    return balance || null;
+  }
   return null;
 });
 // Computed property to get the correct utilized amount based on the selected broker
@@ -1758,7 +1765,12 @@ const usedAmount = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     const utilizedAmount = Number(fundLimits.value.utilizedAmount) || 0;
     return utilizedAmount;
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  }
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    return marginUsed;
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     return marginUsed;
   }
