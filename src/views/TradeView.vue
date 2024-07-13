@@ -882,6 +882,9 @@ const fetchTradingData = async () => {
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     console.log('Flattrade Symbols:', response);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    response = await fetch(`http://localhost:3000/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    console.log('Shoonya Symbols:', response);
   } else {
     throw new Error('Unsupported broker');
   }
