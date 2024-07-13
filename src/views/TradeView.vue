@@ -1231,6 +1231,7 @@ const fetchFlattradePositions = async () => {
   }
 };
 const fundLimits = ref({});
+// Update the fetchFundLimit function
 const fetchFundLimit = async () => {
   try {
     if (!selectedBroker.value) {
@@ -1240,13 +1241,17 @@ const fetchFundLimit = async () => {
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.get('http://localhost:3000/dhanFundLimit');
-    } else if (selectedBroker.value.brokerName === 'Flattrade') {
-      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN'); // Retrieve the token from local storage
+    }
+    else if (selectedBroker.value.brokerName === 'Flattrade') {
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       if (!FLATTRADE_API_TOKEN) {
         throw new Error('Flattrade API Token is missing');
       }
       response = await axios.post('http://localhost:3000/flattradeFundLimit', null, {
-        params: { FLATTRADE_API_TOKEN }
+        params: {
+          FLATTRADE_API_TOKEN,
+          FLATTRADE_CLIENT_ID: selectedBroker.value.clientId
+        }
       });
     } else {
       throw new Error('Unsupported broker');
@@ -2099,9 +2104,12 @@ onBeforeUnmount(() => {
 });
 
 // Watchers
+// Watch for changes in selectedBrokerName
+watch(selectedBrokerName, () => {
+  updateSelectedBroker();
+});
 watch(selectedBroker, async (newBroker) => {
   if (newBroker) {
-    setSelectedBroker(newBroker); // Save to localStorage
     selectedOrderType.value = orderTypes.value[0];
     previousOrderType.value = orderTypes.value[0];
     selectedProductType.value = getProductTypeValue(productTypes.value[1]); // Default to 'Margin' or 'M'
