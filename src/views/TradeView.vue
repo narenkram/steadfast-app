@@ -1191,7 +1191,15 @@ const fetchFlattradePositions = async () => {
     return;
   }
 
-  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: localStorage.getItem('FLATTRADE_CLIENT_ID'), actid: localStorage.getItem('FLATTRADE_CLIENT_ID') })}`;
+  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+    toastMessage.value = 'Flattrade broker is not selected.';
+    showToast.value = true;
+    return;
+  }
+
+  const clientId = selectedBroker.value.clientId;
+
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: clientId, actid: clientId })}`;
 
   try {
     const positionBookRes = await axios.post('https://piconnect.flattrade.in/PiConnectTP/PositionBook', positionBookPayload, {
@@ -1205,7 +1213,7 @@ const fetchFlattradePositions = async () => {
       flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
       updatePositionSecurityIds();
-      subscribeToPositionLTPs(); // Add this line
+      subscribeToPositionLTPs();
       subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
