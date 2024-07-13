@@ -12,7 +12,7 @@ const SHOONYA_API_KEY = ref('');
 const SHOONYA_CLIENT_ID = ref('');
 const SHOONYA_API_TOKEN = ref('');
 
-const reqCode = ref('');
+const flattradeReqCode = ref('');
 const token = ref('');
 const errorMessage = ref('');
 const statusMessage = ref('');
@@ -76,24 +76,24 @@ onMounted(() => {
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
-  const storedCode = localStorage.getItem('reqCode');
+  const storedCode = localStorage.getItem('flattradeReqCode');
   if (storedCode) {
-    reqCode.value = storedCode;
+    flattradeReqCode.value = storedCode;
   }
   statusMessage.value = localStorage.getItem('statusMessage') || '';
 
   // Add event listener for postMessage
   window.addEventListener('message', (event) => {
-    if (event.data.type === 'reqCode' && event.data.code) {
-      reqCode.value = event.data.code;
-      localStorage.setItem('reqCode', event.data.code); // Update local storage with new reqCode
+    if (event.data.type === 'flattradeReqCode' && event.data.code) {
+      flattradeReqCode.value = event.data.code;
+      localStorage.setItem('flattradeReqCode', event.data.code); // Update local storage with new flattradeReqCode
     }
   });
 });
 
-watch(reqCode, (newCode) => {
+watch(flattradeReqCode, (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
-    statusMessage.value = `Received reqCode: ${newCode}`;
+    statusMessage.value = `Received flattradeReqCode: ${newCode}`;
     generateToken();
   }
 });
@@ -141,18 +141,18 @@ const generateToken = async (broker) => {
 
   if (broker.brokerName === 'Flattrade') {
     openFlattradeAuthUrl();
-    statusMessage.value = 'Waiting for reqCode...';
+    statusMessage.value = 'Waiting for flattradeReqCode...';
     return;
   }
 
-  if (!reqCode.value) {
+  if (!flattradeReqCode.value) {
     errorMessage.value = 'Request code is missing';
     clearErrorMessage();
     return;
   }
 };
 
-watch(reqCode, async (newCode) => {
+watch(flattradeReqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
     const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
     const storedApiKey = flattradeDetails.apiKey;

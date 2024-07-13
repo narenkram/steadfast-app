@@ -7,9 +7,9 @@ const route = useRoute();
 onMounted(() => {
   const code = route.query.code;
   if (typeof code === 'string') {
-    localStorage.setItem('reqCode', code);
+    localStorage.setItem('flattradeReqCode', code);
     localStorage.removeItem('statusMessage');
-    window.opener.postMessage({ type: 'reqCode', code }, '*');
+    window.opener.postMessage({ type: 'flattradeReqCode', code }, '*');
     window.close();
   } else {
     console.error('No valid code found in the URL');
