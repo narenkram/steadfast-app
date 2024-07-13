@@ -1482,7 +1482,13 @@ const placeOrder = async (transactionType, drvOptionType) => {
     console.log("Placing order with data:", orderData);
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
-      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
+      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+
+      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData, {
+        params: {
+          DHAN_API_TOKEN: dhanDetails.apiToken
+        }
+      });
       await fetchDhanOrdersTradesBook();
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
