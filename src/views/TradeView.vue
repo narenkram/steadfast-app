@@ -11,7 +11,7 @@
           <div class="d-flex align-items-center">
             <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBrokerName"
               @change="updateSelectedBroker">
-              <option value="">Select a broker</option>
+              <option value="" disabled selected>Select a broker</option>
               <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
                 {{ brokerName }}
               </option>
