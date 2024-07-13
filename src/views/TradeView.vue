@@ -9,9 +9,11 @@
         <div class="col-2">
           <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
           <div class="d-flex align-items-center">
-            <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBroker">
-              <option v-for="broker in brokers" :key="broker.brokerClientId" :value="broker">
-                {{ broker.brokerName }}
+            <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBrokerName"
+              @change="updateSelectedBroker">
+              <option value="">Select a broker</option>
+              <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
+                {{ brokerName }}
               </option>
             </select>
           </div>
@@ -19,19 +21,26 @@
 
         <!-- Broker Name and Status with Broker ID -->
         <div class="col-3 text-center">
-          <p class="mb-1"><b>Broker</b> <span
-              :class="{ 'badge bg-success': brokerStatus === 'Connected', 'badge bg-danger': brokerStatus === 'Not Connected', 'badge bg-warning text-dark': brokerStatus === 'Token Expired' }">{{
-                brokerStatus }}</span></p>
+          <p class="mb-1">
+            <b>Status: </b>
+            <span :class="{
+              'badge bg-success': brokerStatus === 'Connected',
+              'badge bg-danger': brokerStatus === 'Not Connected',
+              'badge bg-warning text-dark': brokerStatus === 'Token Expired'
+            }">
+              {{ brokerStatus }}
+            </span>
+          </p>
           <p class="mb-0 d-flex align-items-center justify-content-center">
             <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
               <span>⚙️</span>
             </RouterLink>
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
-              {{ selectedBroker?.brokerClientId || 'N/A' }}
+              {{ selectedBroker?.clientId || 'N/A' }}
               <span>👀</span>
             </span>
             <span v-else @click="toggleBrokerClientIdVisibility">
-              {{ maskBrokerClientId(selectedBroker?.brokerClientId) }}
+              {{ maskBrokerClientId(selectedBroker?.clientId) }}
               <span>👁️</span>
             </span>
           </p>
@@ -687,10 +696,13 @@ const updateToastVisibility = (value) => {
 };
 const flattradeTokenStatus = ref('Unknown');
 const brokerStatus = computed(() => {
-  const dhanClientId = localStorage.getItem('DHAN_CLIENT_ID');
-  const dhanApiToken = localStorage.getItem('DHAN_API_TOKEN');
-  const flattradeClientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
-  const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
+  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+
+  const dhanClientId = dhanDetails.clientId;
+  const dhanApiToken = dhanDetails.apiToken;
+  const flattradeClientId = flattradeDetails.clientId;
+  const flattradeApiToken = flattradeDetails.apiToken;
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
@@ -773,28 +785,24 @@ function formatTimeDuration(milliseconds) {
 // Fetch brokers and set selectedBroker
 const brokers = ref([]);
 const selectedBroker = ref(null);
+const selectedBrokerName = ref('');
+const availableBrokers = computed(() => {
+  return Object.keys(localStorage)
+    .filter(key => key.startsWith('broker_'))
+    .map(key => key.replace('broker_', ''));
+});
 // Function to set selected broker and save to localStorage
-const setSelectedBroker = (broker) => {
-  localStorage.setItem('selectedBroker', JSON.stringify(broker));
-};
-const fetchBrokers = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/brokers');
-    brokers.value = response.data;
-    if (brokers.value.length > 0) {
-      // Ensure a broker is selected before fetching fund limits
-      const storedBroker = localStorage.getItem('selectedBroker');
-      if (storedBroker) {
-        selectedBroker.value = JSON.parse(storedBroker);
-      } else {
-        selectedBroker.value = brokers.value[0]; // Default to the first broker if none is stored
-      }
-      fetchFundLimit(); // Fetch fund limits after setting the selected broker
-    }
-  } catch (error) {
-    console.error('Failed to fetch brokers:', error);
+const updateSelectedBroker = () => {
+  if (selectedBrokerName.value) {
+    const brokerDetails = JSON.parse(localStorage.getItem(`broker_${selectedBrokerName.value}`) || '{}');
+    selectedBroker.value = brokerDetails;
+    localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails));
+  } else {
+    selectedBroker.value = null;
+    localStorage.removeItem('selectedBroker');
   }
 };
+
 
 // Fetch trading symbols and strikes
 const selectedExchange = ref({});
@@ -1253,20 +1261,16 @@ const toggleBrokerClientIdVisibility = () => {
   showBrokerClientId.value = !showBrokerClientId.value;
 };
 
-const maskBrokerClientId = (brokerClientId) => {
-  if (!brokerClientId) return 'N/A'; // Ensure brokerClientId is defined
-
-  const length = brokerClientId.length;
-  if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
-
-  const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
+const maskBrokerClientId = (clientId) => {
+  if (!clientId) return 'N/A';
+  const length = clientId.length;
+  if (length <= 2) return clientId;
+  const maskLength = Math.max(1, Math.floor(length / 2));
   const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
   const endUnmaskedLength = length - startUnmaskedLength - maskLength;
-
-  const firstPart = brokerClientId.slice(0, startUnmaskedLength);
-  const lastPart = brokerClientId.slice(-endUnmaskedLength);
-  const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
-
+  const firstPart = clientId.slice(0, startUnmaskedLength);
+  const lastPart = clientId.slice(-endUnmaskedLength);
+  const middleMask = '*'.repeat(maskLength);
   return `${firstPart}${middleMask}${lastPart}`;
 };
 
@@ -2049,12 +2053,17 @@ const totalSellValue = computed(() => {
 
 // Lifecycle hooks
 onMounted(async () => {
-  await fetchBrokers()
-    .then(() => updateExchangeSymbols())
-    .then(() => setDefaultExchangeAndMasterSymbol())
-    .then(() => fetchTradingData())
-    .then(() => updateAvailableQuantities())
-    .then(() => setDefaultExpiry());
+  const storedBroker = localStorage.getItem('selectedBroker');
+  if (storedBroker) {
+    const brokerDetails = JSON.parse(storedBroker);
+    selectedBroker.value = brokerDetails;
+    selectedBrokerName.value = brokerDetails.brokerName;
+  }
+  updateExchangeSymbols()
+  setDefaultExchangeAndMasterSymbol()
+  fetchTradingData()
+  updateAvailableQuantities()
+  setDefaultExpiry()
 
   window.addEventListener('keydown', handleHotKeys);
 
