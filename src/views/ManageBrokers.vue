@@ -1,13 +1,16 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 
 const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
 const FLATTRADE_CLIENT_ID = ref('');
-const FLATTRADE_API_TOKEN = ref(localStorage.getItem('FLATTRADE_API_TOKEN') || ''); // Initialize from localStorage
+const FLATTRADE_API_TOKEN = ref('');
 const DHAN_API_TOKEN = ref('');
 const DHAN_CLIENT_ID = ref('');
+const SHOONYA_API_KEY = ref('');
+const SHOONYA_CLIENT_ID = ref('');
+const SHOONYA_API_TOKEN = ref('');
 
 const reqCode = ref('');
 const token = ref('');
@@ -15,63 +18,63 @@ const errorMessage = ref('');
 const statusMessage = ref('');
 const userTriggeredTokenGeneration = ref(false); // Flag to track user-triggered token generation
 
-const brokers = ref([]);
-const fetchBrokers = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/brokers');
-    brokers.value = response.data;
-    await fetchFlattradeCredentials(); // Fetch Flattrade credentials
-    await fetchDhanCredentials(); // Fetch Dhan credentials
-  } catch (error) {
-    console.error('Failed to fetch brokers:', error);
-  }
-};
+const brokers = computed(() => {
+  const brokersArray = [];
 
-const fetchFlattradeCredentials = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/api/flattrade-credentials');
-    FLATTRADE_API_KEY.value = response.data.apiKey;
-    FLATTRADE_API_SECRET.value = response.data.apiSecret;
-    FLATTRADE_CLIENT_ID.value = response.data.clientId;
-
-    // Store the API key and secret in localStorage
-    localStorage.setItem('FLATTRADE_API_KEY', FLATTRADE_API_KEY.value);
-    localStorage.setItem('FLATTRADE_API_SECRET', FLATTRADE_API_SECRET.value);
-    localStorage.setItem('FLATTRADE_CLIENT_ID', FLATTRADE_CLIENT_ID.value);
-
-    return {
+  if (FLATTRADE_CLIENT_ID.value && FLATTRADE_API_KEY.value && FLATTRADE_API_SECRET.value) {
+    brokersArray.push({
+      id: 'Flattrade',
+      brokerName: 'Flattrade',
+      brokerClientId: FLATTRADE_CLIENT_ID.value,
       apiKey: FLATTRADE_API_KEY.value,
       apiSecret: FLATTRADE_API_SECRET.value,
-      clientId: FLATTRADE_CLIENT_ID.value
-    };
-  } catch (error) {
-    console.error('Failed to fetch Flattrade credentials:', error);
-    return null;
+      apiToken: FLATTRADE_API_TOKEN.value
+    });
   }
-};
 
-const fetchDhanCredentials = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/api/dhan-credentials');
-    DHAN_API_TOKEN.value = response.data.apiToken;
-    DHAN_CLIENT_ID.value = response.data.clientId;
-
-    // Store the API key and secret in localStorage
-    localStorage.setItem('DHAN_API_TOKEN', DHAN_API_TOKEN.value);
-    localStorage.setItem('DHAN_CLIENT_ID', DHAN_CLIENT_ID.value);
-
-    return {
-      apiToken: DHAN_API_TOKEN.value,
-      clientId: DHAN_CLIENT_ID.value
-    };
-  } catch (error) {
-    console.error('Failed to fetch Dhan credentials:', error);
-    return null;
+  if (DHAN_CLIENT_ID.value && DHAN_API_TOKEN.value) {
+    brokersArray.push({
+      id: 'Dhan',
+      brokerName: 'Dhan',
+      brokerClientId: DHAN_CLIENT_ID.value,
+      apiToken: DHAN_API_TOKEN.value
+    });
   }
-};
+
+  if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
+    brokersArray.push({
+      id: 'Shoonya',
+      brokerName: 'Shoonya',
+      brokerClientId: SHOONYA_CLIENT_ID.value,
+      apiKey: SHOONYA_API_KEY.value,
+      apiToken: SHOONYA_API_TOKEN.value
+    });
+  }
+
+  return brokersArray;
+});
 
 onMounted(() => {
-  fetchBrokers();
+  // Retrieve Flattrade details
+  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+  FLATTRADE_API_KEY.value = flattradeDetails.apiKey || '';
+  FLATTRADE_API_SECRET.value = flattradeDetails.apiSecret || '';
+  FLATTRADE_CLIENT_ID.value = flattradeDetails.clientId || '';
+  FLATTRADE_API_TOKEN.value = localStorage.getItem('FLATTRADE_API_TOKEN') || '';
+
+  // Retrieve Dhan details
+  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+  DHAN_API_TOKEN.value = dhanDetails.apiToken || '';
+  DHAN_CLIENT_ID.value = dhanDetails.clientId || '';
+
+  // Retrieve Shoonya details
+  const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
+  SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
+  SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
+  SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
+
+
+  // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
   const storedCode = localStorage.getItem('reqCode');
   if (storedCode) {
@@ -189,15 +192,8 @@ watch(reqCode, async (newCode) => {
 });
 
 function maskBrokerClientId(brokerClientId) {
-  const placeholders = [
-    "Your_Dhan_Client_ID",
-    "Your_Dhan_API_Token",
-    "Your_Flattrade_Client_ID",
-    "Your_Flattrade_API_Key",
-    "Your_Flattrade_API_Secret"
-  ];
 
-  if (!brokerClientId || placeholders.includes(brokerClientId)) return brokerClientId; // Ensure brokerClientId is defined and not a placeholder
+  if (!brokerClientId) return brokerClientId; // Ensure brokerClientId is defined and not a placeholder
 
   const length = brokerClientId.length;
   if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
@@ -212,25 +208,24 @@ function maskBrokerClientId(brokerClientId) {
 
   return `${firstPart}${middleMask}${lastPart}`;
 }
-const placeholders = [
-  "Your_Dhan_Client_ID",
-  "Your_Dhan_API_Token",
-  "Your_Flattrade_Client_ID",
-  "Your_Flattrade_API_Key",
-  "Your_Flattrade_API_Secret"
-];
+
 const getStatus = (broker) => {
   let status = 'Active';
   let statusClass = 'bg-success';
 
-  if (placeholders.includes(broker.brokerClientId) || placeholders.includes(broker.apiToken)) {
-    status = 'API details & Token missing';
-    statusClass = 'bg-danger';
+  if (broker.brokerName === 'Flattrade' && !FLATTRADE_API_TOKEN.value) {
+    status = 'Token missing, Click generate';
+    statusClass = 'bg-warning text-dark';
   }
 
-  if (broker.brokerName === 'Flattrade' && !FLATTRADE_API_TOKEN.value) {
-    status = status === 'API details & Token missing' ? 'API details & Token missing' : 'Token missing, Click generate';
-    statusClass = status === 'API details & Token missing' ? 'bg-danger' : 'bg-warning text-dark';
+  if (broker.brokerName === 'Dhan' && !DHAN_API_TOKEN.value) {
+    status = 'Token missing, Click generate';
+    statusClass = 'bg-warning text-dark';
+  }
+
+  if (broker.brokerName === 'Shoonya' && !SHOONYA_API_TOKEN.value) {
+    status = 'Token missing, Click generate';
+    statusClass = 'bg-warning text-dark';
   }
 
   return { status, statusClass };
@@ -238,7 +233,7 @@ const getStatus = (broker) => {
 
 function maskTokenSecret(apiSecret) {
 
-  if (!apiSecret || apiSecret.length < 10 || placeholders.includes(apiSecret)) return apiSecret; // Ensure there are enough characters to mask and not a placeholder
+  if (!apiSecret || apiSecret.length < 10) return apiSecret; // Ensure there are enough characters to mask and not a placeholder
 
   const start = apiSecret.slice(0, 3);
   const end = apiSecret.slice(-3);
@@ -338,25 +333,24 @@ const sendCredentialsToBackend = async () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="broker in brokers" :key="broker.id">
+          <tr v-if="brokers.length === 0">
+            <td colspan="6" class="text-center">No brokers added yet. Please add a broker to get started.</td>
+          </tr>
+          <tr v-else v-for="broker in brokers" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
             <td>
               <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
             </td>
             <td>
-              <span v-if="broker.brokerName === 'Flattrade' && FLATTRADE_API_TOKEN">{{
-                maskTokenSecret(FLATTRADE_API_TOKEN) }}</span>
-              <span v-else>{{ maskTokenSecret(broker.apiToken) }}</span>
+              <span v-if="broker.brokerName === 'Flattrade'">{{ maskTokenSecret(broker.apiToken) }}</span>
+              <span v-if="broker.brokerName === 'Dhan'">{{ maskTokenSecret(broker.apiToken) }}</span>
+              <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
-            <td>
-              24 Hours
-            </td>
+            <td>24 Hours</td>
             <td v-if="broker.brokerName !== 'Dhan'">
               <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
             </td>
-            <td v-else>
-              -
-            </td>
+            <td v-else>-</td>
             <td>
               <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
             </td>

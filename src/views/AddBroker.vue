@@ -18,6 +18,7 @@
         <form @submit.prevent="addBroker">
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
           <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
+            <option value="">Select a broker</option>
             <option value="Dhan">Dhan</option>
             <option value="Flattrade">Flattrade</option>
             <option value="Shoonya">Shoonya</option>
@@ -63,39 +64,37 @@
   </section>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      selectedBroker: 'Dhan',
-      apiKey: '',
-      apiSecret: '',
-      apiToken: '',
-      clientId: '',
-    };
-  },
-  methods: {
-    addBroker() {
-      const brokerDetails = {
-        brokerName: this.selectedBroker,
-        clientId: this.clientId,
-      };
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-      if (this.selectedBroker === 'Dhan') {
-        brokerDetails.apiToken = this.apiToken;
-      } else if (this.selectedBroker === 'Flattrade') {
-        brokerDetails.apiKey = this.apiKey;
-        brokerDetails.apiSecret = this.apiSecret;
-      } else if (this.selectedBroker === 'Shoonya') {
-        brokerDetails.apiKey = this.apiKey;
-      }
+const router = useRouter();
 
-      // Store in localStorage
-      localStorage.setItem(`broker_${this.selectedBroker}`, JSON.stringify(brokerDetails));
+const selectedBroker = ref('');
+const apiKey = ref('');
+const apiSecret = ref('');
+const apiToken = ref('');
+const clientId = ref('');
 
-      // Navigate to manage-brokers page
-      this.$router.push('/manage-brokers');
-    },
-  },
+const addBroker = () => {
+  const brokerDetails = {
+    brokerName: selectedBroker.value,
+    clientId: clientId.value,
+  };
+
+  if (selectedBroker.value === 'Dhan') {
+    brokerDetails.apiToken = apiToken.value;
+  } else if (selectedBroker.value === 'Flattrade') {
+    brokerDetails.apiKey = apiKey.value;
+    brokerDetails.apiSecret = apiSecret.value;
+  } else if (selectedBroker.value === 'Shoonya') {
+    brokerDetails.apiKey = apiKey.value;
+  }
+
+  // Store in localStorage
+  localStorage.setItem(`broker_${selectedBroker.value}`, JSON.stringify(brokerDetails));
+
+  // Navigate to manage-brokers page
+  router.push('/manage-brokers');
 };
 </script>
