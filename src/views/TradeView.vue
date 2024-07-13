@@ -1647,9 +1647,13 @@ const cancelOrder = async (order) => {
 
   try {
     if (selectedBroker.value?.brokerName === 'Dhan') {
+      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
       console.log(`Sending request to cancel Dhan order ${orderId}`);
       await axios.delete('http://localhost:3000/dhanCancelOrder', {
         data: { orderId },
+        params: {
+          DHAN_API_TOKEN: dhanDetails.apiToken
+        }
       });
     }
     else if (selectedBroker.value?.brokerName === 'Flattrade') {
