@@ -1116,7 +1116,14 @@ const token = ref('');
 
 const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
-  let clientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
+
+  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+    toastMessage.value = 'Flattrade broker is not selected.';
+    showToast.value = true;
+    return;
+  }
+
+  const clientId = selectedBroker.value.clientId;
 
   if (!jKey || !clientId) {
     toastMessage.value = 'Token or Client ID is missing. Please generate a token first.';
