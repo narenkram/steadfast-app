@@ -1173,8 +1173,18 @@ const combinedOrdersAndTrades = computed(() => {
 
 const dhanPositionBook = ref([]);
 const fetchDhanPositions = async () => {
+  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+  if (!dhanDetails.apiToken) {
+    toastMessage.value = 'Dhan API Token is missing. Please generate a token first.';
+    showToast.value = true;
+    return;
+  }
   try {
-    const response = await axios.get('http://localhost:3000/dhanPositions');
+    const response = await axios.get('http://localhost:3000/dhanPositions', {
+      params: {
+        DHAN_API_TOKEN: dhanDetails.apiToken,
+      }
+    });
     dhanPositionBook.value = response.data;
     console.log('Dhan Position Book:', dhanPositionBook.value);
   } catch (error) {
@@ -2109,15 +2119,18 @@ onMounted(async () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       fetchFlattradePositions();
       activeFetchFunction.value = 'fetchFlattradePositions';
-    } else {
+    }
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       fetchDhanPositions();
       activeFetchFunction.value = 'fetchDhanPositions';
     }
-  } else if (activeTab.value === 'trades') {
+  }
+  if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       fetchFlattradeOrdersTradesBook();
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
-    } else {
+    }
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       fetchDhanOrdersTradesBook();
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
