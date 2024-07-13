@@ -49,7 +49,10 @@
         <!-- Total Funds -->
         <div class="col-3 text-center">
           <p class="mb-1"><b>Total Funds</b></p>
-          <p class="mt-2 mb-0">₹ {{ availableBalance || null }}</p>
+          <p class="mt-2 mb-0">
+            ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
+              'N/A' }}
+          </p>
         </div>
 
         <!-- Utilized Margin -->
@@ -1248,7 +1251,15 @@ const fetchFundLimit = async () => {
 
     let response;
     if (selectedBroker.value.brokerName === 'Dhan') {
-      response = await axios.get('http://localhost:3000/dhanFundLimit');
+      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+      if (!dhanDetails.apiToken) {
+        throw new Error('Dhan API Token is missing');
+      }
+      response = await axios.get('http://localhost:3000/dhanFundLimit', {
+        params: {
+          DHAN_API_TOKEN: dhanDetails.apiToken,
+        }
+      });
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
@@ -1667,17 +1678,29 @@ const cancelPendingOrders = async () => {
 
 
 
-// Computed properties
 const availableBalance = computed(() => {
+  console.log('Fund Limits:', fundLimits.value);
+  console.log('Selected Broker:', selectedBroker.value?.brokerName);
+
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return fundLimits.value.availabelBalance; // yes, it's availabelBalance, a misspelling of availableBalance on DhanAPI
+    const dhanBalance = fundLimits.value.availabelBalance;
+    console.log('Dhan Available Balance (raw):', dhanBalance);
+    console.log('Dhan Available Balance (type):', typeof dhanBalance);
+
+    // Convert to number if it's a string, or use the value directly if it's already a number
+    const numericBalance = typeof dhanBalance === 'string' ? parseFloat(dhanBalance) : dhanBalance;
+
+    console.log('Dhan Available Balance (processed):', numericBalance);
+    return isNaN(numericBalance) ? null : Math.floor(numericBalance);
   }
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
     const cash = Number(fundLimits.value.cash) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
-    return Math.floor(cash - marginUsed);
+    const balance = Math.floor(cash - marginUsed);
+    console.log('Flattrade Available Balance:', balance);
+    return balance || null;
   }
-  return 0;
+  return null;
 });
 // Computed property to get the correct utilized amount based on the selected broker
 const usedAmount = computed(() => {
