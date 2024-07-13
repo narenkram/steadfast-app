@@ -306,6 +306,11 @@ const handleShoonyaLogin = async () => {
       shoonyaBrokerUserId.value = '';
       shoonyaBrokerPassword.value = '';
       shoonyaOneTimePassword.value = '';
+      // Clear the status message after 5 seconds
+      setTimeout(() => {
+        statusMessage.value = '';
+      }, 5000);
+
     } else {
       throw new Error(response.data.emsg || 'Login failed');
     }
