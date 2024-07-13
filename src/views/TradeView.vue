@@ -1100,8 +1100,14 @@ const handleHotKeys = (event) => {
 
 const dhanOrders = ref([]);
 const fetchDhanOrdersTradesBook = async () => {
+  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+
   try {
-    const response = await axios.get('http://localhost:3000/dhanGetOrders');
+    const response = await axios.get('http://localhost:3000/dhanGetOrders', {
+      params: {
+        DHAN_API_TOKEN: dhanDetails.apiToken,
+      }
+    });
     dhanOrders.value = response.data; // Set the orders array
     console.log('Dhan Order Book:', response.data);
   } catch (error) {
