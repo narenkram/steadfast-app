@@ -702,11 +702,12 @@ const brokerStatus = computed(() => {
   const dhanClientId = dhanDetails.clientId;
   const dhanApiToken = dhanDetails.apiToken;
   const flattradeClientId = flattradeDetails.clientId;
-  const flattradeApiToken = flattradeDetails.apiToken;
+  const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  }
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (flattradeClientId && flattradeApiToken) {
       return flattradeTokenStatus.value === 'Expired' ? 'Token Expired' : 'Connected';
     }
