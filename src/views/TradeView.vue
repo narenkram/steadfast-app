@@ -829,6 +829,12 @@ const updateExchangeSymbols = () => {
       BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
     };
   }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    exchangeSymbols.value = {
+      NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
+      BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
+    };
+  }
 };
 const setDefaultExchangeAndMasterSymbol = () => {
   const exchanges = Object.keys(exchangeSymbols.value);
@@ -1356,6 +1362,8 @@ const orderTypes = computed(() => {
     return ['MARKET', 'LIMIT'];
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return ['MKT', 'LMT'];
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['MKT', 'LMT'];
   }
   return [];
 });
@@ -1433,7 +1441,17 @@ const getExchangeSegment = () => {
     } else {
       throw new Error("Selected exchange is not valid for Flattrade");
     }
-  } else {
+  }
+  else if (selectedBroker.value.brokerName === 'Shoonya') {
+    if (selectedExchange.value === 'NFO') {
+      return 'NFO';
+    } else if (selectedExchange.value === 'BFO') {
+      return 'BFO';
+    } else {
+      throw new Error("Selected exchange is not valid for Shoonya");
+    }
+  }
+  else {
     throw new Error("Unsupported broker");
   }
 };
