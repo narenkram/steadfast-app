@@ -293,9 +293,9 @@ const sendCredentialsToBackend = async () => {
 <template>
   <section class="row py-5">
     <div class="col-8 text-start">
-      <!-- <RouterLink to="/add-broker">
+      <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
-      </RouterLink> -->
+      </RouterLink>
       <ul>
         <li>
           <blockquote class="blockquote">

@@ -17,28 +17,31 @@
         <!-- Select Broker -->
         <form @submit.prevent="addBroker">
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
-          <select class="form-select" aria-label="Select Broker">
-            <option value="Dhan" selected>Dhan</option>
+          <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
+            <option value="Dhan">Dhan</option>
             <option value="Flattrade">Flattrade</option>
             <option value="Shoonya">Shoonya</option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
           <div class="text-center w-100">
-            <a class="nav-link my-3" href="" target="_blank">Click here to access your selectedBroker API Dashboard</a>
+            <a class="nav-link my-3" href="" target="_blank">Click here to access your selected broker API Dashboard</a>
           </div>
 
-          <!-- API Key -->
-          <label for="APIKey" class="form-label mb-0  mt-3"><b>API Key</b></label>
-          <input type="text" class="form-control" id="APIKey" required>
+          <!-- API Key (for Flattrade and Shoonya) -->
+          <label v-if="selectedBroker !== 'Dhan'" for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
+          <input v-if="selectedBroker !== 'Dhan'" v-model="apiKey" type="text" class="form-control" id="APIKey" required>
 
-          <!-- API Secret Key -->
-          <label for="APISecretKey" class="form-label mb-0  mt-3"><b>API Secret Key</b></label>
-          <input type="text" class="form-control" id="APISecretKey" required>
+          <!-- API Secret Key (only for Flattrade) -->
+          <label v-if="selectedBroker === 'Flattrade'" for="APISecretKey" class="form-label mb-0 mt-3"><b>API Secret Key</b></label>
+          <input v-if="selectedBroker === 'Flattrade'" v-model="apiSecret" type="text" class="form-control" id="APISecretKey" required>
 
-          <!-- Name Tag -->
-          <label for="NameTag" class="form-label mb-0 mt-3"><b>Name Tag</b></label>
-          <input type="text" class="form-control" id="NameTag" required>
+          <!-- API Token (only for Dhan) -->
+          <label v-if="selectedBroker === 'Dhan'" for="APIToken" class="form-label mb-0 mt-3"><b>API Token</b></label>
+          <input v-if="selectedBroker === 'Dhan'" v-model="apiToken" type="text" class="form-control" id="APIToken" required>
+
+          <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
+          <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
 
           <!-- Redirect URL -->
           <label for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
@@ -61,23 +64,37 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
+  data() {
+    return {
+      selectedBroker: 'Dhan',
+      apiKey: '',
+      apiSecret: '',
+      apiToken: '',
+      clientId: '',
+    };
+  },
   methods: {
-    async addBroker() {
+    addBroker() {
       const brokerDetails = {
         brokerName: this.selectedBroker,
-        apiKey: this.apiKey,
-        apiSecret: this.apiSecret,
-        nameTag: this.nameTag,
+        clientId: this.clientId,
       };
-      try {
-        await axios.post('http://localhost:3000/addBroker', brokerDetails);
-        this.$router.push('/manage-brokers');
-      } catch (error) {
-        console.error('Failed to add broker:', error);
+
+      if (this.selectedBroker === 'Dhan') {
+        brokerDetails.apiToken = this.apiToken;
+      } else if (this.selectedBroker === 'Flattrade') {
+        brokerDetails.apiKey = this.apiKey;
+        brokerDetails.apiSecret = this.apiSecret;
+      } else if (this.selectedBroker === 'Shoonya') {
+        brokerDetails.apiKey = this.apiKey;
       }
+
+      // Store in localStorage
+      localStorage.setItem(`broker_${this.selectedBroker}`, JSON.stringify(brokerDetails));
+
+      // Navigate to manage-brokers page
+      this.$router.push('/manage-brokers');
     },
   },
 };
