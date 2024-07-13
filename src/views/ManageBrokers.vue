@@ -110,7 +110,9 @@ watch(FLATTRADE_API_TOKEN, (newToken) => {
 
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
-  const storedFlattradeApiKey = localStorage.getItem('FLATTRADE_API_KEY');
+
+  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+  const storedFlattradeApiKey = flattradeDetails.apiKey;
 
   if (!storedFlattradeApiKey) {
     errorMessage.value = 'API key is missing';
@@ -152,8 +154,9 @@ const generateToken = async (broker) => {
 
 watch(reqCode, async (newCode) => {
   if (newCode && userTriggeredTokenGeneration.value) {
-    const storedApiKey = localStorage.getItem('FLATTRADE_API_KEY');
-    const storedApiSecret = localStorage.getItem('FLATTRADE_API_SECRET');
+    const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+    const storedApiKey = flattradeDetails.apiKey;
+    const storedApiSecret = flattradeDetails.apiSecret;
 
     if (!storedApiKey || !storedApiSecret) {
       errorMessage.value = 'API key or secret is missing';
@@ -291,24 +294,6 @@ const sendCredentialsToBackend = async () => {
       <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink>
-      <ul>
-        <li>
-          <blockquote class="blockquote">
-            Add your API Key details in <code class="bg-light"><b>.env</b></code> file
-            and Stop CMDs and Start again using <code><b>start-all.bat</b></code>
-          </blockquote>
-        </li>
-        <li>
-          <blockquote class="blockquote">
-            If you have a
-            <badge class="badge bg-warning text-dark">
-              Token Expired
-            </badge>
-            Generate a new Token, And Stop & Start again using <code><b>start-all.bat</b></code>,
-          </blockquote>
-        </li>
-      </ul>
-
     </div>
     <div class="col-4 text-end">
       <RouterLink to="/">
@@ -362,8 +347,10 @@ const sendCredentialsToBackend = async () => {
 
   <section class="row">
     <div class="col-12">
-      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-      <div v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</div>
+      <div>
+        <span v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</span>
+        <span v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</span>
+      </div>
     </div>
   </section>
 
