@@ -20,8 +20,13 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/flattradeApi/, '')
       },
+      '/shoonyaApi': {
+        target: 'https://api.shoonya.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
+      }
       // '/dhanApi': {
-      //   target: 'https://authapi.flattrade.in',
+      //   target: 'https://api.dhan.in',
       //   changeOrigin: true,
       //   rewrite: (path) => path.replace(/^\/dhanApi/, '')
       // }

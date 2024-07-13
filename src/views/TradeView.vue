@@ -1295,7 +1295,20 @@ const fetchFundLimit = async () => {
           FLATTRADE_CLIENT_ID: selectedBroker.value.clientId
         }
       });
-    } else {
+    }
+    else if (selectedBroker.value.brokerName === 'Shoonya') {
+      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+      if (!SHOONYA_API_TOKEN) {
+        throw new Error('Shoonya API Token is missing');
+      }
+      response = await axios.post('http://localhost:3000/shoonyaFundLimit', null, {
+        params: {
+          SHOONYA_API_TOKEN,
+          SHOONYA_CLIENT_ID: selectedBroker.value.clientId
+        }
+      });
+    }
+    else {
       throw new Error('Unsupported broker');
     }
     fundLimits.value = response.data;
