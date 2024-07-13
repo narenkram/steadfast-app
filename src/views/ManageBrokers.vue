@@ -248,6 +248,65 @@ function maskTokenSecret(apiSecret) {
   return `${start}******${end}`;
 }
 
+const handleShoonyaLogin = async () => {
+  try {
+    const encoder = new TextEncoder();
+
+    // Retrieve Shoonya details from localStorage
+    const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
+    const clientId = shoonyaDetails.clientId;
+    const apiKey = shoonyaDetails.apiKey;
+
+    if (!clientId || !apiKey) {
+      throw new Error('Shoonya client ID or API key is missing');
+    }
+
+    // Hash the password
+    const pwdBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(shoonyaBrokerPassword.value));
+    const pwd = Array.from(new Uint8Array(pwdBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Create and hash the appkey
+    const appkeyRaw = `${shoonyaBrokerUserId.value}|${apiKey}`;
+    const appkeyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(appkeyRaw));
+    const appkey = Array.from(new Uint8Array(appkeyBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const jData = {
+      apkversion: "1.0.0",
+      uid: shoonyaBrokerUserId.value,
+      pwd: pwd,
+      factor2: shoonyaOneTimePassword.value,
+      vc: `${clientId}_U`,
+      appkey: appkey,
+      imei: "mac",
+      source: "API"
+    };
+
+    const jDataString = JSON.stringify(jData);
+    const payload = `jData=${jDataString}&jKey=${apiKey}`;
+
+    const response = await axios.post('https://api.shoonya.com/NorenWClientTP/QuickAuth', payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (response.data.stat === 'Ok') {
+      SHOONYA_API_TOKEN.value = response.data.susertoken;
+      localStorage.setItem('SHOONYA_API_TOKEN', SHOONYA_API_TOKEN.value);
+      statusMessage.value = 'Shoonya login successful';
+
+      // Clear the form fields
+      shoonyaBrokerUserId.value = '';
+      shoonyaBrokerPassword.value = '';
+      shoonyaOneTimePassword.value = '';
+    } else {
+      throw new Error(response.data.emsg || 'Login failed');
+    }
+  } catch (error) {
+    errorMessage.value = `Shoonya login error: ${error.message}`;
+    clearErrorMessage();
+  }
+};
 
 const fundLimits = ref('');
 const flattradeFundLimits = async () => {
@@ -435,7 +494,7 @@ const deleteBroker = (broker) => {
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             Cancel
           </button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="handleShoonyaLogin">
             Login
           </button>
         </div>
