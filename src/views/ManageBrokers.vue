@@ -294,6 +294,31 @@ const sendCredentialsToBackend = async () => {
   }
 };
 
+const deleteBroker = (broker) => {
+  // Remove broker details from localStorage
+  localStorage.removeItem(`broker_${broker.brokerName}`);
+
+  // Remove API token from localStorage if it exists
+  if (broker.brokerName === 'Flattrade') {
+    localStorage.removeItem('FLATTRADE_API_TOKEN');
+    FLATTRADE_API_TOKEN.value = '';
+    FLATTRADE_API_KEY.value = '';
+    FLATTRADE_API_SECRET.value = '';
+    FLATTRADE_CLIENT_ID.value = '';
+  } else if (broker.brokerName === 'Dhan') {
+    DHAN_API_TOKEN.value = '';
+    DHAN_CLIENT_ID.value = '';
+  } else if (broker.brokerName === 'Shoonya') {
+    localStorage.removeItem('SHOONYA_API_TOKEN');
+    SHOONYA_API_TOKEN.value = '';
+    SHOONYA_API_KEY.value = '';
+    SHOONYA_CLIENT_ID.value = '';
+  }
+
+  // Update the brokers computed property
+  // This will automatically update the table
+};
+
 </script>
 
 <template>
@@ -323,11 +348,12 @@ const sendCredentialsToBackend = async () => {
             <th scope="col">Validity</th>
             <th scope="col">Generate Token</th>
             <th scope="col">Status</th>
+            <th scope="col">Delete</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="brokers.length === 0">
-            <td colspan="6" class="text-center">No brokers added yet. Please add a broker to get started.</td>
+            <td colspan="7" class="text-center">No brokers added yet. Please add a broker to get started.</td>
           </tr>
           <tr v-else v-for="broker in brokers" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
@@ -346,6 +372,9 @@ const sendCredentialsToBackend = async () => {
             <td v-else>-</td>
             <td>
               <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
+            </td>
+            <td>
+              <button class="btn btn-outline-danger btn-sm" @click="deleteBroker(broker)">🗑️</button>
             </td>
           </tr>
         </tbody>
