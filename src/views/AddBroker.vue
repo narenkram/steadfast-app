@@ -25,29 +25,36 @@
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
-          <div class="text-center w-100">
-            <a class="nav-link my-3" href="" target="_blank">Click here to access your selected broker API Dashboard</a>
+          <div class="text-center w-100" v-if="selectedBroker">
+            <button class="btn btn-outline-primary my-3" @click="openBrokerDashboard" :disabled="!selectedBroker">
+              Click here to access your {{ selectedBroker }} API Dashboard
+            </button>
           </div>
 
           <!-- API Key (for Flattrade and Shoonya) -->
           <label v-if="selectedBroker !== 'Dhan'" for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
-          <input v-if="selectedBroker !== 'Dhan'" v-model="apiKey" type="text" class="form-control" id="APIKey" required>
+          <input v-if="selectedBroker !== 'Dhan'" v-model="apiKey" type="text" class="form-control" id="APIKey"
+            required>
 
           <!-- API Secret Key (only for Flattrade) -->
-          <label v-if="selectedBroker === 'Flattrade'" for="APISecretKey" class="form-label mb-0 mt-3"><b>API Secret Key</b></label>
-          <input v-if="selectedBroker === 'Flattrade'" v-model="apiSecret" type="text" class="form-control" id="APISecretKey" required>
+          <label v-if="selectedBroker === 'Flattrade'" for="APISecretKey" class="form-label mb-0 mt-3"><b>API Secret
+              Key</b></label>
+          <input v-if="selectedBroker === 'Flattrade'" v-model="apiSecret" type="text" class="form-control"
+            id="APISecretKey" required>
 
           <!-- API Token (only for Dhan) -->
           <label v-if="selectedBroker === 'Dhan'" for="APIToken" class="form-label mb-0 mt-3"><b>API Token</b></label>
-          <input v-if="selectedBroker === 'Dhan'" v-model="apiToken" type="text" class="form-control" id="APIToken" required>
+          <input v-if="selectedBroker === 'Dhan'" v-model="apiToken" type="text" class="form-control" id="APIToken"
+            required>
 
           <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
           <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
 
           <!-- Redirect URL -->
           <label for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
-          <input type="text" class="form-control" id="RedirectURL" disabled
-            value="https://localhost:5173/broker/login/{{ selectedBroker }}" required>
+          <input type="text" class="form-control" id="RedirectURL" disabled value="http://localhost:5173/redirect?"
+            required>
+          <p class="form-text">Register this URL in your broker's portal to get API details.</p>
 
           <!-- Add Broker -->
           <div class="d-flex justify-content-between mt-5">
@@ -65,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -75,6 +82,24 @@ const apiKey = ref('');
 const apiSecret = ref('');
 const apiToken = ref('');
 const clientId = ref('');
+
+const getBrokerDashboardLink = computed(() => {
+  switch (selectedBroker.value) {
+    case 'Dhan':
+      return 'https://web.dhan.co/';
+    case 'Flattrade':
+      return 'https://wall.flattrade.in/';
+    case 'Shoonya':
+      return 'https://prism.shoonya.com/';
+    default:
+      return '#';
+  }
+});
+const openBrokerDashboard = () => {
+  if (selectedBroker.value) {
+    window.open(getBrokerDashboardLink.value, '_blank');
+  }
+};
 
 const addBroker = () => {
   const brokerDetails = {
