@@ -434,7 +434,7 @@ const deleteBroker = (broker) => {
             <th scope="col">Broker Client ID</th>
             <th scope="col">API Token</th>
             <th scope="col">Validity</th>
-            <th scope="col">Generate Token</th>
+            <th scope="col">Activation</th>
             <th scope="col">Status</th>
             <th scope="col">Delete</th>
           </tr>
