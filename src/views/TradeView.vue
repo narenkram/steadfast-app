@@ -1639,9 +1639,10 @@ const cancelOrder = async (order) => {
       await axios.delete('http://localhost:3000/dhanCancelOrder', {
         data: { orderId },
       });
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    }
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
-      const clientId = localStorage.getItem('FLATTRADE_CLIENT_ID');
+      const clientId = selectedBroker.value.clientId;
       console.log(`Sending request to cancel Flattrade order ${orderId}`);
       await axios.post('http://localhost:3000/flattradeCancelOrder', {
         norenordno: orderId,
