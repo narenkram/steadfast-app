@@ -2,7 +2,7 @@
   <section class="row py-5">
     <div class="row">
       <div class="col-6">
-        <h3>Steps to generate API Key 🔑 and API Secret key</h3>
+        <h3>Steps to add your broker 💰</h3>
 
         <div class="card w-100 h-75 bg-light">
           <div class="card-body">
@@ -54,7 +54,10 @@
           <label for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
           <input type="text" class="form-control" id="RedirectURL" disabled value="http://localhost:5173/redirect?"
             required>
-          <p class="form-text">Register this URL in your broker's portal to get API details.</p>
+          <p class="form-text text-danger">If your broker requires a redirect URL, register this URL in your broker's
+            portal to
+            get API details.
+          </p>
 
           <!-- Add Broker -->
           <div class="d-flex justify-content-between mt-5">
