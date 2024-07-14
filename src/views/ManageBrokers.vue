@@ -107,6 +107,25 @@ watch(FLATTRADE_API_TOKEN, (newToken) => {
     localStorage.removeItem('FLATTRADE_API_TOKEN');
   }
 });
+// Watch for changes in SHOONYA_API_TOKEN and update localStorage
+watch(SHOONYA_API_TOKEN, (newToken) => {
+  if (newToken) {
+    localStorage.setItem('SHOONYA_API_TOKEN', newToken);
+    validateToken({ brokerName: 'Shoonya' });
+  } else {
+    localStorage.removeItem('SHOONYA_API_TOKEN');
+  }
+});
+
+// Watch for changes in DHAN_API_TOKEN and update localStorage
+watch(DHAN_API_TOKEN, (newToken) => {
+  if (newToken) {
+    localStorage.setItem('DHAN_API_TOKEN', newToken);
+    validateToken({ brokerName: 'Dhan' });
+  } else {
+    localStorage.removeItem('DHAN_API_TOKEN');
+  }
+});
 
 const openFlattradeAuthUrl = () => {
   localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
@@ -227,20 +246,30 @@ const getStatus = (broker) => {
     if (!FLATTRADE_API_TOKEN.value) {
       status = 'Token missing, Click generate';
       statusClass = 'bg-warning text-dark';
-    } else if (tokenStatus.value.Flattrade === 'invalid') {
-      status = 'Token Expried, Click generate';
+    } else if (tokenStatus.value.Flattrade === 'expired') {
+      status = 'Token Expired, Click generate';
       statusClass = 'bg-warning text-dark';
     }
   }
 
-  if (broker.brokerName === 'Dhan' && !DHAN_API_TOKEN.value) {
-    status = 'Token missing, Click generate';
-    statusClass = 'bg-warning text-dark';
+  if (broker.brokerName === 'Dhan') {
+    if (!DHAN_API_TOKEN.value) {
+      status = 'Token missing, Click generate';
+      statusClass = 'bg-warning text-dark';
+    } else if (tokenStatus.value.Dhan === 'expired') {
+      status = 'Token Expired, Click generate';
+      statusClass = 'bg-warning text-dark';
+    }
   }
 
-  if (broker.brokerName === 'Shoonya' && !SHOONYA_API_TOKEN.value) {
-    status = 'Token missing, Click generate';
-    statusClass = 'bg-warning text-dark';
+  if (broker.brokerName === 'Shoonya') {
+    if (!SHOONYA_API_TOKEN.value) {
+      status = 'Token missing, Click generate';
+      statusClass = 'bg-warning text-dark';
+    } else if (tokenStatus.value.Shoonya === 'expired') {
+      status = 'Token Expired, Click generate';
+      statusClass = 'bg-warning text-dark';
+    }
   }
 
   return { status, statusClass };
@@ -391,12 +420,7 @@ const validateToken = async (broker) => {
       await flattradeFundLimits();
       tokenStatus.value.Flattrade = 'valid';
     } catch (error) {
-      const errorMsg = error.message;
-      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
-        tokenStatus.value.Flattrade = 'expired';
-      } else {
-        tokenStatus.value.Flattrade = 'invalid';
-      }
+      tokenStatus.value.Flattrade = 'expired';
     }
   }
   if (broker.brokerName === 'Shoonya') {
@@ -404,12 +428,7 @@ const validateToken = async (broker) => {
       await shoonyaFundLimits();
       tokenStatus.value.Shoonya = 'valid';
     } catch (error) {
-      const errorMsg = error.message;
-      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
-        tokenStatus.value.Shoonya = 'expired';
-      } else {
-        tokenStatus.value.Shoonya = 'invalid';
-      }
+      tokenStatus.value.Shoonya = 'expired';
     }
   }
   if (broker.brokerName === 'Dhan') {
@@ -417,12 +436,7 @@ const validateToken = async (broker) => {
       await dhanFundLimits();
       tokenStatus.value.Dhan = 'valid';
     } catch (error) {
-      const errorMsg = error.message;
-      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
-        tokenStatus.value.Dhan = 'expired';
-      } else {
-        tokenStatus.value.Dhan = 'invalid';
-      }
+      tokenStatus.value.Dhan = 'expired';
     }
   }
 };
