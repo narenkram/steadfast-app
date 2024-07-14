@@ -516,8 +516,8 @@ const deleteBroker = (broker) => {
         <div class="modal-body">
           <div class="col-12">
             <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
-            <input type="text" id="ShoonyaBrokerUserId" class="form-control" v-model="SHOONYA_CLIENT_ID"
-              placeholder="Enter Broker User ID" disabled>
+            <input type="text" id="ShoonyaBrokerUserId" class="form-control"
+              :value="maskBrokerClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
 
             <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
             <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
