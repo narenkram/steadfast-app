@@ -264,10 +264,10 @@ const getStatus = (broker) => {
 
   if (broker.brokerName === 'Shoonya') {
     if (!SHOONYA_API_TOKEN.value) {
-      status = 'Token missing, Click generate';
+      status = 'Token missing, Click Login';
       statusClass = 'bg-warning text-dark';
     } else if (tokenStatus.value.Shoonya === 'expired') {
-      status = 'Token Expired, Click generate';
+      status = 'Token Expired, Click Login';
       statusClass = 'bg-warning text-dark';
     }
   }
