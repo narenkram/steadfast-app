@@ -51,7 +51,7 @@
           <p class="mb-1"><b>Total Funds</b></p>
           <p class="mt-2 mb-0">
             ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
-              'N/A' }}
+            'N/A' }}
           </p>
         </div>
 
@@ -1317,6 +1317,12 @@ const fetchFundLimit = async () => {
           SHOONYA_CLIENT_ID: selectedBroker.value.clientId
         }
       });
+      // Make sure the response data has the correct structure
+      fundLimits.value = {
+        cash: response.data.cash,
+        marginused: response.data.marginused
+        // Add any other relevant fields from the Shoonya response
+      };
     }
     else {
       throw new Error('Unsupported broker');
@@ -1766,19 +1772,12 @@ const availableBalance = computed(() => {
     console.log('Dhan Available Balance (processed):', numericBalance);
     return isNaN(numericBalance) ? null : Math.floor(numericBalance);
   }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     const cash = Number(fundLimits.value.cash) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
-    console.log('Flattrade Available Balance:', balance);
-    return balance || null;
-  }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const cash = Number(fundLimits.value.cash) || 0;
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
-    console.log('Flattrade Available Balance:', balance);
-    return balance || null;
+    console.log(`${selectedBroker.value.brokerName} Available Balance:`, balance);
+    return balance;
   }
   return null;
 });
