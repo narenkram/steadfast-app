@@ -861,12 +861,10 @@ const toggleKillSwitch = async () => {
     cycleClockEmoji();
     const activationTime = localStorage.getItem('KillSwitchActivationTime');
     const currentTime = new Date().getTime();
-    const twelveHoursInMillis = 12 * 60 * 60 * 1000;
+    const sixHoursInMillis = 6 * 60 * 60 * 1000; // Changed from 12 to 6 hours
 
-    if (activationTime && (currentTime - activationTime < twelveHoursInMillis)) {
-      const remainingTimeMillis = twelveHoursInMillis - (currentTime - activationTime);
-      const remainingTime = formatTimeDuration(remainingTimeMillis);
-      toastMessage.value = `Kill Switch cannot be deactivated until ${remainingTime} remaining`;
+    if (activationTime && (currentTime - parseInt(activationTime) < sixHoursInMillis)) {
+      toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation'; // Updated message
       showToast.value = true;
       return;
     }
@@ -877,7 +875,7 @@ const toggleKillSwitch = async () => {
     toastMessage.value = 'Kill Switch activated successfully';
     killSwitchActive.value = true;
     localStorage.setItem('KillSwitchStatus', 'true');
-    localStorage.setItem('KillSwitchActivationTime', new Date().getTime());
+    localStorage.setItem('KillSwitchActivationTime', new Date().getTime().toString());
     enableHotKeys.value = false;
   } else if (newStatus === 'DEACTIVATED') {
     toastMessage.value = 'Kill Switch deactivated successfully';
@@ -891,17 +889,6 @@ const toggleKillSwitch = async () => {
 
 const killSwitchButtonText = computed(() => killSwitchActive.value ? 'Deactivate' : 'Activate');
 const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-sm btn-danger shadow fs-5' : 'btn btn-sm btn-success shadow fs-5');
-
-// Helper function to format milliseconds to D:HH:MM:SS
-function formatTimeDuration(milliseconds) {
-  const totalSeconds = Math.floor(milliseconds / 1000);
-  const days = Math.floor(totalSeconds / (3600 * 24));
-  const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${days}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
 
 // Fetch brokers and set selectedBroker
 const selectedBroker = ref(null);
