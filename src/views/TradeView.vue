@@ -866,13 +866,30 @@ const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true'
 const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
 const currentTime = ref(Date.now());
 
+// Initialize kill switch state
+const initKillSwitch = () => {
+  const storedStatus = localStorage.getItem('KillSwitchStatus');
+  const storedActivationTime = localStorage.getItem('KillSwitchActivationTime');
+
+  if (storedStatus === 'true' && storedActivationTime) {
+    killSwitchActive.value = true;
+    activationTime.value = parseInt(storedActivationTime);
+  } else {
+    // Deactivate kill switch if KillSwitchActivationTime is missing
+    killSwitchActive.value = false;
+    activationTime.value = 0;
+    localStorage.removeItem('KillSwitchStatus');
+    localStorage.removeItem('KillSwitchActivationTime');
+  }
+};
+
 const isFormDisabled = computed(() => killSwitchActive.value);
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
+// Modify the toggleKillSwitch function
 const toggleKillSwitch = async () => {
 
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
-
   if (newStatus === 'ACTIVATED') {
     await closeAllPositions(); // Wait for closeAllPositions to complete
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -896,7 +913,7 @@ const toggleKillSwitch = async () => {
   } else {
     toastMessage.value = 'Kill Switch deactivated successfully';
     killSwitchActive.value = false;
-    localStorage.setItem('KillSwitchStatus', 'false');
+    localStorage.removeItem('KillSwitchStatus');
     activationTime.value = 0;
     localStorage.removeItem('KillSwitchActivationTime');
   }
@@ -2521,6 +2538,7 @@ let timer;
 // Lifecycle hooks
 onMounted(async () => {
   await checkAllTokens();
+  initKillSwitch();
   const storedBroker = localStorage.getItem('selectedBroker');
   if (storedBroker) {
     const brokerDetails = JSON.parse(storedBroker);
