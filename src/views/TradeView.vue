@@ -697,24 +697,26 @@ const toastMessage = ref('');
 const updateToastVisibility = (value) => {
   showToast.value = value;
 };
-const flattradeTokenStatus = ref('Unknown');
 const brokerStatus = computed(() => {
   const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+  const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
 
   const dhanClientId = dhanDetails.clientId;
   const dhanApiToken = dhanDetails.apiToken;
   const flattradeClientId = flattradeDetails.clientId;
   const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
+  const shoonyaApiToken = localStorage.getItem('SHOONYA_API_TOKEN');
+  const shoonyaClientId = shoonyaDetails.clientId;
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
   }
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    if (flattradeClientId && flattradeApiToken) {
-      return flattradeTokenStatus.value === 'Expired' ? 'Token Expired' : 'Connected';
-    }
-    return 'Not Connected';
+    return flattradeClientId && flattradeApiToken ? 'Connected' : 'Not Connected';
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaClientId && shoonyaApiToken ? 'Connected' : 'Not Connected';
   }
   return 'Not Connected';
 });
@@ -1245,32 +1247,21 @@ const fetchFlattradePositions = async () => {
 
     if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
       flatTradePositionBook.value = positionBookRes.data;
-      flattradeTokenStatus.value = 'Valid';
       console.log('Flattrade Position Book:', positionBookRes.data);
       updatePositionSecurityIds();
       subscribeToPositionLTPs();
       subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
-      flattradeTokenStatus.value = 'Valid';
       console.log('No positions in Flattrade Position Book');
     } else {
       const errorMsg = positionBookRes.data.emsg || 'Unknown error';
       console.error('Error fetching position book:', errorMsg);
       flatTradePositionBook.value = [];
-      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
-        flattradeTokenStatus.value = 'Expired';
-      }
     }
   } catch (error) {
     console.error('Error fetching position book:', error);
     flatTradePositionBook.value = [];
-    if (error.response && error.response.data && error.response.data.emsg) {
-      const errorMsg = error.response.data.emsg;
-      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
-        flattradeTokenStatus.value = 'Expired';
-      }
-    }
   }
 };
 const fundLimits = ref({});
