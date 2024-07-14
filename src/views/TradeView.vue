@@ -51,7 +51,7 @@
           <p class="mb-1"><b>Total Funds</b></p>
           <p class="mt-2 mb-0">
             ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
-            'N/A' }}
+              'N/A' }}
           </p>
         </div>
 
@@ -971,6 +971,9 @@ const updateStrikesForExpiry = (expiryDate) => {
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
 
   // console.log('Filtered Call Strikes:', filteredCallStrikes);
@@ -1031,6 +1034,8 @@ const synchronizeCallStrikes = () => {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
     }
     const matchingCallStrike = callStrikes.value.find(strike =>
       strike.tradingSymbol.startsWith(baseSymbol) &&
@@ -1053,6 +1058,8 @@ const synchronizePutStrikes = () => {
     if (selectedBroker.value?.brokerName === 'Dhan') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
     }
     const matchingPutStrike = putStrikes.value.find(strike =>
@@ -1401,12 +1408,18 @@ const productTypes = computed(() => {
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return ['Intraday', 'Margin'];
   }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['Intraday', 'Margin'];
+  }
   return [];
 });
 const getProductTypeValue = (productType) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return productType.toUpperCase();
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return productType === 'Intraday' ? 'I' : 'M';
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return productType === 'Intraday' ? 'I' : 'M';
   }
   return productType;
@@ -1418,6 +1431,8 @@ const getTransactionType = (type) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return type;
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return type === 'BUY' ? 'B' : 'S';
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return type === 'BUY' ? 'B' : 'S';
   }
   return type;
