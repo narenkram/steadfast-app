@@ -301,13 +301,13 @@ const handleShoonyaLogin = async () => {
     const pwd = Array.from(new Uint8Array(pwdBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
     // Create and hash the appkey
-    const appkeyRaw = `${shoonyaBrokerUserId.value}|${apiKey}`;
+    const appkeyRaw = `${SHOONYA_CLIENT_ID.value}|${apiKey}`;
     const appkeyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(appkeyRaw));
     const appkey = Array.from(new Uint8Array(appkeyBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
     const jData = {
       apkversion: "1.0.0",
-      uid: shoonyaBrokerUserId.value,
+      uid: SHOONYA_CLIENT_ID.value,
       pwd: pwd,
       factor2: shoonyaOneTimePassword.value,
       vc: `${clientId}_U`,
@@ -516,8 +516,8 @@ const deleteBroker = (broker) => {
         <div class="modal-body">
           <div class="col-12">
             <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
-            <input type="text" id="ShoonyaBrokerUserId" class="form-control" v-model="shoonyaBrokerUserId"
-              placeholder="Enter Broker User ID">
+            <input type="text" id="ShoonyaBrokerUserId" class="form-control" v-model="SHOONYA_CLIENT_ID"
+              placeholder="Enter Broker User ID" disabled>
 
             <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
             <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
