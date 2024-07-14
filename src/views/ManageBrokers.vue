@@ -13,7 +13,6 @@ const SHOONYA_CLIENT_ID = ref('');
 const SHOONYA_API_TOKEN = ref('');
 
 const flattradeReqCode = ref('');
-const shoonyaReqCode = ref('');
 const shoonyaBrokerUserId = ref('');
 const shoonyaBrokerPassword = ref('');
 const shoonyaOneTimePassword = ref('');
