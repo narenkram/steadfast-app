@@ -86,7 +86,13 @@ onMounted(() => {
     flattradeReqCode.value = storedCode;
   }
   statusMessage.value = localStorage.getItem('statusMessage') || '';
-
+  // Clear any lingering status message after component mount
+  if (statusMessage.value === 'Waiting for broker auth to complete...') {
+    setTimeout(() => {
+      statusMessage.value = '';
+      localStorage.removeItem('statusMessage');
+    }, 5000);
+  }
   // Add event listener for postMessage
   window.addEventListener('message', (event) => {
     if (event.data.type === 'flattradeReqCode' && event.data.code) {
@@ -128,7 +134,8 @@ watch(DHAN_API_TOKEN, (newToken) => {
 });
 
 const openFlattradeAuthUrl = () => {
-  localStorage.setItem('statusMessage', 'Waiting for broker auth to complete...');
+  statusMessage.value = 'Waiting for broker auth to complete...';
+  localStorage.setItem('statusMessage', statusMessage.value);
 
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
   const storedFlattradeApiKey = flattradeDetails.apiKey;
@@ -141,6 +148,14 @@ const openFlattradeAuthUrl = () => {
 
   const authUrl = `https://auth.flattrade.in/?app_key=${storedFlattradeApiKey}`;
   window.open(authUrl, '_blank');
+
+  // Clear status message after 2 minutes if token generation doesn't complete
+  setTimeout(() => {
+    if (statusMessage.value === 'Waiting for broker auth to complete...') {
+      statusMessage.value = '';
+      localStorage.removeItem('statusMessage');
+    }
+  }, 120000); // 2 minutes
 };
 
 const clearErrorMessage = () => {
@@ -205,7 +220,13 @@ watch(flattradeReqCode, async (newCode) => {
         FLATTRADE_API_TOKEN.value = token;
         errorMessage.value = '';
         statusMessage.value = `Token generated successfully: ${token}`;
+        localStorage.removeItem('statusMessage'); // Clear the stored status message
         console.log('Token generated successfully:', token);
+
+        // Clear success message after 5 seconds
+        setTimeout(() => {
+          statusMessage.value = '';
+        }, 5000);
       }
     } catch (error) {
       errorMessage.value = 'Error generating token: ' + error.message;
