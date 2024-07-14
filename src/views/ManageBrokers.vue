@@ -37,7 +37,7 @@ const brokers = computed(() => {
     });
   }
 
-  if (DHAN_CLIENT_ID.value && DHAN_API_TOKEN.value) {
+  if (DHAN_CLIENT_ID.value) {
     brokersArray.push({
       id: 'Dhan',
       brokerName: 'Dhan',
@@ -275,10 +275,10 @@ const getStatus = (broker) => {
 
   if (broker.brokerName === 'Dhan') {
     if (!DHAN_API_TOKEN.value) {
-      status = 'Token missing, Click generate';
+      status = 'Token missing, Click update';
       statusClass = 'bg-warning text-dark';
     } else if (tokenStatus.value.Dhan === 'expired') {
-      status = 'Token Expired, Click generate';
+      status = 'Token Expired, Click update';
       statusClass = 'bg-warning text-dark';
     }
   }
