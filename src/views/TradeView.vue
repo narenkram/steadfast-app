@@ -533,6 +533,54 @@
               </tbody>
             </table>
           </div>
+          <!-- Shoonya Positions -->
+          <div v-if="activeFetchFunction === 'fetchShoonyaPositions'">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Symbol Name</th>
+                  <th scope="col">Net Qty</th>
+                  <th scope="col">Net Avg</th>
+                  <th scope="col">Position Type</th>
+                  <th scope="col">Product Type</th>
+                  <th scope="col">LTP</th>
+                  <th scope="col">Buy Value</th>
+                  <th scope="col">Sell Value</th>
+                  <th scope="col">Realized</th>
+                  <th scope="col">Unrealized</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-if="shoonyaPositionBook.length">
+                  <tr v-for="shoonyaPosition in shoonyaPositionBook" :key="shoonyaPosition.tsym">
+                    <td>{{ shoonyaPosition.tsym }}</td>
+                    <td
+                      :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                      {{ shoonyaPosition.netqty }}
+                    </td>
+                    <td>{{ shoonyaPosition.netavgprc }}</td>
+                    <td>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</td>
+                    <td>{{ shoonyaPosition.prd }}</td>
+                    <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
+                    <td>{{ shoonyaPosition.daybuyamt }}</td>
+                    <td>{{ shoonyaPosition.daysellamt }}</td>
+                    <td
+                      :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : 'text-dark'">
+                      {{ shoonyaPosition.rpnl }}
+                    </td>
+                    <td
+                      :class="shoonyaPosition.urmtom > 0 ? 'text-success' : shoonyaPosition.urmtom < 0 ? 'text-danger' : 'text-dark'">
+                      {{ shoonyaPosition.urmtom }}
+                    </td>
+                  </tr>
+                </template>
+                <tr v-else>
+                  <td colspan="9" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           <!-- Dhan Trades -->
@@ -1291,7 +1339,51 @@ const fetchFlattradePositions = async () => {
 };
 
 const shoonyaPositionBook = ref([]);
-// TODO: Implement the fetchShoonyaPositions function
+const fetchShoonyaPositions = async () => {
+  let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
+
+  if (!jKey) {
+    toastMessage.value = 'Token is missing. Please generate a token first.';
+    showToast.value = true;
+    return;
+  }
+
+  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+    toastMessage.value = 'Shoonya broker is not selected.';
+    showToast.value = true;
+    return;
+  }
+
+  const clientId = selectedBroker.value.clientId;
+
+  const positionBookPayload = `jKey=${jKey}&jData=${JSON.stringify({ uid: clientId, actid: clientId })}`;
+
+  try {
+    const positionBookRes = await axios.post('https://api.shoonya.com/NorenWClientTP/PositionBook', positionBookPayload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
+      shoonyaPositionBook.value = positionBookRes.data;
+      console.log('Shoonya Position Book:', positionBookRes.data);
+      updatePositionSecurityIds();
+      subscribeToPositionLTPs();
+      subscribeToOptions();
+    } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
+      shoonyaPositionBook.value = [];
+      console.log('No positions in Shoonya Position Book');
+    } else {
+      const errorMsg = positionBookRes.data.emsg || 'Unknown error';
+      console.error('Error fetching position book:', errorMsg);
+      shoonyaPositionBook.value = [];
+    }
+  } catch (error) {
+    console.error('Error fetching position book:', error);
+    shoonyaPositionBook.value = [];
+  }
+};
 
 const fundLimits = ref({});
 // Update the fetchFundLimit function
@@ -2310,6 +2402,10 @@ onMounted(async () => {
       fetchDhanPositions();
       activeFetchFunction.value = 'fetchDhanPositions';
     }
+    if (selectedBroker.value?.brokerName === 'Shoonya') {
+      fetchShoonyaPositions();
+      activeFetchFunction.value = 'fetchShoonyaPositions';
+    }
   }
   if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -2354,7 +2450,12 @@ watch(selectedBroker, async (newBroker) => {
       if (newBroker.brokerName === 'Flattrade') {
         activeFetchFunction.value = 'fetchFlattradePositions';
         await fetchFlattradePositions();
-      } else {
+      }
+      else if (newBroker.brokerName === 'Shoonya') {
+        activeFetchFunction.value = 'fetchShoonyaPositions';
+        await fetchShoonyaPositions();
+      }
+      else {
         activeFetchFunction.value = 'fetchDhanPositions';
         await fetchDhanPositions();
       }
