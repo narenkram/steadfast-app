@@ -1509,6 +1509,19 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       ret: "DAY"
       // Add any additional fields specific to Flattrade here
     };
+  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+    return {
+      uid: selectedBroker.value.brokerClientId,
+      actid: selectedBroker.value.brokerClientId,
+      exch: exchangeSegment,
+      tsym: selectedStrike.tradingSymbol,
+      qty: selectedQuantity.value,
+      prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
+      prd: selectedProductType.value,
+      trantype: transactionType,
+      prctyp: selectedOrderType.value,
+      ret: "DAY"
+    };
   } else {
     throw new Error("Unsupported broker");
   }
@@ -1561,6 +1574,21 @@ const placeOrder = async (transactionType, drvOptionType) => {
         }
       });
       await fetchFlattradeOrdersTradesBook();
+    }
+    else if (selectedBroker.value.brokerName === 'Shoonya') {
+      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+      const payload = qs.stringify({
+        ...orderData,
+        uid: selectedBroker.value.clientId,
+        actid: selectedBroker.value.clientId
+      });
+      response = await axios.post('http://localhost:3000/shoonyaPlaceOrder', payload, {
+        headers: {
+          'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      // await fetchShoonyaOrdersTradesBook();
     }
 
     console.log("Order placed successfully:", response.data);
@@ -1634,6 +1662,17 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         }
       });
       await fetchFlattradeOrdersTradesBook();
+    }
+    else if (selectedBroker.value.brokerName === 'Shoonya') {
+      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+      const payload = qs.stringify(orderData); // orderData already includes uid and actid
+      response = await axios.post('http://localhost:3000/shoonyaPlaceOrder', payload, {
+        headers: {
+          'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      // await fetchShoonyaOrdersTradesBook();
     }
 
     console.log("Order placed successfully for position:", response.data);
