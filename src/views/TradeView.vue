@@ -686,6 +686,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
+import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
@@ -710,13 +711,22 @@ const brokerStatus = computed(() => {
   const shoonyaClientId = shoonyaDetails.clientId;
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanClientId && dhanApiToken ? 'Connected' : 'Not Connected';
+    if (dhanClientId && dhanApiToken) {
+      return tokenStatus.Dhan === 'valid' ? 'Connected' : 'Token Expired';
+    }
+    return 'Not Connected';
   }
   else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flattradeClientId && flattradeApiToken ? 'Connected' : 'Not Connected';
+    if (flattradeClientId && flattradeApiToken) {
+      return tokenStatus.Flattrade === 'valid' ? 'Connected' : 'Token Expired';
+    }
+    return 'Not Connected';
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaClientId && shoonyaApiToken ? 'Connected' : 'Not Connected';
+    if (shoonyaClientId && shoonyaApiToken) {
+      return tokenStatus.Shoonya === 'valid' ? 'Connected' : 'Token Expired';
+    }
+    return 'Not Connected';
   }
   return 'Not Connected';
 });
@@ -2178,6 +2188,7 @@ const totalSellValue = computed(() => {
 
 // Lifecycle hooks
 onMounted(async () => {
+  await checkAllTokens();
   const storedBroker = localStorage.getItem('selectedBroker');
   if (storedBroker) {
     const brokerDetails = JSON.parse(storedBroker);
