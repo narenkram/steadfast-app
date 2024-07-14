@@ -118,7 +118,9 @@
         <div class="card-title">
           <h5>Kill Switch</h5>
         </div>
-        <button :class="killSwitchButtonClass" @click="toggleKillSwitch">
+        <button :class="killSwitchButtonClass" @click="handleKillSwitchClick"
+          :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
+          :data-bs-toggle="killSwitchActive ? '' : 'modal'">
           {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
         </button>
       </div>
@@ -805,6 +807,31 @@
     </div>
   </div>
 
+  <!-- Kill Swtich Activation Confirmation Modal -->
+  <div class="modal fade" id="KillSwitchActivationConfirmationModal" tabindex="-1"
+    aria-labelledby="KillSwitchActivationConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="KillSwitchActivationConfirmationModalLabel">Confirm Kill Switch Activation</h5>
+        </div>
+        <div class="modal-body">
+          <blockquote class="blockquote">
+            This action will <b class="text-danger">close all positions</b> and block trading for the next 6 hours.
+          </blockquote>
+          <p>Are you sure you want to continue?</p>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex flex-row justify-content-between w-100">
+            <button type="button" class="btn btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">No</button>
+            <button type="button" class="btn btn-danger w-50 ms-1" data-bs-dismiss="modal" @click="toggleKillSwitch">
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 
@@ -886,9 +913,15 @@ const initKillSwitch = () => {
 const isFormDisabled = computed(() => killSwitchActive.value);
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
+const handleKillSwitchClick = () => {
+  if (killSwitchActive.value) {
+    // If the kill switch is already active, deactivate it directly
+    toggleKillSwitch();
+  }
+  // If it's not active, the modal will be shown due to data-bs-target and data-bs-toggle
+};
 // Modify the toggleKillSwitch function
 const toggleKillSwitch = async () => {
-
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
   if (newStatus === 'ACTIVATED') {
     await closeAllPositions(); // Wait for closeAllPositions to complete
