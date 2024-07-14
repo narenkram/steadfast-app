@@ -799,7 +799,6 @@ function formatTimeDuration(milliseconds) {
 }
 
 // Fetch brokers and set selectedBroker
-const brokers = ref([]);
 const selectedBroker = ref(null);
 const selectedBrokerName = ref('');
 const availableBrokers = computed(() => {
