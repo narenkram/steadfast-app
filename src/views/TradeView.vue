@@ -1281,6 +1281,10 @@ const fetchFlattradePositions = async () => {
     flatTradePositionBook.value = [];
   }
 };
+
+const shoonyaPositionBook = ref([]);
+// TODO: Implement the fetchShoonyaPositions function
+
 const fundLimits = ref({});
 // Update the fetchFundLimit function
 const fetchFundLimit = async () => {
@@ -1716,6 +1720,21 @@ const closeAllPositions = async () => {
         toastMessage.value = 'All Flattrade positions closed successfully';
       } else {
         toastMessage.value = 'No positions to close for Flattrade';
+      }
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      for (const position of shoonyaPositionBook.value) {
+        const netqty = Number(position.netqty); // Ensure netqty is treated as a number
+        if (netqty !== 0) {
+          const transactionType = netqty > 0 ? 'S' : 'B';
+          const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
+          await placeOrderForPosition(transactionType, optionType, position);
+          positionsClosed = true;
+        }
+      }
+      if (positionsClosed) {
+        toastMessage.value = 'All Shoonya positions closed successfully';
+      } else {
+        toastMessage.value = 'No positions to close for Shoonya';
       }
     }
 
