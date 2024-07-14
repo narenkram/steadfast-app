@@ -468,6 +468,20 @@ const sendCredentialsToBackend = async () => {
   }
 };
 
+const updateDhanToken = () => {
+  if (DHAN_API_TOKEN.value) {
+    localStorage.setItem('DHAN_API_TOKEN', DHAN_API_TOKEN.value);
+    validateToken({ brokerName: 'Dhan' });
+    statusMessage.value = 'Dhan token updated successfully';
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 5000);
+  } else {
+    errorMessage.value = 'Please enter a valid Dhan API token';
+    clearErrorMessage();
+  }
+};
+
 const deleteBroker = (broker) => {
   // Remove broker details from localStorage
   localStorage.removeItem(`broker_${broker.brokerName}`);
@@ -520,7 +534,7 @@ const deleteBroker = (broker) => {
             <th scope="col">Broker Client ID</th>
             <th scope="col">API Token</th>
             <th scope="col">Validity</th>
-            <th scope="col">Activation</th>
+            <th scope="col" class="text-center">Activation</th>
             <th scope="col">Status</th>
             <th scope="col">Delete</th>
           </tr>
@@ -540,18 +554,21 @@ const deleteBroker = (broker) => {
               <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
             <td>24 Hours</td>
-            <td>
+            <td class="text-center">
               <template v-if="broker.brokerName === 'Shoonya'">
-                <button class="btn btn-outline-primary btn-sm w-50" data-bs-toggle="modal"
+                <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
                   data-bs-target="#ShoonyaLogin">
                   Login
                 </button>
               </template>
-              <template v-else-if="broker.brokerName !== 'Dhan'">
+              <template v-else-if="broker.brokerName == 'Flattrade'">
                 <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
               </template>
-              <template v-else>
-                -
+              <template v-else-if="broker.brokerName === 'Dhan'">
+                <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
+                  data-bs-target="#DhanUpdateToken">
+                  Update Token
+                </button>
               </template>
             </td>
             <td>
@@ -611,4 +628,34 @@ const deleteBroker = (broker) => {
       </div>
     </div>
   </div>
+
+  <!-- Dhan Update Token -->
+  <div class="modal fade" id="DhanUpdateToken" tabindex="-1" aria-labelledby="DhanUpdateTokenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="DhanUpdateTokenLabel">
+            Dhan Update Token
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-12">
+            <label for="DhanApiToken" class="form-label mb-0">API Token</label>
+            <input type="text" id="DhanApiToken" class="form-control" v-model="DHAN_API_TOKEN"
+              placeholder="Enter API Token">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" @click="updateDhanToken" data-bs-dismiss="modal">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
