@@ -24,6 +24,11 @@ export default defineConfig({
         target: 'https://api.shoonya.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
+      },
+      '/dhanApi': {
+        target: 'https://api.dhan.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/dhanApi/, '')
       }
       // '/dhanApi': {
       //   target: 'https://api.dhan.in',

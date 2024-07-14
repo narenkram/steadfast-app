@@ -320,7 +320,7 @@ const handleShoonyaLogin = async () => {
   }
 };
 
-const fundLimits = ref('');
+const flattradeFundLimitResponse = ref('');
 const flattradeFundLimits = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
@@ -337,10 +337,52 @@ const flattradeFundLimits = async () => {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
-    fundLimits.value = res.data;
-    console.log(res.data);
+    flattradeFundLimitResponse.value = res.data;
+    console.log('Flattrade fund limits:', flattradeFundLimitResponse);
   } catch (error) {
     throw new Error('Error fetching fund limits: ' + error.message);
+  }
+};
+const shoonyaFundLimitResponse = ref('');
+const shoonyaFundLimits = async () => {
+  let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
+
+  if (!jKey) {
+    throw new Error('Token is missing. Please generate a token first.');
+  }
+
+  const jData = JSON.stringify({ uid: SHOONYA_CLIENT_ID.value, actid: SHOONYA_CLIENT_ID.value });
+  const payload = `jKey=${jKey}&jData=${jData}`;
+
+  try {
+    const res = await axios.post('https://api.shoonya.com/NorenWClientTP/Limits', payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    shoonyaFundLimitResponse.value = res.data;
+    console.log('Shoonya fund limits:', shoonyaFundLimitResponse);
+  } catch (error) {
+    throw new Error('Error fetching fund limits: ' + error.message);
+  }
+};
+const dhanFundLimitResponse = ref('');
+const dhanFundLimits = async () => {
+  const accessToken = localStorage.getItem('DHAN_API_TOKEN');
+  if (!accessToken) {
+    throw new Error('Dhan API token is missing. Please generate a token first.');
+  }
+  try {
+    const res = await axios.get('/dhanApi/fundlimit', {
+      headers: {
+        'access-token': accessToken
+      }
+    });
+    dhanFundLimitResponse.value = res.data;
+    console.log('Dhan fund limits:', dhanFundLimitResponse);
+  } catch (error) {
+    console.error('Error fetching Dhan fund limits:', error);
+    throw new Error('Error fetching fund limits: ' + (error.response?.data?.message || error.message));
   }
 };
 const validateToken = async (broker) => {
@@ -357,7 +399,32 @@ const validateToken = async (broker) => {
       }
     }
   }
-  // Add similar checks for Dhan and Shoonya when you have their validation endpoints
+  if (broker.brokerName === 'Shoonya') {
+    try {
+      await shoonyaFundLimits();
+      tokenStatus.value.Shoonya = 'valid';
+    } catch (error) {
+      const errorMsg = error.message;
+      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
+        tokenStatus.value.Shoonya = 'expired';
+      } else {
+        tokenStatus.value.Shoonya = 'invalid';
+      }
+    }
+  }
+  if (broker.brokerName === 'Dhan') {
+    try {
+      await dhanFundLimits();
+      tokenStatus.value.Dhan = 'valid';
+    } catch (error) {
+      const errorMsg = error.message;
+      if (errorMsg.includes('Session Expired') || errorMsg.includes('Invalid Session Key')) {
+        tokenStatus.value.Dhan = 'expired';
+      } else {
+        tokenStatus.value.Dhan = 'invalid';
+      }
+    }
+  }
 };
 // Call this function when the component mounts or when you want to check token status
 const checkAllTokens = async () => {
