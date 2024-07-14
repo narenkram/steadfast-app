@@ -133,9 +133,7 @@ watch(DHAN_API_TOKEN, (newToken) => {
     validateToken('Dhan');
   } else {
     localStorage.removeItem('DHAN_API_TOKEN');
-    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-    delete dhanDetails.apiToken;
-    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
+    localStorage.removeItem('broker_Dhan');
   }
 });
 
