@@ -259,7 +259,7 @@ function maskBrokerClientId(brokerClientId) {
 
 const getStatus = (broker) => {
   const status = getBrokerStatus(broker.brokerName);
-  let statusText = 'Active';
+  let statusText = 'Activated';
   let statusClass = 'bg-success';
 
   if (status === 'Token missing') {
