@@ -1783,6 +1783,19 @@ const cancelOrder = async (order) => {
         }
       });
     }
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      const jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
+      const clientId = selectedBroker.value.clientId;
+      console.log(`Sending request to cancel Shoonya order ${orderId}`);
+      await axios.post('http://localhost:3000/shoonyaCancelOrder', {
+        norenordno: orderId,
+        uid: clientId
+      }, {
+        params: {
+          SHOONYA_API_TOKEN: jKey
+        }
+      });
+    }
     console.log(`Order ${orderId} canceled successfully.`);
   } catch (error) {
     console.error(`Failed to cancel order ${orderId}:`, error);
@@ -1800,6 +1813,8 @@ const cancelPendingOrders = async () => {
     await fetchDhanOrdersTradesBook();
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     await fetchFlattradeOrdersTradesBook();
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    // await fetchShoonyaOrdersTradesBook();
   }
 
   const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
@@ -1820,6 +1835,8 @@ const cancelPendingOrders = async () => {
       await fetchDhanOrdersTradesBook();
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
       await fetchFlattradeOrdersTradesBook();
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      // await fetchShoonyaOrdersTradesBook();
     }
   } catch (error) {
     console.error('Failed to cancel orders:', error);
