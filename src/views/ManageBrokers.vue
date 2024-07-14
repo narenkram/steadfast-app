@@ -107,7 +107,6 @@ onMounted(() => {
 watch(FLATTRADE_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
-    sendCredentialsToBackend();
     validateToken('Flattrade');
   } else {
     localStorage.removeItem('FLATTRADE_API_TOKEN');
@@ -345,28 +344,6 @@ const handleShoonyaLogin = async () => {
   } catch (error) {
     errorMessage.value = `Shoonya login error: ${error.message}`;
     clearErrorMessage();
-  }
-};
-
-const sendCredentialsToBackend = async () => {
-  try {
-    const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
-    const clientId = flattradeDetails.clientId;
-
-    if (!clientId) {
-      console.error('Flattrade client ID not found in broker details');
-      return;
-    }
-
-    const credentials = {
-      usersession: FLATTRADE_API_TOKEN.value,
-      userid: clientId
-    };
-
-    await axios.post('http://localhost:3000/api/set-flattrade-credentials', credentials);
-    console.log('Credentials sent to backend successfully');
-  } catch (error) {
-    console.error('Failed to send credentials to backend:', error);
   }
 };
 
