@@ -809,13 +809,22 @@ const availableBrokers = computed(() => {
 });
 // Function to set selected broker and save to localStorage
 const updateSelectedBroker = () => {
-  if (selectedBrokerName.value) {
+  const availableBrokerNames = availableBrokers.value;
+
+  if (availableBrokerNames.length === 0) {
+    // No brokers available, remove selectedBroker from localStorage
+    selectedBroker.value = null;
+    localStorage.removeItem('selectedBroker');
+    selectedBrokerName.value = '';
+  } else if (selectedBrokerName.value && availableBrokerNames.includes(selectedBrokerName.value)) {
     const brokerDetails = JSON.parse(localStorage.getItem(`broker_${selectedBrokerName.value}`) || '{}');
     selectedBroker.value = brokerDetails;
     localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails));
   } else {
+    // If the selected broker is not available, clear the selection
     selectedBroker.value = null;
     localStorage.removeItem('selectedBroker');
+    selectedBrokerName.value = '';
   }
 };
 
