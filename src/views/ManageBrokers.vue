@@ -122,13 +122,19 @@ watch(SHOONYA_API_TOKEN, (newToken) => {
   }
 });
 
-// Watch for changes in DHAN_API_TOKEN and update localStorage
+// Update the watch function similarly
 watch(DHAN_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('DHAN_API_TOKEN', newToken);
+    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+    dhanDetails.apiToken = newToken;
+    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
     validateToken({ brokerName: 'Dhan' });
   } else {
     localStorage.removeItem('DHAN_API_TOKEN');
+    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+    delete dhanDetails.apiToken;
+    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
   }
 });
 
@@ -490,7 +496,14 @@ const sendCredentialsToBackend = async () => {
 
 const updateDhanToken = () => {
   if (DHAN_API_TOKEN.value) {
+    // Update localStorage
     localStorage.setItem('DHAN_API_TOKEN', DHAN_API_TOKEN.value);
+
+    // Update broker object in localStorage
+    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+    dhanDetails.apiToken = DHAN_API_TOKEN.value;
+    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
+
     validateToken({ brokerName: 'Dhan' });
     statusMessage.value = 'Dhan token updated successfully';
     setTimeout(() => {
