@@ -125,6 +125,26 @@
     </div>
   </section>
 
+  <section class="row py-1">
+    <div class="col-12" v-if="killSwitchActive">
+      <div class="bg-danger text-white p-3 rounded-3 shadow">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="mb-2">Kill Switch Activated</h5>
+            <p class="mb-0">
+              Trading has been blocked for the next 6 hours. Take a break to put your mind at ease.
+            </p>
+          </div>
+          <div class="text-center">
+            <span class="bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+              {{ killSwitchRemainingTime }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <hr />
 
   <!-- Place Order Form -->
@@ -843,31 +863,26 @@ const setActiveTab = (tab) => {
 
 // Kill Switch - Client Side
 const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
+const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
+const currentTime = ref(Date.now());
+
 const isFormDisabled = computed(() => killSwitchActive.value);
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
 
 const toggleKillSwitch = async () => {
+
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
 
   if (newStatus === 'ACTIVATED') {
     await closeAllPositions(); // Wait for closeAllPositions to complete
-
-    // Add a small delay to ensure the toast message is displayed
     await new Promise(resolve => setTimeout(resolve, 500));
-
   }
 
-  if (newStatus === 'DEACTIVATED') {
+  if (newStatus === 'DEACTIVATED' && remainingTimeInMs.value > 0) {
     cycleClockEmoji();
-    const activationTime = localStorage.getItem('KillSwitchActivationTime');
-    const currentTime = new Date().getTime();
-    const sixHoursInMillis = 6 * 60 * 60 * 1000; // Changed from 12 to 6 hours
-
-    if (activationTime && (currentTime - parseInt(activationTime) < sixHoursInMillis)) {
-      toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation'; // Updated message
-      showToast.value = true;
-      return;
-    }
+    toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation';
+    showToast.value = true;
+    return;
   }
 
   // Handle different response messages
@@ -875,18 +890,45 @@ const toggleKillSwitch = async () => {
     toastMessage.value = 'Kill Switch activated successfully';
     killSwitchActive.value = true;
     localStorage.setItem('KillSwitchStatus', 'true');
-    localStorage.setItem('KillSwitchActivationTime', new Date().getTime().toString());
+    activationTime.value = Date.now();
+    localStorage.setItem('KillSwitchActivationTime', activationTime.value.toString());
     enableHotKeys.value = false;
-  } else if (newStatus === 'DEACTIVATED') {
+  } else {
     toastMessage.value = 'Kill Switch deactivated successfully';
     killSwitchActive.value = false;
     localStorage.setItem('KillSwitchStatus', 'false');
+    activationTime.value = 0;
     localStorage.removeItem('KillSwitchActivationTime');
   }
 
   showToast.value = true;
 };
+const remainingTimeInMs = computed(() => {
+  if (!activationTime.value || !killSwitchActive.value) return 0;
+  const sixHoursInMillis = 6 * 60 * 60 * 1000;
+  return Math.max(0, sixHoursInMillis - (currentTime.value - activationTime.value));
+});
+const killSwitchRemainingTime = computed(() => {
+  if (remainingTimeInMs.value === 0) return '';
 
+  const hours = Math.floor(remainingTimeInMs.value / (60 * 60 * 1000));
+  const minutes = Math.floor((remainingTimeInMs.value % (60 * 60 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((remainingTimeInMs.value % (60 * 1000)) / 1000);
+
+  return `${hours}h ${minutes}m ${seconds}s`;
+});
+// Watch for changes in killSwitchRemainingTime
+watch(killSwitchRemainingTime, (newValue) => {
+  if (newValue === '' && killSwitchActive.value) {
+    toggleKillSwitch();
+  }
+});
+// Watch for changes in remainingTimeInMs
+watch(remainingTimeInMs, (newValue) => {
+  if (newValue === 0 && killSwitchActive.value) {
+    toggleKillSwitch();
+  }
+});
 const killSwitchButtonText = computed(() => killSwitchActive.value ? 'Deactivate' : 'Activate');
 const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-sm btn-danger shadow fs-5' : 'btn btn-sm btn-success shadow fs-5');
 
@@ -2475,6 +2517,7 @@ const totalSellValue = computed(() => {
   return 0;
 });
 
+let timer;
 // Lifecycle hooks
 onMounted(async () => {
   await checkAllTokens();
@@ -2523,6 +2566,10 @@ onMounted(async () => {
   }
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
+  timer = setInterval(() => {
+    currentTime.value = Date.now();
+  }, 1000);
+
   connectWebSocket();
 });
 
@@ -2531,6 +2578,7 @@ onBeforeUnmount(() => {
   if (socket.value) {
     socket.value.close();
   }
+  clearInterval(timer);
 });
 
 // Watchers
