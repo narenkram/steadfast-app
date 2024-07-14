@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
+import { validateToken, checkAllTokens, getBrokerStatus, tokenStatus } from '../utils/brokerTokenValidator';
 
 const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
@@ -107,7 +108,7 @@ watch(FLATTRADE_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
     sendCredentialsToBackend();
-    validateToken({ brokerName: 'Flattrade' });
+    validateToken('Flattrade');
   } else {
     localStorage.removeItem('FLATTRADE_API_TOKEN');
   }
@@ -116,7 +117,7 @@ watch(FLATTRADE_API_TOKEN, (newToken) => {
 watch(SHOONYA_API_TOKEN, (newToken) => {
   if (newToken) {
     localStorage.setItem('SHOONYA_API_TOKEN', newToken);
-    validateToken({ brokerName: 'Shoonya' });
+    validateToken('Shoonya');
   } else {
     localStorage.removeItem('SHOONYA_API_TOKEN');
   }
@@ -129,7 +130,7 @@ watch(DHAN_API_TOKEN, (newToken) => {
     const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
     dhanDetails.apiToken = newToken;
     localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
-    validateToken({ brokerName: 'Dhan' });
+    validateToken('Dhan');
   } else {
     localStorage.removeItem('DHAN_API_TOKEN');
     const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
@@ -258,47 +259,21 @@ function maskBrokerClientId(brokerClientId) {
 
   return `${firstPart}${middleMask}${lastPart}`;
 }
-const tokenStatus = ref({
-  Flattrade: 'unknown',
-  Dhan: 'unknown',
-  Shoonya: 'unknown'
-});
 
 const getStatus = (broker) => {
-  let status = 'Active';
+  const status = getBrokerStatus(broker.brokerName);
+  let statusText = 'Active';
   let statusClass = 'bg-success';
 
-  if (broker.brokerName === 'Flattrade') {
-    if (!FLATTRADE_API_TOKEN.value) {
-      status = 'Token missing, Click generate';
-      statusClass = 'bg-warning text-dark';
-    } else if (tokenStatus.value.Flattrade === 'expired') {
-      status = 'Token Expired, Click generate';
-      statusClass = 'bg-warning text-dark';
-    }
+  if (status === 'Token missing') {
+    statusText = `Token missing, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`;
+    statusClass = 'bg-warning text-dark';
+  } else if (status === 'expired') {
+    statusText = `Token Expired, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`;
+    statusClass = 'bg-warning text-dark';
   }
 
-  if (broker.brokerName === 'Dhan') {
-    if (!DHAN_API_TOKEN.value) {
-      status = 'Token missing, Click update';
-      statusClass = 'bg-warning text-dark';
-    } else if (tokenStatus.value.Dhan === 'expired') {
-      status = 'Token Expired, Click update';
-      statusClass = 'bg-warning text-dark';
-    }
-  }
-
-  if (broker.brokerName === 'Shoonya') {
-    if (!SHOONYA_API_TOKEN.value) {
-      status = 'Token missing, Click Login';
-      statusClass = 'bg-warning text-dark';
-    } else if (tokenStatus.value.Shoonya === 'expired') {
-      status = 'Token Expired, Click Login';
-      statusClass = 'bg-warning text-dark';
-    }
-  }
-
-  return { status, statusClass };
+  return { status: statusText, statusClass };
 };
 
 function maskTokenSecret(apiSecret) {
@@ -440,38 +415,7 @@ const dhanFundLimits = async () => {
     throw new Error('Error fetching fund limits: ' + (error.response?.data?.message || error.message));
   }
 };
-const validateToken = async (broker) => {
-  if (broker.brokerName === 'Flattrade') {
-    try {
-      await flattradeFundLimits();
-      tokenStatus.value.Flattrade = 'valid';
-    } catch (error) {
-      tokenStatus.value.Flattrade = 'expired';
-    }
-  }
-  if (broker.brokerName === 'Shoonya') {
-    try {
-      await shoonyaFundLimits();
-      tokenStatus.value.Shoonya = 'valid';
-    } catch (error) {
-      tokenStatus.value.Shoonya = 'expired';
-    }
-  }
-  if (broker.brokerName === 'Dhan') {
-    try {
-      await dhanFundLimits();
-      tokenStatus.value.Dhan = 'valid';
-    } catch (error) {
-      tokenStatus.value.Dhan = 'expired';
-    }
-  }
-};
-// Call this function when the component mounts or when you want to check token status
-const checkAllTokens = async () => {
-  for (const broker of brokers.value) {
-    await validateToken(broker);
-  }
-};
+
 const sendCredentialsToBackend = async () => {
   try {
     const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -504,7 +448,7 @@ const updateDhanToken = () => {
     dhanDetails.apiToken = DHAN_API_TOKEN.value;
     localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
 
-    validateToken({ brokerName: 'Dhan' });
+    validateToken('Dhan');
     statusMessage.value = 'Dhan token updated successfully';
     setTimeout(() => {
       statusMessage.value = '';
@@ -541,6 +485,8 @@ const deleteBroker = (broker) => {
 };
 
 </script>
+
+
 
 <template>
   <section class="row py-5">
