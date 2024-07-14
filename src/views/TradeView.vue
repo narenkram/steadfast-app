@@ -667,6 +667,63 @@
               </tbody>
             </table>
           </div>
+          <!-- Shoonya Trades -->
+          <div v-if="activeFetchFunction === 'fetchShoonyaOrdersTradesBook'">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Type</th>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Trade ID</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-if="combinedOrdersAndTrades.length">
+                  <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
+                    <tr>
+                      <td>Order</td>
+                      <td>{{ item.order.norenordno }}</td>
+                      <td>-</td>
+                      <td>{{ item.order.tsym }}</td>
+                      <td>{{ item.order.qty }}</td>
+                      <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.norentm }}</td>
+                      <td :class="{
+                        'text-danger': item.order.status === 'REJECTED',
+                        'text-success': item.order.status === 'COMPLETE',
+                        'text-warning': item.order.status === 'PENDING'
+                      }">
+                        {{ item.order.status }}
+                      </td>
+                      <td>{{ item.order.rejreason }}</td>
+                    </tr>
+                    <tr v-if="item.trade" class="nested-trade-row">
+                      <td>Trade</td>
+                      <td>-</td>
+                      <td>{{ item.trade.norenordno }}</td>
+                      <td>{{ item.trade.tsym }}</td>
+                      <td>{{ item.trade.qty }}</td>
+                      <td>{{ item.trade.flprc }}</td>
+                      <td>{{ item.trade.norentm }}</td>
+                      <td>{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
+                      <td>-</td>
+                    </tr>
+                  </template>
+                </template>
+                <tr v-else>
+                  <td colspan="9" class="text-center">No orders or trades on selected broker {{
+                    selectedBroker.brokerName }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="tab-pane fade" id="automation-tab-pane" role="tabpanel" aria-labelledby="automation-tab"
           tabindex="0">
@@ -1240,25 +1297,81 @@ const fetchFlattradeOrdersTradesBook = async () => {
   }
 };
 
+const shoonyaOrderBook = ref([]);
+const shoonyaTradeBook = ref([]);
+const fetchShoonyaOrdersTradesBook = async () => {
+  let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
+
+  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+    toastMessage.value = 'Shoonya broker is not selected.';
+    showToast.value = true;
+    return;
+  }
+
+  const clientId = selectedBroker.value.clientId;
+
+  if (!jKey || !clientId) {
+    toastMessage.value = 'Token or Client ID is missing. Please generate a token first.';
+    showToast.value = true;
+    return;
+  }
+
+  try {
+    const response = await axios.get('http://localhost:3000/shoonyaGetOrdersAndTrades', {
+      params: {
+        SHOONYA_API_TOKEN: jKey,
+        SHOONYA_CLIENT_ID: clientId
+      }
+    });
+
+    shoonyaOrderBook.value = response.data.orderBook;
+    shoonyaTradeBook.value = response.data.tradeBook;
+    console.log('Shoonya Order Book:', response.data.orderBook);
+    console.log('Shoonya Trade Book:', response.data.tradeBook);
+  } catch (error) {
+    toastMessage.value = 'Error fetching trades: ' + error.message;
+    showToast.value = true;
+    console.error('Error fetching trades:', error);
+  }
+};
+
 const combinedOrdersAndTrades = computed(() => {
   const combined = {};
 
-  // Check if flatOrderBook.value is an array before using forEach
-  if (Array.isArray(flatOrderBook.value)) {
-    flatOrderBook.value.forEach(order => {
-      combined[order.norenordno] = { order, trade: null };
-    });
-  }
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    // Process Flattrade orders and trades
+    if (Array.isArray(flatOrderBook.value)) {
+      flatOrderBook.value.forEach(order => {
+        combined[order.norenordno] = { order, trade: null };
+      });
+    }
 
-  // Check if flatTradeBook.value is an array before using forEach
-  if (Array.isArray(flatTradeBook.value)) {
-    flatTradeBook.value.forEach(trade => {
-      if (combined[trade.norenordno]) {
-        combined[trade.norenordno].trade = trade;
-      } else {
-        combined[trade.norenordno] = { order: null, trade };
-      }
-    });
+    if (Array.isArray(flatTradeBook.value)) {
+      flatTradeBook.value.forEach(trade => {
+        if (combined[trade.norenordno]) {
+          combined[trade.norenordno].trade = trade;
+        } else {
+          combined[trade.norenordno] = { order: null, trade };
+        }
+      });
+    }
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    // Process Shoonya orders and trades
+    if (Array.isArray(shoonyaOrderBook.value)) {
+      shoonyaOrderBook.value.forEach(order => {
+        combined[order.norenordno] = { order, trade: null };
+      });
+    }
+
+    if (Array.isArray(shoonyaTradeBook.value)) {
+      shoonyaTradeBook.value.forEach(trade => {
+        if (combined[trade.norenordno]) {
+          combined[trade.norenordno].trade = trade;
+        } else {
+          combined[trade.norenordno] = { order: null, trade };
+        }
+      });
+    }
   }
 
   return Object.values(combined).sort((a, b) => {
@@ -1692,7 +1805,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
-      // await fetchShoonyaOrdersTradesBook();
+      await fetchShoonyaOrdersTradesBook();
     }
 
     console.log("Order placed successfully:", response.data);
@@ -1776,7 +1889,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
-      // await fetchShoonyaOrdersTradesBook();
+      await fetchShoonyaOrdersTradesBook();
     }
 
     console.log("Order placed successfully for position:", response.data);
@@ -1914,7 +2027,7 @@ const cancelPendingOrders = async () => {
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     await fetchFlattradeOrdersTradesBook();
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    // await fetchShoonyaOrdersTradesBook();
+    await fetchShoonyaOrdersTradesBook();
   }
 
   const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
@@ -1936,7 +2049,7 @@ const cancelPendingOrders = async () => {
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
       await fetchFlattradeOrdersTradesBook();
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      // await fetchShoonyaOrdersTradesBook();
+      await fetchShoonyaOrdersTradesBook();
     }
   } catch (error) {
     console.error('Failed to cancel orders:', error);
@@ -2416,6 +2529,10 @@ onMounted(async () => {
       fetchDhanOrdersTradesBook();
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
+    if (selectedBroker.value?.brokerName === 'Shoonya') {
+      fetchShoonyaOrdersTradesBook();
+      activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
+    }
   }
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
@@ -2455,7 +2572,7 @@ watch(selectedBroker, async (newBroker) => {
         activeFetchFunction.value = 'fetchShoonyaPositions';
         await fetchShoonyaPositions();
       }
-      else {
+      else if (newBroker.brokerName === 'Dhan') {
         activeFetchFunction.value = 'fetchDhanPositions';
         await fetchDhanPositions();
       }
@@ -2463,7 +2580,12 @@ watch(selectedBroker, async (newBroker) => {
       if (newBroker.brokerName === 'Flattrade') {
         activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
         await fetchFlattradeOrdersTradesBook();
-      } else {
+      }
+      else if (newBroker.brokerName === 'Shoonya') {
+        activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
+        await fetchShoonyaOrdersTradesBook();
+      }
+      else if (newBroker.brokerName === 'Dhan') {
         activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
         await fetchDhanOrdersTradesBook();
       }
@@ -2566,7 +2688,12 @@ watch(activeTab, () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       activeFetchFunction.value = 'fetchFlattradePositions';
       fetchFlattradePositions();
-    } else {
+    }
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      activeFetchFunction.value = 'fetchShoonyaPositions';
+      fetchShoonyaPositions();
+    }
+    else if (selectedBroker.value?.brokerName === 'Dhan') {
       activeFetchFunction.value = 'fetchDhanPositions';
       fetchDhanPositions();
     }
@@ -2574,7 +2701,12 @@ watch(activeTab, () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
       fetchFlattradeOrdersTradesBook();
-    } else {
+    }
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
+      fetchShoonyaOrdersTradesBook();
+    }
+    else if (selectedBroker.value?.brokerName === 'Dhan') {
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
       fetchDhanOrdersTradesBook();
     }
