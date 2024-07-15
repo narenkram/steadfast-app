@@ -485,7 +485,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="dhanPosition in dhanPositionBook" :key="dhanPosition.securityId">
+              <tr v-for="dhanPosition in positionsWithCalculatedProfit" :key="dhanPosition.securityId">
                 <td>{{ dhanPosition.tradingSymbol }}</td>
                 <td>{{ dhanPosition.positionType }}</td>
                 <td>{{ dhanPosition.productType }}</td>
@@ -499,7 +499,10 @@
                   :class="dhanPosition.realizedProfit > 0 ? 'text-success' : dhanPosition.realizedProfit < 0 ? 'text-danger' : 'text-dark'">
                   {{ dhanPosition.realizedProfit }}
                 </td>
-                <td>{{ dhanPosition.unrealizedProfit }}</td>
+                <td
+                  :class="dhanPosition.calculatedUrmtom > 0 ? 'text-success' : dhanPosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
+                  {{ dhanPosition.calculatedUrmtom.toFixed(2) }}
+                </td>
               </tr>
               <tr v-if="dhanPositionBook.length === 0">
                 <td colspan="8" class="text-center">No positions on selected broker {{ selectedBroker.brokerName
@@ -574,7 +577,7 @@
               </thead>
               <tbody>
                 <template v-if="shoonyaPositionBook.length">
-                  <tr v-for="shoonyaPosition in shoonyaPositionBook" :key="shoonyaPosition.tsym">
+                  <tr v-for="shoonyaPosition in positionsWithCalculatedProfit" :key="shoonyaPosition.tsym">
                     <td>{{ shoonyaPosition.tsym }}</td>
                     <td
                       :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
@@ -591,8 +594,8 @@
                       {{ shoonyaPosition.rpnl }}
                     </td>
                     <td
-                      :class="shoonyaPosition.urmtom > 0 ? 'text-success' : shoonyaPosition.urmtom < 0 ? 'text-danger' : 'text-dark'">
-                      {{ shoonyaPosition.urmtom }}
+                      :class="shoonyaPosition.calculatedUrmtom > 0 ? 'text-success' : shoonyaPosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
+                      {{ shoonyaPosition.calculatedUrmtom.toFixed(2) }}
                     </td>
                   </tr>
                 </template>
@@ -2197,10 +2200,14 @@ const totalNetQty = computed(() => {
 
 const totalProfit = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.reduce((acc, position) => {
-      const unrealizedProfit = calculateUnrealizedProfit(position);
+    return positionsWithCalculatedProfit.value.reduce((acc, position) => {
+      const unrealizedProfit = position.calculatedUrmtom;
+      const realizedProfit = position.realizedProfit || 0;
+      return acc + unrealizedProfit + realizedProfit;
+    }, 0);
+  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    return positionsWithCalculatedProfit.value.reduce((acc, position) => {
+      const unrealizedProfit = position.calculatedUrmtom;
       const realizedProfit = parseFloat(position.rpnl) || 0;
       return acc + unrealizedProfit + realizedProfit;
     }, 0);
@@ -2209,10 +2216,10 @@ const totalProfit = computed(() => {
 });
 
 const calculateUnrealizedProfit = (position) => {
-  const ltp = positionLTPs.value[position.tsym] || position.lp;
-  const netQty = parseFloat(position.netqty);
-  const netAvgPrice = parseFloat(position.netavgprc);
-  const priceFactor = parseFloat(position.prcftr || 1);
+  const ltp = positionLTPs.value[position.tsym || position.tradingSymbol] || position.lp || position.lastPrice;
+  const netQty = parseFloat(position.netqty || position.netQty);
+  const netAvgPrice = parseFloat(position.netavgprc || position.averagePrice);
+  const priceFactor = parseFloat(position.prcftr || position.multiplier || 1);
 
   if (ltp && !isNaN(netQty) && !isNaN(netAvgPrice)) {
     return netQty * (ltp - netAvgPrice) * priceFactor;
@@ -2221,10 +2228,23 @@ const calculateUnrealizedProfit = (position) => {
 };
 
 const positionsWithCalculatedProfit = computed(() => {
-  return flatTradePositionBook.value.map(position => ({
-    ...position,
-    calculatedUrmtom: calculateUnrealizedProfit(position)
-  }));
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    return dhanPositionBook.value.map(position => ({
+      ...position,
+      calculatedUrmtom: calculateUnrealizedProfit(position)
+    }));
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.map(position => ({
+      ...position,
+      calculatedUrmtom: calculateUnrealizedProfit(position)
+    }));
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.map(position => ({
+      ...position,
+      calculatedUrmtom: calculateUnrealizedProfit(position)
+    }));
+  }
+  return [];
 });
 
 // const profitData = computed(() => {
