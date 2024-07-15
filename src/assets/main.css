@@ -164,6 +164,11 @@ tr:hover+.nested-trade-row,
 
 /* Homepage */
 .broker-logo {
-  max-height: 40px;
+  max-height: 80px;
+  width: auto;
+}
+
+.arrow_keys {
+  max-height: 200px;
   width: auto;
 }

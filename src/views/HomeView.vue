@@ -8,6 +8,7 @@
 
             <div class="row mt-5">
                 <div class="col-6 mb-4">
+                    <img src="/1click_arrow_keys.png" alt="1-Click Trading" class="img-fluid arrow_keys">
                     <h2>1-Click Trading</h2>
                     <p>Execute trades with lightning speed using our intuitive 1-Click Trading feature. Perfect for
                         capturing market opportunities in real-time.</p>
@@ -23,6 +24,7 @@
                 <div class="col-4 mb-4">
                     <img src="/flattrade_logo.png" alt="Flattrade" class="img-fluid broker-logo">
                     <img src="/shoonya_logo.png" alt="Shoonya" class="img-fluid broker-logo">
+                    <img src="/dhan_logo.png" alt="Dhan" class="img-fluid broker-logo">
                     <h3>Multi-Broker Support</h3>
                     <p>
                         Seamlessly integrate with Flattrade, Dhan, and Shoonya. Manage all your accounts from one
