@@ -59,13 +59,6 @@ const brokers = computed(() => {
   return brokersArray;
 });
 
-const tradeViewWindow = ref(null)
-const openTradeView = () => {
-  const url = `${window.location.origin}/steadfast`
-  const windowFeatures = 'width=1024,height=936,resizable=yes,scrollbars=yes,status=1'
-  tradeViewWindow.value = window.open(url, 'TradeView', windowFeatures)
-}
-
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -107,11 +100,6 @@ onMounted(() => {
       localStorage.setItem('flattradeReqCode', event.data.code); // Update local storage with new flattradeReqCode
     }
   });
-  window.addEventListener('beforeunload', () => {
-    if (tradeViewWindow.value) {
-      tradeViewWindow.value.close()
-    }
-  })
   checkAllTokens();
 });
 
@@ -416,9 +404,11 @@ const deleteBroker = (broker) => {
       </RouterLink>
     </div>
     <div class="col-4 text-end">
-      <button @click="openTradeView" class="btn btn-primary">
-        Open 1 Click Trade View
-      </button>
+      <RouterLink to="/steadfast">
+        <button class="btn btn-primary">
+          Open 1 Click Trade View
+        </button>
+      </RouterLink>
     </div>
   </section>
 

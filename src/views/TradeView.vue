@@ -32,7 +32,7 @@
             </span>
           </p>
           <p class="mb-0 d-flex align-items-center justify-content-center">
-            <RouterLink class="fs-4 text-decoration-none me-2" to="/">
+            <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
               <span>⚙️</span>
             </RouterLink>
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
