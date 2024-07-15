@@ -161,3 +161,9 @@ tr:hover+.nested-trade-row,
   color: #6c757d;
   /* Subdued color for the arrow */
 }
+
+/* Homepage */
+.broker-logo {
+  max-height: 40px;
+  width: auto;
+}

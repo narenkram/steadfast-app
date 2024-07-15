@@ -21,9 +21,13 @@
 
             <div class="row mt-3">
                 <div class="col-4 mb-4">
+                    <img src="/flattrade_logo.png" alt="Flattrade" class="img-fluid broker-logo">
+                    <img src="/shoonya_logo.png" alt="Shoonya" class="img-fluid broker-logo">
                     <h3>Multi-Broker Support</h3>
-                    <p>Seamlessly integrate with Flattrade, Dhan, and Shoonya. Manage all your accounts from one
-                        platform.</p>
+                    <p>
+                        Seamlessly integrate with Flattrade, Dhan, and Shoonya. Manage all your accounts from one
+                        platform.
+                    </p>
                 </div>
                 <div class="col-4 mb-4">
                     <h3>Real-Time Market Data</h3>
