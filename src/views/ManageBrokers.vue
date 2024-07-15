@@ -62,7 +62,7 @@ const brokers = computed(() => {
 const tradeViewWindow = ref(null)
 const openTradeView = () => {
   const url = `${window.location.origin}/steadfast`
-  const windowFeatures = 'width=800,height=600,resizable,scrollbars=yes,status=1'
+  const windowFeatures = 'width=1024,height=936,resizable=yes,scrollbars=yes,status=1'
   tradeViewWindow.value = window.open(url, 'TradeView', windowFeatures)
 }
 
