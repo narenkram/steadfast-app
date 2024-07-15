@@ -526,7 +526,7 @@
               </thead>
               <tbody>
                 <template v-if="flatTradePositionBook.length">
-                  <tr v-for="flattradePosition in flatTradePositionBook" :key="flattradePosition.tsym">
+                  <tr v-for="flattradePosition in positionsWithCalculatedProfit" :key="flattradePosition.tsym">
                     <td>{{ flattradePosition.tsym }}</td>
                     <td
                       :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
@@ -543,8 +543,8 @@
                       {{ flattradePosition.rpnl }}
                     </td>
                     <td
-                      :class="flattradePosition.urmtom > 0 ? 'text-success' : flattradePosition.urmtom < 0 ? 'text-danger' : 'text-dark'">
-                      {{ flattradePosition.urmtom }}
+                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
+                      {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                     </td>
                   </tr>
                 </template>
@@ -2199,9 +2199,32 @@ const totalProfit = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.reduce((acc, position) => acc + position.unrealizedProfit + position.realizedProfit, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.reduce((acc, position) => acc + parseFloat(position.urmtom) + parseFloat(position.rpnl), 0);
+    return flatTradePositionBook.value.reduce((acc, position) => {
+      const unrealizedProfit = calculateUnrealizedProfit(position);
+      const realizedProfit = parseFloat(position.rpnl) || 0;
+      return acc + unrealizedProfit + realizedProfit;
+    }, 0);
   }
   return 0;
+});
+
+const calculateUnrealizedProfit = (position) => {
+  const ltp = positionLTPs.value[position.tsym] || position.lp;
+  const netQty = parseFloat(position.netqty);
+  const netAvgPrice = parseFloat(position.netavgprc);
+  const priceFactor = parseFloat(position.prcftr || 1);
+
+  if (ltp && !isNaN(netQty) && !isNaN(netAvgPrice)) {
+    return netQty * (ltp - netAvgPrice) * priceFactor;
+  }
+  return 0;
+};
+
+const positionsWithCalculatedProfit = computed(() => {
+  return flatTradePositionBook.value.map(position => ({
+    ...position,
+    calculatedUrmtom: calculateUnrealizedProfit(position)
+  }));
 });
 
 // const profitData = computed(() => {
