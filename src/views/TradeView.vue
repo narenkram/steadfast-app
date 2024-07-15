@@ -2280,11 +2280,11 @@ const totalBrokerage = computed(() => {
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     // Calculate charges for Dhan broker
-    const exchangeCharge = Math.round(totalValue * 0.0005 * 100) / 100;                     // Adjusted rate for Dhan
-    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;                       // Adjusted rate for Dhan
-    const gstCharge = Math.round((exchangeCharge + sebiCharge) * 18) / 100;                 // Adjusted rate for Dhan
-    const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);                       // Adjusted rate for Dhan
-    const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;               // Adjusted rate for Dhan
+    const exchangeCharge = Math.round(totalValue * 0.0005 * 100) / 100;
+    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;
+    const gstCharge = Math.round((exchangeCharge + sebiCharge) * 18) / 100;
+    const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);
+    const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;
 
     // Accumulate brokerage for Dhan
     for (const order of dhanOrders.value) {
@@ -2293,20 +2293,22 @@ const totalBrokerage = computed(() => {
       }
     }
 
-    // Subtract charges from total for Dhan
+    // Add charges to total for Dhan
     total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
 
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    // Calculate charges for Flattrade
-    const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;                   // Adjusted rate for Flattrade
-    const ipftCharge = Math.round(totalValue * 0.000005 * 100) / 100;                       // Adjusted rate for Flattrade	
-    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;                       // Adjusted rate for Flattrade
-    const gstCharge = Math.round((exchangeCharge + sebiCharge + ipftCharge) * 18) / 100;    // Adjusted rate for Flattrade
-    const stampdutyCharge = Math.round(totalBuyValue.value * 0.00003);                      // Adjusted rate for Flattrade
-    const sttCharge = Math.round(totalSellValue.value * 0.000625);                          // Adjusted rate for Flattrade
+  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    // Calculate charges for Flattrade and Shoonya (they have the same structure)
+    const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;
+    const ipftCharge = Math.round(totalValue * 0.000005 * 100) / 100;
+    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;
+    const gstCharge = Math.round((exchangeCharge + sebiCharge + ipftCharge) * 18) / 100;
+    const stampdutyCharge = Math.round(totalBuyValue.value * 0.00003);
+    const sttCharge = Math.round(totalSellValue.value * 0.000625);
 
-    // Subtract charges from total for Flattrade
+    // Add charges to total for Flattrade and Shoonya
     total += (exchangeCharge + ipftCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
+
+    // No additional brokerage for Flattrade and Shoonya
   }
 
   return total;
