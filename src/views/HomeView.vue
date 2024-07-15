@@ -7,12 +7,12 @@
             <button @click="openTradeView" class="btn btn-primary btn-lg mb-5">Launch App</button>
 
             <div class="row mt-5">
-                <div class="col-md-6 mb-4">
+                <div class="col-6 mb-4">
                     <h2>1-Click Trading</h2>
                     <p>Execute trades with lightning speed using our intuitive 1-Click Trading feature. Perfect for
                         capturing market opportunities in real-time.</p>
                 </div>
-                <div class="col-md-6 mb-4">
+                <div class="col-6 mb-4">
                     <h2>Kill Switch</h2>
                     <p>Take control of your emotions and prevent overtrading with our unique Kill Switch. Automatically
                         block trading for 6 hours, giving you time to reassess and regroup.</p>
@@ -20,16 +20,16 @@
             </div>
 
             <div class="row mt-3">
-                <div class="col-md-4 mb-4">
+                <div class="col-4 mb-4">
                     <h3>Multi-Broker Support</h3>
                     <p>Seamlessly integrate with Flattrade, Dhan, and Shoonya. Manage all your accounts from one
                         platform.</p>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-4 mb-4">
                     <h3>Real-Time Market Data</h3>
                     <p>Stay informed with live LTP updates for underlying assets and selected strikes.</p>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-4 mb-4">
                     <h3>Advanced Order Types</h3>
                     <p>Place market orders, limit orders, and manage your positions with ease.</p>
                 </div>
