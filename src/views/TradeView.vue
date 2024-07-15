@@ -1904,7 +1904,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true;
   }
 };
-// Place Order for Dhan or Flattrade for each position
+// Place Order for Dhan, Flattrade, or Shoonya for each position
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty));
@@ -1930,7 +1930,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         drvExpiryDate: position.expiryDate,
         drvOptionType: optionType
       };
-    } else if (selectedBroker.value.brokerName === 'Flattrade') {
+    } else if (selectedBroker.value.brokerName === 'Flattrade' || selectedBroker.value.brokerName === 'Shoonya') {
       orderData = {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId,
@@ -1953,7 +1953,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-      const payload = qs.stringify(orderData); // orderData already includes uid and actid
+      const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
         headers: {
           'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
@@ -1964,7 +1964,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
     else if (selectedBroker.value.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
-      const payload = qs.stringify(orderData); // orderData already includes uid and actid
+      const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/shoonyaPlaceOrder', payload, {
         headers: {
           'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
