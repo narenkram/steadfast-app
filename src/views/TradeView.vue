@@ -1,6 +1,6 @@
 <template>
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
-  <section class="row py-3">
+  <section class="row pb-3">
     <div class="col-12">
 
       <div class="row">
@@ -32,7 +32,7 @@
             </span>
           </p>
           <p class="mb-0 d-flex align-items-center justify-content-center">
-            <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
+            <RouterLink class="fs-4 text-decoration-none me-2" to="/">
               <span>⚙️</span>
             </RouterLink>
             <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">

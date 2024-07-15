@@ -1,7 +1,7 @@
 <template>
   <header></header>
 
-  <main class="container py-5">
+  <main class="container py-3">
     <RouterView />
   </main>
 </template>
