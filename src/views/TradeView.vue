@@ -2112,9 +2112,17 @@ const cancelPendingOrders = async () => {
     await fetchShoonyaOrdersTradesBook();
   }
 
-  const pendingOrders = selectedBroker.value?.brokerName === 'Dhan'
-    ? dhanOrders.value.filter(order => order.orderStatus === 'PENDING')
-    : flatOrderBook.value.filter(order => order.status === 'OPEN');
+  let pendingOrders;
+  if (selectedBroker.value?.brokerName === 'Dhan') {
+    pendingOrders = dhanOrders.value.filter(order => order.orderStatus === 'PENDING');
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    pendingOrders = flatOrderBook.value.filter(order => order.status === 'OPEN');
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    pendingOrders = shoonyaOrderBook.value.filter(order => order.status === 'OPEN');
+  } else {
+    console.error('Unknown broker');
+    return;
+  }
 
   console.log(`Pending orders:`, pendingOrders);
 
@@ -2139,7 +2147,6 @@ const cancelPendingOrders = async () => {
     showToast.value = true;
   }
 };
-
 
 
 const availableBalance = computed(() => {
