@@ -246,11 +246,13 @@
             <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" id="enableStoploss" aria-label="Enable Stoploss"
+                <input class="form-check-input mt-0" type="checkbox" id="enableStoploss"
+                  v-model="tradeSettings.enableStoploss" aria-label="Enable Stoploss"
                   :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" id="stoplossValue" aria-label="Stoploss" value="75"
-                :class="{ 'disabled-form': isFormDisabled }">
+              <input type="number" class="form-control" id="stoplossValue" v-model.number="tradeSettings.stoplossValue"
+                aria-label="Stoploss (points)" :class="{ 'disabled-form': isFormDisabled }">
+
             </div>
           </div>
           <!-- Target -->
@@ -258,11 +260,12 @@
             <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" id="enableTarget" aria-label="Enable Target"
+                <input class="form-check-input mt-0" type="checkbox" id="enableTarget"
+                  v-model="tradeSettings.enableTarget" aria-label="Enable Target"
                   :class="{ 'disabled-form': isFormDisabled }">
               </div>
-              <input type="number" class="form-control" id="targetValue" aria-label="Target" value="75"
-                :class="{ 'disabled-form': isFormDisabled }">
+              <input type="number" class="form-control" id="targetValue" v-model.number="tradeSettings.targetValue"
+                aria-label="Target (points)" :class="{ 'disabled-form': isFormDisabled }">
             </div>
           </div>
           <!-- 1 Click Keys -->
@@ -521,6 +524,8 @@
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
+                  <th>Stoploss</th>
+                  <th>Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
@@ -539,6 +544,8 @@
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
+                    <td>{{ formatPrice(positionStoplosses[flattradePosition.tsym]) }}</td>
+                    <td>{{ formatPrice(positionTargets[flattradePosition.tsym]) }}</td>
                     <td>{{ flattradePosition.daybuyamt }}</td>
                     <td>{{ flattradePosition.daysellamt }}</td>
                     <td
@@ -569,6 +576,8 @@
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
                   <th scope="col">LTP</th>
+                  <th scope="col">Stoploss</th>
+                  <th scope="col">Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
@@ -587,6 +596,8 @@
                     <td>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ shoonyaPosition.prd }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
+                    <td>{{ formatPrice(positionStoplosses[shoonyaPosition.tsym]) }}</td>
+                    <td>{{ formatPrice(positionTargets[shoonyaPosition.tsym]) }}</td>
                     <td>{{ shoonyaPosition.daybuyamt }}</td>
                     <td>{{ shoonyaPosition.daysellamt }}</td>
                     <td
@@ -840,7 +851,7 @@
 
 
 <script setup>
-import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount, reactive } from 'vue';
 import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
@@ -1816,7 +1827,16 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     throw new Error("Unsupported broker");
   }
 };
-
+// With a reactive object
+const tradeSettings = reactive({
+  enableStoploss: false,
+  stoplossValue: 75,
+  enableTarget: false,
+  targetValue: 75
+});
+// Add these to your existing reactive variables
+const positionStoplosses = ref({});
+const positionTargets = ref({});
 // Place Order for Dhan or Flattrade
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
@@ -2136,6 +2156,70 @@ const cancelPendingOrders = async () => {
     console.error('Failed to cancel orders:', error);
     toastMessage.value = 'Failed to cancel some orders';
     showToast.value = true;
+  }
+};
+const formatPrice = (price) => {
+  if (price == null || isNaN(price)) {
+    return '-';
+  }
+  const numPrice = Number(price);
+  return numPrice.toFixed(2);
+};
+// Add a new function to set stoploss and target for a position
+const setStoplossAndTarget = (position) => {
+  const tsym = position.tsym || position.tradingSymbol;
+  const currentLTP = Number(positionLTPs.value[tsym] || 0);
+  const netQty = Number(position.netQty || position.netqty);
+
+  // Default to treating it as a long position if netQty is 0
+  const isLong = netQty >= 0;
+
+  if (tradeSettings.enableStoploss) {
+    const direction = isLong ? -1 : 1; // Subtract for long, add for short
+    positionStoplosses.value[tsym] = Number(currentLTP + (direction * tradeSettings.stoplossValue));
+  } else {
+    delete positionStoplosses.value[tsym];
+  }
+
+  if (tradeSettings.enableTarget) {
+    const direction = isLong ? 1 : -1; // Add for long, subtract for short
+    positionTargets.value[tsym] = Number(currentLTP + (direction * tradeSettings.targetValue));
+  } else {
+    delete positionTargets.value[tsym];
+  }
+
+  console.log('Setting SL/Target for', tsym);
+  console.log('Current LTP:', currentLTP);
+  console.log('Net Qty:', netQty);
+  console.log('Is Long:', isLong);
+  console.log('Stoploss:', positionStoplosses.value[tsym]);
+  console.log('Target:', positionTargets.value[tsym]);
+};
+
+// Add a new function to check and execute stoploss and target orders
+const checkStoplossAndTarget = (position, currentLTP) => {
+  const tsym = position.tsym || position.tradingSymbol;
+  const netQty = Number(position.netQty || position.netqty);
+
+  if (netQty === 0) return;
+
+  const stoploss = positionStoplosses.value[tsym];
+  const target = positionTargets.value[tsym];
+
+  if (stoploss && currentLTP <= stoploss) {
+    console.log(`Stoploss hit for ${tsym}`);
+    const transactionType = netQty > 0 ? 'SELL' : 'BUY';
+    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
+    placeOrderForPosition(transactionType, optionType, position, currentLTP);
+    delete positionStoplosses.value[tsym];
+    delete positionTargets.value[tsym];
+  } else if (target && currentLTP >= target) {
+    console.log(`Target hit for ${tsym}`);
+    const transactionType = netQty > 0 ? 'SELL' : 'BUY';
+    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
+    placeOrderForPosition(transactionType, optionType, position, currentLTP);
+    delete positionStoplosses.value[tsym];
+    delete positionTargets.value[tsym];
   }
 };
 
@@ -2846,4 +2930,32 @@ watch(activeTab, () => {
 watch(enableHotKeys, (newValue) => {
   localStorage.setItem('EnableHotKeys', newValue.toString());
 });
+
+
+// Modify the existing watcher for positionLTPs
+watch(positionLTPs, (newLTPs, oldLTPs) => {
+  Object.entries(newLTPs).forEach(([tsym, ltp]) => {
+    if (ltp !== oldLTPs[tsym]) {
+      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
+        .find(p => (p.tsym || p.tradingSymbol) === tsym);
+      if (position) {
+        checkStoplossAndTarget(position, ltp);
+      }
+    }
+  });
+}, { deep: true });
+
+// Add watchers for enableStoploss, stoplossValue, enableTarget, and targetValue
+watch(() => [tradeSettings.enableStoploss, tradeSettings.stoplossValue, tradeSettings.enableTarget, tradeSettings.targetValue], () => {
+  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+  allPositions.forEach(setStoplossAndTarget);
+});
+// // Modify the existing watchers for position books to set initial stoploss and target
+// watch([flatTradePositionBook, shoonyaPositionBook, dhanPositionBook, positionLTPs], () => {
+//   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+//   allPositions.forEach(setStoplossAndTarget);
+// }, { deep: true });
+watch(tradeSettings, (newSettings, oldSettings) => {
+  console.log('Trade settings changed:', newSettings, oldSettings);
+}, { deep: true });
 </script>
