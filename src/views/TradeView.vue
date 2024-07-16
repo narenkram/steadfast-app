@@ -455,7 +455,7 @@
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
           <div class="row align-items-center">
-            <div class="col-6 text-center py-2">
+            <div class="col-4 text-center py-2">
               <p class="mb-0">
                 <b>Net Qty:
                   <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : 'text-dark'">
@@ -464,7 +464,7 @@
                 </b>
               </p>
             </div>
-            <div class="col-6 text-center py-2">
+            <div class="col-8 text-center py-2">
               <p class="mb-0">
                 <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
                 <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
@@ -676,10 +676,9 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
-                  <th scope="col">Order ID</th>
-                  <th scope="col">Trade ID</th>
+                  <th scope="col">Order/Trade ID</th>
                   <th scope="col">Symbol</th>
-                  <th scope="col">Quantity</th>
+                  <th scope="col">Qty</th>
                   <th scope="col">Price</th>
                   <th scope="col">Date</th>
                   <th scope="col">Status</th>
@@ -692,7 +691,6 @@
                     <tr>
                       <td>Order</td>
                       <td>{{ item.order.norenordno }}</td>
-                      <td>-</td>
                       <td>{{ item.order.tsym }}</td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
@@ -708,7 +706,6 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-                      <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
                       <td>{{ item.trade.tsym }}</td>
                       <td>{{ item.trade.qty }}</td>
@@ -733,8 +730,7 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
-                  <th scope="col">Order ID</th>
-                  <th scope="col">Trade ID</th>
+                  <th scope="col">Order/Trade ID</th>
                   <th scope="col">Symbol</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
@@ -749,7 +745,6 @@
                     <tr>
                       <td>Order</td>
                       <td>{{ item.order.norenordno }}</td>
-                      <td>-</td>
                       <td>{{ item.order.tsym }}</td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
@@ -765,13 +760,12 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-                      <td>-</td>
                       <td>{{ item.trade.norenordno }}</td>
                       <td>{{ item.trade.tsym }}</td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
-                      <td>{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
+                      <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                       <td>-</td>
                     </tr>
                   </template>
