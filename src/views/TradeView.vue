@@ -679,7 +679,7 @@
                   <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
-                  <th scope="col">Date</th>
+                  <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
                 </tr>
               </thead>
@@ -694,7 +694,7 @@
                       </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
-                      <td>{{ item.order.norentm }}</td>
+                      <td>{{ formatTime(item.order.norentm) }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
@@ -711,7 +711,7 @@
                       </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
-                      <td>{{ item.trade.norentm }}</td>
+                      <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                     </tr>
                   </template>
@@ -731,9 +731,9 @@
                 <tr>
                   <th scope="col">Type</th>
                   <th scope="col">Details</th>
-                  <th scope="col">Quantity</th>
+                  <th scope="col">Qty</th>
                   <th scope="col">Price</th>
-                  <th scope="col">Date</th>
+                  <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
                 </tr>
               </thead>
@@ -748,7 +748,7 @@
                       </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
-                      <td>{{ item.order.norentm }}</td>
+                      <td>{{ formatTime(item.order.norentm) }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
@@ -765,7 +765,7 @@
                       </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
-                      <td>{{ item.trade.norentm }}</td>
+                      <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                     </tr>
                   </template>
@@ -779,7 +779,7 @@
             </table>
           </div>
 
-          <p class="text-secondary" v-if="selectedBroker.brokerName !== 'Dhan'">
+          <p class="text-secondary" v-if="selectedBroker?.brokerName !== 'Dhan'">
             This trades tab fetches orders and trades from selected broker and combines them. Only failed orders are
             shown. If the order is successfully placed, you'll only see the respective trade.
           </p>
@@ -1487,6 +1487,21 @@ const combinedOrdersAndTrades = computed(() => {
     return new Date(bTime) - new Date(aTime); // Sort in descending order (most recent first)
   });
 });
+
+const formatTime = (timeString) => {
+  if (!timeString) return '';
+
+  const [time] = timeString.split(' ');
+  const [hours, minutes, seconds] = time.split(':');
+
+  let formattedHours = parseInt(hours, 10);
+  const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+  formattedHours = formattedHours % 12 || 12;
+
+  const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
+  return `${formattedTime}`;
+};
+
 
 const dhanPositionBook = ref([]);
 const fetchDhanPositions = async () => {
