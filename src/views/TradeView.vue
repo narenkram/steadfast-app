@@ -518,10 +518,7 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Symbol Name</th>
-                  <th scope="col">Net Qty</th>
-                  <th scope="col">Position Type</th>
-                  <th scope="col">Product Type</th>
+                  <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th>Stoploss</th>
@@ -535,13 +532,28 @@
               <tbody>
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in positionsWithCalculatedProfit" :key="flattradePosition.tsym">
-                    <td>{{ flattradePosition.tsym }}</td>
-                    <td
-                      :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
-                      {{ flattradePosition.netqty }}
+                    <td>
+                      <div class="d-flex flex-column">
+                        <div class="d-flex ">
+                          {{ flattradePosition.tsym }}
+                        </div>
+
+                        <div class="d-flex flex-row">
+                          <span
+                            :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                            Qty: {{ flattradePosition.netqty }}
+                          </span>
+                          <span class="ms-2">
+                            Side:
+                            <b>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</b>
+                          </span>
+                          <span class="ms-2">
+                            Type: {{ flattradePosition.prd }}
+                          </span>
+                        </div>
+
+                      </div>
                     </td>
-                    <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
-                    <td>{{ flattradePosition.prd }}</td>
                     <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td>{{ formatPrice(positionStoplosses[flattradePosition.tsym]) }}</td>
