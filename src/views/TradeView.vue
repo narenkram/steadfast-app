@@ -1837,7 +1837,7 @@ const tradeSettings = reactive({
 // Add these to your existing reactive variables
 const positionStoplosses = ref({});
 const positionTargets = ref({});
-// Place Order for Dhan or Flattrade
+// Place Order for Dhan, Flattrade or Shoonya
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -1868,7 +1868,6 @@ const placeOrder = async (transactionType, drvOptionType) => {
           DHAN_API_TOKEN: dhanDetails.apiToken
         }
       });
-      await fetchDhanOrdersTradesBook();
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
@@ -1883,7 +1882,6 @@ const placeOrder = async (transactionType, drvOptionType) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
-      await fetchFlattradeOrdersTradesBook();
     }
     else if (selectedBroker.value.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
@@ -1898,12 +1896,17 @@ const placeOrder = async (transactionType, drvOptionType) => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
-      await fetchShoonyaOrdersTradesBook();
     }
 
     console.log("Order placed successfully:", response.data);
     toastMessage.value = 'Order placed successfully';
     showToast.value = true;
+    // Add a delay before fetching updated data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update both orders and positions
+    await updateOrdersAndPositions();
+
   } catch (error) {
     console.error("Error placing order:", error); // Log the full error
     if (error.response && error.response.data && error.response.data.message) {
@@ -1915,6 +1918,27 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true;
   }
 };
+
+// New function to update both orders and positions
+const updateOrdersAndPositions = async () => {
+  if (selectedBroker.value.brokerName === 'Dhan') {
+    await Promise.all([
+      fetchDhanOrdersTradesBook(),
+      fetchDhanPositions()
+    ]);
+  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+    await Promise.all([
+      fetchFlattradeOrdersTradesBook(),
+      fetchFlattradePositions()
+    ]);
+  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+    await Promise.all([
+      fetchShoonyaOrdersTradesBook(),
+      fetchShoonyaPositions()
+    ]);
+  }
+};
+
 // Place Order for Dhan, Flattrade, or Shoonya for each position
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
@@ -1961,6 +1985,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     if (selectedBroker.value.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
       await fetchDhanOrdersTradesBook();
+      await fetchDhanPositions();
     }
     else if (selectedBroker.value.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
@@ -1972,6 +1997,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         }
       });
       await fetchFlattradeOrdersTradesBook();
+      await fetchFlattradePositions();
     }
     else if (selectedBroker.value.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
@@ -1983,6 +2009,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         }
       });
       await fetchShoonyaOrdersTradesBook();
+      await fetchShoonyaPositions();
     }
 
     console.log("Order placed successfully for position:", response.data);
@@ -1992,14 +2019,14 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
   }
 };
 
-// Close all positions for Dhan or Flattrade
+// Close all positions for Dhan, Flattrade, or Shoonya
 const closeAllPositions = async () => {
   try {
     let positionsClosed = false;
 
     if (selectedBroker.value?.brokerName === 'Dhan') {
       for (const position of dhanPositionBook.value) {
-        const netQty = Number(position.netQty); // Ensure netQty is treated as a number
+        const netQty = Number(position.netQty);
         if (netQty !== 0) {
           const transactionType = netQty > 0 ? 'SELL' : 'BUY';
           const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
@@ -2007,29 +2034,19 @@ const closeAllPositions = async () => {
           positionsClosed = true;
         }
       }
-      if (positionsClosed) {
-        toastMessage.value = 'All Dhan positions closed successfully';
-      } else {
-        toastMessage.value = 'No positions to close for Dhan';
-      }
     } else if (selectedBroker.value?.brokerName === 'Flattrade') {
       for (const position of flatTradePositionBook.value) {
-        const netqty = Number(position.netqty); // Ensure netqty is treated as a number
+        const netqty = Number(position.netqty);
         if (netqty !== 0) {
           const transactionType = netqty > 0 ? 'S' : 'B';
           const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
           await placeOrderForPosition(transactionType, optionType, position);
           positionsClosed = true;
         }
-      }
-      if (positionsClosed) {
-        toastMessage.value = 'All Flattrade positions closed successfully';
-      } else {
-        toastMessage.value = 'No positions to close for Flattrade';
       }
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       for (const position of shoonyaPositionBook.value) {
-        const netqty = Number(position.netqty); // Ensure netqty is treated as a number
+        const netqty = Number(position.netqty);
         if (netqty !== 0) {
           const transactionType = netqty > 0 ? 'S' : 'B';
           const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
@@ -2037,13 +2054,19 @@ const closeAllPositions = async () => {
           positionsClosed = true;
         }
       }
-      if (positionsClosed) {
-        toastMessage.value = 'All Shoonya positions closed successfully';
-      } else {
-        toastMessage.value = 'No positions to close for Shoonya';
-      }
     }
 
+    // Add a delay before fetching updated data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update both orders and positions
+    await updateOrdersAndPositions();
+
+    if (positionsClosed) {
+      toastMessage.value = `All ${selectedBroker.value?.brokerName} positions closed successfully`;
+    } else {
+      toastMessage.value = `No positions to close for ${selectedBroker.value?.brokerName}`;
+    }
     showToast.value = true;
   } catch (error) {
     console.error('Error closing positions:', error);
@@ -2895,35 +2918,38 @@ watch(selectedOrderType, (newValue, oldValue) => {
 
 const activeFetchFunction = ref(null);
 
-watch(activeTab, () => {
+watch(activeTab, async (newTab) => {
   // Update activeFetchFunction based on the new broker
-  if (activeTab.value === 'positions') {
+  if (newTab === 'positions') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       activeFetchFunction.value = 'fetchFlattradePositions';
-      fetchFlattradePositions();
+      await fetchFlattradePositions();
     }
     else if (selectedBroker.value?.brokerName === 'Shoonya') {
       activeFetchFunction.value = 'fetchShoonyaPositions';
-      fetchShoonyaPositions();
+      await fetchShoonyaPositions();
     }
     else if (selectedBroker.value?.brokerName === 'Dhan') {
       activeFetchFunction.value = 'fetchDhanPositions';
-      fetchDhanPositions();
+      await fetchDhanPositions();
     }
-  } else if (activeTab.value === 'trades') {
+  } else if (newTab === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
-      fetchFlattradeOrdersTradesBook();
+      await fetchFlattradeOrdersTradesBook();
     }
     else if (selectedBroker.value?.brokerName === 'Shoonya') {
       activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
-      fetchShoonyaOrdersTradesBook();
+      await fetchShoonyaOrdersTradesBook();
     }
     else if (selectedBroker.value?.brokerName === 'Dhan') {
       activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
-      fetchDhanOrdersTradesBook();
+      await fetchDhanOrdersTradesBook();
     }
   }
+
+  // Update both orders and positions regardless of the active tab
+  await updateOrdersAndPositions();
 });
 
 // Watcher to update localStorage when enableHotKeys changes
