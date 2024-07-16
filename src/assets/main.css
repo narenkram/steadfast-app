@@ -154,13 +154,11 @@ tr:hover+.nested-trade-row,
   padding-left: calc(2rem - 3px);
 }
 
-.nested-trade-row td:first-child::before {
+/* .nested-trade-row td:first-child::before {
   content: "↳";
-  /* Add an arrow or any other symbol to indicate nesting */
   margin-right: 0.5rem;
   color: #6c757d;
-  /* Subdued color for the arrow */
-}
+} */
 
 /* Homepage */
 .broker-logo {

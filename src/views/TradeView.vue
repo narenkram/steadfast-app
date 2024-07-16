@@ -688,7 +688,7 @@
               <tbody>
                 <template v-if="combinedOrdersAndTrades.length">
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
-                    <tr>
+                    <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
                       <td>{{ item.order.norenordno }}</td>
                       <td>{{ item.order.tsym }}</td>
@@ -697,7 +697,6 @@
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
-                        'text-success': item.order.status === 'COMPLETE',
                         'text-warning': item.order.status === 'PENDING'
                       }">
                         {{ item.order.status }}
@@ -711,7 +710,7 @@
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
-                      <td>{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
+                      <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                       <td>-</td>
                     </tr>
                   </template>
@@ -742,7 +741,7 @@
               <tbody>
                 <template v-if="combinedOrdersAndTrades.length">
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
-                    <tr>
+                    <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
                       <td>{{ item.order.norenordno }}</td>
                       <td>{{ item.order.tsym }}</td>
@@ -751,7 +750,6 @@
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
-                        'text-success': item.order.status === 'COMPLETE',
                         'text-warning': item.order.status === 'PENDING'
                       }">
                         {{ item.order.status }}
