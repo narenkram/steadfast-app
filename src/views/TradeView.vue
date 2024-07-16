@@ -474,7 +474,7 @@
             </div>
           </div>
           <!-- Dhan Positions -->
-          <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanPositions'">
+          <table class="table table-responsive table-hover" v-if="activeFetchFunction === 'fetchDhanPositions'">
             <thead>
               <tr>
                 <th scope="col">Symbol Name</th>
@@ -515,14 +515,14 @@
           </table>
           <!-- Flattrade Positions -->
           <div v-if="activeFetchFunction === 'fetchFlattradePositions'">
-            <table class="table table-hover">
+            <table class="table table-responsive table-hover">
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
                   <th scope="col">Net Qty</th>
-                  <th scope="col">Net Avg</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th>Stoploss</th>
                   <th>Target</th>
@@ -540,9 +540,9 @@
                       :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
                       {{ flattradePosition.netqty }}
                     </td>
-                    <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ flattradePosition.prd }}</td>
+                    <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td>{{ formatPrice(positionStoplosses[flattradePosition.tsym]) }}</td>
                     <td>{{ formatPrice(positionTargets[flattradePosition.tsym]) }}</td>
@@ -567,14 +567,14 @@
           </div>
           <!-- Shoonya Positions -->
           <div v-if="activeFetchFunction === 'fetchShoonyaPositions'">
-            <table class="table table-hover">
+            <table class="table table-responsive table-hover">
               <thead>
                 <tr>
                   <th scope="col">Symbol Name</th>
                   <th scope="col">Net Qty</th>
-                  <th scope="col">Net Avg</th>
                   <th scope="col">Position Type</th>
                   <th scope="col">Product Type</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th scope="col">Stoploss</th>
                   <th scope="col">Target</th>
@@ -592,9 +592,9 @@
                       :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
                       {{ shoonyaPosition.netqty }}
                     </td>
-                    <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</td>
                     <td>{{ shoonyaPosition.prd }}</td>
+                    <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
                     <td>{{ formatPrice(positionStoplosses[shoonyaPosition.tsym]) }}</td>
                     <td>{{ formatPrice(positionTargets[shoonyaPosition.tsym]) }}</td>
