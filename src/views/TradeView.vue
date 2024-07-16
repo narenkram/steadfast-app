@@ -2490,11 +2490,21 @@ const setFlattradeCredentials = async () => {
       return;
     }
 
+    // Check if the broker status is 'Connected'
+    if (brokerStatus.value !== 'Connected') {
+      console.error('Flattrade broker is not connected');
+      toastMessage.value = 'Flattrade broker is not connected';
+      showToast.value = true;
+      return;
+    }
+
     const clientId = selectedBroker.value.clientId;
     const apiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
 
     if (!clientId || !apiToken) {
       console.error('Flattrade client ID or API token is missing');
+      toastMessage.value = 'Flattrade credentials are missing';
+      showToast.value = true;
       return;
     }
 
@@ -2505,8 +2515,12 @@ const setFlattradeCredentials = async () => {
       defaultPutSecurityId: defaultPutSecurityId.value
     });
     console.log('Credentials and security IDs set successfully:', response.data);
+    toastMessage.value = 'Flattrade credentials set successfully';
+    showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials and security IDs:', error);
+    toastMessage.value = 'Failed to set Flattrade credentials';
+    showToast.value = true;
   }
 };
 const socket = ref(null);
