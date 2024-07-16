@@ -697,7 +697,7 @@
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
-                        'text-warning': item.order.status === 'PENDING'
+                        'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
                       </td>
@@ -750,7 +750,7 @@
                       <td>{{ item.order.norentm }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
-                        'text-warning': item.order.status === 'PENDING'
+                        'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
                       </td>
