@@ -582,10 +582,7 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Symbol Name</th>
-                  <th scope="col">Net Qty</th>
-                  <th scope="col">Position Type</th>
-                  <th scope="col">Product Type</th>
+                  <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th scope="col">Stoploss</th>
@@ -599,13 +596,28 @@
               <tbody>
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in positionsWithCalculatedProfit" :key="shoonyaPosition.tsym">
-                    <td>{{ shoonyaPosition.tsym }}</td>
-                    <td
-                      :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
-                      {{ shoonyaPosition.netqty }}
+                    <td>
+                      <div class="d-flex flex-column">
+                        <div class="d-flex ">
+                          {{ shoonyaPosition.tsym }}
+                        </div>
+
+                        <div class="d-flex flex-row">
+                          <span
+                            :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                            Qty: {{ shoonyaPosition.netqty }}
+                          </span>
+                          <span class="ms-2">
+                            Side:
+                            <b>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</b>
+                          </span>
+                          <span class="ms-2">
+                            Type: {{ shoonyaPosition.prd }}
+                          </span>
+                        </div>
+
+                      </div>
                     </td>
-                    <td>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</td>
-                    <td>{{ shoonyaPosition.prd }}</td>
                     <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
                     <td>{{ formatPrice(positionStoplosses[shoonyaPosition.tsym]) }}</td>
