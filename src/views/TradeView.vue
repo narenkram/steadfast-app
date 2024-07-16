@@ -212,11 +212,11 @@
             <label for="Quantity" class="form-label mb-0">Quantity</label>
             <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity"
               :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
-              </option>
+              <option v-for="quantityOption in quantityOptions"
+                      :key="quantityOption.key"
+                      :value="quantityOption.value">{{ quantityOption.label }}</option>
             </select>
           </div>
-
         </div>
 
         <div class="row mt-3">
@@ -1309,6 +1309,24 @@ const updateAvailableQuantities = () => {
     selectedQuantity.value = availableQuantities.value[0];
   }
 };
+
+// Watch for changes in selectedMasterSymbol and update available quantities
+watch(selectedMasterSymbol, updateAvailableQuantities);
+
+const quantityOptions = computed(() => {
+  const options = [];
+  availableQuantities.value.forEach(quantity => {
+    options.push({ key: quantity, value: quantity, label: quantity });
+    for (let multiplier = 2; multiplier <= 36; multiplier++) {
+      options.push({
+        key: `${quantity}-${multiplier}`,
+        value: quantity * multiplier,
+        label: quantity * multiplier
+      });
+    }
+  });
+  return options;
+});
 
 const handleHotKeys = (event) => {
   if (!enableHotKeys.value) return;
