@@ -772,6 +772,12 @@
               </tbody>
             </table>
           </div>
+
+          <p class="text-secondary" v-if="selectedBroker.brokerName !== 'Dhan'">
+            This trades tab fetches orders and trades from selected broker and combines them. Only failed orders are
+            shown for
+            {{ selectedBroker.brokerName }} If the order is successfully placed, you'll only see the respective trade.
+          </p>
         </div>
         <div class="tab-pane fade" id="automation-tab-pane" role="tabpanel" aria-labelledby="automation-tab"
           tabindex="0">
