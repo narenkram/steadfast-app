@@ -1,12 +1,12 @@
 <template>
-    <section class="row">
+    <section class="row py-5">
         <div class="col-12 text-center">
             <h1 class="display-4 mb-4">Steadfast</h1>
             <p class="lead mb-5">Your Ultimate Options Trading Companion</p>
 
             <button @click="openTradeView" class="btn btn-primary btn-lg mb-5">Launch App</button>
 
-            <div class="row mt-5">
+            <!-- <div class="row mt-5">
                 <div class="col-6 mb-4">
                     <img src="/1click_arrow_keys.png" alt="1-Click Trading" class="img-fluid arrow_keys">
                     <h2>1-Click Trading</h2>
@@ -39,7 +39,7 @@
                     <h3>Advanced Order Types</h3>
                     <p>Place market orders, limit orders, and manage your positions with ease.</p>
                 </div>
-            </div>
+            </div> -->
 
             <div class="mt-5">
                 <h2>Join Our Community</h2>
