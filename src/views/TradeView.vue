@@ -681,8 +681,7 @@
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
                   <th scope="col">Date</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Reason</th>
+                  <th scope="col">Status & Reason</th>
                 </tr>
               </thead>
               <tbody>
@@ -700,8 +699,8 @@
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
+                        {{ item.order.rejreason }}
                       </td>
-                      <td>{{ item.order.rejreason }}</td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
@@ -711,7 +710,6 @@
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
-                      <td>-</td>
                     </tr>
                   </template>
                 </template>
@@ -734,8 +732,7 @@
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
                   <th scope="col">Date</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Reason</th>
+                  <th scope="col">Status & Reason</th>
                 </tr>
               </thead>
               <tbody>
@@ -753,8 +750,8 @@
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
+                        {{ item.order.rejreason }}
                       </td>
-                      <td>{{ item.order.rejreason }}</td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
@@ -764,7 +761,6 @@
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
-                      <td>-</td>
                     </tr>
                   </template>
                 </template>
