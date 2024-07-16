@@ -676,8 +676,7 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
-                  <th scope="col">Order/Trade ID</th>
-                  <th scope="col">Symbol</th>
+                  <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
                   <th scope="col">Date</th>
@@ -689,8 +688,10 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
-                      <td>{{ item.order.norenordno }}</td>
-                      <td>{{ item.order.tsym }}</td>
+                      <td>
+                        {{ item.order.norenordno }}
+                        {{ item.order.tsym }}
+                      </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
@@ -704,8 +705,10 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-                      <td>{{ item.trade.norenordno }}</td>
-                      <td>{{ item.trade.tsym }}</td>
+                      <td>
+                        {{ item.trade.norenordno }}
+                        {{ item.trade.tsym }}
+                      </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
@@ -727,8 +730,7 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
-                  <th scope="col">Order/Trade ID</th>
-                  <th scope="col">Symbol</th>
+                  <th scope="col">Details</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
                   <th scope="col">Date</th>
@@ -740,8 +742,10 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
-                      <td>{{ item.order.norenordno }}</td>
-                      <td>{{ item.order.tsym }}</td>
+                      <td>
+                        {{ item.order.norenordno }}
+                        {{ item.order.tsym }}
+                      </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
                       <td>{{ item.order.norentm }}</td>
@@ -755,8 +759,10 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-                      <td>{{ item.trade.norenordno }}</td>
-                      <td>{{ item.trade.tsym }}</td>
+                      <td>
+                        {{ item.trade.norenordno }}
+                        {{ item.trade.tsym }}
+                      </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
                       <td>{{ item.trade.norentm }}</td>
