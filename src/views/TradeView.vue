@@ -1104,16 +1104,7 @@ const fetchTradingData = async () => {
 
   const data = await response.json();
   console.log('Data:', data);
-
-  // Filter expiry dates for the selected master symbol and limit to 3 weeks
-  const today = new Date();
-  const threeWeeksLater = new Date(today.getTime() + (21 * 24 * 60 * 60 * 1000)); // Three weeks later
-
-  expiryDates.value = data.expiryDates
-    .filter(expiryDate => {
-      const date = new Date(expiryDate);
-      return date >= today && date <= threeWeeksLater;
-    });
+  expiryDates.value = data.expiryDates;
 
   // Filter by selected expiry date before sorting and mapping
   callStrikes.value = data.callStrikes
