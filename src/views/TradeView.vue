@@ -1867,10 +1867,10 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
 };
 // With a reactive object
 const tradeSettings = reactive({
-  enableStoploss: false,
-  stoplossValue: 75,
-  enableTarget: false,
-  targetValue: 75
+  enableStoploss: true,
+  stoplossValue: 20,
+  enableTarget: true,
+  targetValue: 30
 });
 // Add these to your existing reactive variables
 const positionStoplosses = ref({});
