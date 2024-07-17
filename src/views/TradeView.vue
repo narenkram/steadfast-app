@@ -96,7 +96,7 @@
           <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : 'text-dark'">
             ₹ {{ netPnl.toFixed(2) }}
           </span>
-          Estimated Net PNL (after brokerage)
+          Estimated (after all charges)
         </small>
       </div>
     </div>
