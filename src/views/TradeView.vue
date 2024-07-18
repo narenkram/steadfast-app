@@ -559,7 +559,6 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">-</button>
@@ -581,7 +580,6 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">-</button>
@@ -665,7 +663,6 @@
                     <td>
                       <template v-if="Number(shoonyaPosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionStoplosses[shoonyaPosition.tsym]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">-</button>
@@ -676,8 +673,8 @@
                           </div>
                         </div>
                         <div>
-                          SL Points: {{ formatPrice(positionStoplosses[position.tsym]) }}
-                          SL Price: {{ formatPrice(positionStoplossesPrice[position.tsym]) }}
+                          SL Points: {{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}
+                          SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}
                         </div>
                       </template>
                       <template v-else>
@@ -687,7 +684,6 @@
                     <td>
                       <template v-if="Number(shoonyaPosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionTargets[shoonyaPosition.tsym]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">-</button>
@@ -698,8 +694,8 @@
                           </div>
                         </div>
                         <div>
-                          Target Points: {{ formatPrice(positionTargets[position.tsym]) }}
-                          Target Price: {{ formatPrice(positionTargetsPrice[position.tsym]) }}
+                          Target Points: {{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}
+                          Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}
                         </div>
                       </template>
                       <template v-else>
