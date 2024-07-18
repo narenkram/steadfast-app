@@ -559,7 +559,7 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionStoplosses[flattradePosition.tsym]) }}</span>
+                          <span>{{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">-</button>
@@ -570,7 +570,8 @@
                           </div>
                         </div>
                         <div>
-                          Price SL: {{ formatPrice(positionStoplossesPrice[flattradePosition.tsym]) }}
+                          SL Points: {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}
+                          SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}
                         </div>
                       </template>
                       <template v-else>
@@ -580,7 +581,7 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <span>{{ formatPrice(positionTargets[flattradePosition.tsym]) }}</span>
+                          <span>{{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}</span>
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">-</button>
@@ -591,7 +592,8 @@
                           </div>
                         </div>
                         <div>
-                          Price Target: {{ formatPrice(positionTargetsPrice[flattradePosition.tsym]) }}
+                          Target Points: {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}
+                          Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}
                         </div>
                       </template>
                       <template v-else>
@@ -674,7 +676,8 @@
                           </div>
                         </div>
                         <div>
-                          Price SL: {{ formatPrice(positionStoplossesPrice[shoonyaPosition.tsym]) }}
+                          SL Points: {{ formatPrice(positionStoplosses[position.tsym]) }}
+                          SL Price: {{ formatPrice(positionStoplossesPrice[position.tsym]) }}
                         </div>
                       </template>
                       <template v-else>
@@ -695,7 +698,8 @@
                           </div>
                         </div>
                         <div>
-                          Price Target: {{ formatPrice(positionTargetsPrice[shoonyaPosition.tsym]) }}
+                          Target Points: {{ formatPrice(positionTargets[position.tsym]) }}
+                          Target Price: {{ formatPrice(positionTargetsPrice[position.tsym]) }}
                         </div>
                       </template>
                       <template v-else>
@@ -1970,27 +1974,47 @@ const positionStoplossesPrice = ref({});
 const positionTargetsPrice = ref({});
 // Add these helper functions
 const adjustStoplossPrice = (tsym, adjustment) => {
-  if (!positionStoplossesPrice.value[tsym]) return;
+  if (!tsym || !positionStoplossesPrice.value[tsym]) return;
 
   const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
-    .find(p => (p.tsym || p.tradingSymbol) === tsym);
+    .find(p => getSymbol(p) === tsym);
 
   if (!position) return;
 
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // Reverse the adjustment for stoploss
-  const actualAdjustment = isLong ? -adjustment : adjustment;
+  // For stoploss, we always add the adjustment (increasing for both long and short positions)
+  positionStoplossesPrice.value[tsym] += adjustment;
 
-  positionStoplossesPrice.value[tsym] += actualAdjustment;
+  // Recalculate the points-based stoploss
+  const currentLTP = Number(positionLTPs.value[tsym] || 0);
+  positionStoplosses.value[tsym] = Math.abs(currentLTP - positionStoplossesPrice.value[tsym]);
+
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
+  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
 };
 
 const adjustTargetPrice = (tsym, adjustment) => {
-  if (!positionTargetsPrice.value[tsym]) return;
+  if (!tsym || !positionTargetsPrice.value[tsym]) return;
+
+  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
+    .find(p => getSymbol(p) === tsym);
+
+  if (!position) return;
+
+  const netQty = Number(position.netQty || position.netqty);
+  const isLong = netQty > 0;
+
+  // For target, we always add the adjustment (increasing for both long and short positions)
   positionTargetsPrice.value[tsym] += adjustment;
+
+  // Recalculate the points-based target
+  const currentLTP = Number(positionLTPs.value[tsym] || 0);
+  positionTargets.value[tsym] = Math.abs(currentLTP - positionTargetsPrice.value[tsym]);
+
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
+  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
 };
 
 const removeStoplossPrice = (tsym) => {
@@ -2123,7 +2147,6 @@ const findNewPosition = (tradingSymbol) => {
 };
 
 // Place Order for Dhan, Flattrade, or Shoonya for each position
-// Modify the placeOrderForPosition function
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty));
@@ -2139,12 +2162,12 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         brokerClientId: selectedBroker.value.clientId,
         transactionType: transactionType,
         exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
-        productType: selectedProductType.value,
+        productType: position.productType || selectedProductType.value,
         orderType: 'MARKET',
         validity: 'DAY',
         tradingSymbol: position.tradingSymbol,
         securityId: position.securityId,
-        quantity: position.netQty,
+        quantity: quantity,
         price: 0,
         drvExpiryDate: position.expiryDate,
         drvOptionType: optionType
@@ -2155,8 +2178,8 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         actid: selectedBroker.value.clientId,
         exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
         tsym: position.tsym,
-        qty: position.netqty,
-        prc: 0,
+        qty: quantity.toString(),
+        prc: "0",
         prd: position.prd,
         trantype: transactionType,
         prctyp: 'MKT',
@@ -2376,10 +2399,18 @@ const formatPrice = (price) => {
   const numPrice = Number(price);
   return numPrice.toFixed(2);
 };
+const getSymbol = (position) => {
+  return position.tsym || position.tradingSymbol || '';
+};
 // Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
-  const tsym = position.tsym || position.tradingSymbol;
-  const netQty = Number(position.netQty || position.netqty);
+  const tsym = getSymbol(position);
+  if (!tsym) {
+    console.error('Invalid position object:', position);
+    return;
+  }
+
+  const netQty = Number(position.netQty || position.netqty || 0);
 
   if (netQty === 0) {
     delete positionStoplosses.value[tsym];
@@ -2394,8 +2425,8 @@ const setStoplossAndTarget = (position) => {
 
   if (tradeSettings.enableStoploss) {
     const direction = isLong ? -1 : 1;
-    positionStoplosses.value[tsym] = Number(currentLTP + (direction * tradeSettings.stoplossValue));
-    positionStoplossesPrice.value[tsym] = positionStoplosses.value[tsym];
+    positionStoplosses.value[tsym] = Number(tradeSettings.stoplossValue);
+    positionStoplossesPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.stoplossValue));
   } else {
     delete positionStoplosses.value[tsym];
     delete positionStoplossesPrice.value[tsym];
@@ -2403,25 +2434,36 @@ const setStoplossAndTarget = (position) => {
 
   if (tradeSettings.enableTarget) {
     const direction = isLong ? 1 : -1;
-    positionTargets.value[tsym] = Number(currentLTP + (direction * tradeSettings.targetValue));
-    positionTargetsPrice.value[tsym] = positionTargets.value[tsym];
+    positionTargets.value[tsym] = Number(tradeSettings.targetValue);
+    positionTargetsPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.targetValue));
   } else {
     delete positionTargets.value[tsym];
     delete positionTargetsPrice.value[tsym];
   }
+
+  console.log(`Setting SL/Target for ${tsym}:`);
+  console.log(`Current LTP: ${currentLTP}`);
+  console.log(`Stoploss Points: ${positionStoplosses.value[tsym]}`);
+  console.log(`Stoploss Price: ${positionStoplossesPrice.value[tsym]}`);
+  console.log(`Target Points: ${positionTargets.value[tsym]}`);
+  console.log(`Target Price: ${positionTargetsPrice.value[tsym]}`);
 
   localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
 };
-
 // Modify the checkStoplossAndTarget function
 const checkStoplossAndTarget = (position, currentLTP) => {
-  const tsym = position.tsym || position.tradingSymbol;
+  const tsym = getSymbol(position);
+  if (!tsym) {
+    console.error('Invalid position object:', position);
+    return;
+  }
   const netQty = Number(position.netQty || position.netqty);
 
   if (netQty === 0) {
+    console.log(`Position ${tsym} has zero quantity, removing SL/Target`);
     delete positionStoplosses.value[tsym];
     delete positionTargets.value[tsym];
     delete positionStoplossesPrice.value[tsym];
@@ -2436,32 +2478,46 @@ const checkStoplossAndTarget = (position, currentLTP) => {
 
   const isLong = netQty > 0;
 
-  if ((isLong && ((stoploss && currentLTP <= stoploss) || (stoplossPrice && currentLTP <= stoplossPrice))) ||
-    (!isLong && ((stoploss && currentLTP >= stoploss) || (stoplossPrice && currentLTP >= stoplossPrice)))) {
-    console.log(`Stoploss hit for ${tsym}`);
-    const transactionType = isLong ? 'SELL' : 'BUY';
-    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
-    placeOrderForPosition(transactionType, optionType, position);
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
-  } else if ((isLong && ((target && currentLTP >= target) || (targetPrice && currentLTP >= targetPrice))) ||
-    (!isLong && ((target && currentLTP <= target) || (targetPrice && currentLTP <= targetPrice)))) {
-    console.log(`Target hit for ${tsym}`);
-    const transactionType = isLong ? 'SELL' : 'BUY';
-    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
-    placeOrderForPosition(transactionType, optionType, position);
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
+  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL=${stoploss}, Target=${target}, SL Price=${stoplossPrice}, Target Price=${targetPrice}`);
+
+  let orderTriggered = false;
+
+  if (isLong) {
+    if ((stoploss && currentLTP <= stoploss) || (stoplossPrice && currentLTP <= stoplossPrice)) {
+      console.log(`Stoploss hit for long position ${tsym}`);
+      orderTriggered = true;
+    } else if ((target && currentLTP >= target) || (targetPrice && currentLTP >= targetPrice)) {
+      console.log(`Target hit for long position ${tsym}`);
+      orderTriggered = true;
+    }
+  } else {
+    if ((stoploss && currentLTP >= stoploss) || (stoplossPrice && currentLTP >= stoplossPrice)) {
+      console.log(`Stoploss hit for short position ${tsym}`);
+      orderTriggered = true;
+    } else if ((target && currentLTP <= target) || (targetPrice && currentLTP <= targetPrice)) {
+      console.log(`Target hit for short position ${tsym}`);
+      orderTriggered = true;
+    }
   }
 
-  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
-  localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-  localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
+  if (orderTriggered) {
+    const transactionType = isLong ? 'SELL' : 'BUY';
+    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
+    console.log(`Placing order for ${tsym}: ${transactionType} ${optionType}`);
+    placeOrderForPosition(transactionType, optionType, position);
+
+    // Remove SL/Target after placing the order
+    delete positionStoplosses.value[tsym];
+    delete positionStoplossesPrice.value[tsym];
+    delete positionTargets.value[tsym];
+    delete positionTargetsPrice.value[tsym];
+
+    // Save updated values to localStorage
+    localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
+    localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
+    localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
+    localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
+  }
 };
 
 const availableBalance = computed(() => {
