@@ -562,14 +562,18 @@
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success"
+                            <button class="btn btn-sm btn-outline-success ms-2"
                               @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">➕</button>
                           </div>
                         </div>
-                        <div>
-                          SL Points: {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}
+                        <div class="text-center mt-2">
+                          <span class="text-danger">
+                            <b>{{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}</b>
+                          </span>
                           <br />
-                          SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}
+                          <span class="text-secondary">
+                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }} pts)
+                          </span>
                         </div>
                       </template>
                       <template v-else>
@@ -582,14 +586,18 @@
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success"
+                            <button class="btn btn-sm btn-outline-success ms-2"
                               @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">➕</button>
                           </div>
                         </div>
-                        <div>
-                          Target Points: {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}
+                        <div class="text-center mt-2">
+                          <span class="text-danger">
+                            <b>{{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}</b>
+                          </span>
                           <br />
-                          Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}
+                          <span class="text-secondary">
+                            ( {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }} pts)
+                          </span>
                         </div>
                       </template>
                       <template v-else>
@@ -664,14 +672,18 @@
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success"
+                            <button class="btn btn-sm btn-outline-success ms-2"
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, -tradeSettings.stoplossStep)">➕</button>
                           </div>
                         </div>
-                        <div>
-                          SL Points: {{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}
+                        <div class="text-center mt-2">
+                          <span class="text-danger">
+                            <b>{{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}</b>
+                          </span>
                           <br />
-                          SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}
+                          <span class="text-secondary">
+                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }} pts)
+                          </span>
                         </div>
                       </template>
                       <template v-else>
@@ -684,14 +696,18 @@
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success"
+                            <button class="btn btn-sm btn-outline-success ms-2"
                               @click="adjustTargetPrice(shoonyaPosition.tsym, tradeSettings.targetStep)">➕</button>
                           </div>
                         </div>
-                        <div>
-                          Target Points: {{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}
+                        <div class="text-center mt-2">
+                          <span class="text-danger">
+                            <b>{{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}</b>
+                          </span>
                           <br />
-                          Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}
+                          <span class="text-secondary">
+                            ( {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }} pts)
+                          </span>
                         </div>
                       </template>
                       <template v-else>
