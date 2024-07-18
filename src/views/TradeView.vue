@@ -564,8 +564,6 @@
                               @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">-</button>
                             <button class="btn btn-sm btn-outline-success"
                               @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">+</button>
-                            <button class="btn btn-sm btn-outline-secondary"
-                              @click="removeStoplossPrice(flattradePosition.tsym)">x</button>
                           </div>
                         </div>
                         <div>
@@ -585,8 +583,6 @@
                               @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">-</button>
                             <button class="btn btn-sm btn-outline-success"
                               @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">+</button>
-                            <button class="btn btn-sm btn-outline-secondary"
-                              @click="removeTargetPrice(flattradePosition.tsym)">x</button>
                           </div>
                         </div>
                         <div>
@@ -668,8 +664,6 @@
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">-</button>
                             <button class="btn btn-sm btn-outline-success"
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, -tradeSettings.stoplossStep)">+</button>
-                            <button class="btn btn-sm btn-outline-secondary"
-                              @click="removeStoplossPrice(shoonyaPosition.tsym)">x</button>
                           </div>
                         </div>
                         <div>
@@ -689,8 +683,6 @@
                               @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">-</button>
                             <button class="btn btn-sm btn-outline-success"
                               @click="adjustTargetPrice(shoonyaPosition.tsym, tradeSettings.targetStep)">+</button>
-                            <button class="btn btn-sm btn-outline-secondary"
-                              @click="removeTargetPrice(shoonyaPosition.tsym)">x</button>
                           </div>
                         </div>
                         <div>
@@ -2013,15 +2005,6 @@ const adjustTargetPrice = (tsym, adjustment) => {
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
 };
 
-const removeStoplossPrice = (tsym) => {
-  delete positionStoplossesPrice.value[tsym];
-  localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-};
-
-const removeTargetPrice = (tsym) => {
-  delete positionTargetsPrice.value[tsym];
-  localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
-};
 // Place Order for Dhan, Flattrade or Shoonya
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
