@@ -531,7 +531,7 @@
               </thead>
               <tbody>
                 <template v-if="flatTradePositionBook.length">
-                  <tr v-for="flattradePosition in positionsWithCalculatedProfit" :key="flattradePosition.tsym">
+                  <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                     <td>
                       <div class="d-flex flex-column">
                         <div class="d-flex ">
@@ -641,7 +641,7 @@
               </thead>
               <tbody>
                 <template v-if="shoonyaPositionBook.length">
-                  <tr v-for="shoonyaPosition in positionsWithCalculatedProfit" :key="shoonyaPosition.tsym">
+                  <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
                       <div class="d-flex flex-column">
                         <div class="d-flex ">
@@ -1711,6 +1711,22 @@ const fetchShoonyaPositions = async () => {
     shoonyaPositionBook.value = [];
   }
 };
+
+const sortedPositions = computed(() => {
+  return [...positionsWithCalculatedProfit.value].sort((a, b) => {
+    // First, sort by open/closed status
+    if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1;
+    if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1;
+
+    // Then, for open positions, sort by absolute quantity in descending order
+    if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
+      return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty));
+    }
+
+    // For closed positions, maintain their original order
+    return 0;
+  });
+});
 
 const fundLimits = ref({});
 // Update the fetchFundLimit function
