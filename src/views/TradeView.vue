@@ -561,13 +561,14 @@
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">-</button>
+                              @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success"
-                              @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">+</button>
+                              @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">➕</button>
                           </div>
                         </div>
                         <div>
                           SL Points: {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}
+                          <br />
                           SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}
                         </div>
                       </template>
@@ -580,13 +581,14 @@
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">-</button>
+                              @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success"
-                              @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">+</button>
+                              @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">➕</button>
                           </div>
                         </div>
                         <div>
                           Target Points: {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}
+                          <br />
                           Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}
                         </div>
                       </template>
@@ -661,13 +663,14 @@
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">-</button>
+                              @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success"
-                              @click="adjustStoplossPrice(shoonyaPosition.tsym, -tradeSettings.stoplossStep)">+</button>
+                              @click="adjustStoplossPrice(shoonyaPosition.tsym, -tradeSettings.stoplossStep)">➕</button>
                           </div>
                         </div>
                         <div>
                           SL Points: {{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}
+                          <br />
                           SL Price: {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}
                         </div>
                       </template>
@@ -680,13 +683,14 @@
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">-</button>
+                              @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success"
-                              @click="adjustTargetPrice(shoonyaPosition.tsym, tradeSettings.targetStep)">+</button>
+                              @click="adjustTargetPrice(shoonyaPosition.tsym, tradeSettings.targetStep)">➕</button>
                           </div>
                         </div>
                         <div>
                           Target Points: {{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}
+                          <br />
                           Target Price: {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}
                         </div>
                       </template>
