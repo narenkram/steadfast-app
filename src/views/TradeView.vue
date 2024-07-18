@@ -1866,12 +1866,20 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
   }
 };
 // With a reactive object
+// Modify the tradeSettings reactive object
 const tradeSettings = reactive({
-  enableStoploss: true,
-  stoplossValue: 20,
-  enableTarget: true,
-  targetValue: 30
+  enableStoploss: JSON.parse(localStorage.getItem('enableStoploss') || 'true'),
+  stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
+  enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
+  targetValue: Number(localStorage.getItem('targetValue') || '30')
 });
+// Add this function to save trade settings to localStorage
+const saveTradeSettings = () => {
+  localStorage.setItem('enableStoploss', JSON.stringify(tradeSettings.enableStoploss));
+  localStorage.setItem('stoplossValue', tradeSettings.stoplossValue.toString());
+  localStorage.setItem('enableTarget', JSON.stringify(tradeSettings.enableTarget));
+  localStorage.setItem('targetValue', tradeSettings.targetValue.toString());
+};
 // Add these to your existing reactive variables
 const positionStoplosses = ref({});
 const positionTargets = ref({});
@@ -2226,7 +2234,7 @@ const formatPrice = (price) => {
   const numPrice = Number(price);
   return numPrice.toFixed(2);
 };
-// Add a new function to set stoploss and target for a position
+// Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
   const tsym = position.tsym || position.tradingSymbol;
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
@@ -2249,6 +2257,10 @@ const setStoplossAndTarget = (position) => {
     delete positionTargets.value[tsym];
   }
 
+  // Save updated stoploss and target values to localStorage
+  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
+  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
+
   console.log('Setting SL/Target for', tsym);
   console.log('Current LTP:', currentLTP);
   console.log('Net Qty:', netQty);
@@ -2257,7 +2269,7 @@ const setStoplossAndTarget = (position) => {
   console.log('Target:', positionTargets.value[tsym]);
 };
 
-// Add a new function to check and execute stoploss and target orders
+// Modify the checkStoplossAndTarget function
 const checkStoplossAndTarget = (position, currentLTP) => {
   const tsym = position.tsym || position.tradingSymbol;
   const netQty = Number(position.netQty || position.netqty);
@@ -2282,8 +2294,11 @@ const checkStoplossAndTarget = (position, currentLTP) => {
     delete positionStoplosses.value[tsym];
     delete positionTargets.value[tsym];
   }
-};
 
+  // Save updated stoploss and target values to localStorage
+  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
+  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
+};
 
 const availableBalance = computed(() => {
   console.log('Fund Limits:', fundLimits.value);
@@ -2824,6 +2839,10 @@ onMounted(async () => {
   }, 1000);
 
   connectWebSocket();
+
+  // Load stoploss and target values from localStorage
+  positionStoplosses.value = JSON.parse(localStorage.getItem('positionStoplosses') || '{}');
+  positionTargets.value = JSON.parse(localStorage.getItem('positionTargets') || '{}');
 });
 
 onBeforeUnmount(() => {
@@ -3033,7 +3052,11 @@ watch(() => [tradeSettings.enableStoploss, tradeSettings.stoplossValue, tradeSet
 //   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
 //   allPositions.forEach(setStoplossAndTarget);
 // }, { deep: true });
+// Modify the existing watcher for tradeSettings
 watch(tradeSettings, (newSettings, oldSettings) => {
   console.log('Trade settings changed:', newSettings, oldSettings);
+  saveTradeSettings();
+  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+  allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
 </script>
