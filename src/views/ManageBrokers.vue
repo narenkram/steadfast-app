@@ -440,7 +440,12 @@ const deleteBroker = (broker) => {
               <span v-if="broker.brokerName === 'Dhan'">{{ maskTokenSecret(broker.apiToken) }}</span>
               <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
-            <td>24 Hours</td>
+            <td>
+              <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
+              <span v-if="broker.brokerName === 'Dhan'"
+                title="Check your broker dashboard for token validity">Custom</span>
+              <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
+            </td>
             <td class="text-center">
               <template v-if="broker.brokerName === 'Shoonya'">
                 <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
