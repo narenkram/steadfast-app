@@ -2008,12 +2008,14 @@ const adjustStoplossPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For stoploss, we always add the adjustment (increasing for both long and short positions)
-  positionStoplossesPrice.value[tsym] += adjustment;
+  // For long positions, decrease stoploss price. For short positions, increase it.
+  positionStoplossesPrice.value[tsym] += isLong ? -adjustment : adjustment;
 
   // Recalculate the points-based stoploss
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionStoplosses.value[tsym] = Math.abs(currentLTP - positionStoplossesPrice.value[tsym]);
+
+  console.log(`Adjusted stoploss for ${tsym}: Price=${positionStoplossesPrice.value[tsym]}, Points=${positionStoplosses.value[tsym]}`);
 
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
@@ -2030,12 +2032,14 @@ const adjustTargetPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For target, we always add the adjustment (increasing for both long and short positions)
-  positionTargetsPrice.value[tsym] += adjustment;
+  // For long positions, increase target price. For short positions, decrease it.
+  positionTargetsPrice.value[tsym] += isLong ? adjustment : -adjustment;
 
   // Recalculate the points-based target
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionTargets.value[tsym] = Math.abs(currentLTP - positionTargetsPrice.value[tsym]);
+
+  console.log(`Adjusted target for ${tsym}: Price=${positionTargetsPrice.value[tsym]}, Points=${positionTargets.value[tsym]}`);
 
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
@@ -2518,8 +2522,8 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   }
 
   if (orderTriggered) {
-    const transactionType = isLong ? 'SELL' : 'BUY';
-    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
+    const transactionType = isLong ? 'S' : 'B';
+    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P';
     console.log(`Placing order for ${tsym}: ${transactionType} ${optionType}`);
     placeOrderForPosition(transactionType, optionType, position);
 
@@ -3290,12 +3294,17 @@ watch(enableHotKeys, (newValue) => {
 
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
+  console.log('positionLTPs updated:', newLTPs);
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
+      console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
       const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
         .find(p => (p.tsym || p.tradingSymbol) === tsym);
       if (position) {
+        console.log(`Found position for ${tsym}:`, position);
         checkStoplossAndTarget(position, ltp);
+      } else {
+        console.log(`No position found for ${tsym}`);
       }
     }
   });
