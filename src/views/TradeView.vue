@@ -2232,8 +2232,8 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       });
     }
 
-    console.log("Order placed successfully for position:", response.data);
-    toastMessage.value = 'Order placed successfully for SL/Target';
+    console.log(`Order placed successfully for ${getSymbol(position)}`, response.data);
+    toastMessage.value = `Order placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
 
     // Add a delay before fetching updated data
@@ -2424,51 +2424,26 @@ const getSymbol = (position) => {
 // Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
   const tsym = getSymbol(position);
-  if (!tsym) {
-    console.error('Invalid position object:', position);
-    return;
-  }
+  if (!tsym) return;
 
-  const netQty = Number(position.netQty || position.netqty || 0);
-
-  if (netQty === 0) {
-    delete positionStoplosses.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargetsPrice.value[tsym];
-    return;
-  }
-
-  const currentLTP = Number(positionLTPs.value[tsym] || 0);
+  const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
+  const currentLTP = Number(positionLTPs.value[tsym] || 0);
 
   if (tradeSettings.enableStoploss) {
-    const direction = isLong ? -1 : 1;
-    positionStoplosses.value[tsym] = Number(tradeSettings.stoplossValue);
-    positionStoplossesPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.stoplossValue));
-  } else {
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
+    positionStoplossesPrice.value[tsym] = isLong
+      ? currentLTP - tradeSettings.stoplossValue
+      : currentLTP + tradeSettings.stoplossValue;
   }
 
   if (tradeSettings.enableTarget) {
-    const direction = isLong ? 1 : -1;
-    positionTargets.value[tsym] = Number(tradeSettings.targetValue);
-    positionTargetsPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.targetValue));
-  } else {
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
+    positionTargetsPrice.value[tsym] = isLong
+      ? currentLTP + tradeSettings.targetValue
+      : currentLTP - tradeSettings.targetValue;
   }
 
-  console.log(`Setting SL/Target for ${tsym}:`);
-  console.log(`Current LTP: ${currentLTP}`);
-  console.log(`Stoploss Points: ${positionStoplosses.value[tsym]}`);
-  console.log(`Stoploss Price: ${positionStoplossesPrice.value[tsym]}`);
-  console.log(`Target Points: ${positionTargets.value[tsym]}`);
-  console.log(`Target Price: ${positionTargetsPrice.value[tsym]}`);
+  console.log(`Set SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
 
-  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
 };
@@ -2481,8 +2456,6 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   }
   const netQty = Number(position.netQty || position.netqty);
 
-  console.log(`Checking SL/Target for ${tsym}: NetQty=${netQty}, CurrentLTP=${currentLTP}`);
-
   if (netQty === 0) {
     console.log(`Position ${tsym} has zero quantity, removing SL/Target`);
     delete positionStoplosses.value[tsym];
@@ -2492,55 +2465,43 @@ const checkStoplossAndTarget = (position, currentLTP) => {
     return;
   }
 
-  const stoploss = positionStoplosses.value[tsym];
-  const target = positionTargets.value[tsym];
   const stoplossPrice = positionStoplossesPrice.value[tsym];
   const targetPrice = positionTargetsPrice.value[tsym];
 
   const isLong = netQty > 0;
 
-  console.log(`${tsym}: LTP=${currentLTP}, SL=${stoploss}, Target=${target}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
-
-  let orderTriggered = false;
+  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
 
   if (isLong) {
-    if ((stoploss && currentLTP <= stoploss) || (stoplossPrice && currentLTP <= stoplossPrice)) {
+    if (stoplossPrice && currentLTP <= stoplossPrice) {
       console.log(`Stoploss hit for long position ${tsym}`);
-      orderTriggered = true;
-    } else if ((target && currentLTP >= target) || (targetPrice && currentLTP >= targetPrice)) {
+      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else if (targetPrice && currentLTP >= targetPrice) {
       console.log(`Target hit for long position ${tsym}`);
-      orderTriggered = true;
+      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else {
+      console.log(`No SL/Target hit for long position ${tsym}`);
     }
   } else {
-    if ((stoploss && currentLTP >= stoploss) || (stoplossPrice && currentLTP >= stoplossPrice)) {
+    if (stoplossPrice && currentLTP >= stoplossPrice) {
       console.log(`Stoploss hit for short position ${tsym}`);
-      orderTriggered = true;
-    } else if ((target && currentLTP <= target) || (targetPrice && currentLTP <= targetPrice)) {
+      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else if (targetPrice && currentLTP <= targetPrice) {
       console.log(`Target hit for short position ${tsym}`);
-      orderTriggered = true;
+      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else {
+      console.log(`No SL/Target hit for short position ${tsym}`);
     }
   }
-
-  if (orderTriggered) {
-    const transactionType = isLong ? 'S' : 'B';
-    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P';
-    console.log(`Placing order for ${tsym}: ${transactionType} ${optionType}`);
-    placeOrderForPosition(transactionType, optionType, position);
-
-    console.log(`Removing SL/Target for ${tsym} after order placement`);
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
-
-    console.log(`Saving updated SL/Target values to localStorage`);
-    localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-    localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
-    localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-    localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
-  } else {
-    console.log(`No SL/Target hit for ${tsym}`);
-  }
+};
+const continuouslyCheckPositions = () => {
+  [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value].forEach(position => {
+    const tsym = getSymbol(position);
+    const currentLTP = positionLTPs.value[tsym];
+    if (currentLTP) {
+      checkStoplossAndTarget(position, currentLTP);
+    }
+  });
 };
 
 const availableBalance = computed(() => {
@@ -3046,6 +3007,8 @@ const totalSellValue = computed(() => {
 });
 
 let timer;
+let positionCheckInterval;
+
 // Lifecycle hooks
 onMounted(async () => {
   await checkAllTokens();
@@ -3106,6 +3069,8 @@ onMounted(async () => {
   positionTargets.value = JSON.parse(localStorage.getItem('positionTargets') || '{}');
   positionStoplossesPrice.value = JSON.parse(localStorage.getItem('positionStoplossesPrice') || '{}');
   positionTargetsPrice.value = JSON.parse(localStorage.getItem('positionTargetsPrice') || '{}');
+  // Start continuous position checking
+  positionCheckInterval = setInterval(continuouslyCheckPositions, 1000); // Check every second
 });
 
 onBeforeUnmount(() => {
@@ -3114,6 +3079,9 @@ onBeforeUnmount(() => {
     socket.value.close();
   }
   clearInterval(timer);
+  if (positionCheckInterval) {
+    clearInterval(positionCheckInterval);
+  }
 });
 
 // Watchers
