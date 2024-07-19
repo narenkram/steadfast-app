@@ -209,12 +209,13 @@
 
           <!-- Quantity Selection -->
           <div class="col-2">
-            <label for="Quantity" class="form-label mb-0">Quantity</label>
-            <select id="Quantity" class="form-select" v-model="selectedQuantity" aria-label="Quantity"
-              :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="quantity in availableQuantities" :key="quantity" :value="quantity">{{ quantity }}
-              </option>
-            </select>
+            <label for="Quantity" class="form-label mb-0">
+              {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity</label>
+            <div class="input-group">
+              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" min="1" max="36"
+                @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }">
+              <span class="input-group-text">{{ selectedQuantity }}</span>
+            </div>
           </div>
 
         </div>
@@ -1144,7 +1145,8 @@ const updateSelectedBroker = () => {
 // Fetch trading symbols and strikes
 const selectedExchange = ref({});
 const selectedMasterSymbol = ref('');
-const selectedQuantity = ref(null);
+const selectedLots = ref(1);
+const selectedQuantity = ref(0);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
 const selectedPutStrike = ref({});
@@ -1395,10 +1397,26 @@ const updateSecurityIds = () => {
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
 
+// Modify the updateAvailableQuantities function
 const updateAvailableQuantities = () => {
-  availableQuantities.value = quantities.value[selectedMasterSymbol.value] || [];
-  if (!availableQuantities.value.includes(selectedQuantity.value)) {
-    selectedQuantity.value = availableQuantities.value[0];
+  const instrument = quantities.value[selectedMasterSymbol.value];
+  if (instrument) {
+    availableQuantities.value = Array.from({ length: instrument.maxLots }, (_, i) => ({
+      lots: i + 1,
+      quantity: (i + 1) * instrument.lotSize
+    }));
+  } else {
+    availableQuantities.value = [];
+  }
+  if (!availableQuantities.value.some(q => q.quantity === selectedQuantity.value)) {
+    selectedQuantity.value = availableQuantities.value[0]?.quantity;
+  }
+};
+const updateSelectedQuantity = () => {
+  const instrument = quantities.value[selectedMasterSymbol.value];
+  if (instrument) {
+    selectedLots.value = Math.min(Math.max(1, selectedLots.value), 36);
+    selectedQuantity.value = selectedLots.value * instrument.lotSize;
   }
 };
 
@@ -1806,15 +1824,16 @@ const maskBrokerClientId = (clientId) => {
 };
 
 
+// Update the quantities object
 const quantities = ref({
-  NIFTY: [25],
-  BANKNIFTY: [15],
-  FINNIFTY: [40],
-  MIDCPNIFTY: [75],
-  NIFTYNXT50: [10],
-  SENSEX: [10],
-  BANKEX: [15],
-  SENSEX50: [25]
+  NIFTY: { lotSize: 25, maxLots: 10 },
+  BANKNIFTY: { lotSize: 15, maxLots: 10 },
+  FINNIFTY: { lotSize: 40, maxLots: 10 },
+  MIDCPNIFTY: { lotSize: 75, maxLots: 10 },
+  NIFTYNXT50: { lotSize: 10, maxLots: 10 },
+  SENSEX: { lotSize: 10, maxLots: 10 },
+  BANKEX: { lotSize: 15, maxLots: 10 },
+  SENSEX50: { lotSize: 25, maxLots: 10 }
 });
 const availableQuantities = ref([]);
 
@@ -3029,6 +3048,7 @@ onMounted(async () => {
   setDefaultExchangeAndMasterSymbol()
   fetchTradingData()
   updateAvailableQuantities()
+  updateSelectedQuantity();
   setDefaultExpiry()
 
   window.addEventListener('keydown', handleHotKeys);
@@ -3185,6 +3205,7 @@ watch(selectedMasterSymbol, async (newValue, oldValue) => {
   console.log('selectedMasterSymbol changed:', newValue);
   saveUserChoice();
   updateAvailableQuantities();
+  updateSelectedQuantity();
 
   // Fetch new trading data and update expiry
   await fetchTradingData();
