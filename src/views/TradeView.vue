@@ -568,11 +568,11 @@
                         </div>
                         <div class="text-center mt-2">
                           <span class="text-danger">
-                            <b>{{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}</b>
+                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }} pts)
+                            ( {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -591,12 +591,12 @@
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-danger">
-                            <b>{{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}</b>
+                          <span class="text-success">
+                            <b>{{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }} pts)
+                            ( {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -678,11 +678,11 @@
                         </div>
                         <div class="text-center mt-2">
                           <span class="text-danger">
-                            <b>{{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}</b>
+                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }} pts)
+                            ( {{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -701,12 +701,12 @@
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-danger">
-                            <b>{{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}</b>
+                          <span class="text-success">
+                            <b> {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }} pts)
+                            ( {{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -1481,7 +1481,7 @@ const token = ref('');
 const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
     toastMessage.value = 'Flattrade broker is not selected.';
     showToast.value = true;
     return;
@@ -1519,7 +1519,7 @@ const shoonyaTradeBook = ref([]);
 const fetchShoonyaOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
     toastMessage.value = 'Shoonya broker is not selected.';
     showToast.value = true;
     return;
@@ -1646,7 +1646,7 @@ const fetchFlattradePositions = async () => {
     return;
   }
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
     toastMessage.value = 'Flattrade broker is not selected.';
     showToast.value = true;
     return;
@@ -1693,7 +1693,7 @@ const fetchShoonyaPositions = async () => {
     return;
   }
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
     toastMessage.value = 'Shoonya broker is not selected.';
     showToast.value = true;
     return;
@@ -1755,7 +1755,7 @@ const fetchFundLimit = async () => {
     }
 
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
       if (!dhanDetails.apiToken) {
         throw new Error('Dhan API Token is missing');
@@ -1766,7 +1766,7 @@ const fetchFundLimit = async () => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       if (!FLATTRADE_API_TOKEN) {
         throw new Error('Flattrade API Token is missing');
@@ -1778,7 +1778,7 @@ const fetchFundLimit = async () => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       if (!SHOONYA_API_TOKEN) {
         throw new Error('Shoonya API Token is missing');
@@ -1912,7 +1912,7 @@ const getExchangeSegment = () => {
     throw new Error("Broker or exchange not selected");
   }
 
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     if (selectedExchange.value === 'NSE') {
       return 'NSE_FNO';
     } else if (selectedExchange.value === 'BSE') {
@@ -1920,7 +1920,7 @@ const getExchangeSegment = () => {
     } else {
       throw new Error("Selected exchange is not valid for Dhan");
     }
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (selectedExchange.value === 'NFO') {
       return 'NFO';
     } else if (selectedExchange.value === 'BFO') {
@@ -1929,7 +1929,7 @@ const getExchangeSegment = () => {
       throw new Error("Selected exchange is not valid for Flattrade");
     }
   }
-  else if (selectedBroker.value.brokerName === 'Shoonya') {
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
     if (selectedExchange.value === 'NFO') {
       return 'NFO';
     } else if (selectedExchange.value === 'BFO') {
@@ -1945,7 +1945,7 @@ const getExchangeSegment = () => {
 
 // Prepare Order Payload for Dhan or Flattrade
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     return {
       brokerClientId: selectedBroker.value.brokerClientId,
       transactionType: transactionType,
@@ -1960,7 +1960,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       drvExpiryDate: selectedExpiry.value,
       drvOptionType: drvOptionType
     };
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
@@ -1974,7 +1974,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       ret: "DAY"
       // Add any additional fields specific to Flattrade here
     };
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
@@ -2026,12 +2026,14 @@ const adjustStoplossPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For stoploss, we always add the adjustment (increasing for both long and short positions)
-  positionStoplossesPrice.value[tsym] += adjustment;
+  // For long positions, decrease stoploss price. For short positions, increase it.
+  positionStoplossesPrice.value[tsym] += isLong ? -adjustment : adjustment;
 
   // Recalculate the points-based stoploss
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionStoplosses.value[tsym] = Math.abs(currentLTP - positionStoplossesPrice.value[tsym]);
+
+  console.log(`Adjusted stoploss for ${tsym}: Price=${positionStoplossesPrice.value[tsym]}, Points=${positionStoplosses.value[tsym]}`);
 
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
@@ -2048,12 +2050,14 @@ const adjustTargetPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For target, we always add the adjustment (increasing for both long and short positions)
-  positionTargetsPrice.value[tsym] += adjustment;
+  // For long positions, increase target price. For short positions, decrease it.
+  positionTargetsPrice.value[tsym] += isLong ? adjustment : -adjustment;
 
   // Recalculate the points-based target
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionTargets.value[tsym] = Math.abs(currentLTP - positionTargetsPrice.value[tsym]);
+
+  console.log(`Adjusted target for ${tsym}: Price=${positionTargetsPrice.value[tsym]}, Points=${positionTargets.value[tsym]}`);
 
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
@@ -2082,7 +2086,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
     console.log("Placing order with data:", orderData);
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
 
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData, {
@@ -2091,7 +2095,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify({
         ...orderData,
@@ -2105,7 +2109,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       const payload = qs.stringify({
         ...orderData,
@@ -2149,17 +2153,17 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
 // New function to update both orders and positions
 const updateOrdersAndPositions = async () => {
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     await Promise.all([
       fetchDhanOrdersTradesBook(),
       fetchDhanPositions()
     ]);
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     await Promise.all([
       fetchFlattradeOrdersTradesBook(),
       fetchFlattradePositions()
     ]);
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     await Promise.all([
       fetchShoonyaOrdersTradesBook(),
       fetchShoonyaPositions()
@@ -2169,11 +2173,11 @@ const updateOrdersAndPositions = async () => {
 
 // Add this helper function to find the new position
 const findNewPosition = (tradingSymbol) => {
-  if (selectedBroker.value.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.find(p => p.tsym === tradingSymbol);
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.find(p => p.tsym === tradingSymbol);
-  } else if (selectedBroker.value.brokerName === 'Dhan') {
+  } else if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.find(p => p.tradingSymbol === tradingSymbol);
   }
   return null;
@@ -2190,7 +2194,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
 
     let orderData;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       orderData = {
         brokerClientId: selectedBroker.value.clientId,
         transactionType: transactionType,
@@ -2205,7 +2209,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         drvExpiryDate: position.expiryDate,
         drvOptionType: optionType
       };
-    } else if (selectedBroker.value.brokerName === 'Flattrade' || selectedBroker.value.brokerName === 'Shoonya') {
+    } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
       orderData = {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId,
@@ -2222,10 +2226,10 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
 
     console.log("Placing order for position with data:", orderData);
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
@@ -2235,7 +2239,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/shoonyaPlaceOrder', payload, {
@@ -2246,8 +2250,8 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       });
     }
 
-    console.log("Order placed successfully for position:", response.data);
-    toastMessage.value = 'Order placed successfully for SL/Target';
+    console.log(`Order placed successfully for ${getSymbol(position)}`, response.data);
+    toastMessage.value = `Order placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
 
     // Add a delay before fetching updated data
@@ -2438,51 +2442,26 @@ const getSymbol = (position) => {
 // Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
   const tsym = getSymbol(position);
-  if (!tsym) {
-    console.error('Invalid position object:', position);
-    return;
-  }
+  if (!tsym) return;
 
-  const netQty = Number(position.netQty || position.netqty || 0);
-
-  if (netQty === 0) {
-    delete positionStoplosses.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargetsPrice.value[tsym];
-    return;
-  }
-
-  const currentLTP = Number(positionLTPs.value[tsym] || 0);
+  const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
+  const currentLTP = Number(positionLTPs.value[tsym] || 0);
 
   if (tradeSettings.enableStoploss) {
-    const direction = isLong ? -1 : 1;
-    positionStoplosses.value[tsym] = Number(tradeSettings.stoplossValue);
-    positionStoplossesPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.stoplossValue));
-  } else {
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
+    positionStoplossesPrice.value[tsym] = isLong
+      ? currentLTP - tradeSettings.stoplossValue
+      : currentLTP + tradeSettings.stoplossValue;
   }
 
   if (tradeSettings.enableTarget) {
-    const direction = isLong ? 1 : -1;
-    positionTargets.value[tsym] = Number(tradeSettings.targetValue);
-    positionTargetsPrice.value[tsym] = Number(currentLTP + (direction * tradeSettings.targetValue));
-  } else {
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
+    positionTargetsPrice.value[tsym] = isLong
+      ? currentLTP + tradeSettings.targetValue
+      : currentLTP - tradeSettings.targetValue;
   }
 
-  console.log(`Setting SL/Target for ${tsym}:`);
-  console.log(`Current LTP: ${currentLTP}`);
-  console.log(`Stoploss Points: ${positionStoplosses.value[tsym]}`);
-  console.log(`Stoploss Price: ${positionStoplossesPrice.value[tsym]}`);
-  console.log(`Target Points: ${positionTargets.value[tsym]}`);
-  console.log(`Target Price: ${positionTargetsPrice.value[tsym]}`);
+  console.log(`Set SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
 
-  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
 };
@@ -2504,53 +2483,43 @@ const checkStoplossAndTarget = (position, currentLTP) => {
     return;
   }
 
-  const stoploss = positionStoplosses.value[tsym];
-  const target = positionTargets.value[tsym];
   const stoplossPrice = positionStoplossesPrice.value[tsym];
   const targetPrice = positionTargetsPrice.value[tsym];
 
   const isLong = netQty > 0;
 
-  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL=${stoploss}, Target=${target}, SL Price=${stoplossPrice}, Target Price=${targetPrice}`);
-
-  let orderTriggered = false;
+  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
 
   if (isLong) {
-    if ((stoploss && currentLTP <= stoploss) || (stoplossPrice && currentLTP <= stoplossPrice)) {
+    if (stoplossPrice && currentLTP <= stoplossPrice) {
       console.log(`Stoploss hit for long position ${tsym}`);
-      orderTriggered = true;
-    } else if ((target && currentLTP >= target) || (targetPrice && currentLTP >= targetPrice)) {
+      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else if (targetPrice && currentLTP >= targetPrice) {
       console.log(`Target hit for long position ${tsym}`);
-      orderTriggered = true;
+      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else {
+      console.log(`No SL/Target hit for long position ${tsym}`);
     }
   } else {
-    if ((stoploss && currentLTP >= stoploss) || (stoplossPrice && currentLTP >= stoplossPrice)) {
+    if (stoplossPrice && currentLTP >= stoplossPrice) {
       console.log(`Stoploss hit for short position ${tsym}`);
-      orderTriggered = true;
-    } else if ((target && currentLTP <= target) || (targetPrice && currentLTP <= targetPrice)) {
+      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else if (targetPrice && currentLTP <= targetPrice) {
       console.log(`Target hit for short position ${tsym}`);
-      orderTriggered = true;
+      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+    } else {
+      console.log(`No SL/Target hit for short position ${tsym}`);
     }
   }
-
-  if (orderTriggered) {
-    const transactionType = isLong ? 'SELL' : 'BUY';
-    const optionType = tsym.includes('CE') || tsym.includes('C') ? 'CALL' : 'PUT';
-    console.log(`Placing order for ${tsym}: ${transactionType} ${optionType}`);
-    placeOrderForPosition(transactionType, optionType, position);
-
-    // Remove SL/Target after placing the order
-    delete positionStoplosses.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionTargetsPrice.value[tsym];
-
-    // Save updated values to localStorage
-    localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-    localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
-    localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-    localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
-  }
+};
+const continuouslyCheckPositions = () => {
+  [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value].forEach(position => {
+    const tsym = getSymbol(position);
+    const currentLTP = positionLTPs.value[tsym];
+    if (currentLTP) {
+      checkStoplossAndTarget(position, currentLTP);
+    }
+  });
 };
 
 const availableBalance = computed(() => {
@@ -2572,7 +2541,7 @@ const availableBalance = computed(() => {
     const cash = Number(fundLimits.value.cash) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
-    console.log(`${selectedBroker.value.brokerName} Available Balance:`, balance);
+    console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
     return balance;
   }
   return null;
@@ -2605,6 +2574,8 @@ const totalNetQty = computed(() => {
     return dhanPositionBook.value.reduce((total, position) => total + position.netQty, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
   }
   return 0;
 });
@@ -2752,7 +2723,7 @@ const cycleClockEmoji = () => {
 
 const setFlattradeCredentials = async () => {
   try {
-    if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
       toastMessage.value = 'Realtime LTP data only available for Flattrade';
       showToast.value = true;
       return;
@@ -2942,11 +2913,21 @@ const updatePositionSecurityIds = () => {
       positionSecurityIds.value[position.tsym] = position.token;
     }
   });
+  // Add this block for Shoonya positions
+  shoonyaPositionBook.value.forEach(position => {
+    if (position.tsym && !positionSecurityIds.value[position.tsym]) {
+      positionSecurityIds.value[position.tsym] = position.token;
+    }
+  });
 };
 const subscribeToPositionLTPs = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
-      .map(([tsym, token]) => `NFO|${token}`);
+      .map(([tsym, token]) => {
+        // Determine the correct exchange based on the position
+        const exchange = selectedExchange.value === 'NFO' ? 'NFO' : 'BFO';
+        return `${exchange}|${token}`;
+      });
 
     if (symbolsToSubscribe.length > 0) {
       const data = {
@@ -2960,6 +2941,11 @@ const subscribeToPositionLTPs = () => {
 };
 // Add a watcher for flatTradePositionBook
 watch(flatTradePositionBook, () => {
+  updatePositionSecurityIds();
+  subscribeToOptions();
+}, { deep: true });
+// Add this watcher after the existing watcher for flatTradePositionBook
+watch(shoonyaPositionBook, () => {
   updatePositionSecurityIds();
   subscribeToOptions();
 }, { deep: true });
@@ -3010,6 +2996,7 @@ const updateSubscriptions = () => {
   // Subscribe to new symbols
   subscribeToMasterSymbol();
   subscribeToOptions();
+  subscribeToPositionLTPs();
 };
 const initializeSubscriptions = () => {
   subscribeToMasterSymbol();
@@ -3021,6 +3008,9 @@ const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
   }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.reduce((total, position) => total + position.dayBuyValue, 0);
   }
@@ -3031,6 +3021,9 @@ const totalSellValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
   }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.reduce((total, position) => total + position.daySellValue, 0);
   }
@@ -3038,6 +3031,8 @@ const totalSellValue = computed(() => {
 });
 
 let timer;
+let positionCheckInterval;
+
 // Lifecycle hooks
 onMounted(async () => {
   await checkAllTokens();
@@ -3098,6 +3093,8 @@ onMounted(async () => {
   positionTargets.value = JSON.parse(localStorage.getItem('positionTargets') || '{}');
   positionStoplossesPrice.value = JSON.parse(localStorage.getItem('positionStoplossesPrice') || '{}');
   positionTargetsPrice.value = JSON.parse(localStorage.getItem('positionTargetsPrice') || '{}');
+  // Start continuous position checking
+  positionCheckInterval = setInterval(continuouslyCheckPositions, 1000); // Check every second
 });
 
 onBeforeUnmount(() => {
@@ -3106,6 +3103,9 @@ onBeforeUnmount(() => {
     socket.value.close();
   }
   clearInterval(timer);
+  if (positionCheckInterval) {
+    clearInterval(positionCheckInterval);
+  }
 });
 
 // Watchers
@@ -3287,12 +3287,17 @@ watch(enableHotKeys, (newValue) => {
 
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
+  console.log('positionLTPs updated:', newLTPs);
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
+      console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
       const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
         .find(p => (p.tsym || p.tradingSymbol) === tsym);
       if (position) {
+        console.log(`Found position for ${tsym}:`, position);
         checkStoplossAndTarget(position, ltp);
+      } else {
+        console.log(`No position found for ${tsym}`);
       }
     }
   });
