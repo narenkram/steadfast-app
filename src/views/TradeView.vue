@@ -168,7 +168,8 @@
           <!-- Segment Selection -->
           <div class="col-2">
             <label for="Segment" class="form-label mb-0">Segment</label>
-            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }">
+            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }"
+              disabled>
               <option value="Options" selected>Options</option>
               <option value="Futures">Futures</option>
             </select>
@@ -225,13 +226,13 @@
           <div class="col-2">
             <label for="OrderType" class="form-label mb-0">Order Type</label>
             <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType"
-              :class="{ 'disabled-form': isFormDisabled }">
+              :class="{ 'disabled-form': isFormDisabled }" disabled>
               <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
               </option>
             </select>
           </div>
           <!-- Market Protection Order %-->
-          <div class="col-3">
+          <!-- <div class="col-3">
             <label for="MarketProtection" class="form-label mb-0">Market Protection Order %</label>
             <select id="MarketProtection" class="form-select" aria-label="Market Protection Order %"
               :class="{ 'disabled-form': isFormDisabled }">
@@ -241,9 +242,9 @@
               <option value="4">4%</option>
               <option value="5">5%</option>
             </select>
-          </div>
+          </div> -->
           <!-- Stoploss -->
-          <div class="col-2">
+          <div class="col-3">
             <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -257,7 +258,7 @@
             </div>
           </div>
           <!-- Target -->
-          <div class="col-2">
+          <div class="col-3">
             <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -270,7 +271,7 @@
             </div>
           </div>
           <!-- 1 Click Keys -->
-          <div class="col-3">
+          <div class="col-4">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
                 <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
@@ -287,21 +288,25 @@
         <div class="row align-items-center justify-content-between">
           <!-- Call Strike Selection -->
           <div class="col-3">
-            <label for="CallStrike" class="form-label mb-0">Call Strike</label>
-            <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
-              :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-                {{ strike.strikePrice }}
-              </option>
-            </select>
-            <div>
+            <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
+              <span>Call Strike</span>
+              <span class="me-4">LTP</span>
+            </label>
+            <div class="input-group">
+              <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
+                :class="{ 'disabled-form': isFormDisabled }">
+                <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
+                  {{ strike.strikePrice }}
+                </option>
+              </select>
+              <span class="input-group-text">{{ latestCallLTP }}</span>
+            </div>
+            <!-- DO NOT REMOVE, USEFUL FOR DEBUGGING -->
+            <!-- <div>
               Security ID: {{ defaultCallSecurityId }}
-            </div>
-            <div>
+            </div> -->
+            <div class="mt-2">
               {{ selectedCallStrike.tradingSymbol }}
-            </div>
-            <div>
-              Call LTP: <b>{{ latestCallLTP }}</b>
             </div>
           </div>
 
@@ -320,21 +325,25 @@
 
           <!-- Put Strike Selection -->
           <div class="col-3">
-            <label for="PutStrike" class="form-label mb-0">Put Strike</label>
-            <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
-              :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-                {{ strike.strikePrice }}
-              </option>
-            </select>
-            <div>
+            <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
+              <span class="ms-4">LTP</span>
+              <span>Put Strike</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">{{ latestPutLTP }}</span>
+              <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
+                :class="{ 'disabled-form': isFormDisabled }">
+                <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
+                  {{ strike.strikePrice }}
+                </option>
+              </select>
+            </div>
+            <!-- DO NOT REMOVE, USEFUL FOR DEBUGGING -->
+            <!-- <div>
               Security ID: {{ defaultPutSecurityId }}
-            </div>
-            <div>
+            </div> -->
+            <div class="mt-2">
               {{ selectedPutStrike.tradingSymbol }}
-            </div>
-            <div>
-              Put LTP: <b>{{ latestPutLTP }}</b>
             </div>
           </div>
         </div>
