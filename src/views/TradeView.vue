@@ -1463,7 +1463,7 @@ const token = ref('');
 const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
     toastMessage.value = 'Flattrade broker is not selected.';
     showToast.value = true;
     return;
@@ -1501,7 +1501,7 @@ const shoonyaTradeBook = ref([]);
 const fetchShoonyaOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
     toastMessage.value = 'Shoonya broker is not selected.';
     showToast.value = true;
     return;
@@ -1628,7 +1628,7 @@ const fetchFlattradePositions = async () => {
     return;
   }
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
     toastMessage.value = 'Flattrade broker is not selected.';
     showToast.value = true;
     return;
@@ -1675,7 +1675,7 @@ const fetchShoonyaPositions = async () => {
     return;
   }
 
-  if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Shoonya') {
+  if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
     toastMessage.value = 'Shoonya broker is not selected.';
     showToast.value = true;
     return;
@@ -1737,7 +1737,7 @@ const fetchFundLimit = async () => {
     }
 
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
       if (!dhanDetails.apiToken) {
         throw new Error('Dhan API Token is missing');
@@ -1748,7 +1748,7 @@ const fetchFundLimit = async () => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       if (!FLATTRADE_API_TOKEN) {
         throw new Error('Flattrade API Token is missing');
@@ -1760,7 +1760,7 @@ const fetchFundLimit = async () => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       if (!SHOONYA_API_TOKEN) {
         throw new Error('Shoonya API Token is missing');
@@ -1894,7 +1894,7 @@ const getExchangeSegment = () => {
     throw new Error("Broker or exchange not selected");
   }
 
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     if (selectedExchange.value === 'NSE') {
       return 'NSE_FNO';
     } else if (selectedExchange.value === 'BSE') {
@@ -1902,7 +1902,7 @@ const getExchangeSegment = () => {
     } else {
       throw new Error("Selected exchange is not valid for Dhan");
     }
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (selectedExchange.value === 'NFO') {
       return 'NFO';
     } else if (selectedExchange.value === 'BFO') {
@@ -1911,7 +1911,7 @@ const getExchangeSegment = () => {
       throw new Error("Selected exchange is not valid for Flattrade");
     }
   }
-  else if (selectedBroker.value.brokerName === 'Shoonya') {
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
     if (selectedExchange.value === 'NFO') {
       return 'NFO';
     } else if (selectedExchange.value === 'BFO') {
@@ -1927,7 +1927,7 @@ const getExchangeSegment = () => {
 
 // Prepare Order Payload for Dhan or Flattrade
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     return {
       brokerClientId: selectedBroker.value.brokerClientId,
       transactionType: transactionType,
@@ -1942,7 +1942,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       drvExpiryDate: selectedExpiry.value,
       drvOptionType: drvOptionType
     };
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
@@ -1956,7 +1956,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       ret: "DAY"
       // Add any additional fields specific to Flattrade here
     };
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
@@ -2064,7 +2064,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
     console.log("Placing order with data:", orderData);
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
 
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData, {
@@ -2073,7 +2073,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify({
         ...orderData,
@@ -2087,7 +2087,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       const payload = qs.stringify({
         ...orderData,
@@ -2131,17 +2131,17 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
 // New function to update both orders and positions
 const updateOrdersAndPositions = async () => {
-  if (selectedBroker.value.brokerName === 'Dhan') {
+  if (selectedBroker.value?.brokerName === 'Dhan') {
     await Promise.all([
       fetchDhanOrdersTradesBook(),
       fetchDhanPositions()
     ]);
-  } else if (selectedBroker.value.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     await Promise.all([
       fetchFlattradeOrdersTradesBook(),
       fetchFlattradePositions()
     ]);
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     await Promise.all([
       fetchShoonyaOrdersTradesBook(),
       fetchShoonyaPositions()
@@ -2151,11 +2151,11 @@ const updateOrdersAndPositions = async () => {
 
 // Add this helper function to find the new position
 const findNewPosition = (tradingSymbol) => {
-  if (selectedBroker.value.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.find(p => p.tsym === tradingSymbol);
-  } else if (selectedBroker.value.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.find(p => p.tsym === tradingSymbol);
-  } else if (selectedBroker.value.brokerName === 'Dhan') {
+  } else if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.find(p => p.tradingSymbol === tradingSymbol);
   }
   return null;
@@ -2172,7 +2172,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
 
     let orderData;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       orderData = {
         brokerClientId: selectedBroker.value.clientId,
         transactionType: transactionType,
@@ -2187,7 +2187,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         drvExpiryDate: position.expiryDate,
         drvOptionType: optionType
       };
-    } else if (selectedBroker.value.brokerName === 'Flattrade' || selectedBroker.value.brokerName === 'Shoonya') {
+    } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
       orderData = {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId,
@@ -2204,10 +2204,10 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
 
     console.log("Placing order for position with data:", orderData);
     let response;
-    if (selectedBroker.value.brokerName === 'Dhan') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
       response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
     }
-    else if (selectedBroker.value.brokerName === 'Flattrade') {
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
@@ -2217,7 +2217,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
         }
       });
     }
-    else if (selectedBroker.value.brokerName === 'Shoonya') {
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
       const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/shoonyaPlaceOrder', payload, {
@@ -2477,6 +2477,8 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   }
   const netQty = Number(position.netQty || position.netqty);
 
+  console.log(`Checking SL/Target for ${tsym}: NetQty=${netQty}, CurrentLTP=${currentLTP}`);
+
   if (netQty === 0) {
     console.log(`Position ${tsym} has zero quantity, removing SL/Target`);
     delete positionStoplosses.value[tsym];
@@ -2493,7 +2495,7 @@ const checkStoplossAndTarget = (position, currentLTP) => {
 
   const isLong = netQty > 0;
 
-  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL=${stoploss}, Target=${target}, SL Price=${stoplossPrice}, Target Price=${targetPrice}`);
+  console.log(`${tsym}: LTP=${currentLTP}, SL=${stoploss}, Target=${target}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
 
   let orderTriggered = false;
 
@@ -2521,17 +2523,19 @@ const checkStoplossAndTarget = (position, currentLTP) => {
     console.log(`Placing order for ${tsym}: ${transactionType} ${optionType}`);
     placeOrderForPosition(transactionType, optionType, position);
 
-    // Remove SL/Target after placing the order
+    console.log(`Removing SL/Target for ${tsym} after order placement`);
     delete positionStoplosses.value[tsym];
     delete positionStoplossesPrice.value[tsym];
     delete positionTargets.value[tsym];
     delete positionTargetsPrice.value[tsym];
 
-    // Save updated values to localStorage
+    console.log(`Saving updated SL/Target values to localStorage`);
     localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
     localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
     localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
     localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
+  } else {
+    console.log(`No SL/Target hit for ${tsym}`);
   }
 };
 
@@ -2554,7 +2558,7 @@ const availableBalance = computed(() => {
     const cash = Number(fundLimits.value.cash) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
-    console.log(`${selectedBroker.value.brokerName} Available Balance:`, balance);
+    console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
     return balance;
   }
   return null;
@@ -2736,7 +2740,7 @@ const cycleClockEmoji = () => {
 
 const setFlattradeCredentials = async () => {
   try {
-    if (!selectedBroker.value || selectedBroker.value.brokerName !== 'Flattrade') {
+    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
       toastMessage.value = 'Realtime LTP data only available for Flattrade';
       showToast.value = true;
       return;
