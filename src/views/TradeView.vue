@@ -2587,6 +2587,8 @@ const totalNetQty = computed(() => {
     return dhanPositionBook.value.reduce((total, position) => total + position.netQty, 0);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
   }
   return 0;
 });
