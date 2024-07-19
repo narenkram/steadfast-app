@@ -1145,7 +1145,6 @@ const updateSelectedBroker = () => {
 // Fetch trading symbols and strikes
 const selectedExchange = ref({});
 const selectedMasterSymbol = ref('');
-const selectedLots = ref(1);
 const selectedQuantity = ref(0);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
@@ -1396,7 +1395,26 @@ const updateSecurityIds = () => {
   defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
+const lotsPerSymbol = ref({});
+const selectedLots = computed({
+  get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
+  set: (value) => {
+    lotsPerSymbol.value[selectedMasterSymbol.value] = value;
+    saveLots();
+  }
+});
+// Function to save lots to localStorage
+const saveLots = () => {
+  localStorage.setItem('lotsPerSymbol', JSON.stringify(lotsPerSymbol.value));
+};
 
+// Function to load lots from localStorage
+const loadLots = () => {
+  const savedLots = localStorage.getItem('lotsPerSymbol');
+  if (savedLots) {
+    lotsPerSymbol.value = JSON.parse(savedLots);
+  }
+};
 // Modify the updateAvailableQuantities function
 const updateAvailableQuantities = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
@@ -1412,13 +1430,19 @@ const updateAvailableQuantities = () => {
     selectedQuantity.value = availableQuantities.value[0]?.quantity;
   }
 };
+// Update the updateSelectedQuantity function
 const updateSelectedQuantity = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
   if (instrument) {
-    selectedLots.value = Math.min(Math.max(1, selectedLots.value), 36);
-    selectedQuantity.value = selectedLots.value * instrument.lotSize;
+    const lots = Math.min(Math.max(1, selectedLots.value), 36);
+    lotsPerSymbol.value[selectedMasterSymbol.value] = lots;
+    selectedQuantity.value = lots * instrument.lotSize;
+    saveLots();
   }
 };
+watch(selectedLots, () => {
+  updateSelectedQuantity();
+});
 
 const handleHotKeys = (event) => {
   if (!enableHotKeys.value) return;
@@ -3048,6 +3072,7 @@ onMounted(async () => {
   setDefaultExchangeAndMasterSymbol()
   fetchTradingData()
   updateAvailableQuantities()
+  loadLots();
   updateSelectedQuantity();
   setDefaultExpiry()
 
