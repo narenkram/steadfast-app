@@ -568,11 +568,11 @@
                         </div>
                         <div class="text-center mt-2">
                           <span class="text-danger">
-                            <b>{{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }}</b>
+                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }} pts)
+                            ( {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -591,12 +591,12 @@
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-danger">
-                            <b>{{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }}</b>
+                          <span class="text-success">
+                            <b>{{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }} pts)
+                            ( {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -678,11 +678,11 @@
                         </div>
                         <div class="text-center mt-2">
                           <span class="text-danger">
-                            <b>{{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }}</b>
+                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }} pts)
+                            ( {{ formatPrice(positionStoplosses[getSymbol(shoonyaPosition)]) }} pts)
                           </span>
                         </div>
                       </template>
@@ -701,12 +701,12 @@
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-danger">
-                            <b>{{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }}</b>
+                          <span class="text-success">
+                            <b> {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}</b>
                           </span>
                           <br />
                           <span class="text-secondary">
-                            ( {{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }} pts)
+                            ( {{ formatPrice(positionTargets[getSymbol(shoonyaPosition)]) }} pts)
                           </span>
                         </div>
                       </template>
