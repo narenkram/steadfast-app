@@ -2924,11 +2924,21 @@ const updatePositionSecurityIds = () => {
       positionSecurityIds.value[position.tsym] = position.token;
     }
   });
+  // Add this block for Shoonya positions
+  shoonyaPositionBook.value.forEach(position => {
+    if (position.tsym && !positionSecurityIds.value[position.tsym]) {
+      positionSecurityIds.value[position.tsym] = position.token;
+    }
+  });
 };
 const subscribeToPositionLTPs = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
-      .map(([tsym, token]) => `NFO|${token}`);
+      .map(([tsym, token]) => {
+        // Determine the correct exchange based on the position
+        const exchange = selectedExchange.value === 'NFO' ? 'NFO' : 'BFO';
+        return `${exchange}|${token}`;
+      });
 
     if (symbolsToSubscribe.length > 0) {
       const data = {
@@ -2942,6 +2952,11 @@ const subscribeToPositionLTPs = () => {
 };
 // Add a watcher for flatTradePositionBook
 watch(flatTradePositionBook, () => {
+  updatePositionSecurityIds();
+  subscribeToOptions();
+}, { deep: true });
+// Add this watcher after the existing watcher for flatTradePositionBook
+watch(shoonyaPositionBook, () => {
   updatePositionSecurityIds();
   subscribeToOptions();
 }, { deep: true });
@@ -2992,6 +3007,7 @@ const updateSubscriptions = () => {
   // Subscribe to new symbols
   subscribeToMasterSymbol();
   subscribeToOptions();
+  subscribeToPositionLTPs();
 };
 const initializeSubscriptions = () => {
   subscribeToMasterSymbol();
