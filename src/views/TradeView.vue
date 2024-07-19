@@ -2990,6 +2990,9 @@ const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
   }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.reduce((total, position) => total + position.dayBuyValue, 0);
   }
@@ -2999,6 +3002,9 @@ const totalBuyValue = computed(() => {
 const totalSellValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
   }
   if (selectedBroker.value?.brokerName === 'Dhan') {
     return dhanPositionBook.value.reduce((total, position) => total + position.daySellValue, 0);
