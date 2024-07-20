@@ -1281,7 +1281,7 @@ const formatDate = (dateString) => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
     // Extract only the date part from the date string for Dhan
     return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     // Return the date string as is for Flattrade
     return dateString;
   }
