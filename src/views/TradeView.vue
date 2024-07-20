@@ -223,13 +223,19 @@
 
         <div class="row mt-3">
           <!-- Order Type -->
-          <div class="col-2">
+          <div class="col-3">
             <label for="OrderType" class="form-label mb-0">Order Type</label>
-            <select id="OrderType" class="form-select" aria-label="OrderType" v-model="selectedOrderType"
-              :class="{ 'disabled-form': isFormDisabled }" disabled>
-              <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
-              </option>
-            </select>
+            <div class="input-group">
+              <select id="OrderType" class="form-select w-50" aria-label="OrderType" v-model="selectedOrderType"
+                :class="{ 'disabled-form': isFormDisabled }">
+                <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">{{ orderType }}
+                </option>
+              </select>
+              <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'LMT'">
+                <input type="number" id="DirectLimitPrice" class="form-control" v-model="limitPrice"
+                  placeholder="Price">
+              </span>
+            </div>
           </div>
           <!-- Market Protection Order %-->
           <!-- <div class="col-3">
@@ -271,7 +277,7 @@
             </div>
           </div>
           <!-- 1 Click Keys -->
-          <div class="col-4">
+          <div class="col-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
                 <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
