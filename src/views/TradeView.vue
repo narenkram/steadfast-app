@@ -2571,15 +2571,15 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   };
 
   if (isLong) {
-    if (stoplossPrice && currentLTP <= stoplossPrice) {
+    if (tradeSettings.enableStoploss && stoplossPrice && currentLTP <= stoplossPrice) {
       executeOrder('S', 'Stoploss hit');
-    } else if (targetPrice && currentLTP >= targetPrice) {
+    } else if (tradeSettings.enableTarget && targetPrice && currentLTP >= targetPrice) {
       executeOrder('S', 'Target hit');
     }
   } else {
-    if (stoplossPrice && currentLTP >= stoplossPrice) {
+    if (tradeSettings.enableStoploss && stoplossPrice && currentLTP >= stoplossPrice) {
       executeOrder('B', 'Stoploss hit');
-    } else if (targetPrice && currentLTP <= targetPrice) {
+    } else if (tradeSettings.enableTarget && targetPrice && currentLTP <= targetPrice) {
       executeOrder('B', 'Target hit');
     }
   }
@@ -2587,6 +2587,14 @@ const checkStoplossAndTarget = (position, currentLTP) => {
 const continuouslyCheckPositions = () => {
   [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value].forEach(position => {
     const tsym = getSymbol(position);
+    const stoplossPrice = positionStoplossesPrice.value[tsym];
+    const targetPrice = positionTargetsPrice.value[tsym];
+
+    // Skip if both stoploss and target are undefined or disabled
+    if ((!stoplossPrice && !targetPrice) || (!tradeSettings.enableStoploss && !tradeSettings.enableTarget)) {
+      return;
+    }
+
     const currentLTP = positionLTPs.value[tsym];
     if (currentLTP) {
       checkStoplossAndTarget(position, currentLTP);
