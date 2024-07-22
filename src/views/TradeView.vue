@@ -573,7 +573,7 @@
                     <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td>
-                      <template v-if="Number(flattradePosition.netqty) !== 0">
+                      <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableStoploss === true">
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
@@ -597,7 +597,7 @@
                       </template>
                     </td>
                     <td>
-                      <template v-if="Number(flattradePosition.netqty) !== 0">
+                      <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableTarget === true">
                         <div class="d-flex align-items-center">
                           <div class="ms-2">
                             <button class="btn btn-sm btn-outline-danger"
