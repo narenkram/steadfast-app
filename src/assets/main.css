@@ -170,3 +170,13 @@ tr:hover+.nested-trade-row,
   max-height: 200px;
   width: auto;
 }
+
+#enableStoploss {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+#enableTarget {
+  background-color: #198754;
+  border-color: #198754;
+}
