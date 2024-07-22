@@ -3348,9 +3348,6 @@ watch(activeTab, async (newTab) => {
       await fetchDhanOrdersTradesBook();
     }
   }
-
-  // Update both orders and positions regardless of the active tab
-  await updateOrdersAndPositions();
 });
 
 // Watcher to update localStorage when enableHotKeys changes
