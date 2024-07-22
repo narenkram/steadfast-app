@@ -466,6 +466,11 @@
             🤖 Automations
           </button>
         </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="refresh-tab" type="button" @click="refreshData">
+            🔄 Refresh
+          </button>
+        </li>	        
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
@@ -1155,7 +1160,27 @@ const updateSelectedBroker = () => {
     selectedBrokerName.value = '';
   }
 };
-
+  
+// Refresh selected tab...
+const refreshData = () => {
+  if (activeTab.value === 'trades') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      fetchDhanOrdersTradesBook();
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      fetchFlattradeOrdersTradesBook();
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      fetchShoonyaOrdersTradesBook();
+    }
+  } else if (activeTab.value === 'positions') {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      fetchDhanPositions();
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      fetchFlattradePositions();
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      fetchShoonyaPositions();
+    }
+  }
+};
 
 // Fetch trading symbols and strikes
 const selectedExchange = ref({});
