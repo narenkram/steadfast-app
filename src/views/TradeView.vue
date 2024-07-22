@@ -3296,8 +3296,12 @@ watch(
       debouncedUpdateSubscriptions();
 
       // Reset LTP values when subscribing to new symbols
-      latestCallLTP.value = 'N/A';
-      latestPutLTP.value = 'N/A';
+      if (newCallId !== oldCallId) {
+        latestCallLTP.value = 'N/A';
+      }
+      if (newPutId !== oldPutId) {
+        latestPutLTP.value = 'N/A';
+      }
 
       setFlattradeCredentials();
     }
