@@ -1843,7 +1843,10 @@ const fetchFundLimit = async () => {
     console.error('Failed to fetch fund limits:', error);
   }
 };
-
+const updateFundLimits = async () => {
+  await fetchFundLimit();
+  console.log('Updated Fund Limits:', fundLimits.value);
+};
 const showBrokerClientId = ref(false);
 const toggleBrokerClientIdVisibility = () => {
   showBrokerClientId.value = !showBrokerClientId.value;
@@ -2173,6 +2176,9 @@ const placeOrder = async (transactionType, drvOptionType) => {
     // Update both orders and positions
     await updateOrdersAndPositions();
 
+    // Update fund limits
+    await updateFundLimits()
+
     // Set stoploss and target for the new position
     const newPosition = findNewPosition(selectedStrike.tradingSymbol);
     if (newPosition) {
@@ -2305,6 +2311,9 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     // Update both orders and positions
     await updateOrdersAndPositions();
 
+    // Update fund limits
+    await updateFundLimits()
+
   } catch (error) {
     console.error('Failed to place order for position:', error);
     toastMessage.value = 'Failed to place order for SL/Target';
@@ -2354,6 +2363,9 @@ const closeAllPositions = async () => {
 
     // Update both orders and positions
     await updateOrdersAndPositions();
+
+    // Update fund limits
+    await updateFundLimits()
 
     if (positionsClosed) {
       toastMessage.value = `All ${selectedBroker.value?.brokerName} positions closed successfully`;
@@ -2419,6 +2431,8 @@ const cancelOrder = async (order) => {
       });
     }
     console.log(`Order ${orderId} canceled successfully.`);
+    // Update fund limits
+    await updateFundLimits();
   } catch (error) {
     console.error(`Failed to cancel order ${orderId}:`, error);
     toastMessage.value = 'Failed to cancel order';
