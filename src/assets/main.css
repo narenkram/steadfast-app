@@ -171,12 +171,12 @@ tr:hover+.nested-trade-row,
   width: auto;
 }
 
-#enableStoploss {
+#enableStoploss:checked {
   background-color: #dc3545;
   border-color: #dc3545;
 }
 
-#enableTarget {
+#enableTarget:checked {
   background-color: #198754;
   border-color: #198754;
 }
