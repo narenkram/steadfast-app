@@ -990,19 +990,40 @@
 
 
 <script setup>
-import { ref, computed, onMounted, watch, onBeforeUnmount, reactive } from 'vue';
-import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
+
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
+import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import { debounce } from 'lodash';
 // import LineChart from '../components/LineChart.vue';
 // const showLineChart = ref(false);
-const showToast = ref(false);
-const toastMessage = ref('');
-const updateToastVisibility = (value) => {
-  showToast.value = value;
-};
+import {
+  tokenStatus,
+  showToast,
+  toastMessage,
+  updateToastVisibility,
+  killSwitchActive,
+  activationTime,
+  enableHotKeys,
+  tradeSettings,
+  positionStoplosses,
+  positionTargets,
+  positionStoplossesPrice,
+  positionTargetsPrice,
+  positionLTPs,
+  saveTradeSettings,
+  dhanOrders,
+  flatOrderBook,
+  flatTradeBook,
+  shoonyaOrderBook,
+  shoonyaTradeBook,
+  flatTradePositionBook,
+  shoonyaPositionBook,
+  dhanPositionBook
+} from '@/utils/sharedState'
+
 const brokerStatus = computed(() => {
   const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -1042,8 +1063,6 @@ const setActiveTab = (tab) => {
 };
 
 // Kill Switch - Client Side
-const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
-const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
 const currentTime = ref(Date.now());
 
 // Initialize kill switch state
@@ -1064,8 +1083,6 @@ const initKillSwitch = () => {
 };
 
 const isFormDisabled = computed(() => killSwitchActive.value);
-const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
-
 const handleKillSwitchClick = () => {
   if (killSwitchActive.value) {
     // If the kill switch is already active, deactivate it directly
@@ -1503,7 +1520,6 @@ const handleHotKeys = (event) => {
   }
 };
 
-const dhanOrders = ref([]);
 const fetchDhanOrdersTradesBook = async () => {
   const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
 
@@ -1521,8 +1537,6 @@ const fetchDhanOrdersTradesBook = async () => {
     showToast.value = true;
   }
 };
-const flatOrderBook = ref([]);
-const flatTradeBook = ref([]);
 const token = ref('');
 
 const fetchFlattradeOrdersTradesBook = async () => {
@@ -1561,8 +1575,6 @@ const fetchFlattradeOrdersTradesBook = async () => {
   }
 };
 
-const shoonyaOrderBook = ref([]);
-const shoonyaTradeBook = ref([]);
 const fetchShoonyaOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
@@ -1660,7 +1672,6 @@ const formatTime = (timeString) => {
 };
 
 
-const dhanPositionBook = ref([]);
 const fetchDhanPositions = async () => {
   const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
   if (!dhanDetails.apiToken) {
@@ -1683,7 +1694,6 @@ const fetchDhanPositions = async () => {
   }
 };
 
-const flatTradePositionBook = ref([]);
 const fetchFlattradePositions = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
@@ -1730,7 +1740,6 @@ const fetchFlattradePositions = async () => {
   }
 };
 
-const shoonyaPositionBook = ref([]);
 const fetchShoonyaPositions = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
@@ -2042,29 +2051,8 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     throw new Error("Unsupported broker");
   }
 };
-// With a reactive object
-// Modify the tradeSettings reactive object
-const tradeSettings = reactive({
-  enableStoploss: JSON.parse(localStorage.getItem('enableStoploss') || 'true'),
-  stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
-  enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
-  targetValue: Number(localStorage.getItem('targetValue') || '30'),
-  stoplossStep: 1, // The step size for increasing/decreasing stoploss price
-  targetStep: 1, // The step size for increasing/decreasing target price
-});
-// Add this function to save trade settings to localStorage
-const saveTradeSettings = () => {
-  localStorage.setItem('enableStoploss', JSON.stringify(tradeSettings.enableStoploss));
-  localStorage.setItem('stoplossValue', tradeSettings.stoplossValue.toString());
-  localStorage.setItem('enableTarget', JSON.stringify(tradeSettings.enableTarget));
-  localStorage.setItem('targetValue', tradeSettings.targetValue.toString());
-};
-// Add these to your existing reactive variables
-const positionStoplosses = ref({});
-const positionTargets = ref({});
-// Add these to your reactive variables
-const positionStoplossesPrice = ref({});
-const positionTargetsPrice = ref({});
+
+
 // Add these helper functions
 const adjustStoplossPrice = (tsym, adjustment) => {
   if (!tsym || !positionStoplossesPrice.value[tsym]) return;
@@ -2932,7 +2920,6 @@ const currentSubscriptions = ref({
 });
 
 // Add these new reactive variables
-const positionLTPs = ref({});
 const positionSecurityIds = ref({});
 
 const subscribeToMasterSymbol = () => {
