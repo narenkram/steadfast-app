@@ -2038,8 +2038,8 @@ const tradeSettings = reactive({
   stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
   enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
   targetValue: Number(localStorage.getItem('targetValue') || '30'),
-  stoplossStep: 0.5, // The step size for increasing/decreasing stoploss price
-  targetStep: 0.5, // The step size for increasing/decreasing target price
+  stoplossStep: 1, // The step size for increasing/decreasing stoploss price
+  targetStep: 1, // The step size for increasing/decreasing target price
 });
 // Add this function to save trade settings to localStorage
 const saveTradeSettings = () => {
@@ -2489,21 +2489,35 @@ const setStoplossAndTarget = (position) => {
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
 
   if (tradeSettings.enableStoploss) {
-    positionStoplossesPrice.value[tsym] = isLong
+    let stoplossPrice = isLong
       ? currentLTP - tradeSettings.stoplossValue
       : currentLTP + tradeSettings.stoplossValue;
+
+    // Ensure stoploss price is not negative for long positions
+    if (isLong && stoplossPrice <= 0) {
+      console.log(`Stoploss for ${tsym} would be negative or zero. Disabling stoploss.`);
+      delete positionStoplossesPrice.value[tsym];
+      tradeSettings.enableStoploss = false;
+    } else {
+      positionStoplossesPrice.value[tsym] = stoplossPrice;
+    }
+  } else {
+    delete positionStoplossesPrice.value[tsym];
   }
 
   if (tradeSettings.enableTarget) {
     positionTargetsPrice.value[tsym] = isLong
       ? currentLTP + tradeSettings.targetValue
       : currentLTP - tradeSettings.targetValue;
+  } else {
+    delete positionTargetsPrice.value[tsym];
   }
 
   console.log(`Set SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
 
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
+  saveTradeSettings();
 };
 // Modify the checkStoplossAndTarget function
 const checkStoplossAndTarget = (position, currentLTP) => {
