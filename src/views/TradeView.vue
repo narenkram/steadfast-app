@@ -2642,12 +2642,19 @@ const formattedDate = computed(() => {
 });
 
 const totalNetQty = computed(() => {
+  const calculateTotalQty = (positions) => {
+    return positions.reduce((total, position) => {
+      const qty = Math.abs(parseInt(position.netQty || position.netqty, 10));
+      return total + qty;
+    }, 0);
+  };
+
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.reduce((total, position) => total + position.netQty, 0);
+    return calculateTotalQty(dhanPositionBook.value);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
+    return calculateTotalQty(flatTradePositionBook.value);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value.reduce((total, position) => total + parseInt(position.netqty, 10), 0);
+    return calculateTotalQty(shoonyaPositionBook.value);
   }
   return 0;
 });
