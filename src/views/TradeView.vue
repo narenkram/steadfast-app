@@ -2294,6 +2294,11 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     toastMessage.value = `Order placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
 
+    // Remove stoploss and target for this position
+    const tsym = getSymbol(position);
+    delete positionStoplossesPrice.value[tsym];
+    delete positionTargetsPrice.value[tsym];
+
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -2519,6 +2524,9 @@ const setStoplossAndTarget = (position) => {
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   saveTradeSettings();
 };
+// Add this to your reactive variables
+const positionsInExecution = ref({});
+
 // Modify the checkStoplossAndTarget function
 const checkStoplossAndTarget = (position, currentLTP) => {
   const tsym = getSymbol(position);
@@ -2528,12 +2536,7 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   }
   const netQty = Number(position.netQty || position.netqty);
 
-  if (netQty === 0) {
-    console.log(`Position ${tsym} has zero quantity, removing SL/Target`);
-    delete positionStoplosses.value[tsym];
-    delete positionTargets.value[tsym];
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargetsPrice.value[tsym];
+  if (netQty === 0 || positionsInExecution.value[tsym]) {
     return;
   }
 
@@ -2544,25 +2547,26 @@ const checkStoplossAndTarget = (position, currentLTP) => {
 
   console.log(`Checking ${tsym}: LTP=${currentLTP}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
 
+  const executeOrder = (orderType, reason) => {
+    console.log(`${reason} for ${isLong ? 'long' : 'short'} position ${tsym}`);
+    positionsInExecution.value[tsym] = true;
+    placeOrderForPosition(orderType, tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position)
+      .finally(() => {
+        delete positionsInExecution.value[tsym];
+      });
+  };
+
   if (isLong) {
     if (stoplossPrice && currentLTP <= stoplossPrice) {
-      console.log(`Stoploss hit for long position ${tsym}`);
-      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+      executeOrder('S', 'Stoploss hit');
     } else if (targetPrice && currentLTP >= targetPrice) {
-      console.log(`Target hit for long position ${tsym}`);
-      placeOrderForPosition('S', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
-    } else {
-      console.log(`No SL/Target hit for long position ${tsym}`);
+      executeOrder('S', 'Target hit');
     }
   } else {
     if (stoplossPrice && currentLTP >= stoplossPrice) {
-      console.log(`Stoploss hit for short position ${tsym}`);
-      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
+      executeOrder('B', 'Stoploss hit');
     } else if (targetPrice && currentLTP <= targetPrice) {
-      console.log(`Target hit for short position ${tsym}`);
-      placeOrderForPosition('B', tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position);
-    } else {
-      console.log(`No SL/Target hit for short position ${tsym}`);
+      executeOrder('B', 'Target hit');
     }
   }
 };
