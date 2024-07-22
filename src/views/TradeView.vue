@@ -760,6 +760,7 @@
           <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
             <thead>
               <tr>
+                <th>Side</th>
                 <th>Order ID</th>
                 <th>Symbol</th>
                 <th>Quantity</th>
@@ -770,6 +771,7 @@
             </thead>
             <tbody>
               <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
+                <td>{{ dhanOrder.transactionType }}</td>
                 <td>{{ dhanOrder.orderId }}</td>
                 <td>{{ dhanOrder.tradingSymbol }}</td>
                 <td>{{ dhanOrder.quantity }}</td>
@@ -789,6 +791,7 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
+                  <th scope="col">Side</th>
                   <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
@@ -801,6 +804,7 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
+                      <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.order.norenordno }}
                         {{ item.order.tsym }}
@@ -818,6 +822,7 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
+                      <td>{{ item.trade.trantype }}</td>
                       <td>
                         {{ item.trade.norenordno }}
                         {{ item.trade.tsym }}
@@ -843,6 +848,7 @@
               <thead>
                 <tr>
                   <th scope="col">Type</th>
+                  <th scope="col">Side</th>
                   <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
@@ -855,6 +861,7 @@
                   <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                     <tr v-if="item.order.status !== 'COMPLETE'">
                       <td>Order</td>
+                      <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.order.norenordno }}
                         {{ item.order.tsym }}
@@ -872,6 +879,7 @@
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
+                      <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.trade.norenordno }}
                         {{ item.trade.tsym }}
