@@ -766,7 +766,7 @@
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Execution Time</th>
-                <th>Status</th>
+                <th>Status & Reason</th>
               </tr>
             </thead>
             <tbody>
@@ -777,10 +777,21 @@
                 <td>{{ dhanOrder.quantity }}</td>
                 <td>{{ dhanOrder.price }}</td>
                 <td>{{ dhanOrder.createTime }}</td>
-                <td>{{ dhanOrder.orderStatus }}</td>
+                <td :class="{
+                      'text-danger': dhanOrder.orderStatus === 'REJECTED',
+                      'text-warning': dhanOrder.orderStatus === 'PENDING' || dhanOrder.orderStatus === 'OPEN'
+                    }">
+                  {{ dhanOrder.orderStatus }}
+                  <span v-if="dhanOrder.orderStatus === 'REJECTED'" 
+                        class="ms-2" 
+                        data-bs-toggle="tooltip" 
+                        :title="dhanOrder.omsErrorDescription">
+                    ℹ️
+                  </span>
+                </td>
               </tr>
               <tr v-if="dhanOrders.length === 0">
-                <td colspan="6" class="text-center">No orders or trades on selected broker {{
+                <td colspan="7" class="text-center">No orders or trades on selected broker {{
                   selectedBroker.brokerName }}</td>
               </tr>
             </tbody>
@@ -817,7 +828,12 @@
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
-                        {{ item.order.rejreason }}
+                        <span v-if="item.order.status === 'REJECTED'" 
+                              class="ms-2" 
+                              data-bs-toggle="tooltip" 
+                              :title="item.order.rejreason">
+                          ℹ️
+                        </span>
                       </td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
@@ -874,7 +890,12 @@
                         'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
                       }">
                         {{ item.order.status }}
-                        {{ item.order.rejreason }}
+                        <span v-if="item.order.status === 'REJECTED'" 
+                              class="ms-2" 
+                              data-bs-toggle="tooltip" 
+                              :title="item.order.rejreason">
+                          ℹ️
+                        </span>
                       </td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
@@ -1898,7 +1919,14 @@ const maskBrokerClientId = (clientId) => {
   return `${firstPart}${middleMask}${lastPart}`;
 };
 
-
+// Rejected Order tooltips...
+onMounted(() => {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
+  
 // Update the quantities object
 const quantities = ref({
   NIFTY: { lotSize: 25, maxLots: 10 },
