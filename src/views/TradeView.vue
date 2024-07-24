@@ -749,6 +749,12 @@
               </tbody>
             </table>
           </div>
+
+          <p class="text-secondary">
+            Stoploss and Target set in this app won't reflect on your broker's own Stoploss and Target. However, they
+            will close
+            positions when triggered, as long as this app is open and connected to the internet.
+          </p>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           <!-- Dhan Trades -->
