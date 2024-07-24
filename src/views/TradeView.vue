@@ -2857,6 +2857,47 @@ const setFlattradeCredentials = async () => {
     showToast.value = true;
   }
 };
+const setShoonyaCredentials = async () => {
+  try {
+    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
+      toastMessage.value = 'Realtime LTP data only available for Shoonya';
+      showToast.value = true;
+      return;
+    }
+
+    // Check if the broker status is 'Connected'
+    if (brokerStatus.value !== 'Connected') {
+      console.error('Flattrade broker is not connected');
+      toastMessage.value = 'Flattrade broker is not connected';
+      showToast.value = true;
+      return;
+    }
+
+    const clientId = selectedBroker.value.clientId;
+    const apiToken = localStorage.getItem('SHOONYA_API_TOKEN');
+
+    if (!clientId || !apiToken) {
+      console.error('Shoonya client ID or API token is missing');
+      toastMessage.value = 'Shoonya credentials are missing';
+      showToast.value = true;
+      return;
+    }
+
+    const response = await axios.post('http://localhost:3000/api/set-shoonya-credentials', {
+      usersession: apiToken,
+      userid: clientId,
+      defaultCallSecurityId: defaultCallSecurityId.value,
+      defaultPutSecurityId: defaultPutSecurityId.value
+    });
+    console.log('Credentials and security IDs set successfully:', response.data);
+    toastMessage.value = 'Shoonya credentials set successfully';
+    showToast.value = true;
+  } catch (error) {
+    console.error('Error setting credentials and security IDs:', error);
+    toastMessage.value = 'Failed to set Shoonya credentials';
+    showToast.value = true;
+  }
+};
 const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
@@ -3294,6 +3335,7 @@ watch(
       }
 
       setFlattradeCredentials();
+      setShoonyaCredentials();
     }
   },
   { deep: true }
