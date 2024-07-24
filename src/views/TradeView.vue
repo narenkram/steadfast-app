@@ -3334,8 +3334,12 @@ watch(
         latestPutLTP.value = 'N/A';
       }
 
-      setFlattradeCredentials();
-      setShoonyaCredentials();
+      if (selectedBroker.value?.brokerName === 'Flattrade') {
+        setFlattradeCredentials();
+      }
+      if (selectedBroker.value?.brokerName === 'Shoonya') {
+        setShoonyaCredentials();
+      }
     }
   },
   { deep: true }
