@@ -2906,7 +2906,7 @@ const defaultCallSecurityId = ref(null);
 const defaultPutSecurityId = ref(null);
 
 const connectWebSocket = () => {
-  socket.value = new WebSocket('ws://localhost:8765');
+  socket.value = new WebSocket(selectedBroker.value?.brokerName === 'Flattrade' ? 'ws://localhost:8765' : 'ws://localhost:8766');
 
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
