@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
-import { validateToken, checkAllTokens, getBrokerStatus } from '../utils/brokerTokenValidator';
+import { validateToken, checkAllTokens, getBrokerStatus, tokenStatus } from '../utils/brokerTokenValidator';
 
 const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');

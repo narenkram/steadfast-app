@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { tokenStatus, brokers } from './sharedState'
+import { reactive } from 'vue';
+
+const tokenStatus = reactive({
+  Flattrade: 'unknown',
+  Dhan: 'unknown',
+  Shoonya: 'unknown'
+})
 
 const flattradeFundLimits = async () => {
   const jKey = localStorage.getItem('FLATTRADE_API_TOKEN')
@@ -90,6 +96,7 @@ const validateToken = async (brokerName) => {
 }
 
 const checkAllTokens = async () => {
+  const brokers = ['Flattrade', 'Shoonya', 'Dhan']
   for (const broker of brokers) {
     await validateToken(broker)
   }
