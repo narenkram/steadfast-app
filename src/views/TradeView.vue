@@ -398,9 +398,15 @@
 
           <!-- Close & Cancel Buttons -->
           <div class="col-6 text-center">
-            <button class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
+            <button v-if="!selectedShoonyaPositions.length > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
+              @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Positions
+            </button>
+            <button v-if="selectedShoonyaPositions.length > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
+              @click="closeSelectedPositions">
+              <span v-if="enableHotKeys">F6 / </span>
+              Close Selected Positions
             </button>
             <button class="btn btn-lg btn-outline-dark fs-5 w-75" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
@@ -649,6 +655,7 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
+                  <th scope="col">Select</th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
@@ -664,11 +671,15 @@
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
+                      <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
+                        v-model="selectedShoonyaPositions" :value="shoonyaPosition"
+                        :disabled="shoonyaPosition.netqty <= 0" />
+                    </td>
+                    <td>
                       <div class="d-flex flex-column">
                         <div class="d-flex ">
                           {{ shoonyaPosition.tsym }}
                         </div>
-
                         <div class="d-flex flex-row">
                           <span
                             :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
@@ -682,7 +693,6 @@
                             Type: {{ shoonyaPosition.prd }}
                           </span>
                         </div>
-
                       </div>
                     </td>
                     <td>{{ shoonyaPosition.netavgprc }}</td>
@@ -748,7 +758,7 @@
                   </tr>
                 </template>
                 <tr v-else>
-                  <td colspan="9" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
+                  <td colspan="10" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
                   </td>
                 </tr>
               </tbody>
@@ -2415,6 +2425,50 @@ const closeAllPositions = async () => {
   }
 };
 
+// Add this to your reactive variables
+const selectedShoonyaPositions = ref([]);
+// Function to close selected positions
+const closeSelectedPositions = async () => {
+  try {
+    let positionsClosed = false;
+
+    // Create a copy of the selected positions to iterate over
+    const positionsToClose = [...selectedShoonyaPositions.value];
+
+    for (const position of positionsToClose) {
+      const netqty = Number(position.netqty);
+      if (netqty !== 0) {
+        const transactionType = netqty > 0 ? 'S' : 'B';
+        const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
+        await placeOrderForPosition(transactionType, optionType, position);
+        positionsClosed = true;
+
+        // Remove the closed position from the selected positions
+        selectedShoonyaPositions.value = selectedShoonyaPositions.value.filter(p => p.tsym !== position.tsym);
+      }
+    }
+
+    // Add a delay before fetching updated data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update both orders and positions
+    await updateOrdersAndPositions();
+
+    // Update fund limits
+    await updateFundLimits();
+
+    if (positionsClosed) {
+      toastMessage.value = `Selected positions closed successfully`;
+    } else {
+      toastMessage.value = `No positions to close`;
+    }
+    showToast.value = true;
+  } catch (error) {
+    console.error('Error closing selected positions:', error);
+    toastMessage.value = 'Failed to close selected positions';
+    showToast.value = true;
+  }
+};
 const cancelOrder = async (order) => {
   const orderId = selectedBroker.value?.brokerName === 'Dhan' ? order.orderId : order.norenordno;
   const orderStatus = selectedBroker.value?.brokerName === 'Dhan' ? order.orderStatus : order.status;
