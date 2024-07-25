@@ -813,6 +813,7 @@
                       <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.order.norenordno }}
+                        <br />
                         {{ item.order.tsym }}
                       </td>
                       <td>{{ item.order.qty }}</td>
@@ -831,6 +832,7 @@
                       <td>{{ item.trade.trantype }}</td>
                       <td>
                         {{ item.trade.norenordno }}
+                        <br />
                         {{ item.trade.tsym }}
                       </td>
                       <td>{{ item.trade.qty }}</td>
@@ -870,6 +872,7 @@
                       <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.order.norenordno }}
+                        <br />
                         {{ item.order.tsym }}
                       </td>
                       <td>{{ item.order.qty }}</td>
@@ -888,6 +891,7 @@
                       <td>{{ item.order.trantype }}</td>
                       <td>
                         {{ item.trade.norenordno }}
+                        <br />
                         {{ item.trade.tsym }}
                       </td>
                       <td>{{ item.trade.qty }}</td>
