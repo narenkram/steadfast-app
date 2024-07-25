@@ -656,7 +656,7 @@
               <thead>
                 <tr>
                   <th scope="col">
-                    <input type="checkbox" @change="toggleSelectAllShoonyaPositions($event)" />
+                    Select
                   </th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
@@ -2430,14 +2430,6 @@ const closeAllPositions = async () => {
 // Add this to your reactive variables
 const selectedShoonyaPositionsSet = ref(new Set());
 
-// Function to toggle select all positions
-const toggleSelectAllShoonyaPositions = (event) => {
-  if (event.target.checked) {
-    selectedShoonyaPositionsSet.value = new Set(shoonyaPositionBook.value.map(p => p.tsym));
-  } else {
-    selectedShoonyaPositionsSet.value.clear();
-  }
-};
 // Function to close selected positions
 const closeSelectedPositions = async () => {
   try {
