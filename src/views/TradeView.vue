@@ -401,7 +401,7 @@
             <button v-if="selectedShoonyaPositionsSet.size === 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
               @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
-              Close Positions
+              Close All Positions
             </button>
             <button v-if="selectedShoonyaPositionsSet.size > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
               @click="closeSelectedPositions">
