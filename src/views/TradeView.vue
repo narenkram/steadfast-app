@@ -398,12 +398,12 @@
 
           <!-- Close & Cancel Buttons -->
           <div class="col-6 text-center">
-            <button v-if="!selectedShoonyaPositions.length > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
+            <button v-if="selectedShoonyaPositionsSet.size === 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
               @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Positions
             </button>
-            <button v-if="selectedShoonyaPositions.length > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
+            <button v-if="selectedShoonyaPositionsSet.size > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
               @click="closeSelectedPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Selected Positions
@@ -655,7 +655,9 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Select</th>
+                  <th scope="col">
+                    <input type="checkbox" @change="toggleSelectAllShoonyaPositions($event)" />
+                  </th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
@@ -672,7 +674,7 @@
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
                       <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
-                        v-model="selectedShoonyaPositions" :value="shoonyaPosition"
+                        v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
                         :disabled="shoonyaPosition.netqty <= 0" />
                     </td>
                     <td>
@@ -2426,16 +2428,26 @@ const closeAllPositions = async () => {
 };
 
 // Add this to your reactive variables
-const selectedShoonyaPositions = ref([]);
+const selectedShoonyaPositionsSet = ref(new Set());
+
+// Function to toggle select all positions
+const toggleSelectAllShoonyaPositions = (event) => {
+  if (event.target.checked) {
+    selectedShoonyaPositionsSet.value = new Set(shoonyaPositionBook.value.map(p => p.tsym));
+  } else {
+    selectedShoonyaPositionsSet.value.clear();
+  }
+};
 // Function to close selected positions
 const closeSelectedPositions = async () => {
   try {
     let positionsClosed = false;
 
     // Create a copy of the selected positions to iterate over
-    const positionsToClose = [...selectedShoonyaPositions.value];
+    const positionsToClose = [...selectedShoonyaPositionsSet.value];
 
-    for (const position of positionsToClose) {
+    for (const tsym of positionsToClose) {
+      const position = shoonyaPositionBook.value.find(p => p.tsym === tsym);
       const netqty = Number(position.netqty);
       if (netqty !== 0) {
         const transactionType = netqty > 0 ? 'S' : 'B';
@@ -2444,7 +2456,7 @@ const closeSelectedPositions = async () => {
         positionsClosed = true;
 
         // Remove the closed position from the selected positions
-        selectedShoonyaPositions.value = selectedShoonyaPositions.value.filter(p => p.tsym !== position.tsym);
+        selectedShoonyaPositionsSet.value.delete(tsym);
       }
     }
 
