@@ -61,10 +61,15 @@
           <p class="mt-2 mb-0">₹ {{ usedAmount || null }}</p>
         </div>
 
-        <!-- Today's date -->
+        <!-- Today's Expiry -->
         <div class="col-2 text-end">
-          <p class="mb-1"><b>Today's date</b></p>
-          <p class="mt-2 mb-0">{{ formattedDate }}</p>
+          <p class="mb-1"><b>Today's Expiry</b></p>
+          <p v-if="isExpiryToday" class="text-danger">
+            <b>{{ selectedMasterSymbol }}</b>
+          </p>
+          <p v-else class="text-danger">
+            <b>-</b>
+          </p>
         </div>
 
       </div>
@@ -1301,6 +1306,18 @@ const formatDate = (dateString) => {
   }
   return dateString; // Default case, return the original date string
 };
+const convertToComparableDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { day: '2-digit', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options).replace(/,/g, '');
+};
+const isExpiryToday = computed(() => {
+  const comparableSelectedExpiry = convertToComparableDate(formatDate(selectedExpiry.value));
+  const comparableFormattedDate = convertToComparableDate(formattedDate.value);
+  console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
+  console.log('Comparable Formatted Date:', comparableFormattedDate);
+  return comparableSelectedExpiry === comparableFormattedDate;
+});
 
 const updateStrikesForExpiry = (expiryDate) => {
   console.log('Updating strikes for expiry:', expiryDate);
@@ -3437,7 +3454,7 @@ watch(enableHotKeys, (newValue) => {
 
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
-  console.log('positionLTPs updated:', newLTPs);
+  // console.log('positionLTPs updated:', newLTPs);
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
       console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
