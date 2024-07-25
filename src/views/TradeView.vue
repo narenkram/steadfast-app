@@ -237,8 +237,24 @@
                 </option>
               </select>
               <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'LMT'">
-                <input type="number" id="DirectLimitPrice" class="form-control" v-model="limitPrice"
-                  placeholder="Price">
+                <input type="number" id="NorenDirectLimitPrice" class="form-control" v-model="limitPrice"
+                  placeholder="Price" style="font-size: 16px;">
+              </span>
+              <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'LIMIT'">
+                <input type="number" id="DhanLimitPrice" class="form-control" v-model="limitPrice"
+                  placeholder="Price" style="font-size: 16px;">
+              </span>              
+              <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'SL-LMT'">
+                <input type="number" id="TriggerPrice" class="form-control" v-model="triggerPrice" 
+                  placeholder="Trigger Price" style="font-size: 12px;">
+                <input type="number" id="NorenStopLossLimitPrice" class="form-control" 
+                  v-model="stopLossLimitPrice" placeholder="Price" style="font-size: 12px;">
+              </span>
+              <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'STOP_LOSS'">
+                <input type="number" id="TriggerPrice" class="form-control" v-model="triggerPrice" 
+                  placeholder="Trigger Price" style="font-size: 12px;">
+                <input type="number" id="DhanStopLossLimitPrice" class="form-control" 
+                  v-model="stopLossLimitPrice" placeholder="Price" style="font-size: 12px;">
               </span>
             </div>
           </div>
@@ -364,8 +380,8 @@
           <div class="col-3">
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
-                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) && placeOrder(getTransactionType('BUY'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬆️</span>
                 Buy CE
               </button>
@@ -376,12 +392,14 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li><a class="dropdown-item" @click="setStopLossLimitOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceStopLossLimitOrderWindow">Place SL LIMIT Order</a></li>                    
               </ul>
             </div>
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
-                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) && placeOrder(getTransactionType('SELL'), 'CALL')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬅️</span>
                 Sell CE
               </button>
@@ -392,10 +410,12 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li><a class="dropdown-item" @click="setStopLossLimitOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceStopLossLimitOrderWindow">Place SL LIMIT Order</a></li>                           
               </ul>
             </div>
           </div>
-
+          
           <!-- Close & Cancel Buttons -->
           <div class="col-6 text-center">
             <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
@@ -418,8 +438,8 @@
           <div class="col-3">
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
-                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
-                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) && placeOrder(getTransactionType('BUY'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬇️</span>
                 Buy PE
               </button>
@@ -430,12 +450,14 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li><a class="dropdown-item" @click="setStopLossLimitOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceStopLossLimitOrderWindow">Place SL LIMIT Order</a></li>                           
               </ul>
             </div>
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
-                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
-                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
+                @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) && placeOrder(getTransactionType('SELL'), 'PUT')"
+                v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1] && orderTypes.value[2]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">➡️</span>
                 Sell PE
               </button>
@@ -446,6 +468,8 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li><a class="dropdown-item" @click="setStopLossLimitOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
+                    data-bs-target="#PlaceStopLossLimitOrderWindow">Place SL LIMIT Order</a></li>                           
               </ul>
             </div>
           </div>
@@ -791,6 +815,7 @@
                 <th>Symbol</th>
                 <th>Quantity</th>
                 <th>Price</th>
+                <th>Trigger <br> Price</th>
                 <th>Execution Time</th>
                 <th>Status</th>
               </tr>
@@ -802,6 +827,8 @@
                 <td>{{ dhanOrder.tradingSymbol }}</td>
                 <td>{{ dhanOrder.quantity }}</td>
                 <td>{{ dhanOrder.price }}</td>
+                <td v-if="['PENDING', 'OPEN', 'REJECTED', 'TRANSIT', 'EXPIRED', 'CANCELLED', 'TRADED'].includes(dhanOrder.orderStatus)">
+                    {{ dhanOrder.triggerPrice === 0 ? '-' : dhanOrder.triggerPrice }}</td>
                 <td>{{ dhanOrder.createTime }}</td>
                 <td>{{ dhanOrder.orderStatus }}</td>
               </tr>
@@ -821,6 +848,7 @@
                   <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
+                  <th scope="col">Trigger <br> Price</th>
                   <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
                 </tr>
@@ -838,6 +866,7 @@
                       </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.trgprc || '-' }}</td>
                       <td>{{ formatTime(item.order.norentm) }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
@@ -857,6 +886,7 @@
                       </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
+                      <td> - </td>
                       <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                     </tr>
@@ -880,6 +910,7 @@
                   <th scope="col">Details</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Price</th>
+                  <th scope="col">Trigger <br> Price</th>
                   <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
                 </tr>
@@ -897,6 +928,7 @@
                       </td>
                       <td>{{ item.order.qty }}</td>
                       <td>{{ item.order.prc }}</td>
+                      <td>{{ item.order.trgprc || '-' }}</td>
                       <td>{{ formatTime(item.order.norentm) }}</td>
                       <td :class="{
                         'text-danger': item.order.status === 'REJECTED',
@@ -916,6 +948,7 @@
                       </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
+                      <td> - </td>                      
                       <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
                     </tr>
@@ -994,6 +1027,46 @@
       </div>
     </div>
   </div>
+
+  <!-- Stop Loss Limit Order Input Modal-->
+  <div class="modal fade" id="PlaceStopLossLimitOrderWindow" tabindex="-1" aria-labelledby="PlaceStopLossLimitOrderWindowLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="PlaceStopLossLimitOrderWindowLabel">
+            {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{ selectedStrike.strikePrice
+            }}
+            {{
+              selectedStrike.expiryDate }}
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="resetOrderType"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-6">
+              <label for="TriggerPrice" class="form-label mb-0">Trigger Price</label>
+              <input type="number" id="TriggerPrice" class="form-control" v-model="triggerPrice"
+                placeholder="Enter trigger price">
+            </div>
+            <div class="col-6">
+              <label for="stopLossLimitPrice" class="form-label mb-0">Limit Price</label>
+              <input type="number" id="stopLossLimitPrice" class="form-control" v-model="stopLossLimitPrice"
+                placeholder="Enter limit price">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            @click="resetOrderTypeIfNeeded">Cancel</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+            @click="placeOrder(modalTransactionType, modalOptionType)">Place
+            Order</button>
+        </div>
+      </div>
+    </div>
+  </div>  
 
   <!-- Kill Swtich Activation Confirmation Modal -->
   <div class="modal fade" id="KillSwitchActivationConfirmationModal" tabindex="-1"
@@ -1936,11 +2009,11 @@ const availableQuantities = ref([]);
 
 const orderTypes = computed(() => {
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    return ['MARKET', 'LIMIT'];
+    return ['MARKET', 'LIMIT', 'STOP_LOSS'];
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return ['MKT', 'LMT'];
+    return ['MKT', 'LMT','SL-LMT'];
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return ['MKT', 'LMT'];
+    return ['MKT', 'LMT','SL-LMT'];
   }
   return [];
 });
@@ -2002,6 +2075,8 @@ const getTransactionType = (type) => {
 };
 
 const limitPrice = ref(null);
+const stopLossLimitPrice = ref(null);
+const triggerPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
 // Get Exchange Segment for Dhan or Flattrade
@@ -2054,7 +2129,8 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       tradingSymbol: selectedStrike.tradingSymbol,
       securityId: selectedStrike.securityId,
       quantity: selectedQuantity.value,
-      price: selectedOrderType.value === 'LIMIT' ? limitPrice.value : 0,
+      price: selectedOrderType.value === 'STOP_LOSS'? stopLossLimitPrice.value : selectedOrderType.value === 'LIMIT'? limitPrice.value : 0,
+      triggerPrice: selectedOrderType.value === 'STOP_LOSS'? triggerPrice.value : 0,
       drvExpiryDate: selectedExpiry.value,
       drvOptionType: drvOptionType
     };
@@ -2065,7 +2141,8 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       exch: exchangeSegment,
       tsym: selectedStrike.tradingSymbol,
       qty: selectedQuantity.value,
-      prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
+      prc: selectedOrderType.value === 'SL-LMT'? stopLossLimitPrice.value : selectedOrderType.value === 'LMT'? limitPrice.value : 0,
+      trgprc: selectedOrderType.value === 'SL-LMT'? triggerPrice.value : 0,
       prd: selectedProductType.value,
       trantype: transactionType,
       prctyp: selectedOrderType.value,
@@ -2079,7 +2156,8 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       exch: exchangeSegment,
       tsym: selectedStrike.tradingSymbol,
       qty: selectedQuantity.value,
-      prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
+      prc: selectedOrderType.value === 'SL-LMT'? stopLossLimitPrice.value : selectedOrderType.value === 'LMT'? limitPrice.value : 0,
+      trgprc: selectedOrderType.value === 'SL-LMT'? triggerPrice.value : 0,
       prd: selectedProductType.value,
       trantype: transactionType,
       prctyp: selectedOrderType.value,
@@ -2089,6 +2167,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     throw new Error("Unsupported broker");
   }
 };
+  
 // With a reactive object
 // Modify the tradeSettings reactive object
 const tradeSettings = reactive({
