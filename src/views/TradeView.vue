@@ -398,13 +398,13 @@
 
           <!-- Close & Cancel Buttons -->
           <div class="col-6 text-center">
-            <button v-if="selectedShoonyaPositionsSet.size === 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
-              @click="closeAllPositions">
+            <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
+              class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close All Positions
             </button>
-            <button v-if="selectedShoonyaPositionsSet.size > 0" class="btn btn-lg btn-outline-dark fs-5 w-75 my-2"
-              @click="closeSelectedPositions">
+            <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
+              class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeSelectedPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Selected Positions
             </button>
@@ -545,6 +545,9 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
+                  <th scope="col">
+                    Select
+                  </th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
@@ -559,6 +562,11 @@
               <tbody>
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
+                    <td>
+                      <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
+                        v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
+                        :disabled="flattradePosition.netqty <= 0" />
+                    </td>
                     <td>
                       <div class="d-flex flex-column">
                         <div class="d-flex ">
@@ -644,7 +652,7 @@
                   </tr>
                 </template>
                 <tr v-else>
-                  <td colspan="9" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
+                  <td colspan="10" class="text-center">No positions on selected broker {{ selectedBroker.brokerName }}
                   </td>
                 </tr>
               </tbody>
@@ -2429,26 +2437,46 @@ const closeAllPositions = async () => {
 
 // Add this to your reactive variables
 const selectedShoonyaPositionsSet = ref(new Set());
+const selectedFlattradePositionsSet = ref(new Set());
 
-// Function to close selected positions
+// Function to close selected positions based on the selected broker
 const closeSelectedPositions = async () => {
   try {
     let positionsClosed = false;
 
-    // Create a copy of the selected positions to iterate over
-    const positionsToClose = [...selectedShoonyaPositionsSet.value];
+    if (selectedBroker.value?.brokerName === 'Shoonya') {
+      // Create a copy of the selected positions to iterate over
+      const positionsToClose = [...selectedShoonyaPositionsSet.value];
 
-    for (const tsym of positionsToClose) {
-      const position = shoonyaPositionBook.value.find(p => p.tsym === tsym);
-      const netqty = Number(position.netqty);
-      if (netqty !== 0) {
-        const transactionType = netqty > 0 ? 'S' : 'B';
-        const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
-        await placeOrderForPosition(transactionType, optionType, position);
-        positionsClosed = true;
+      for (const tsym of positionsToClose) {
+        const position = shoonyaPositionBook.value.find(p => p.tsym === tsym);
+        const netqty = Number(position.netqty);
+        if (netqty !== 0) {
+          const transactionType = netqty > 0 ? 'S' : 'B';
+          const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
+          await placeOrderForPosition(transactionType, optionType, position);
+          positionsClosed = true;
 
-        // Remove the closed position from the selected positions
-        selectedShoonyaPositionsSet.value.delete(tsym);
+          // Remove the closed position from the selected positions
+          selectedShoonyaPositionsSet.value.delete(tsym);
+        }
+      }
+    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      // Create a copy of the selected positions to iterate over
+      const positionsToClose = [...selectedFlattradePositionsSet.value];
+
+      for (const tsym of positionsToClose) {
+        const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+        const netqty = Number(position.netqty);
+        if (netqty !== 0) {
+          const transactionType = netqty > 0 ? 'S' : 'B';
+          const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT';
+          await placeOrderForPosition(transactionType, optionType, position);
+          positionsClosed = true;
+
+          // Remove the closed position from the selected positions
+          selectedFlattradePositionsSet.value.delete(tsym);
+        }
       }
     }
 
