@@ -2027,6 +2027,12 @@ const setOrderDetails = (transactionType, optionType) => {
   selectedOrderType.value = orderTypes.value[1]; // Set selectedOrderType to LIMIT or LMT based on broker
   selectedStrike.value = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
 };
+const setStopLossLimitOrderDetails = (transactionType, optionType) => {
+  modalTransactionType.value = getTransactionType(transactionType); // Use getTransactionType to set modalTransactionType
+  modalOptionType.value = optionType;
+  selectedOrderType.value = orderTypes.value[2]; // Set selectedOrderType to STOP_LOSS or SL-LMT based on broker
+  selectedStrike.value = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
+};
 const resetOrderTypeIfNeeded = () => {
   if (previousOrderType.value === orderTypes.value[0]) { // Check if previousOrderType is MARKET or MKT
     resetOrderType();
