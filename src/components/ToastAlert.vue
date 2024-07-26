@@ -1,8 +1,8 @@
 <template>
-    <div v-if="show" class="toast" :class="{ 'show': show }" role="alert" aria-live="assertive" aria-atomic="true">
+    <div v-if="show" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" @click="hide"></button>
+            <button type="button" class="btn-close" @click="hide" aria-label="Close"></button>
         </div>
         <div class="toast-body">
             {{ message }}

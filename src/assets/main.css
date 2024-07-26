@@ -117,12 +117,11 @@ th {
 }
 
 .toast {
-  position: absolute;
+  position: fixed;
   top: 10%;
-  z-index: 1000;
-  transform: translateY(-50%);
-  transform: translateX(-50%);
   left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
 }
 
 .dropdown-menu {
