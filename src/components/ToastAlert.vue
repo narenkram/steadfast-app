@@ -1,11 +1,11 @@
 <template>
     <div v-if="show" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-            <strong class="me-auto">Notification</strong>
+            <strong class="me-auto">🔔 Notification</strong>
             <button type="button" class="btn-close" @click="hide" aria-label="Close"></button>
         </div>
-        <div class="toast-body">
-            {{ message }}
+        <div class="toast-body bg-light text-center">
+            <span class="text-muted fs-6">{{ message }}</span>
         </div>
     </div>
 </template>

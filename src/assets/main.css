@@ -122,6 +122,7 @@ th {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
+  overflow: hidden;
 }
 
 .dropdown-menu {
