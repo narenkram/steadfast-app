@@ -1998,8 +1998,8 @@ const maskBrokerClientId = (clientId) => {
 const quantities = ref({
   NIFTY: { lotSize: 25, maxLots: 10 },
   BANKNIFTY: { lotSize: 15, maxLots: 10 },
-  FINNIFTY: { lotSize: 40, maxLots: 10 },
-  MIDCPNIFTY: { lotSize: 75, maxLots: 10 },
+  FINNIFTY: { lotSize: 25, maxLots: 10 },
+  MIDCPNIFTY: { lotSize: 50, maxLots: 10 },
   NIFTYNXT50: { lotSize: 10, maxLots: 10 },
   SENSEX: { lotSize: 10, maxLots: 10 },
   BANKEX: { lotSize: 15, maxLots: 10 },
