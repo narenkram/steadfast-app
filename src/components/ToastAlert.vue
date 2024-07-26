@@ -25,9 +25,13 @@ export default {
     watch: {
         show(newVal) {
             if (newVal) {
+                // Play notification sound
+                const audio = new Audio('/cyberpunk-notification.mp3');
+                audio.play();
+
                 setTimeout(() => {
                     this.hide();
-                }, 3000); // Hide after 5 seconds
+                }, 3000); // Hide after 3 seconds
             }
         }
     },
