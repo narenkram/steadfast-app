@@ -3,9 +3,20 @@
         <!-- Hero Section -->
         <section class="row py-5 bg-light">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-4 mb-4">Steadfast</h1>
-                <p class="lead mb-5">Your Ultimate Options Trading Companion</p>
-                <button @click="openTradeView" class="btn btn-primary btn-lg mb-5">Launch App</button>
+                <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
+                <h1 class="display-3 mb-4">Steadfast</h1>
+                <blockquote class="blockquote mb-5">
+                    <p>
+                        Designed to survive and thrive in the options market.
+                    </p>
+                </blockquote>
+                <button @click="openTradeView" class="btn btn-dark btn-lg">
+                    ⚡ Launch App
+                </button>
+                <br />
+                <a href="https://t.me/steadfastapp" target="_blank" class="mt-5 btn btn-outline-muted">
+                    💬 Join Telegram Community
+                </a>
             </div>
         </section>
 
@@ -97,14 +108,14 @@
         </section> -->
 
         <!-- Community Section -->
-        <section class="row py-5">
+        <!-- <section class="row py-5">
             <div class="col-lg-8 mx-auto text-center">
                 <h2 class="mb-4">Join Our Community</h2>
                 <p class="mb-4">Stay updated with the latest features and trading insights.</p>
                 <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline-primary btn-lg">Join
                     Telegram Channel</a>
             </div>
-        </section>
+        </section> -->
     </div>
 </template>
 <script setup>
@@ -122,9 +133,9 @@ onMounted(() => {
 
     window.addEventListener('beforeunload', () => {
         if (tradeViewWindow.value) {
-            tradeViewWindow.value.close()
+            tradeViewWindow.value.close();
         }
-    })
+    });
 });
 
 </script>
