@@ -101,7 +101,7 @@
             <div class="col-lg-8 mx-auto text-center">
                 <h2 class="mb-4">Join Our Community</h2>
                 <p class="mb-4">Stay updated with the latest features and trading insights.</p>
-                <a href="https://t.me/steadfaststoic" target="_blank" class="btn btn-outline-primary btn-lg">Join
+                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline-primary btn-lg">Join
                     Telegram Channel</a>
             </div>
         </section>
