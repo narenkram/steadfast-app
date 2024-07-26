@@ -3002,6 +3002,47 @@ const setShoonyaCredentials = async () => {
     showToast.value = true;
   }
 };
+const setDhanCredentials = async () => {
+  try {
+    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Dhan') {
+      toastMessage.value = 'Realtime LTP data only available for Dhan';
+      showToast.value = true;
+      return;
+    }
+
+    // Check if the broker status is 'Connected'
+    if (brokerStatus.value !== 'Connected') {
+      console.error('Dhan broker is not connected');
+      toastMessage.value = 'Dhan broker is not connected';
+      showToast.value = true;
+      return;
+    }
+
+    const clientId = selectedBroker.value.clientId;
+    const apiToken = localStorage.getItem('DHAN_API_TOKEN');
+
+    if (!clientId || !apiToken) {
+      console.error('Dhan client ID or API token is missing');
+      toastMessage.value = 'Dhan credentials are missing';
+      showToast.value = true;
+      return;
+    }
+
+    const response = await axios.post('http://localhost:3000/api/set-dhan-credentials', {
+      usersession: apiToken,
+      userid: clientId,
+      defaultCallSecurityId: defaultCallSecurityId.value,
+      defaultPutSecurityId: defaultPutSecurityId.value
+    });
+    console.log('Credentials and security IDs set successfully:', response.data);
+    toastMessage.value = 'Dhan credentials set successfully';
+    showToast.value = true;
+  } catch (error) {
+    console.error('Error setting credentials and security IDs:', error);
+    toastMessage.value = 'Failed to set Dhan credentials';
+    showToast.value = true;
+  }
+};
 const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
@@ -3010,7 +3051,16 @@ const defaultCallSecurityId = ref(null);
 const defaultPutSecurityId = ref(null);
 
 const connectWebSocket = () => {
-  socket.value = new WebSocket(selectedBroker.value?.brokerName === 'Flattrade' ? 'ws://localhost:8765' : 'ws://localhost:8766');
+  let websocketUrl;
+
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    websocketUrl = 'ws://localhost:8765';
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    websocketUrl = 'ws://localhost:8766';
+  } else if (selectedBroker.value?.brokerName === 'Dhan') {
+    websocketUrl = 'ws://localhost:8767';
+  }
+  socket.value = new WebSocket(websocketUrl);
 
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
@@ -3443,6 +3493,9 @@ watch(
       }
       if (selectedBroker.value?.brokerName === 'Shoonya') {
         setShoonyaCredentials();
+      }
+      if (selectedBroker.value?.brokerName === 'Dhan') {
+        setDhanCredentials();
       }
     }
   },
