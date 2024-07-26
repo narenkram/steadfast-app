@@ -218,7 +218,7 @@
             <label for="Quantity" class="form-label mb-0">
               {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity</label>
             <div class="input-group">
-              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" min="1" max="36"
+              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" min="1" max="56"
                 @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }">
               <span class="input-group-text">{{ selectedQuantity }}</span>
             </div>
@@ -1495,7 +1495,7 @@ const updateAvailableQuantities = () => {
 const updateSelectedQuantity = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
   if (instrument) {
-    const lots = Math.min(Math.max(1, selectedLots.value), 36);
+    const lots = Math.min(Math.max(1, selectedLots.value), 56);
     lotsPerSymbol.value[selectedMasterSymbol.value] = lots;
     selectedQuantity.value = lots * instrument.lotSize;
     saveLots();
