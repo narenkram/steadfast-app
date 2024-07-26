@@ -594,7 +594,7 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableStoploss === true">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2">
+                          <div class="ms-2 d-flex flex-row">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success ms-2"
@@ -618,7 +618,7 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableTarget === true">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2">
+                          <div class="ms-2 d-flex flex-row">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success ms-2"
@@ -710,7 +710,7 @@
                     <td>
                       <template v-if="Number(shoonyaPosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2">
+                          <div class="ms-2 d-flex flex-row">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success ms-2"
@@ -734,7 +734,7 @@
                     <td>
                       <template v-if="Number(shoonyaPosition.netqty) !== 0">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2">
+                          <div class="ms-2 d-flex flex-row">
                             <button class="btn btn-sm btn-outline-danger"
                               @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)">➖</button>
                             <button class="btn btn-sm btn-outline-success ms-2"
