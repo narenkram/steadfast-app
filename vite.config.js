@@ -15,6 +15,7 @@ export default defineConfig({
     proxy: {
       '/dhanSymbols': 'http://localhost:3000',
       '/flattradeSymbols': 'http://localhost:3000',
+      '/shoonyaSymbols': 'http://localhost:3000',
       '/flattradeApi': {
         target: 'https://authapi.flattrade.in',
         changeOrigin: true,
