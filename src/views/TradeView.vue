@@ -545,14 +545,11 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
-                  <th scope="col">
-                    Select
-                  </th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
-                  <th>Stoploss</th>
-                  <th>Target</th>
+                  <th scope="col" class="text-center">Stoploss</th>
+                  <th scope="col" class="text-center">Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
@@ -563,12 +560,11 @@
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                     <td>
-                      <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
-                        v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
-                        :disabled="flattradePosition.netqty <= 0" />
-                    </td>
-                    <td>
-                      <div class="d-flex flex-column">
+                      <div class="d-flex flex-column align-items-start">
+                        <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
+                          v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
+                          :disabled="flattradePosition.netqty <= 0" />
+
                         <div class="d-flex ">
                           {{ flattradePosition.tsym }}
                         </div>
@@ -663,14 +659,11 @@
             <table class="table table-responsive table-hover">
               <thead>
                 <tr>
-                  <th scope="col">
-                    Select
-                  </th>
                   <th scope="col">Symbol Details</th>
                   <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
-                  <th scope="col">Stoploss</th>
-                  <th scope="col">Target</th>
+                  <th scope="col" class="text-center">Stoploss</th>
+                  <th scope="col" class="text-center">Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
@@ -681,12 +674,10 @@
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
-                      <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
-                        v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
-                        :disabled="shoonyaPosition.netqty <= 0" />
-                    </td>
-                    <td>
-                      <div class="d-flex flex-column">
+                      <div class="d-flex flex-column align-items-start">
+                        <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
+                          v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
+                          :disabled="shoonyaPosition.netqty <= 0" />
                         <div class="d-flex ">
                           {{ shoonyaPosition.tsym }}
                         </div>
