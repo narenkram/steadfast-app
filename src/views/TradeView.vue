@@ -809,6 +809,7 @@
                 <th>Trigger <br> Price</th>
                 <th>Execution Time</th>
                 <th>Status</th>
+                <th class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -822,6 +823,12 @@
                     {{ dhanOrder.triggerPrice === 0 ? '-' : dhanOrder.triggerPrice }}</td>
                 <td>{{ dhanOrder.createTime }}</td>
                 <td>{{ dhanOrder.orderStatus }}</td>
+                <td v-if="dhanOrder.orderStatus === 'PENDING'">
+                  <button @click="cancelOpenOrder(dhanOrder.orderId)" class="btn btn-sm btn-outline-danger">
+                    🗑️
+                  </button>
+                </td>
+                <td v-else> </td>
               </tr>
               <tr v-if="dhanOrders.length === 0">
                 <td colspan="6" class="text-center">No orders or trades on selected broker {{
@@ -842,6 +849,7 @@
                   <th scope="col">Trigger <br> Price</th>
                   <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
+                  <th scope="col" class="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -866,6 +874,12 @@
                         {{ item.order.status }}
                         {{ item.order.rejreason }}
                       </td>
+                      <td v-if="item.order.status === 'OPEN'">
+                        <button @click="cancelOpenOrder(item.order.norenordno)" class="btn btn-sm btn-outline-danger">
+                          🗑️
+                        </button>
+                      </td>
+                      <td v-else> </td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
@@ -880,6 +894,7 @@
                       <td> - </td>
                       <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
+                      <td> </td>
                     </tr>
                   </template>
                 </template>
@@ -904,6 +919,7 @@
                   <th scope="col">Trigger <br> Price</th>
                   <th scope="col">Time</th>
                   <th scope="col">Status & Reason</th>
+                  <th scope="col" class="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -928,10 +944,16 @@
                         {{ item.order.status }}
                         {{ item.order.rejreason }}
                       </td>
+                      <td v-if="item.order.status === 'OPEN'">
+                        <button @click="cancelOpenOrder(item.order.norenordno)" class="btn btn-sm btn-outline-danger">
+                          🗑️
+                        </button>
+                      </td>
+                      <td v-else> </td>
                     </tr>
                     <tr v-if="item.trade" class="nested-trade-row">
                       <td>Trade</td>
-                      <td>{{ item.order.trantype }}</td>
+                      <td>{{ item.trade.trantype }}</td>
                       <td>
                         {{ item.trade.norenordno }}
                         <br />
@@ -939,9 +961,10 @@
                       </td>
                       <td>{{ item.trade.qty }}</td>
                       <td>{{ item.trade.flprc }}</td>
-                      <td> - </td>                      
+                      <td> - </td>
                       <td>{{ formatTime(item.trade.norentm) }}</td>
                       <td class="text-success">{{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}</td>
+                      <td> </td>
                     </tr>
                   </template>
                 </template>
@@ -2695,6 +2718,60 @@ const formatPrice = (price) => {
 const getSymbol = (position) => {
   return position.tsym || position.tradingSymbol || '';
 };
+
+// Cancel Open Order from Trades Tab...  
+const cancelOpenOrder = async (orderId) => {
+  console.log(`Canceling open order with ID: ${orderId}`);
+  try {
+    if (selectedBroker.value?.brokerName === 'Dhan') {
+      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
+      console.log(`Sending request to cancel Dhan order ${orderId}`);
+      await axios.delete('http://localhost:3000/dhanCancelOrder', {
+        data: { orderId },
+        params: {
+          DHAN_API_TOKEN: dhanDetails.apiToken
+        }
+      });
+      await fetchDhanOrdersTradesBook();
+    }
+    else if (selectedBroker.value?.brokerName === 'Flattrade') {
+      const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
+      const clientId = selectedBroker.value.clientId;
+      console.log(`Sending request to cancel Flattrade order ${orderId}`);
+      await axios.post('http://localhost:3000/flattradeCancelOrder', {
+        norenordno: orderId,
+        uid: clientId
+      }, {
+        params: {
+          FLATTRADE_API_TOKEN: jKey
+        }
+      });
+      await fetchFlattradeOrdersTradesBook();
+    }
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      const jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
+      const clientId = selectedBroker.value.clientId;
+      console.log(`Sending request to cancel Shoonya order ${orderId}`);
+      await axios.post('http://localhost:3000/shoonyaCancelOrder', {
+        norenordno: orderId,
+        uid: clientId
+      }, {
+        params: {
+          SHOONYA_API_TOKEN: jKey
+        }
+      });
+      await fetchShoonyaOrdersTradesBook();
+    }
+    console.log(`Order ${orderId} canceled successfully.`);
+    await updateFundLimits();
+  } catch (error) {
+    console.error(`Failed to cancel order ${orderId}:`, error);
+    toastMessage.value = 'Failed to cancel order';
+    showToast.value = true;
+    throw error; 
+  }
+};
+
 // Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
   const tsym = getSymbol(position);
