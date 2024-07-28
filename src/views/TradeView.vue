@@ -3002,6 +3002,7 @@ const setShoonyaCredentials = async () => {
     showToast.value = true;
   }
 };
+
 const setDhanCredentials = async () => {
   try {
     if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Dhan') {
@@ -3031,6 +3032,8 @@ const setDhanCredentials = async () => {
     const response = await axios.post('http://localhost:3000/api/set-dhan-credentials', {
       accessToken: apiToken, // Corrected key
       clientId: clientId,    // Corrected key
+      dhanExchangeSegment: "0",  // Send as string
+      dhanSecurityId: "25"       // Send as string
     });
     console.log('Credentials and security IDs set successfully:', response.data);
     toastMessage.value = 'Dhan credentials set successfully';
