@@ -3029,10 +3029,8 @@ const setDhanCredentials = async () => {
     }
 
     const response = await axios.post('http://localhost:3000/api/set-dhan-credentials', {
-      usersession: apiToken,
-      userid: clientId,
-      defaultCallSecurityId: defaultCallSecurityId.value,
-      defaultPutSecurityId: defaultPutSecurityId.value
+      accessToken: apiToken, // Corrected key
+      clientId: clientId,    // Corrected key
     });
     console.log('Credentials and security IDs set successfully:', response.data);
     toastMessage.value = 'Dhan credentials set successfully';
@@ -3060,12 +3058,14 @@ const connectWebSocket = () => {
   } else if (selectedBroker.value?.brokerName === 'Dhan') {
     websocketUrl = 'ws://localhost:8767';
   }
+
+  console.log(`Connecting to WebSocket at ${websocketUrl}`);
   socket.value = new WebSocket(websocketUrl);
 
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
-    // console.log('Received data:', quoteData);
+    console.log('WebSocket message received:', quoteData);
     if (quoteData.lp) {
       if (quoteData.tk === '26000' && selectedMasterSymbol.value === 'NIFTY') {
         niftyPrice.value = quoteData.lp;
@@ -3093,10 +3093,10 @@ const connectWebSocket = () => {
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
-        // console.log('Updated Call LTP:', latestCallLTP.value);
+        console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
-        // console.log('Updated Put LTP:', latestPutLTP.value);
+        console.log('Updated Put LTP:', latestPutLTP.value);
       }
 
       // Update position LTPs
@@ -3115,6 +3115,7 @@ const connectWebSocket = () => {
     console.log('WebSocket connected');
     initializeSubscriptions();
   };
+
   socket.value.onclose = () => {
     console.log('WebSocket disconnected. Attempting to reconnect...');
     setTimeout(connectWebSocket, 5000);
