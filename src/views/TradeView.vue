@@ -216,14 +216,15 @@
           <!-- Quantity Selection -->
           <div class="col-2">
             <label for="Quantity" class="form-label mb-0">
-              {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity</label>
-            <div class="input-group">
-              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" min="1" max="56"
-                @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }">
-              <span class="input-group-text">{{ selectedQuantity }}</span>
-            </div>
+              {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity
+            </label>
+          <div class="input-group">
+            <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" 
+              :min="1" :max="maxLots" @input="updateSelectedQuantity"
+              :class="{ 'disabled-form': isFormDisabled }">
+            <span class="input-group-text">{{ selectedQuantity }}</span>
           </div>
-
+        </div>
         </div>
 
         <div class="row mt-3">
@@ -1476,6 +1477,11 @@ const loadLots = () => {
     lotsPerSymbol.value = JSON.parse(savedLots);
   }
 };
+// maxlots computation....
+const maxLots = computed(() => {
+  const instrument = quantities.value[selectedMasterSymbol.value];
+  return instrument ? instrument.maxLots : 56; // maxlots 56 is conditional...
+});
 // Modify the updateAvailableQuantities function
 const updateAvailableQuantities = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
@@ -1487,20 +1493,23 @@ const updateAvailableQuantities = () => {
   } else {
     availableQuantities.value = [];
   }
+  // Ensure selectedQuantity is in the available quantities list
   if (!availableQuantities.value.some(q => q.quantity === selectedQuantity.value)) {
-    selectedQuantity.value = availableQuantities.value[0]?.quantity;
+    selectedQuantity.value = availableQuantities.value[0]?.quantity || 0;
   }
 };
 // Update the updateSelectedQuantity function
 const updateSelectedQuantity = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
   if (instrument) {
-    const lots = Math.min(Math.max(1, selectedLots.value), 56);
+    const maxLots = instrument.maxLots; // Use maxLots from the instrument
+    const lots = Math.min(Math.max(1, selectedLots.value), maxLots);
     lotsPerSymbol.value[selectedMasterSymbol.value] = lots;
     selectedQuantity.value = lots * instrument.lotSize;
     saveLots();
   }
 };
+
 watch(selectedLots, () => {
   updateSelectedQuantity();
 });
@@ -1914,14 +1923,14 @@ const maskBrokerClientId = (clientId) => {
 
 // Update the quantities object
 const quantities = ref({
-  NIFTY: { lotSize: 25, maxLots: 10 },
-  BANKNIFTY: { lotSize: 15, maxLots: 10 },
-  FINNIFTY: { lotSize: 25, maxLots: 10 },
-  MIDCPNIFTY: { lotSize: 50, maxLots: 10 },
-  NIFTYNXT50: { lotSize: 10, maxLots: 10 },
-  SENSEX: { lotSize: 10, maxLots: 10 },
-  BANKEX: { lotSize: 15, maxLots: 10 },
-  SENSEX50: { lotSize: 25, maxLots: 10 }
+  NIFTY: { lotSize: 25, maxLots: 72 },
+  BANKNIFTY: { lotSize: 15, maxLots: 60 },
+  FINNIFTY: { lotSize: 25, maxLots: 72 },
+  MIDCPNIFTY: { lotSize: 50, maxLots: 56 },
+  NIFTYNXT50: { lotSize: 10, maxLots: 60 },
+  SENSEX: { lotSize: 10, maxLots: 100 },
+  BANKEX: { lotSize: 15, maxLots: 60 },
+  SENSEX50: { lotSize: 25, maxLots: 72 }
 });
 const availableQuantities = ref([]);
 
