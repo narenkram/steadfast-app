@@ -1300,6 +1300,7 @@ const getInitialPrice = (symbol) => {
   );
   return strike ? parseFloat(strike.strikePrice) : null;
 };
+const dataFetched = ref(false);
 const fetchTradingData = async () => {
   let response;
   if (selectedBroker.value?.brokerName === 'Dhan') {
@@ -1340,6 +1341,7 @@ const fetchTradingData = async () => {
   if (sensex50Price.value === 'N/A') sensex50Price.value = getInitialPrice('SENSEX50');
 
   updateStrikesForExpiry(selectedExpiry.value);
+  dataFetched.value = true;
 };
 // Add watchers for the price values
 watch([niftyPrice, bankNiftyPrice, finniftyPrice, niftynxt50Price, midcpniftyPrice, sensexPrice, bankexPrice, sensex50Price], () => {
@@ -1348,14 +1350,16 @@ watch([niftyPrice, bankNiftyPrice, finniftyPrice, niftynxt50Price, midcpniftyPri
   }
 });
 const formatDate = (dateString) => {
+  if (!dataFetched.value || !dateString) {
+    return ''; // Return empty string if data hasn't been fetched or dateString is null
+  }
+
   if (selectedBroker.value?.brokerName === 'Dhan') {
-    // Extract only the date part from the date string for Dhan
-    return dateString.split(' ')[0]; // Splits the string by space and returns the first part (date)
+    return dateString.split(' ')[0];
   } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
-    // Return the date string as is for Flattrade
     return dateString;
   }
-  return dateString; // Default case, return the original date string
+  return dateString;
 };
 const convertToComparableDate = (dateString) => {
   const date = new Date(dateString);
