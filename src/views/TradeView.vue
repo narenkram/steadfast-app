@@ -164,8 +164,8 @@
             <label for="Exchange" class="form-label mb-0">Exchange</label>
             <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="(symbols, exchange) in exchangeSymbols" :key="exchange" :value="exchange">{{
-                exchange }}
+              <option v-for="exchange in exchangeOptions" :key="exchange" :value="exchange">
+                {{ exchange }}
               </option>
             </select>
           </div>
@@ -218,13 +218,12 @@
             <label for="Quantity" class="form-label mb-0">
               {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity
             </label>
-          <div class="input-group">
-            <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" 
-              :min="1" :max="maxLots" @input="updateSelectedQuantity"
-              :class="{ 'disabled-form': isFormDisabled }">
-            <span class="input-group-text">{{ selectedQuantity }}</span>
+            <div class="input-group">
+              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" :min="1"
+                :max="maxLots" @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }">
+              <span class="input-group-text">{{ selectedQuantity }}</span>
+            </div>
           </div>
-        </div>
         </div>
 
         <div class="row mt-3">
@@ -1202,26 +1201,38 @@ const selectedPutStrike = ref({});
 const exchangeSymbols = ref({});
 
 const updateExchangeSymbols = () => {
+  const symbolData = {
+    NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000' },
+    BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009' },
+    FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037' },
+    MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074' },
+    NIFTYNXT50: { exchangeCode: 'NSE', exchangeSecurityId: '26013' },
+    SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1' },
+    BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12' },
+    SENSEX50: { exchangeCode: 'BSE', exchangeSecurityId: '47' },
+  };
+
   if (selectedBroker.value?.brokerName === 'Dhan') {
     exchangeSymbols.value = {
       NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-      BSE: ['SENSEX', 'BANKEX', 'SENSEX50']
+      BSE: ['SENSEX', 'BANKEX', 'SENSEX50'],
     };
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     exchangeSymbols.value = {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-      BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
+      BFO: ['SENSEX', 'BANKEX', 'SENSEX50'],
     };
   }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    exchangeSymbols.value = {
-      NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-      BFO: ['SENSEX', 'BANKEX', 'SENSEX50']
-    };
-  }
+
+  // Store symbolData separately
+  exchangeSymbols.value.symbolData = symbolData;
 };
+// Add this computed property
+const exchangeOptions = computed(() => {
+  return Object.keys(exchangeSymbols.value).filter(key => key !== 'symbolData');
+});
 const setDefaultExchangeAndMasterSymbol = () => {
-  const exchanges = Object.keys(exchangeSymbols.value);
+  const exchanges = exchangeOptions.value;
   if (exchanges.length > 0) {
     // Set the exchange
     const savedExchange = localStorage.getItem('selectedExchange');
@@ -3079,29 +3090,19 @@ const connectWebSocket = () => {
     const quoteData = JSON.parse(event.data);
     console.log('WebSocket message received:', quoteData);
     if (quoteData.lp) {
-      if (quoteData.tk === '26000' && selectedMasterSymbol.value === 'NIFTY') {
-        niftyPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '26009' && selectedMasterSymbol.value === 'BANKNIFTY') {
-        bankNiftyPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '26037' && selectedMasterSymbol.value === 'FINNIFTY') {
-        finniftyPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '26013' && selectedMasterSymbol.value === 'NIFTYNXT50') {
-        niftynxt50Price.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '26074' && selectedMasterSymbol.value === 'MIDCPNIFTY') {
-        midcpniftyPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '1' && selectedMasterSymbol.value === 'SENSEX') {
-        sensexPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '12' && selectedMasterSymbol.value === 'BANKEX') {
-        bankexPrice.value = quoteData.lp;
-      }
-      else if (quoteData.tk === '47' && selectedMasterSymbol.value === 'SENSEX50') {
-        sensex50Price.value = quoteData.lp;
+      const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
+      if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
+        // Update the price for the selected master symbol
+        switch (selectedMasterSymbol.value) {
+          case 'NIFTY': niftyPrice.value = quoteData.lp; break;
+          case 'BANKNIFTY': bankNiftyPrice.value = quoteData.lp; break;
+          case 'FINNIFTY': finniftyPrice.value = quoteData.lp; break;
+          case 'NIFTYNXT50': niftynxt50Price.value = quoteData.lp; break;
+          case 'MIDCPNIFTY': midcpniftyPrice.value = quoteData.lp; break;
+          case 'SENSEX': sensexPrice.value = quoteData.lp; break;
+          case 'BANKEX': bankexPrice.value = quoteData.lp; break;
+          case 'SENSEX50': sensex50Price.value = quoteData.lp; break;
+        }
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
@@ -3145,38 +3146,20 @@ const positionSecurityIds = ref({});
 
 const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    let symbolToSubscribe;
-
-    // Mapping for NSE symbols
-    if (selectedMasterSymbol.value === 'NIFTY') {
-      symbolToSubscribe = 'NSE|26000';
-    } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
-      symbolToSubscribe = 'NSE|26009';
-    } else if (selectedMasterSymbol.value === 'FINNIFTY') {
-      symbolToSubscribe = 'NSE|26037';
-    } else if (selectedMasterSymbol.value === 'NIFTYNXT50') {
-      symbolToSubscribe = 'NSE|26013';
-    } else if (selectedMasterSymbol.value === 'MIDCPNIFTY') {
-      symbolToSubscribe = 'NSE|26074';
-    }
-
-    // Mapping for BSE symbols
-    else if (selectedMasterSymbol.value === 'SENSEX') {
-      symbolToSubscribe = 'BSE|1';
-    } else if (selectedMasterSymbol.value === 'BANKEX') {
-      symbolToSubscribe = 'BSE|12';
-    } else if (selectedMasterSymbol.value === 'SENSEX50') {
-      symbolToSubscribe = 'BSE|47';
-    }
-
-    if (symbolToSubscribe && symbolToSubscribe !== `NSE|${currentSubscriptions.value.masterSymbol}` && symbolToSubscribe !== `BSE|${currentSubscriptions.value.masterSymbol}`) {
-      const data = {
-        action: 'subscribe',
-        symbols: [symbolToSubscribe]
-      };
-      console.log('Sending master symbol subscribe data:', data);
-      socket.value.send(JSON.stringify(data));
-      currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value;
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
+    if (symbolInfo) {
+      const symbolToSubscribe = `${symbolInfo.exchangeCode}|${symbolInfo.exchangeSecurityId}`;
+      if (symbolToSubscribe !== `${currentSubscriptions.value.masterSymbolExchangeCode}|${currentSubscriptions.value.masterSymbolSecurityId}`) {
+        const data = {
+          action: 'subscribe',
+          symbols: [symbolToSubscribe]
+        };
+        console.log('Sending master symbol subscribe data:', data);
+        socket.value.send(JSON.stringify(data));
+        currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value;
+        currentSubscriptions.value.masterSymbolExchangeCode = symbolInfo.exchangeCode;
+        currentSubscriptions.value.masterSymbolSecurityId = symbolInfo.exchangeSecurityId;
+      }
     }
   }
 };
@@ -3270,16 +3253,10 @@ const updateSubscriptions = () => {
   // Check if master symbol has changed
   if (currentSubscriptions.value.masterSymbol !== selectedMasterSymbol.value) {
     if (currentSubscriptions.value.masterSymbol) {
-      let oldSymbol;
-      if (currentSubscriptions.value.masterSymbol === 'NIFTY') oldSymbol = 'NSE|26000';
-      else if (currentSubscriptions.value.masterSymbol === 'BANKNIFTY') oldSymbol = 'NSE|26009';
-      else if (currentSubscriptions.value.masterSymbol === 'FINNIFTY') oldSymbol = 'NSE|26037';
-      else if (currentSubscriptions.value.masterSymbol === 'NIFTYNXT50') oldSymbol = 'NSE|26013';
-      else if (currentSubscriptions.value.masterSymbol === 'MIDCPNIFTY') oldSymbol = 'NSE|26074';
-      else if (currentSubscriptions.value.masterSymbol === 'SENSEX') oldSymbol = 'BSE|1';
-      else if (currentSubscriptions.value.masterSymbol === 'BANKEX') oldSymbol = 'BSE|12';
-      else if (currentSubscriptions.value.masterSymbol === 'SENSEX50') oldSymbol = 'BSE|47';
-      if (oldSymbol) symbolsToUnsubscribe.push(oldSymbol);
+      const oldSymbolInfo = exchangeSymbols.value.symbolData[currentSubscriptions.value.masterSymbol];
+      if (oldSymbolInfo) {
+        symbolsToUnsubscribe.push(`${oldSymbolInfo.exchangeCode}|${oldSymbolInfo.exchangeSecurityId}`);
+      }
     }
   }
 
