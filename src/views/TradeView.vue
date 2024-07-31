@@ -2994,9 +2994,21 @@ const setFlattradeCredentials = async () => {
       return;
     }
 
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
+    if (!symbolInfo || !symbolInfo.other) {
+      console.error('Invalid or missing symbol info for Flattrade');
+      toastMessage.value = 'Invalid symbol selected for Flattrade';
+      showToast.value = true;
+      return;
+    }
+
+    const { exchangeCode: flattradeExchangeSegment, exchangeSecurityId: flattradeSecurityId } = symbolInfo.other;
+
     const response = await axios.post('http://localhost:3000/api/set-flattrade-credentials', {
       usersession: apiToken,
       userid: clientId,
+      flattradeExchangeSegment,
+      flattradeSecurityId,
       defaultCallSecurityId: defaultCallSecurityId.value,
       defaultPutSecurityId: defaultPutSecurityId.value
     });
@@ -3009,6 +3021,7 @@ const setFlattradeCredentials = async () => {
     showToast.value = true;
   }
 };
+
 const setShoonyaCredentials = async () => {
   try {
     if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
@@ -3019,8 +3032,8 @@ const setShoonyaCredentials = async () => {
 
     // Check if the broker status is 'Connected'
     if (brokerStatus.value !== 'Connected') {
-      console.error('Flattrade broker is not connected');
-      toastMessage.value = 'Flattrade broker is not connected';
+      console.error('Shoonya broker is not connected');
+      toastMessage.value = 'Shoonya broker is not connected';
       showToast.value = true;
       return;
     }
@@ -3035,9 +3048,21 @@ const setShoonyaCredentials = async () => {
       return;
     }
 
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
+    if (!symbolInfo || !symbolInfo.other) {
+      console.error('Invalid or missing symbol info for Shoonya');
+      toastMessage.value = 'Invalid symbol selected for Shoonya';
+      showToast.value = true;
+      return;
+    }
+
+    const { exchangeCode: shoonyaExchangeSegment, exchangeSecurityId: shoonyaSecurityId } = symbolInfo.other;
+
     const response = await axios.post('http://localhost:3000/api/set-shoonya-credentials', {
       usersession: apiToken,
       userid: clientId,
+      shoonyaExchangeSegment,
+      shoonyaSecurityId,
       defaultCallSecurityId: defaultCallSecurityId.value,
       defaultPutSecurityId: defaultPutSecurityId.value
     });
