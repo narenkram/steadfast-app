@@ -1307,16 +1307,16 @@ const fetchTradingData = async () => {
     response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
     response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
-    console.log('Flattrade Symbols:', response);
+    // console.log('Flattrade Symbols:', response);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     response = await fetch(`http://localhost:3000/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
-    console.log('Shoonya Symbols:', response);
+    // console.log('Shoonya Symbols:', response);
   } else {
     throw new Error('Unsupported broker');
   }
 
   const data = await response.json();
-  console.log('Data:', data);
+  // console.log('Data:', data);
   expiryDates.value = data.expiryDates;
 
   // Filter by selected expiry date before sorting and mapping
@@ -1369,13 +1369,13 @@ const convertToComparableDate = (dateString) => {
 const isExpiryToday = computed(() => {
   const comparableSelectedExpiry = convertToComparableDate(formatDate(selectedExpiry.value));
   const comparableFormattedDate = convertToComparableDate(formattedDate.value);
-  console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
-  console.log('Comparable Formatted Date:', comparableFormattedDate);
+  // console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
+  // console.log('Comparable Formatted Date:', comparableFormattedDate);
   return comparableSelectedExpiry === comparableFormattedDate;
 });
 
 const updateStrikesForExpiry = (expiryDate) => {
-  console.log('Updating strikes for expiry:', expiryDate);
+  // console.log('Updating strikes for expiry:', expiryDate);
 
   let filteredCallStrikes, filteredPutStrikes;
 
@@ -1424,8 +1424,8 @@ const updateStrikesForExpiry = (expiryDate) => {
       selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
     }
 
-    console.log('Selected Call Strike:', selectedCallStrike.value);
-    console.log('Selected Put Strike:', selectedPutStrike.value);
+    // console.log('Selected Call Strike:', selectedCallStrike.value);
+    // console.log('Selected Put Strike:', selectedPutStrike.value);
 
     if (synchronizeOnLoad.value) {
       synchronizeStrikes();
@@ -1492,7 +1492,7 @@ const synchronizePutStrikes = () => {
 };
 
 const updateSecurityIds = () => {
-  console.log('Updating Security IDs');
+  // console.log('Updating Security IDs');
   defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
@@ -1798,13 +1798,13 @@ const fetchFlattradePositions = async () => {
 
     if (Array.isArray(positionBookRes.data) && positionBookRes.data.every(item => item.stat === 'Ok')) {
       flatTradePositionBook.value = positionBookRes.data;
-      console.log('Flattrade Position Book:', positionBookRes.data);
+      // console.log('Flattrade Position Book:', positionBookRes.data);
       updatePositionSecurityIds();
       subscribeToPositionLTPs();
       subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       flatTradePositionBook.value = [];
-      console.log('No positions in Flattrade Position Book');
+      // console.log('No positions in Flattrade Position Book');
     } else {
       const errorMsg = positionBookRes.data.emsg || 'Unknown error';
       console.error('Error fetching position book:', errorMsg);
@@ -1939,7 +1939,7 @@ const fetchFundLimit = async () => {
 };
 const updateFundLimits = async () => {
   await fetchFundLimit();
-  console.log('Updated Fund Limits:', fundLimits.value);
+  // console.log('Updated Fund Limits:', fundLimits.value);
 };
 const showBrokerClientId = ref(false);
 const toggleBrokerClientIdVisibility = () => {
@@ -2763,25 +2763,25 @@ const continuouslyCheckPositions = () => {
 };
 
 const availableBalance = computed(() => {
-  console.log('Fund Limits:', fundLimits.value);
-  console.log('Selected Broker:', selectedBroker.value?.brokerName);
+  // console.log('Fund Limits:', fundLimits.value);
+  // console.log('Selected Broker:', selectedBroker.value?.brokerName);
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
     const dhanBalance = fundLimits.value.availabelBalance;
-    console.log('Dhan Available Balance (raw):', dhanBalance);
-    console.log('Dhan Available Balance (type):', typeof dhanBalance);
+    // console.log('Dhan Available Balance (raw):', dhanBalance);
+    // console.log('Dhan Available Balance (type):', typeof dhanBalance);
 
     // Convert to number if it's a string, or use the value directly if it's already a number
     const numericBalance = typeof dhanBalance === 'string' ? parseFloat(dhanBalance) : dhanBalance;
 
-    console.log('Dhan Available Balance (processed):', numericBalance);
+    // console.log('Dhan Available Balance (processed):', numericBalance);
     return isNaN(numericBalance) ? null : Math.floor(numericBalance);
   }
   else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     const cash = Number(fundLimits.value.cash) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
-    console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
+    // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
     return balance;
   }
   return null;
@@ -3128,7 +3128,7 @@ const connectWebSocket = () => {
   // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
-    console.log('WebSocket message received:', quoteData);
+    // console.log('WebSocket message received:', quoteData);
     if (quoteData.lp) {
       const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
       if (symbolInfo) {
@@ -3151,10 +3151,10 @@ const connectWebSocket = () => {
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
-        console.log('Updated Call LTP:', latestCallLTP.value);
+        // console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
-        console.log('Updated Put LTP:', latestPutLTP.value);
+        // console.log('Updated Put LTP:', latestPutLTP.value);
       }
 
       // Update position LTPs
@@ -3199,7 +3199,7 @@ const subscribeToMasterSymbol = () => {
           action: 'subscribe',
           symbols: [symbolToSubscribe]
         };
-        console.log('Sending master symbol subscribe data:', data);
+        // console.log('Sending master symbol subscribe data:', data);
         socket.value.send(JSON.stringify(data));
         currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value;
         currentSubscriptions.value.masterSymbolExchangeCode = symbolInfo.exchangeCode;
@@ -3227,7 +3227,7 @@ const subscribeToOptions = () => {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending options subscribe data:', data);
+      // console.log('Sending options subscribe data:', data);
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
@@ -3265,7 +3265,7 @@ const subscribeToPositionLTPs = () => {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      console.log('Sending position LTPs subscribe data:', data);
+      // console.log('Sending position LTPs subscribe data:', data);
       socket.value.send(JSON.stringify(data));
     }
   }
@@ -3287,7 +3287,7 @@ const unsubscribeFromSymbols = (symbols) => {
       action: 'unsubscribe',
       symbols: symbols
     };
-    console.log('Sending unsubscribe data:', data);
+    // console.log('Sending unsubscribe data:', data);
     socket.value.send(JSON.stringify(data));
   }
 };
@@ -3489,14 +3489,14 @@ watch(selectedExpiry, async (newExpiry) => {
 });
 
 watch(selectedCallStrike, (newStrike, oldStrike) => {
-  console.log('Selected Call Strike changed:', newStrike);
+  // console.log('Selected Call Strike changed:', newStrike);
   if (newStrike !== oldStrike) {
     defaultCallSecurityId.value = newStrike.securityId || 'N/A';
   }
 });
 
 watch(selectedPutStrike, (newStrike, oldStrike) => {
-  console.log('Selected Put Strike changed:', newStrike);
+  // console.log('Selected Put Strike changed:', newStrike);
   if (newStrike !== oldStrike) {
     defaultPutSecurityId.value = newStrike.securityId || 'N/A';
   }
@@ -3539,7 +3539,7 @@ watch(
 
 // Modify the watcher for selectedMasterSymbol
 watch(selectedMasterSymbol, async (newValue, oldValue) => {
-  console.log('selectedMasterSymbol changed:', newValue);
+  // console.log('selectedMasterSymbol changed:', newValue);
   saveUserChoice();
   updateAvailableQuantities();
   updateSelectedQuantity();
