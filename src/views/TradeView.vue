@@ -3078,14 +3078,23 @@ const setDhanCredentials = async () => {
       return;
     }
 
-    const { dhanExchangeSegment } = getExchangeSegment();
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
+    if (!symbolInfo || !symbolInfo.dhan) {
+      console.error('Invalid or missing symbol info for Dhan');
+      toastMessage.value = 'Invalid symbol selected for Dhan';
+      showToast.value = true;
+      return;
+    }
+
+    const { exchangeCode: dhanExchangeSegment, exchangeSecurityId: dhanSecurityId } = symbolInfo.dhan;
 
     const response = await axios.post('http://localhost:3000/api/set-dhan-credentials', {
       accessToken: apiToken,
       clientId: clientId,
-      dhanExchangeSegment: dhanExchangeSegment,
-      dhanSecurityId: "25"  // You might want to update this based on your requirements
+      dhanExchangeSegment,
+      dhanSecurityId
     });
+
     console.log('Credentials and security IDs set successfully:', response.data);
     toastMessage.value = 'Dhan credentials set successfully';
     showToast.value = true;
@@ -3122,17 +3131,22 @@ const connectWebSocket = () => {
     console.log('WebSocket message received:', quoteData);
     if (quoteData.lp) {
       const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
-      if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
-        // Update the price for the selected master symbol
-        switch (selectedMasterSymbol.value) {
-          case 'NIFTY': niftyPrice.value = quoteData.lp; break;
-          case 'BANKNIFTY': bankNiftyPrice.value = quoteData.lp; break;
-          case 'FINNIFTY': finniftyPrice.value = quoteData.lp; break;
-          case 'NIFTYNXT50': niftynxt50Price.value = quoteData.lp; break;
-          case 'MIDCPNIFTY': midcpniftyPrice.value = quoteData.lp; break;
-          case 'SENSEX': sensexPrice.value = quoteData.lp; break;
-          case 'BANKEX': bankexPrice.value = quoteData.lp; break;
-          case 'SENSEX50': sensex50Price.value = quoteData.lp; break;
+      if (symbolInfo) {
+        const { exchangeSecurityId } =
+          selectedBroker.value?.brokerName === 'Dhan' ? symbolInfo.dhan : symbolInfo.other;
+
+        if (quoteData.tk === exchangeSecurityId) {
+          // Update the price for the selected master symbol
+          switch (selectedMasterSymbol.value) {
+            case 'NIFTY': niftyPrice.value = quoteData.lp; break;
+            case 'BANKNIFTY': bankNiftyPrice.value = quoteData.lp; break;
+            case 'FINNIFTY': finniftyPrice.value = quoteData.lp; break;
+            case 'NIFTYNXT50': niftynxt50Price.value = quoteData.lp; break;
+            case 'MIDCPNIFTY': midcpniftyPrice.value = quoteData.lp; break;
+            case 'SENSEX': sensexPrice.value = quoteData.lp; break;
+            case 'BANKEX': bankexPrice.value = quoteData.lp; break;
+            case 'SENSEX50': sensex50Price.value = quoteData.lp; break;
+          }
         }
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
