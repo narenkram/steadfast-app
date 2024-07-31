@@ -3157,8 +3157,8 @@ const connectWebSocket = () => {
     if (quoteData.lp) {
       const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
       if (symbolInfo) {
-        const { exchangeSecurityId } =
-          selectedBroker.value?.brokerName === 'Dhan' ? symbolInfo.dhan : symbolInfo.other;
+        const brokerType = selectedBroker.value?.brokerName === 'Dhan' ? 'dhan' : 'other';
+        const { exchangeSecurityId } = symbolInfo[brokerType];
 
         if (quoteData.tk === exchangeSecurityId) {
           // Update the price for the selected master symbol
@@ -3174,7 +3174,8 @@ const connectWebSocket = () => {
           }
         }
       }
-      else if (quoteData.tk === defaultCallSecurityId.value) {
+
+      if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
         // console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
