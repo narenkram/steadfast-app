@@ -1202,14 +1202,38 @@ const exchangeSymbols = ref({});
 
 const updateExchangeSymbols = () => {
   const symbolData = {
-    NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000' },
-    BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009' },
-    FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037' },
-    MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074' },
-    NIFTYNXT50: { exchangeCode: 'NSE', exchangeSecurityId: '26013' },
-    SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1' },
-    BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12' },
-    SENSEX50: { exchangeCode: 'BSE', exchangeSecurityId: '47' },
+    NIFTY: {
+      dhan: { exchangeCode: '0', exchangeSecurityId: '13' },
+      other: { exchangeCode: 'NSE', exchangeSecurityId: '26000' }
+    },
+    BANKNIFTY: {
+      dhan: { exchangeCode: '0', exchangeSecurityId: '25' },
+      other: { exchangeCode: 'NSE', exchangeSecurityId: '26009' }
+    },
+    FINNIFTY: {
+      dhan: { exchangeCode: '0', exchangeSecurityId: '27' },
+      other: { exchangeCode: 'NSE', exchangeSecurityId: '26037' }
+    },
+    MIDCPNIFTY: {
+      dhan: { exchangeCode: '0', exchangeSecurityId: '442' },
+      other: { exchangeCode: 'NSE', exchangeSecurityId: '26074' }
+    },
+    NIFTYNXT50: {
+      dhan: { exchangeCode: '0', exchangeSecurityId: '38' },
+      other: { exchangeCode: 'NSE', exchangeSecurityId: '26013' }
+    },
+    SENSEX: {
+      dhan: { exchangeCode: '1', exchangeSecurityId: '51' },
+      other: { exchangeCode: 'BSE', exchangeSecurityId: '1' }
+    },
+    BANKEX: {
+      dhan: { exchangeCode: '1', exchangeSecurityId: '69' },
+      other: { exchangeCode: 'BSE', exchangeSecurityId: '12' }
+    },
+    SENSEX50: {
+      dhan: { exchangeCode: '1', exchangeSecurityId: '83' },
+      other: { exchangeCode: 'BSE', exchangeSecurityId: '47' }
+    },
   };
 
   if (selectedBroker.value?.brokerName === 'Dhan') {
