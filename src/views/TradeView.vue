@@ -2219,7 +2219,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
       throw new Error(`Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`);
     }
 
-    const exchangeSegment = getExchangeSegment();
+    const exchangeSegment = getExchangeSegment().segment;
     const orderData = prepareOrderPayload(transactionType, drvOptionType, selectedStrike, exchangeSegment);
 
     console.log("Placing order with data:", orderData);
