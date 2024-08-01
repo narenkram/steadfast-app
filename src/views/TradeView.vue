@@ -2778,11 +2778,18 @@ const availableBalance = computed(() => {
     // console.log('Dhan Available Balance (processed):', numericBalance);
     return isNaN(numericBalance) ? null : Math.floor(numericBalance);
   }
-  else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
-    const cash = Number(fundLimits.value.cash) || 0;
+  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
-    // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
+    // console.log('Flattrade Available Balance:', balance);
+    return balance;
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    const balance = Math.floor(cash - marginUsed);
+    // console.log('Shoonya Available Balance:', balance);
     return balance;
   }
   return null;
