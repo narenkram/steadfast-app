@@ -60,6 +60,13 @@
       border-bottom-color: var(--bs-border-color);
     }
   }
+
+  .input-group-text {
+    color: var(--bs-body-color);
+    background-color: var(--bs-input-bg);
+    border-color: var(--bs-border-color);
+  }
+
 }
 
 @media (prefers-color-scheme: light) {
