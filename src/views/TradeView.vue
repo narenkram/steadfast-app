@@ -3226,9 +3226,7 @@ const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
     if (symbolInfo) {
-      const brokerType = selectedBroker.value?.brokerName === 'Dhan' ? 'dhan' : 'other';
-      const { exchangeCode, exchangeSecurityId } = symbolInfo[brokerType];
-      const symbolToSubscribe = `${exchangeCode}|${exchangeSecurityId}`;
+      const symbolToSubscribe = `${symbolInfo.exchangeCode}|${symbolInfo.exchangeSecurityId}`;
       if (symbolToSubscribe !== `${currentSubscriptions.value.masterSymbolExchangeCode}|${currentSubscriptions.value.masterSymbolSecurityId}`) {
         const data = {
           action: 'subscribe',
@@ -3237,8 +3235,8 @@ const subscribeToMasterSymbol = () => {
         // console.log('Sending master symbol subscribe data:', data);
         socket.value.send(JSON.stringify(data));
         currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value;
-        currentSubscriptions.value.masterSymbolExchangeCode = exchangeCode;
-        currentSubscriptions.value.masterSymbolSecurityId = exchangeSecurityId;
+        currentSubscriptions.value.masterSymbolExchangeCode = symbolInfo.exchangeCode;
+        currentSubscriptions.value.masterSymbolSecurityId = symbolInfo.exchangeSecurityId;
       }
     }
   }
@@ -3247,7 +3245,7 @@ const subscribeToMasterSymbol = () => {
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
-    const exchangeSegment = getExchangeSegment().segment;
+    const exchangeSegment = getExchangeSegment();
 
     // Add subscriptions for Call and Put options
     if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A' && defaultCallSecurityId.value !== currentSubscriptions.value.callOption) {
