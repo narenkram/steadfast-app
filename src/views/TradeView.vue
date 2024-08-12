@@ -93,12 +93,11 @@
   <section class="row py-3">
     <div class="col-5">
       <div class="Card">
-        <blockquote class="fs-3"
-          :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : 'text-dark'">
+        <blockquote class="fs-3" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
           ₹ {{ totalProfit.toFixed(2) }}
         </blockquote>
         <small>
-          <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : 'text-dark'">
+          <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
             ₹ {{ netPnl.toFixed(2) }}
           </span>
           Estimated (after all charges)
@@ -109,7 +108,7 @@
       <div class="Card">
         <blockquote class="fs-3 text-center m-0">
           <span
-            :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : 'text-dark'">
+            :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
             {{ totalCapitalPercentage.toFixed(2) }}%
           </span>
           <br />
@@ -485,7 +484,7 @@
             <div class="col-4 text-center py-2">
               <p class="mb-0">
                 <b>Net Qty:
-                  <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : 'text-dark'">
+                  <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
                     {{ totalNetQty }}
                   </span>
                 </b>
@@ -531,7 +530,7 @@
 
                         <div class="d-flex flex-row">
                           <span
-                            :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                            :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : null">
                             Qty: {{ flattradePosition.netqty }}
                           </span>
                           <span class="ms-2">
@@ -598,11 +597,11 @@
                     <td>{{ flattradePosition.daybuyamt }}</td>
                     <td>{{ flattradePosition.daysellamt }}</td>
                     <td
-                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : 'text-dark'">
+                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
                       {{ flattradePosition.rpnl }}
                     </td>
                     <td
-                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
+                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                     </td>
                   </tr>
@@ -643,7 +642,7 @@
                         </div>
                         <div class="d-flex flex-row">
                           <span
-                            :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : 'text-dark'">
+                            :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : null">
                             Qty: {{ shoonyaPosition.netqty }}
                           </span>
                           <span class="ms-2">
@@ -709,11 +708,11 @@
                     <td>{{ shoonyaPosition.daybuyamt }}</td>
                     <td>{{ shoonyaPosition.daysellamt }}</td>
                     <td
-                      :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : 'text-dark'">
+                      :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : null">
                       {{ shoonyaPosition.rpnl }}
                     </td>
                     <td
-                      :class="shoonyaPosition.calculatedUrmtom > 0 ? 'text-success' : shoonyaPosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
+                      :class="shoonyaPosition.calculatedUrmtom > 0 ? 'text-success' : shoonyaPosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ shoonyaPosition.calculatedUrmtom.toFixed(2) }}
                     </td>
                   </tr>
