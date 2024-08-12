@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <!-- Hero Section -->
-        <section class="row py-5 bg-light">
+        <section class="row py-5 border">
             <div class="col-lg-8 mx-auto text-center">
                 <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
                 <h1 class="display-3 mb-4">Steadfast</h1>
@@ -14,7 +14,8 @@
                     ⚡ Launch App
                 </button>
                 <br />
-                <a href="https://t.me/steadfastapp" target="_blank" class="mt-5 btn btn-outline-muted">
+                <br />
+                <a href="https://t.me/steadfastapp" target="_blank" class="text-decoration-none">
                     💬 Join Telegram Community
                 </a>
             </div>
