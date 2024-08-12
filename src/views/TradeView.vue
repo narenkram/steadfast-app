@@ -500,46 +500,6 @@
               </p>
             </div>
           </div>
-          <!-- Dhan Positions -->
-          <table class="table table-responsive table-hover" v-if="activeFetchFunction === 'fetchDhanPositions'">
-            <thead>
-              <tr>
-                <th scope="col">Symbol Name</th>
-                <th scope="col">Position Type</th>
-                <th scope="col">Product Type</th>
-                <th scope="col">Net Qty</th>
-                <th scope="col">Buy Value</th>
-                <th scope="col">Sell Value</th>
-                <th scope="col">Realized Profit</th>
-                <th scope="col">Unrealized Profit</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="dhanPosition in positionsWithCalculatedProfit" :key="dhanPosition.securityId">
-                <td>{{ dhanPosition.tradingSymbol }}</td>
-                <td>{{ dhanPosition.positionType }}</td>
-                <td>{{ dhanPosition.productType }}</td>
-                <td
-                  :class="dhanPosition.netQty > 0 ? 'text-success' : dhanPosition.netQty < 0 ? 'text-danger' : 'text-dark'">
-                  {{ dhanPosition.netQty }}
-                </td>
-                <td>{{ dhanPosition.dayBuyValue }}</td>
-                <td>{{ dhanPosition.daySellValue }}</td>
-                <td
-                  :class="dhanPosition.realizedProfit > 0 ? 'text-success' : dhanPosition.realizedProfit < 0 ? 'text-danger' : 'text-dark'">
-                  {{ dhanPosition.realizedProfit }}
-                </td>
-                <td
-                  :class="dhanPosition.calculatedUrmtom > 0 ? 'text-success' : dhanPosition.calculatedUrmtom < 0 ? 'text-danger' : 'text-dark'">
-                  {{ dhanPosition.calculatedUrmtom.toFixed(2) }}
-                </td>
-              </tr>
-              <tr v-if="dhanPositionBook.length === 0">
-                <td colspan="8" class="text-center">No positions on selected broker {{ selectedBroker.brokerName
-                  }}</td>
-              </tr>
-            </tbody>
-          </table>
           <!-- Flattrade Positions -->
           <div v-if="activeFetchFunction === 'fetchFlattradePositions'">
             <table class="table table-responsive table-hover">
@@ -773,35 +733,6 @@
           </p>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
-          <!-- Dhan Trades -->
-          <table class="table table-hover" v-if="activeFetchFunction === 'fetchDhanOrdersTradesBook'">
-            <thead>
-              <tr>
-                <th>Side</th>
-                <th>Order ID</th>
-                <th>Symbol</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Execution Time</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="dhanOrder in dhanOrders" :key="dhanOrder.orderId">
-                <td>{{ dhanOrder.transactionType }}</td>
-                <td>{{ dhanOrder.orderId }}</td>
-                <td>{{ dhanOrder.tradingSymbol }}</td>
-                <td>{{ dhanOrder.quantity }}</td>
-                <td>{{ dhanOrder.price }}</td>
-                <td>{{ dhanOrder.createTime }}</td>
-                <td>{{ dhanOrder.orderStatus }}</td>
-              </tr>
-              <tr v-if="dhanOrders.length === 0">
-                <td colspan="6" class="text-center">No orders or trades on selected broker {{
-                  selectedBroker.brokerName }}</td>
-              </tr>
-            </tbody>
-          </table>
           <!-- Flattrade Trades -->
           <div v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
             <table class="table table-hover">
@@ -921,7 +852,7 @@
             </table>
           </div>
 
-          <p class="text-secondary" v-if="selectedBroker?.brokerName !== 'Dhan'">
+          <p class="text-secondary">
             This trades tab fetches orders and trades from selected broker and combines them. Only failed orders are
             shown. If the order is successfully placed, you'll only see the respective trade.
           </p>
@@ -1030,24 +961,15 @@ const updateToastVisibility = (value) => {
   showToast.value = value;
 };
 const brokerStatus = computed(() => {
-  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
   const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
 
-  const dhanClientId = dhanDetails.clientId;
-  const dhanApiToken = dhanDetails.apiToken;
   const flattradeClientId = flattradeDetails.clientId;
   const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
   const shoonyaApiToken = localStorage.getItem('SHOONYA_API_TOKEN');
   const shoonyaClientId = shoonyaDetails.clientId;
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    if (dhanClientId && dhanApiToken) {
-      return tokenStatus.Dhan === 'valid' ? 'Connected' : 'Token Expired';
-    }
-    return 'Not Connected';
-  }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (flattradeClientId && flattradeApiToken) {
       return tokenStatus.Flattrade === 'valid' ? 'Connected' : 'Token Expired';
     }
@@ -1212,12 +1134,7 @@ const updateExchangeSymbols = () => {
     SENSEX50: { exchangeCode: 'BSE', exchangeSecurityId: '47' },
   };
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    exchangeSymbols.value = {
-      NSE: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-      BSE: ['SENSEX', 'BANKEX', 'SENSEX50'],
-    };
-  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     exchangeSymbols.value = {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
       BFO: ['SENSEX', 'BANKEX', 'SENSEX50'],
@@ -1270,18 +1187,14 @@ const sensex50Price = ref('N/A');
 const getInitialPrice = (symbol) => {
   const strike = callStrikes.value.find(s =>
     s.tradingSymbol.includes(symbol) &&
-    (selectedBroker.value?.brokerName === 'Dhan' ?
-      s.tradingSymbol.endsWith('-CE') :
-      /C\d+$/.test(s.tradingSymbol))
+    /C\d+$/.test(s.tradingSymbol)
   );
   return strike ? parseFloat(strike.strikePrice) : null;
 };
 const dataFetched = ref(false);
 const fetchTradingData = async () => {
   let response;
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    response = await fetch(`http://localhost:3000/dhanSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     // response = await fetch(`http://localhost:3000/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     response = await fetch(`http://localhost:3000/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     // console.log('Flattrade Symbols:', response);
@@ -1331,9 +1244,7 @@ const formatDate = (dateString) => {
     return ''; // Return empty string if data hasn't been fetched or dateString is null
   }
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dateString.split(' ')[0];
-  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     return dateString;
   }
   return dateString;
@@ -1356,10 +1267,7 @@ const updateStrikesForExpiry = (expiryDate) => {
 
   let filteredCallStrikes, filteredPutStrikes;
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
-    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
@@ -1421,18 +1329,12 @@ const synchronizeStrikes = () => {
 const synchronizeCallStrikes = () => {
   if (selectedPutStrike.value && selectedPutStrike.value.tradingSymbol) {
     let baseSymbol;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/-PE$/, '');
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
     }
     const matchingCallStrike = callStrikes.value.find(strike =>
       strike.tradingSymbol.startsWith(baseSymbol) &&
-      (selectedBroker.value?.brokerName === 'Dhan' ?
-        strike.tradingSymbol.endsWith('-CE') :
-        /C\d+$/.test(strike.tradingSymbol))
+      /C\d+$/.test(strike.tradingSymbol)
     );
     if (matchingCallStrike) {
       selectedCallStrike.value = matchingCallStrike;
@@ -1446,18 +1348,12 @@ const synchronizeCallStrikes = () => {
 const synchronizePutStrikes = () => {
   if (selectedCallStrike.value && selectedCallStrike.value.tradingSymbol) {
     let baseSymbol;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/-CE$/, '');
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-      baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
     }
     const matchingPutStrike = putStrikes.value.find(strike =>
       strike.tradingSymbol.startsWith(baseSymbol) &&
-      (selectedBroker.value?.brokerName === 'Dhan' ?
-        strike.tradingSymbol.endsWith('-PE') :
-        /P\d+$/.test(strike.tradingSymbol))
+      /P\d+$/.test(strike.tradingSymbol)
     );
     if (matchingPutStrike) {
       selectedPutStrike.value = matchingPutStrike;
@@ -1566,24 +1462,6 @@ const handleHotKeys = (event) => {
   }
 };
 
-const dhanOrders = ref([]);
-const fetchDhanOrdersTradesBook = async () => {
-  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-
-  try {
-    const response = await axios.get('http://localhost:3000/dhanGetOrders', {
-      params: {
-        DHAN_API_TOKEN: dhanDetails.apiToken,
-      }
-    });
-    dhanOrders.value = response.data; // Set the orders array
-    console.log('Dhan Order Book:', response.data);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    toastMessage.value = 'Error fetching orders';
-    showToast.value = true;
-  }
-};
 const flatOrderBook = ref([]);
 const flatTradeBook = ref([]);
 const token = ref('');
@@ -1722,30 +1600,6 @@ const formatTime = (timeString) => {
   return `${formattedTime}`;
 };
 
-
-const dhanPositionBook = ref([]);
-const fetchDhanPositions = async () => {
-  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-  if (!dhanDetails.apiToken) {
-    toastMessage.value = 'Dhan API Token is missing. Please generate a token first.';
-    showToast.value = true;
-    return;
-  }
-  try {
-    const response = await axios.get('http://localhost:3000/dhanPositions', {
-      params: {
-        DHAN_API_TOKEN: dhanDetails.apiToken,
-      }
-    });
-    dhanPositionBook.value = response.data;
-    console.log('Dhan Position Book:', dhanPositionBook.value);
-  } catch (error) {
-    console.error('Error fetching dhanPositionBook:', error);
-    toastMessage.value = 'Failed to fetch dhanPositionBook';
-    showToast.value = true;
-  }
-};
-
 const flatTradePositionBook = ref([]);
 const fetchFlattradePositions = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
@@ -1865,18 +1719,7 @@ const fetchFundLimit = async () => {
     }
 
     let response;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-      if (!dhanDetails.apiToken) {
-        throw new Error('Dhan API Token is missing');
-      }
-      response = await axios.get('http://localhost:3000/dhanFundLimit', {
-        params: {
-          DHAN_API_TOKEN: dhanDetails.apiToken,
-        }
-      });
-    }
-    else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       if (!FLATTRADE_API_TOKEN) {
         throw new Error('Flattrade API Token is missing');
@@ -1951,9 +1794,7 @@ const quantities = ref({
 const availableQuantities = ref([]);
 
 const orderTypes = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return ['MARKET', 'LIMIT'];
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return ['MKT', 'LMT'];
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return ['MKT', 'LMT'];
@@ -1981,10 +1822,7 @@ const resetOrderType = () => {
 };
 
 const productTypes = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return ['Intraday', 'Margin'];
-  }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return ['Intraday', 'Margin'];
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
@@ -1993,9 +1831,7 @@ const productTypes = computed(() => {
   return [];
 });
 const getProductTypeValue = (productType) => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return productType.toUpperCase();
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return productType === 'Intraday' ? 'I' : 'M';
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
@@ -2007,9 +1843,7 @@ const getProductTypeValue = (productType) => {
 const selectedProductType = ref(''); // Initialize with an empty string
 
 const getTransactionType = (type) => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return type;
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return type === 'BUY' ? 'B' : 'S';
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return type === 'BUY' ? 'B' : 'S';
@@ -2020,21 +1854,13 @@ const getTransactionType = (type) => {
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
-// Get Exchange Segment for Dhan or Flattrade
+// Get Exchange Segment for Flattrade & Shoonya
 const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
     throw new Error("Broker or exchange not selected");
   }
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    if (selectedExchange.value === 'NSE') {
-      return 'NSE_FNO';
-    } else if (selectedExchange.value === 'BSE') {
-      return 'BSE_FNO';
-    } else {
-      throw new Error("Selected exchange is not valid for Dhan");
-    }
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (selectedExchange.value === 'NFO') {
       return 'NFO';
     } else if (selectedExchange.value === 'BFO') {
@@ -2057,24 +1883,9 @@ const getExchangeSegment = () => {
   }
 };
 
-// Prepare Order Payload for Dhan or Flattrade
+// Prepare Order Payload for Flattrade & Shoonya
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return {
-      brokerClientId: selectedBroker.value.brokerClientId,
-      transactionType: transactionType,
-      exchangeSegment: exchangeSegment,
-      productType: selectedProductType.value,
-      orderType: selectedOrderType.value,
-      validity: 'DAY',
-      tradingSymbol: selectedStrike.tradingSymbol,
-      securityId: selectedStrike.securityId,
-      quantity: selectedQuantity.value,
-      price: selectedOrderType.value === 'LIMIT' ? limitPrice.value : 0,
-      drvExpiryDate: selectedExpiry.value,
-      drvOptionType: drvOptionType
-    };
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return {
       uid: selectedBroker.value.brokerClientId,
       actid: selectedBroker.value.brokerClientId,
@@ -2132,7 +1943,7 @@ const positionTargetsPrice = ref({});
 const adjustStoplossPrice = (tsym, adjustment) => {
   if (!tsym || !positionStoplossesPrice.value[tsym]) return;
 
-  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
+  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
     .find(p => getSymbol(p) === tsym);
 
   if (!position) return;
@@ -2156,7 +1967,7 @@ const adjustStoplossPrice = (tsym, adjustment) => {
 const adjustTargetPrice = (tsym, adjustment) => {
   if (!tsym || !positionTargetsPrice.value[tsym]) return;
 
-  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
+  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
     .find(p => getSymbol(p) === tsym);
 
   if (!position) return;
@@ -2177,7 +1988,7 @@ const adjustTargetPrice = (tsym, adjustment) => {
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
 };
 
-// Place Order for Dhan, Flattrade or Shoonya
+// Place Order for Flattrade & Shoonya
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -2200,16 +2011,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
     console.log("Placing order with data:", orderData);
     let response;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-
-      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData, {
-        params: {
-          DHAN_API_TOKEN: dhanDetails.apiToken
-        }
-      });
-    }
-    else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify({
         ...orderData,
@@ -2270,12 +2072,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
 // New function to update both orders and positions
 const updateOrdersAndPositions = async () => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    await Promise.all([
-      fetchDhanOrdersTradesBook(),
-      fetchDhanPositions()
-    ]);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     await Promise.all([
       fetchFlattradeOrdersTradesBook(),
       fetchFlattradePositions()
@@ -2294,13 +2091,11 @@ const findNewPosition = (tradingSymbol) => {
     return flatTradePositionBook.value.find(p => p.tsym === tradingSymbol);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.find(p => p.tsym === tradingSymbol);
-  } else if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.find(p => p.tradingSymbol === tradingSymbol);
   }
   return null;
 };
 
-// Place Order for Dhan, Flattrade, or Shoonya for each position
+// Place Order for Flattrade & Shoonya for each position
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty));
@@ -2311,22 +2106,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     }
 
     let orderData;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      orderData = {
-        brokerClientId: selectedBroker.value.clientId,
-        transactionType: transactionType,
-        exchangeSegment: selectedExchange.value === 'NSE' ? 'NSE_FNO' : 'BSE_FNO',
-        productType: position.productType || selectedProductType.value,
-        orderType: 'MARKET',
-        validity: 'DAY',
-        tradingSymbol: position.tradingSymbol,
-        securityId: position.securityId,
-        quantity: quantity,
-        price: 0,
-        drvExpiryDate: position.expiryDate,
-        drvOptionType: optionType
-      };
-    } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
       orderData = {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId,
@@ -2343,10 +2123,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
 
     console.log("Placing order for position with data:", orderData);
     let response;
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      response = await axios.post('http://localhost:3000/dhanPlaceOrder', orderData);
-    }
-    else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
       const payload = qs.stringify(orderData);
       response = await axios.post('http://localhost:3000/flattradePlaceOrder', payload, {
@@ -2392,22 +2169,12 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
   }
 };
 
-// Close all positions for Dhan, Flattrade, or Shoonya
+// Close all positions for Flattrade & Shoonya
 const closeAllPositions = async () => {
   try {
     let positionsClosed = false;
 
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      for (const position of dhanPositionBook.value) {
-        const netQty = Number(position.netQty);
-        if (netQty !== 0) {
-          const transactionType = netQty > 0 ? 'SELL' : 'BUY';
-          const optionType = position.tradingSymbol.includes('CE') ? 'CALL' : 'PUT';
-          await placeOrderForPosition(transactionType, optionType, position);
-          positionsClosed = true;
-        }
-      }
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       for (const position of flatTradePositionBook.value) {
         const netqty = Number(position.netqty);
         if (netqty !== 0) {
@@ -2518,30 +2285,19 @@ const closeSelectedPositions = async () => {
   }
 };
 const cancelOrder = async (order) => {
-  const orderId = selectedBroker.value?.brokerName === 'Dhan' ? order.orderId : order.norenordno;
-  const orderStatus = selectedBroker.value?.brokerName === 'Dhan' ? order.orderStatus : order.status;
+  const orderId = order.norenordno;
+  const orderStatus = order.status;
 
   console.log(`Attempting to cancel order ${orderId} with status ${orderStatus}`);
   console.log(`Broker: ${selectedBroker.value?.brokerName}`);
 
-  if ((selectedBroker.value?.brokerName === 'Dhan' && orderStatus !== 'PENDING') ||
-    (selectedBroker.value?.brokerName === 'Flattrade' && orderStatus !== 'OPEN')) {
+  if (orderStatus !== 'OPEN') {
     console.log(`Order ${orderId} is not in a cancellable state and cannot be canceled.`);
     return;
   }
 
   try {
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-      console.log(`Sending request to cancel Dhan order ${orderId}`);
-      await axios.delete('http://localhost:3000/dhanCancelOrder', {
-        data: { orderId },
-        params: {
-          DHAN_API_TOKEN: dhanDetails.apiToken
-        }
-      });
-    }
-    else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
       const clientId = selectedBroker.value.clientId;
       console.log(`Sending request to cancel Flattrade order ${orderId}`);
@@ -2582,18 +2338,14 @@ const cancelPendingOrders = async () => {
   console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);
 
   // Fetch orders based on the selected broker
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    await fetchDhanOrdersTradesBook();
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     await fetchFlattradeOrdersTradesBook();
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     await fetchShoonyaOrdersTradesBook();
   }
 
   let pendingOrders;
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    pendingOrders = dhanOrders.value.filter(order => order.orderStatus === 'PENDING');
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     pendingOrders = flatOrderBook.value.filter(order => order.status === 'OPEN');
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     pendingOrders = shoonyaOrderBook.value.filter(order => order.status === 'OPEN');
@@ -2612,9 +2364,7 @@ const cancelPendingOrders = async () => {
     showToast.value = true;
 
     // Refresh the orders list based on the selected broker
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      await fetchDhanOrdersTradesBook();
-    } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
       await fetchFlattradeOrdersTradesBook();
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       await fetchShoonyaOrdersTradesBook();
@@ -2722,7 +2472,7 @@ const checkStoplossAndTarget = (position, currentLTP) => {
   }
 };
 const continuouslyCheckPositions = () => {
-  [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value].forEach(position => {
+  [...flatTradePositionBook.value, ...shoonyaPositionBook.value].forEach(position => {
     const tsym = getSymbol(position);
     const stoplossPrice = positionStoplossesPrice.value[tsym];
     const targetPrice = positionTargetsPrice.value[tsym];
@@ -2743,18 +2493,7 @@ const availableBalance = computed(() => {
   // console.log('Fund Limits:', fundLimits.value);
   // console.log('Selected Broker:', selectedBroker.value?.brokerName);
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    const dhanBalance = fundLimits.value.availabelBalance;
-    // console.log('Dhan Available Balance (raw):', dhanBalance);
-    // console.log('Dhan Available Balance (type):', typeof dhanBalance);
-
-    // Convert to number if it's a string, or use the value directly if it's already a number
-    const numericBalance = typeof dhanBalance === 'string' ? parseFloat(dhanBalance) : dhanBalance;
-
-    // console.log('Dhan Available Balance (processed):', numericBalance);
-    return isNaN(numericBalance) ? null : Math.floor(numericBalance);
-  }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     const balance = Math.floor(cash - marginUsed);
@@ -2772,11 +2511,7 @@ const availableBalance = computed(() => {
 });
 // Computed property to get the correct utilized amount based on the selected broker
 const usedAmount = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    const utilizedAmount = Number(fundLimits.value.utilizedAmount) || 0;
-    return utilizedAmount;
-  }
-  else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     const marginUsed = Number(fundLimits.value.marginused) || 0;
     return marginUsed;
   }
@@ -2801,9 +2536,7 @@ const totalNetQty = computed(() => {
     }, 0);
   };
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return calculateTotalQty(dhanPositionBook.value);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return calculateTotalQty(flatTradePositionBook.value);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return calculateTotalQty(shoonyaPositionBook.value);
@@ -2812,13 +2545,7 @@ const totalNetQty = computed(() => {
 });
 
 const totalProfit = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return positionsWithCalculatedProfit.value.reduce((acc, position) => {
-      const unrealizedProfit = position.calculatedUrmtom;
-      const realizedProfit = position.realizedProfit || 0;
-      return acc + unrealizedProfit + realizedProfit;
-    }, 0);
-  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     return positionsWithCalculatedProfit.value.reduce((acc, position) => {
       const unrealizedProfit = position.calculatedUrmtom;
       const realizedProfit = parseFloat(position.rpnl) || 0;
@@ -2841,12 +2568,7 @@ const calculateUnrealizedProfit = (position) => {
 };
 
 const positionsWithCalculatedProfit = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.map(position => ({
-      ...position,
-      calculatedUrmtom: calculateUnrealizedProfit(position)
-    }));
-  } else if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.map(position => ({
       ...position,
       calculatedUrmtom: calculateUnrealizedProfit(position)
@@ -2859,15 +2581,6 @@ const positionsWithCalculatedProfit = computed(() => {
   }
   return [];
 });
-
-// const profitData = computed(() => {
-//   if (selectedBroker.value?.brokerName === 'Dhan') {
-//     return dhanPositionBook.value.map(position => position.unrealizedProfit + position.realizedProfit);
-//   } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-//     return flatTradePositionBook.value.map(position => parseFloat(position.urmtom) + parseFloat(position.rpnl));
-//   }
-//   return [];
-// });
 
 const totalCapitalPercentage = computed(() => {
   const totalMoney = Number(availableBalance.value) + Number(usedAmount.value);
@@ -2884,25 +2597,7 @@ const totalBrokerage = computed(() => {
   // Calculate totalValue based on totalBuyValue and totalSellValue
   const totalValue = totalBuyValue.value + totalSellValue.value;
 
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    // Calculate charges for Dhan broker
-    const exchangeCharge = Math.round(totalValue * 0.0005 * 100) / 100;
-    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;
-    const gstCharge = Math.round((exchangeCharge + sebiCharge) * 18) / 100;
-    const stampdutyCharge = Math.round(totalBuyValue.value * 0.0003);
-    const sttCharge = Math.round(totalSellValue.value * 0.000625 * 100) / 100;
-
-    // Accumulate brokerage for Dhan
-    for (const order of dhanOrders.value) {
-      if (order.orderStatus === 'TRADED') {
-        total += 23.6; // Accumulate brokerage total
-      }
-    }
-
-    // Add charges to total for Dhan
-    total += (exchangeCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
-
-  } else if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     // Calculate charges for Flattrade and Shoonya (they have the same structure)
     const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;
     const ipftCharge = Math.round(totalValue * 0.000005 * 100) / 100;
@@ -3035,47 +2730,6 @@ const setShoonyaCredentials = async () => {
   }
 };
 
-const setDhanCredentials = async () => {
-  try {
-    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Dhan') {
-      toastMessage.value = 'Realtime LTP data only available for Dhan';
-      showToast.value = true;
-      return;
-    }
-
-    // Check if the broker status is 'Connected'
-    if (brokerStatus.value !== 'Connected') {
-      console.error('Dhan broker is not connected');
-      toastMessage.value = 'Dhan broker is not connected';
-      showToast.value = true;
-      return;
-    }
-
-    const clientId = selectedBroker.value.clientId;
-    const apiToken = localStorage.getItem('DHAN_API_TOKEN');
-
-    if (!clientId || !apiToken) {
-      console.error('Dhan client ID or API token is missing');
-      toastMessage.value = 'Dhan credentials are missing';
-      showToast.value = true;
-      return;
-    }
-
-    const response = await axios.post('http://localhost:3000/api/set-dhan-credentials', {
-      accessToken: apiToken, // Corrected key
-      clientId: clientId,    // Corrected key
-      dhanExchangeSegment: "0",  // Send as string
-      dhanSecurityId: "25"       // Send as string
-    });
-    console.log('Credentials and security IDs set successfully:', response.data);
-    toastMessage.value = 'Dhan credentials set successfully';
-    showToast.value = true;
-  } catch (error) {
-    console.error('Error setting credentials and security IDs:', error);
-    toastMessage.value = 'Failed to set Dhan credentials';
-    showToast.value = true;
-  }
-};
 const socket = ref(null);
 const latestCallLTP = ref('N/A');
 const latestPutLTP = ref('N/A');
@@ -3090,8 +2744,6 @@ const connectWebSocket = () => {
     websocketUrl = 'ws://localhost:8765';
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     websocketUrl = 'ws://localhost:8766';
-  } else if (selectedBroker.value?.brokerName === 'Dhan') {
-    websocketUrl = 'ws://localhost:8767';
   }
 
   console.log(`Connecting to WebSocket at ${websocketUrl}`);
@@ -3303,9 +2955,6 @@ const totalBuyValue = computed(() => {
   if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
   }
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.reduce((total, position) => total + position.dayBuyValue, 0);
-  }
   return 0;
 });
 
@@ -3315,9 +2964,6 @@ const totalSellValue = computed(() => {
   }
   if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  }
-  if (selectedBroker.value?.brokerName === 'Dhan') {
-    return dhanPositionBook.value.reduce((total, position) => total + position.daySellValue, 0);
   }
   return 0;
 });
@@ -3351,10 +2997,6 @@ onMounted(async () => {
       fetchFlattradePositions();
       activeFetchFunction.value = 'fetchFlattradePositions';
     }
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      fetchDhanPositions();
-      activeFetchFunction.value = 'fetchDhanPositions';
-    }
     if (selectedBroker.value?.brokerName === 'Shoonya') {
       fetchShoonyaPositions();
       activeFetchFunction.value = 'fetchShoonyaPositions';
@@ -3364,10 +3006,6 @@ onMounted(async () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       fetchFlattradeOrdersTradesBook();
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
-    }
-    if (selectedBroker.value?.brokerName === 'Dhan') {
-      fetchDhanOrdersTradesBook();
-      activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
     }
     if (selectedBroker.value?.brokerName === 'Shoonya') {
       fetchShoonyaOrdersTradesBook();
@@ -3428,10 +3066,6 @@ watch(selectedBroker, async (newBroker) => {
         activeFetchFunction.value = 'fetchShoonyaPositions';
         await fetchShoonyaPositions();
       }
-      else if (newBroker.brokerName === 'Dhan') {
-        activeFetchFunction.value = 'fetchDhanPositions';
-        await fetchDhanPositions();
-      }
     } else if (activeTab.value === 'trades') {
       if (newBroker.brokerName === 'Flattrade') {
         activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
@@ -3440,10 +3074,6 @@ watch(selectedBroker, async (newBroker) => {
       else if (newBroker.brokerName === 'Shoonya') {
         activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
         await fetchShoonyaOrdersTradesBook();
-      }
-      else if (newBroker.brokerName === 'Dhan') {
-        activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
-        await fetchDhanOrdersTradesBook();
       }
     }
   }
@@ -3495,9 +3125,6 @@ watch(
       }
       if (selectedBroker.value?.brokerName === 'Shoonya') {
         setShoonyaCredentials();
-      }
-      if (selectedBroker.value?.brokerName === 'Dhan') {
-        setDhanCredentials();
       }
     }
   },
@@ -3562,10 +3189,6 @@ watch(activeTab, async (newTab) => {
       activeFetchFunction.value = 'fetchShoonyaPositions';
       await fetchShoonyaPositions();
     }
-    else if (selectedBroker.value?.brokerName === 'Dhan') {
-      activeFetchFunction.value = 'fetchDhanPositions';
-      await fetchDhanPositions();
-    }
   } else if (newTab === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
@@ -3574,10 +3197,6 @@ watch(activeTab, async (newTab) => {
     else if (selectedBroker.value?.brokerName === 'Shoonya') {
       activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
       await fetchShoonyaOrdersTradesBook();
-    }
-    else if (selectedBroker.value?.brokerName === 'Dhan') {
-      activeFetchFunction.value = 'fetchDhanOrdersTradesBook';
-      await fetchDhanOrdersTradesBook();
     }
   }
 });
@@ -3594,7 +3213,7 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
       console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
-      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value]
+      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
         .find(p => (p.tsym || p.tradingSymbol) === tsym);
       if (position) {
         console.log(`Found position for ${tsym}:`, position);
@@ -3608,19 +3227,19 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
 
 // Add watchers for enableStoploss, stoplossValue, enableTarget, and targetValue
 watch(() => [tradeSettings.enableStoploss, tradeSettings.stoplossValue, tradeSettings.enableTarget, tradeSettings.targetValue], () => {
-  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
   allPositions.forEach(setStoplossAndTarget);
 });
 // // Modify the existing watchers for position books to set initial stoploss and target
-// watch([flatTradePositionBook, shoonyaPositionBook, dhanPositionBook, positionLTPs], () => {
-//   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+// watch([flatTradePositionBook, shoonyaPositionBook, positionLTPs], () => {
+//   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
 //   allPositions.forEach(setStoplossAndTarget);
 // }, { deep: true });
 // Modify the existing watcher for tradeSettings
 watch(tradeSettings, (newSettings, oldSettings) => {
   console.log('Trade settings changed:', newSettings, oldSettings);
   saveTradeSettings();
-  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...dhanPositionBook.value];
+  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
   allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
 </script>
