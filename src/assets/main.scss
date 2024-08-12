@@ -50,6 +50,16 @@
     background-color: var(--bs-success);
     border-color: var(--bs-success);
   }
+
+  // Add table styles
+  .table {
+    color: var(--bs-body-color);
+    
+    > :not(caption) > * > * {
+      color: var(--bs-body-color);
+      border-bottom-color: var(--bs-border-color);
+    }
+  }
 }
 
 @media (prefers-color-scheme: light) {
