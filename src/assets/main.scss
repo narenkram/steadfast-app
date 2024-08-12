@@ -94,22 +94,18 @@
 @media (prefers-color-scheme: dark) {
   :root {
     // Invert some of the theme colors for dark mode
-    --bs-primary: #{$blue-300};
-    --bs-secondary: #{$gray-600};
-    --bs-success: #{$green-300};
-    --bs-info: #{$cyan-300};
-    --bs-warning: #{$yellow-300};
-    --bs-danger: #{$red-300};
-    --bs-light: #{$gray-800};
-    --bs-dark: #{$gray-100};
-
-    // Set body colors
-    --bs-body-color: #{$gray-100};
-    --bs-body-bg: #{$gray-900};
-
-    // Adjust other variables as needed
-    --bs-border-color: #{$gray-700};
-    --bs-card-border-color: #{$gray-300};
+    --bs-primary: #6ea8fe; // Light blue
+    --bs-secondary: #6c757d; // Gray
+    --bs-success: #75b798; // Light green
+    --bs-info: #6edff6; // Light cyan
+    --bs-warning: #ffda6a; // Light yellow
+    --bs-danger: #ea868f; // Light red
+    --bs-light: #343a40; // Dark gray
+    --bs-dark: #212529; // Dark background color (changed)
+    --bs-body-color: #f8f9fa; // Light text color (should be darker)
+    --bs-body-bg: #212529; // Dark background
+    --bs-border-color: #495057; // Dark gray
+    --bs-card-border-color: #dee2e6; // Light gray
   }
   @include color-scheme-styles;
 
@@ -117,12 +113,12 @@
   .btn-outline {
     color: var(--bs-white); // White text color for dark theme
     border-color: var(--bs-white); // White border color for dark theme
-    background-color: var(--bs-dark);
+    background-color: var(--bs-dark); // Dark background color
 
     &:hover {
-      color: var(--bs-dark); // White text color on hover
+      color: var(--bs-dark); // Dark text color on hover
       border-color: var(--bs-white); // White border color on hover
-      background-color: var(--bs-white);
+      background-color: var(--bs-white); // Light background color on hover
     }
   }
 }
