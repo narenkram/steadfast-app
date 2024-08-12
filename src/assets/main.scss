@@ -60,6 +60,9 @@
       border-bottom-color: var(--bs-border-color);
     }
   }
+  .table th {
+    font-weight: 600;
+  }
 
   .input-group-text {
     color: var(--bs-body-color);
