@@ -66,7 +66,6 @@
     background-color: var(--bs-input-bg);
     border-color: var(--bs-border-color);
   }
-
 }
 
 @media (prefers-color-scheme: light) {
@@ -77,6 +76,19 @@
     --bs-card-border-color: #{$gray-700};
   }
   @include color-scheme-styles;
+
+  // Light theme styles
+  .btn-outline {
+    color: var(--bs-dark); // Dark text color for light theme
+    border-color: var(--bs-dark); // Dark border color for light theme
+    background-color: var(--bs-white);
+
+    &:hover {
+      color: var(--bs-white); // white text color on hover
+      border-color: var(--bs-dark); // Dark border color on hover
+      background-color: var(--bs-dark);
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -100,6 +112,19 @@
     --bs-card-border-color: #{$gray-300};
   }
   @include color-scheme-styles;
+
+  // Dark theme styles
+  .btn-outline {
+    color: var(--bs-white); // White text color for dark theme
+    border-color: var(--bs-white); // White border color for dark theme
+    background-color: var(--bs-dark);
+
+    &:hover {
+      color: var(--bs-dark); // White text color on hover
+      border-color: var(--bs-white); // White border color on hover
+      background-color: var(--bs-white);
+    }
+  }
 }
 
 // Styles that don't change based on color scheme

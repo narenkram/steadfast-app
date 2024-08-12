@@ -397,16 +397,16 @@
           <!-- Close & Cancel Buttons -->
           <div class="col-6 text-center">
             <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
-              class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeAllPositions">
+              class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close All Positions
             </button>
             <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
-              class="btn btn-lg btn-outline-dark fs-5 w-75 my-2" @click="closeSelectedPositions">
+              class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeSelectedPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Selected Positions
             </button>
-            <button class="btn btn-lg btn-outline-dark fs-5 w-75" @click="cancelPendingOrders">
+            <button class="btn btn-lg btn-outline fs-5 w-75" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
               Cancel Orders
             </button>
