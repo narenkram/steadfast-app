@@ -1,27 +1,107 @@
-@media (prefers-color-scheme: light) {
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
 
+@mixin color-scheme-styles {
   html,
   body {
-    color: #000000;
-    background-color: #ffffff;
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
   }
+
+  .Card {
+    border: 1px solid var(--bs-card-border-color);
+  }
+
+  .ToggleSlider {
+    background-color: var(--bs-secondary);
+  }
+
+  .ToggleSlider:before {
+    background-color: var(--bs-white);
+  }
+
+  .ToggleInput:checked + .ToggleSlider {
+    background-color: var(--bs-success);
+  }
+
+  .ToggleInput:focus + .ToggleSlider {
+    box-shadow: 0 0 1px var(--bs-success);
+  }
+
+  .ToggleInput:disabled + .ToggleSlider {
+    background-color: var(--bs-gray-200);
+  }
+
+  .table {
+    border: 1px solid var(--bs-table-border-color);
+  }
+
+  th {
+    background-color: var(--bs-gray-100) !important;
+    color: var(--bs-body-color) !important;
+  }
+
+  .nested-trade-row {
+    background-color: var(--bs-gray-100);
+  }
+
+  tr:hover + .nested-trade-row,
+  .nested-trade-row:hover {
+    background-color: var(--bs-gray-200);
+  }
+
+  #enableStoploss:checked {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+  }
+
+  #enableTarget:checked {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    @each $color, $value in $theme-colors {
+      --bs-#{$color}: #{$value};
+    }
+    --bs-card-border-color: #{$gray-700};
+    --bs-table-border-color: #{$gray-700};
+  }
+  @include color-scheme-styles;
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    // Invert some of the theme colors for dark mode
+    --bs-primary: #{$blue-300};
+    --bs-secondary: #{$gray-600};
+    --bs-success: #{$green-300};
+    --bs-info: #{$cyan-300};
+    --bs-warning: #{$yellow-300};
+    --bs-danger: #{$red-300};
+    --bs-light: #{$gray-800};
+    --bs-dark: #{$gray-100};
 
-  html,
-  body {
-    color: #ffffff;
-    background-color: #000000;
+    // Set body colors
+    --bs-body-color: #{$gray-100};
+    --bs-body-bg: #{$gray-900};
+
+    // Adjust other variables as needed
+    --bs-border-color: #{$gray-700};
+    --bs-card-border-color: #{$gray-300};
+    --bs-table-border-color: #{$gray-300};
   }
+  @include color-scheme-styles;
 }
 
+// Styles that don't change based on color scheme
 .Card {
-  border-radius: 6px;
-  padding: 12px;
+  border-radius: $border-radius;
+  padding: $spacer;
   width: 100%;
   height: 100%;
-  border: 1px solid gray;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -51,7 +131,7 @@ input:focus {
 }
 
 .ToggleLabel {
-  margin-left: 10px;
+  margin-left: $spacer;
 }
 
 .ToggleSlider {
@@ -61,9 +141,7 @@ input:focus {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+  transition: $transition-base;
 }
 
 .ToggleSlider:before {
@@ -73,30 +151,13 @@ input:focus {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  transition: $transition-base;
 }
 
-.ToggleInput:checked+.ToggleSlider {
-  background-color: #27b600;
-}
-
-.ToggleInput:focus+.ToggleSlider {
-  box-shadow: 0 0 1px #27b600;
-}
-
-.ToggleInput:checked+.ToggleSlider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
+.ToggleInput:checked + .ToggleSlider:before {
   transform: translateX(26px);
 }
 
-.ToggleInput:disabled+.ToggleSlider {
-  background-color: #e9ecef;
-}
-
-/* Rounded ToggleSliders */
 .ToggleSlider.SliderRound {
   border-radius: 34px;
 }
@@ -105,21 +166,12 @@ input:focus {
   border-radius: 50%;
 }
 
-.table {
-  border: 1px solid gray;
-}
-
-th {
-  background-color: #f5f7f7 !important;
-  color: black !important;
-}
-
 .toast {
   position: fixed;
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: $zindex-toast;
   overflow: hidden;
 }
 
@@ -133,32 +185,17 @@ th {
 }
 
 .nav-link {
-  color: unset !important;
+  color: inherit !important;
 }
 
 .nested-trade-row {
-  background-color: #f8f9fa;
   transition: background-color 0.3s ease;
-  /* Light gray background */
-}
-
-tr:hover+.nested-trade-row,
-.nested-trade-row:hover {
-  background-color: #e9ecef;
-  /* Slightly darker on hover */
 }
 
 .nested-trade-row td {
   padding-left: calc(2rem - 3px);
 }
 
-/* .nested-trade-row td:first-child::before {
-  content: "↳";
-  margin-right: 0.5rem;
-  color: #6c757d;
-} */
-
-/* Homepage */
 .broker-logo {
   max-height: 80px;
   width: auto;
@@ -167,14 +204,4 @@ tr:hover+.nested-trade-row,
 .arrow_keys {
   max-height: 200px;
   width: auto;
-}
-
-#enableStoploss:checked {
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-#enableTarget:checked {
-  background-color: #198754;
-  border-color: #198754;
 }
