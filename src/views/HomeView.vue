@@ -52,9 +52,8 @@
                 <div class="d-flex justify-content-center align-items-center mb-4">
                     <img src="/flattrade_logo.png" alt="Flattrade" class="img-fluid mx-3" style="max-height: 50px;">
                     <img src="/shoonya_logo.png" alt="Shoonya" class="img-fluid mx-3" style="max-height: 50px;">
-                    <img src="/dhan_logo.png" alt="Dhan" class="img-fluid mx-3" style="max-height: 50px;">
                 </div>
-                <p>Seamlessly integrate with Flattrade, Shoonya, and Dhan. Manage all your accounts from one platform.
+                <p>Seamlessly integrate with Flattrade, and Shoonya. Manage all your accounts from one platform.
                 </p>
             </div>
         </section> -->

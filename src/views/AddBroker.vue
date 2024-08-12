@@ -19,7 +19,6 @@
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
           <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
             <option value="">Select a broker</option>
-            <!-- <option value="Dhan">Dhan</option> -->
             <option value="Flattrade">Flattrade</option>
             <option value="Shoonya">Shoonya</option>
           </select>
@@ -32,20 +31,14 @@
           </div>
 
           <!-- API Key (for Flattrade and Shoonya) -->
-          <label v-if="selectedBroker !== 'Dhan'" for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
-          <input v-if="selectedBroker !== 'Dhan'" v-model="apiKey" type="text" class="form-control" id="APIKey"
-            required>
+          <label for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
+          <input v-model="apiKey" type="text" class="form-control" id="APIKey" required>
 
           <!-- API Secret Key (only for Flattrade) -->
           <label v-if="selectedBroker === 'Flattrade'" for="APISecretKey" class="form-label mb-0 mt-3"><b>API Secret
               Key</b></label>
           <input v-if="selectedBroker === 'Flattrade'" v-model="apiSecret" type="text" class="form-control"
             id="APISecretKey" required>
-
-          <!-- API Token (only for Dhan) -->
-          <label v-if="selectedBroker === 'Dhan'" for="APIToken" class="form-label mb-0 mt-3"><b>API Token</b></label>
-          <input v-if="selectedBroker === 'Dhan'" v-model="apiToken" type="text" class="form-control" id="APIToken"
-            required>
 
           <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
           <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
@@ -83,13 +76,10 @@ const router = useRouter();
 const selectedBroker = ref('');
 const apiKey = ref('');
 const apiSecret = ref('');
-const apiToken = ref('');
 const clientId = ref('');
 
 const getBrokerDashboardLink = computed(() => {
   switch (selectedBroker.value) {
-    case 'Dhan':
-      return 'https://web.dhan.co/';
     case 'Flattrade':
       return 'https://wall.flattrade.in/';
     case 'Shoonya':
@@ -108,15 +98,11 @@ const addBroker = () => {
   const brokerDetails = {
     brokerName: selectedBroker.value,
     clientId: clientId.value,
+    apiKey: apiKey.value,
   };
 
-  if (selectedBroker.value === 'Dhan') {
-    brokerDetails.apiToken = apiToken.value;
-  } else if (selectedBroker.value === 'Flattrade') {
-    brokerDetails.apiKey = apiKey.value;
+  if (selectedBroker.value === 'Flattrade') {
     brokerDetails.apiSecret = apiSecret.value;
-  } else if (selectedBroker.value === 'Shoonya') {
-    brokerDetails.apiKey = apiKey.value;
   }
 
   // Store in localStorage

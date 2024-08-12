@@ -3,7 +3,6 @@ import { reactive } from 'vue';
 
 const tokenStatus = reactive({
   Flattrade: 'unknown',
-  Dhan: 'unknown',
   Shoonya: 'unknown'
 })
 
@@ -53,25 +52,6 @@ const shoonyaFundLimits = async () => {
   }
 }
 
-const dhanFundLimits = async () => {
-  const accessToken = localStorage.getItem('DHAN_API_TOKEN')
-  if (!accessToken) {
-    throw new Error('Dhan API token is missing.')
-  }
-  try {
-    const res = await axios.get('/dhanApi/fundlimit', {
-      headers: {
-        'access-token': accessToken
-      }
-    })
-    return res.data
-  } catch (error) {
-    throw new Error(
-      'Error fetching Dhan fund limits: ' + (error.response?.data?.message || error.message)
-    )
-  }
-}
-
 const validateToken = async (brokerName) => {
   try {
     switch (brokerName) {
@@ -83,10 +63,6 @@ const validateToken = async (brokerName) => {
         await shoonyaFundLimits()
         tokenStatus.Shoonya = 'valid'
         break
-      case 'Dhan':
-        await dhanFundLimits()
-        tokenStatus.Dhan = 'valid'
-        break
       default:
         throw new Error('Invalid broker name')
     }
@@ -96,7 +72,7 @@ const validateToken = async (brokerName) => {
 }
 
 const checkAllTokens = async () => {
-  const brokers = ['Flattrade', 'Shoonya', 'Dhan']
+  const brokers = ['Flattrade', 'Shoonya']
   for (const broker of brokers) {
     await validateToken(broker)
   }
