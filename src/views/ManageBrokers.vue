@@ -7,8 +7,6 @@ const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
 const FLATTRADE_CLIENT_ID = ref('');
 const FLATTRADE_API_TOKEN = ref('');
-const DHAN_API_TOKEN = ref('');
-const DHAN_CLIENT_ID = ref('');
 const SHOONYA_API_KEY = ref('');
 const SHOONYA_CLIENT_ID = ref('');
 const SHOONYA_API_TOKEN = ref('');
@@ -37,15 +35,6 @@ const brokers = computed(() => {
     });
   }
 
-  if (DHAN_CLIENT_ID.value) {
-    brokersArray.push({
-      id: 'Dhan',
-      brokerName: 'Dhan',
-      brokerClientId: DHAN_CLIENT_ID.value,
-      apiToken: DHAN_API_TOKEN.value
-    });
-  }
-
   if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
     brokersArray.push({
       id: 'Shoonya',
@@ -66,11 +55,6 @@ onMounted(() => {
   FLATTRADE_API_SECRET.value = flattradeDetails.apiSecret || '';
   FLATTRADE_CLIENT_ID.value = flattradeDetails.clientId || '';
   FLATTRADE_API_TOKEN.value = localStorage.getItem('FLATTRADE_API_TOKEN') || '';
-
-  // Retrieve Dhan details
-  const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-  DHAN_API_TOKEN.value = dhanDetails.apiToken || '';
-  DHAN_CLIENT_ID.value = dhanDetails.clientId || '';
 
   // Retrieve Shoonya details
   const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
@@ -119,20 +103,6 @@ watch(SHOONYA_API_TOKEN, (newToken) => {
     validateToken('Shoonya');
   } else {
     localStorage.removeItem('SHOONYA_API_TOKEN');
-  }
-});
-
-// Update the watch function similarly
-watch(DHAN_API_TOKEN, (newToken) => {
-  if (newToken) {
-    localStorage.setItem('DHAN_API_TOKEN', newToken);
-    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-    dhanDetails.apiToken = newToken;
-    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
-    validateToken('Dhan');
-  } else {
-    localStorage.removeItem('DHAN_API_TOKEN');
-    localStorage.removeItem('broker_Dhan');
   }
 });
 
@@ -347,27 +317,6 @@ const handleShoonyaLogin = async () => {
   }
 };
 
-const updateDhanToken = () => {
-  if (DHAN_API_TOKEN.value) {
-    // Update localStorage
-    localStorage.setItem('DHAN_API_TOKEN', DHAN_API_TOKEN.value);
-
-    // Update broker object in localStorage
-    const dhanDetails = JSON.parse(localStorage.getItem('broker_Dhan') || '{}');
-    dhanDetails.apiToken = DHAN_API_TOKEN.value;
-    localStorage.setItem('broker_Dhan', JSON.stringify(dhanDetails));
-
-    validateToken('Dhan');
-    statusMessage.value = 'Dhan token updated successfully';
-    setTimeout(() => {
-      statusMessage.value = '';
-    }, 5000);
-  } else {
-    errorMessage.value = 'Please enter a valid Dhan API token';
-    clearErrorMessage();
-  }
-};
-
 const deleteBroker = (broker) => {
   // Remove broker details from localStorage
   localStorage.removeItem(`broker_${broker.brokerName}`);
@@ -379,9 +328,6 @@ const deleteBroker = (broker) => {
     FLATTRADE_API_KEY.value = '';
     FLATTRADE_API_SECRET.value = '';
     FLATTRADE_CLIENT_ID.value = '';
-  } else if (broker.brokerName === 'Dhan') {
-    DHAN_API_TOKEN.value = '';
-    DHAN_CLIENT_ID.value = '';
   } else if (broker.brokerName === 'Shoonya') {
     localStorage.removeItem('SHOONYA_API_TOKEN');
     SHOONYA_API_TOKEN.value = '';
@@ -437,13 +383,10 @@ const deleteBroker = (broker) => {
             </td>
             <td>
               <span v-if="broker.brokerName === 'Flattrade'">{{ maskTokenSecret(broker.apiToken) }}</span>
-              <span v-if="broker.brokerName === 'Dhan'">{{ maskTokenSecret(broker.apiToken) }}</span>
               <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
             </td>
             <td>
               <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
-              <span v-if="broker.brokerName === 'Dhan'"
-                title="Check your broker dashboard for token validity">Custom</span>
               <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
             </td>
             <td class="text-center">
@@ -455,12 +398,6 @@ const deleteBroker = (broker) => {
               </template>
               <template v-else-if="broker.brokerName == 'Flattrade'">
                 <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
-              </template>
-              <template v-else-if="broker.brokerName === 'Dhan'">
-                <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
-                  data-bs-target="#DhanUpdateToken">
-                  Update Token
-                </button>
               </template>
             </td>
             <td>
@@ -521,28 +458,27 @@ const deleteBroker = (broker) => {
     </div>
   </div>
 
-  <!-- Dhan Update Token -->
-  <div class="modal fade" id="DhanUpdateToken" tabindex="-1" aria-labelledby="DhanUpdateTokenLabel" aria-hidden="true">
+  <!-- Update Token -->
+  <div class="modal fade" id="UpdateToken" tabindex="-1" aria-labelledby="UpdateTokenLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="DhanUpdateTokenLabel">
-            Dhan Update Token
+          <h1 class="modal-title fs-5" id="UpdateTokenLabel">
+            Update Token
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="col-12">
-            <label for="DhanApiToken" class="form-label mb-0">API Token</label>
-            <input type="text" id="DhanApiToken" class="form-control" v-model="DHAN_API_TOKEN"
-              placeholder="Enter API Token">
+            <label for="ApiToken" class="form-label mb-0">API Token</label>
+            <input type="text" id="ApiToken" class="form-control" v-model="API_TOKEN" placeholder="Enter API Token">
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             Cancel
           </button>
-          <button type="button" class="btn btn-primary" @click="updateDhanToken" data-bs-dismiss="modal">
+          <button type="button" class="btn btn-primary" @click="updateToken" data-bs-dismiss="modal">
             Update
           </button>
         </div>
