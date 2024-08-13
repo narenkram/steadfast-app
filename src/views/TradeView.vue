@@ -1,80 +1,73 @@
 <template>
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <section class="row pb-3">
-    <div class="col-12">
-
-      <div class="row">
-
-        <!-- Change Broker -->
-        <div class="col-2">
-          <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
-          <div class="d-flex align-items-center">
-            <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBrokerName"
-              @change="updateSelectedBroker">
-              <option value="" disabled selected>Select a broker</option>
-              <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-                {{ brokerName }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Broker Name and Status with Broker ID -->
-        <div class="col-3 text-center">
-          <p class="mb-1">
-            <b>Status: </b>
-            <span :class="{
-              'badge bg-success': brokerStatus === 'Connected',
-              'badge bg-danger': brokerStatus === 'Not Connected',
-              'badge bg-warning text-dark': brokerStatus === 'Token Expired'
-            }">
-              {{ brokerStatus }}
-            </span>
-          </p>
-          <p class="mb-0 d-flex align-items-center justify-content-center">
-            <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
-              <span>⚙️</span>
-            </RouterLink>
-            <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
-              {{ selectedBroker?.clientId || 'N/A' }}
-              <span>👀</span>
-            </span>
-            <span v-else @click="toggleBrokerClientIdVisibility">
-              {{ maskBrokerClientId(selectedBroker?.clientId) }}
-              <span>👁️</span>
-            </span>
-          </p>
-        </div>
-
-        <!-- Total Funds -->
-        <div class="col-3 text-center">
-          <p class="mb-1"><b>Total Funds</b></p>
-          <p class="mt-2 mb-0">
-            ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
-              'N/A' }}
-          </p>
-        </div>
-
-        <!-- Utilized Margin -->
-        <div class="col-2 text-center">
-          <p class="mb-1"><b>Utilized Margin</b></p>
-          <p class="mt-2 mb-0">₹ {{ usedAmount || null }}</p>
-        </div>
-
-        <!-- Today's Expiry -->
-        <div class="col-2 text-end">
-          <p class="mb-1"><b>Today's Expiry</b></p>
-          <p v-if="isExpiryToday" class="text-danger">
-            <b>{{ selectedMasterSymbol }}</b>
-          </p>
-          <p v-else class="text-danger">
-            <b>-</b>
-          </p>
-        </div>
-
+    <!-- Change Broker -->
+    <div class="col-6 col-md-4 col-lg-2">
+      <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
+      <div class="d-flex align-items-center">
+        <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBrokerName"
+          @change="updateSelectedBroker">
+          <option value="" disabled selected>Select a broker</option>
+          <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
+            {{ brokerName }}
+          </option>
+        </select>
       </div>
-
     </div>
+
+    <!-- Broker Name and Status with Broker ID -->
+    <div class="col-6 col-md-4 col-lg-3 text-center">
+      <p class="mb-1">
+        <b>Status: </b>
+        <span :class="{
+          'badge bg-success': brokerStatus === 'Connected',
+          'badge bg-danger': brokerStatus === 'Not Connected',
+          'badge bg-warning text-dark': brokerStatus === 'Token Expired'
+        }">
+          {{ brokerStatus }}
+        </span>
+      </p>
+      <p class="mb-0 d-flex align-items-center justify-content-center">
+        <RouterLink class="fs-4 text-decoration-none me-2" to="/manage-brokers">
+          <span>⚙️</span>
+        </RouterLink>
+        <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
+          {{ selectedBroker?.clientId || 'N/A' }}
+          <span>👀</span>
+        </span>
+        <span v-else @click="toggleBrokerClientIdVisibility">
+          {{ maskBrokerClientId(selectedBroker?.clientId) }}
+          <span>👁️</span>
+        </span>
+      </p>
+    </div>
+
+    <!-- Total Funds -->
+    <div class="col-6 col-md-4 col-lg-3 text-center">
+      <p class="mb-1"><b>Total Funds</b></p>
+      <p class="mt-2 mb-0">
+        ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
+          'N/A' }}
+      </p>
+    </div>
+
+    <!-- Utilized Margin -->
+    <div class="col-6 col-md-6 col-lg-2 text-center">
+      <p class="mb-1"><b>Utilized Margin</b></p>
+      <p class="mt-2 mb-0">₹ {{ usedAmount || null }}</p>
+    </div>
+
+    <!-- Today's Expiry -->
+    <div class="col-6 col-md-6 col-lg-2 text-end">
+      <p class="mb-1"><b>Today's Expiry</b></p>
+      <p v-if="isExpiryToday" class="text-danger">
+        <b>{{ selectedMasterSymbol }}</b>
+      </p>
+      <p v-else class="text-danger">
+        <b>-</b>
+      </p>
+    </div>
+
   </section>
 
   <!-- <section class="row py-3">
@@ -91,7 +84,7 @@
 
   <!-- Total Profit & Net PNL -->
   <section class="row py-3">
-    <div class="col-5">
+    <div class="col-6 col-md-4 col-lg-5">
       <div class="Card">
         <blockquote class="fs-3" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
           ₹ {{ totalProfit.toFixed(2) }}
@@ -104,7 +97,7 @@
         </small>
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-6 col-md-4 col-lg-4">
       <div class="Card">
         <blockquote class="fs-3 text-center m-0">
           <span
@@ -117,7 +110,7 @@
         <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
-    <div class="col-3 d-flex justify-content-center align-items-center">
+    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
       <div class="Card">
         <div class="card-title">
           <h5>Kill Switch</h5>
@@ -159,7 +152,7 @@
       <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
         <div class="row">
           <!-- Exchange Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="Exchange" class="form-label mb-0">Exchange</label>
             <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
@@ -170,16 +163,17 @@
           </div>
 
           <!-- Segment Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="Segment" class="form-label mb-0">Segment</label>
-            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }" disabled>
+            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }"
+              disabled>
               <option value="Options" selected>Options</option>
               <!-- <option value="Futures">Futures</option> -->
             </select>
           </div>
 
           <!-- Master Symbol Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
             <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
@@ -190,7 +184,7 @@
           </div>
 
           <!-- Expiry Date Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="Expiry" class="form-label mb-0">Expiry Date</label>
             <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry"
               :class="{ 'disabled-form': isFormDisabled }">
@@ -201,7 +195,7 @@
           </div>
 
           <!-- Product Type Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="ProductType" class="form-label mb-0">Product Type</label>
             <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType"
               :class="{ 'disabled-form': isFormDisabled }">
@@ -212,7 +206,7 @@
           </div>
 
           <!-- Quantity Selection -->
-          <div class="col-2">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="Quantity" class="form-label mb-0">
               {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity
             </label>
@@ -226,7 +220,7 @@
 
         <div class="row mt-3">
           <!-- Order Type -->
-          <div class="col-3">
+          <div class="col-4 col-md-3 col-lg-3">
             <label for="OrderType" class="form-label mb-0">Order Type</label>
             <div class="input-group">
               <select id="OrderType" class="form-select w-50" aria-label="OrderType" v-model="selectedOrderType"
@@ -253,7 +247,7 @@
             </select>
           </div> -->
           <!-- Stoploss -->
-          <div class="col-3">
+          <div class="col-4 col-md-3 col-lg-3">
             <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -267,7 +261,7 @@
             </div>
           </div>
           <!-- Target -->
-          <div class="col-3">
+          <div class="col-4 col-md-3 col-lg-3">
             <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -280,7 +274,7 @@
             </div>
           </div>
           <!-- 1 Click Keys -->
-          <div class="col-3">
+          <div class="col-12 col-md-3 col-lg-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
                 <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
@@ -296,7 +290,7 @@
         <!-- Trading Symbols & Strikes -->
         <div class="row align-items-center justify-content-between">
           <!-- Call Strike Selection -->
-          <div class="col-3">
+          <div class="col-12 col-md-4 col-lg-3">
             <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span>Call Strike</span>
               <span class="me-4">LTP</span>
@@ -320,7 +314,7 @@
           </div>
 
           <!-- Live Underlying Price -->
-          <div class="col-6 text-center">
+          <div class="col-12 col-md-4 col-lg-6 text-center">
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">Nifty 50: <b>{{ niftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
@@ -333,7 +327,7 @@
           </div>
 
           <!-- Put Strike Selection -->
-          <div class="col-3">
+          <div class="col-12 col-md-4 col-lg-3">
             <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span class="ms-4">LTP</span>
               <span>Put Strike</span>
@@ -359,7 +353,7 @@
 
         <div class="row">
           <!-- Call Strike Buy/Sell Buttons -->
-          <div class="col-3">
+          <div class="col-12 col-md-4 col-lg-3">
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
@@ -395,16 +389,16 @@
           </div>
 
           <!-- Close & Cancel Buttons -->
-          <div class="col-6 text-center">
+          <div class="col-12 col-md-4 col-lg-6 text-center">
             <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
               class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
-              Close All Positions
+              Close All
             </button>
             <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
               class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeSelectedPositions">
               <span v-if="enableHotKeys">F6 / </span>
-              Close Selected Positions
+              Close Selected
             </button>
             <button class="btn btn-lg btn-outline fs-5 w-75" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
@@ -413,7 +407,7 @@
           </div>
 
           <!-- Put Strike Buy/Sell Buttons -->
-          <div class="col-3">
+          <div class="col-12 col-md-4 col-lg-3">
             <div class="btn-group w-100">
               <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
@@ -499,8 +493,8 @@
             </div>
           </div>
           <!-- Flattrade Positions -->
-          <div v-if="activeFetchFunction === 'fetchFlattradePositions'">
-            <table class="table table-responsive table-hover">
+          <div class="table-responsive" v-if="activeFetchFunction === 'fetchFlattradePositions'">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col">Symbol Details</th>
@@ -613,8 +607,8 @@
             </table>
           </div>
           <!-- Shoonya Positions -->
-          <div v-if="activeFetchFunction === 'fetchShoonyaPositions'">
-            <table class="table table-responsive table-hover">
+          <div class="table-responsive" v-if="activeFetchFunction === 'fetchShoonyaPositions'">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col">Symbol Details</th>
