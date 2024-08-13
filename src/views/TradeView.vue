@@ -726,7 +726,7 @@
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
           <!-- Flattrade Trades -->
-          <div v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
+          <div class="table-responsive" v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -785,7 +785,7 @@
             </table>
           </div>
           <!-- Shoonya Trades -->
-          <div v-if="activeFetchFunction === 'fetchShoonyaOrdersTradesBook'">
+          <div class="table-responsive" v-if="activeFetchFunction === 'fetchShoonyaOrdersTradesBook'">
             <table class="table table-hover">
               <thead>
                 <tr>
