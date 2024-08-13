@@ -1,5 +1,5 @@
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
 
 @mixin color-scheme-styles {
   html,
@@ -54,7 +54,7 @@
   // Add table styles
   .table {
     color: var(--bs-body-color);
-    
+
     > :not(caption) > * > * {
       color: var(--bs-body-color);
       border-bottom-color: var(--bs-border-color);
@@ -124,6 +124,11 @@
       background-color: var(--bs-white); // Light background color on hover
     }
   }
+
+  // Dark theme styles
+  .text-success {
+    color: #00ff89 !important; // Updated text-success color
+  }
 }
 
 // Styles that don't change based on color scheme
@@ -176,7 +181,7 @@ input:focus {
 
 .ToggleSlider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;
