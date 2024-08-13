@@ -355,13 +355,13 @@
           <!-- Call Strike Buy/Sell Buttons -->
           <div class="col-12 col-md-4 col-lg-3">
             <div class="btn-group w-100">
-              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+              <button type="button" class="btn btn-md btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬆️</span>
                 Buy CE
               </button>
-              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button" class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -371,13 +371,13 @@
               </ul>
             </div>
             <div class="btn-group w-100">
-              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+              <button type="button" class="btn btn-md btn-danger fs-5 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬅️</span>
                 Sell CE
               </button>
-              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button" class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -391,16 +391,16 @@
           <!-- Close & Cancel Buttons -->
           <div class="col-12 col-md-4 col-lg-6 text-center">
             <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
-              class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeAllPositions">
+              class="btn btn-md btn-outline fs-5 w-75 my-2" @click="closeAllPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close All
             </button>
             <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
-              class="btn btn-lg btn-outline fs-5 w-75 my-2" @click="closeSelectedPositions">
+              class="btn btn-md btn-outline fs-5 w-75 my-2" @click="closeSelectedPositions">
               <span v-if="enableHotKeys">F6 / </span>
               Close Selected
             </button>
-            <button class="btn btn-lg btn-outline fs-5 w-75" @click="cancelPendingOrders">
+            <button class="btn btn-md btn-outline fs-5 w-75" @click="cancelPendingOrders">
               <span v-if="enableHotKeys">F7 / </span>
               Cancel Orders
             </button>
@@ -409,13 +409,13 @@
           <!-- Put Strike Buy/Sell Buttons -->
           <div class="col-12 col-md-4 col-lg-3">
             <div class="btn-group w-100">
-              <button type="button" class="btn btn-lg btn-success fs-5 my-2 w-75"
+              <button type="button" class="btn btn-md btn-success fs-5 my-2 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">⬇️</span>
                 Buy PE
               </button>
-              <button type="button" class="btn btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button" class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -425,13 +425,13 @@
               </ul>
             </div>
             <div class="btn-group w-100">
-              <button type="button" class="btn btn-lg btn-danger fs-5 w-75"
+              <button type="button" class="btn btn-md btn-danger fs-5 w-75"
                 @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
                 v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}">
                 <span v-if="enableHotKeys">➡️</span>
                 Sell PE
               </button>
-              <button type="button" class="btn btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button" class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
