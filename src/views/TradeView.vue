@@ -2866,10 +2866,20 @@ const subscribeToPositionLTPs = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
       .map(([tsym, token]) => {
-        // Determine the correct exchange based on the position
-        const exchange = selectedExchange.value === 'NFO' ? 'NFO' : 'BFO';
+        const position = [
+          ...flatTradePositionBook.value,
+          ...shoonyaPositionBook.value,
+        ].find(p => (p.tsym) === tsym);
+
+        if (!position) {
+          // console.warn(`No position found for tsym: ${tsym}`);
+          return null;
+        }
+
+        const exchange = position.exch || position.exchangeSegment || 'NFO' || NSE_NFO;
         return `${exchange}|${token}`;
-      });
+      })
+      .filter(Boolean);
 
     if (symbolsToSubscribe.length > 0) {
       const data = {
