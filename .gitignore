@@ -31,3 +31,5 @@ coverage
 
 .env
 *.csv#
+package-lock.json
+.vscode/extensions.json
