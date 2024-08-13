@@ -123,10 +123,17 @@
       background-color: var(--bs-white); // Light background color on hover
     }
   }
+  .btn-outline-primary {
+    border-color: var(--bs-primary); // White border color for dark theme
+    color: var(--bs-primary); // White text color for dark theme
+  }
 
   // Dark theme styles
   .text-success {
     color: #00ff89 !important; // Updated text-success color
+  }
+  a {
+    color: var(--bs-primary);
   }
 }
 
