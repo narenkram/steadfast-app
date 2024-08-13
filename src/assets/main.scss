@@ -52,16 +52,19 @@
   }
 
   // Add table styles
-  .table {
-    color: var(--bs-body-color);
-
-    > :not(caption) > * > * {
-      color: var(--bs-body-color);
-      border-bottom-color: var(--bs-border-color);
-    }
+  .table,
+  th,
+  td {
+    border: 1px solid var(--bs-border-color);
+    border-collapse: collapse;
   }
   .table th {
+    color: var(--bs-body-color);
     font-weight: 600;
+  }
+  .table > :not(caption) > * > * {
+    color: var(--bs-body-color);
+    border-bottom-color: var(--bs-border-color);
   }
 
   .input-group-text {
@@ -99,10 +102,6 @@
     // Invert some of the theme colors for dark mode
     --bs-primary: #6ea8fe; // Light blue
     --bs-secondary: #6c757d; // Gray
-    --bs-success: #75b798; // Light green
-    --bs-info: #6edff6; // Light cyan
-    --bs-warning: #ffda6a; // Light yellow
-    --bs-danger: #ea868f; // Light red
     --bs-light: #343a40; // Dark gray
     --bs-dark: #212529; // Dark background color (changed)
     --bs-body-color: #f8f9fa; // Light text color (should be darker)
