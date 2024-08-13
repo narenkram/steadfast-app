@@ -172,7 +172,7 @@
           <!-- Segment Selection -->
           <div class="col-2">
             <label for="Segment" class="form-label mb-0">Segment</label>
-            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }">
+            <select id="Segment" class="form-select" aria-label="Segment" :class="{ 'disabled-form': isFormDisabled }" disabled>
               <option value="Options" selected>Options</option>
               <!-- <option value="Futures">Futures</option> -->
             </select>

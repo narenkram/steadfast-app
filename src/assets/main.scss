@@ -72,6 +72,16 @@
     background-color: var(--bs-input-bg);
     border-color: var(--bs-border-color);
   }
+  .form-control:disabled {
+    color: var(--bs-body-color);
+    background-color: var(--bs-input-bg);
+    border-color: var(--bs-border-color);
+  }
+  .form-select:disabled {
+    color: var(--bs-body-color);
+    background-color: var(--bs-input-bg);
+    border-color: var(--bs-border-color);
+  }
 }
 
 @media (prefers-color-scheme: light) {

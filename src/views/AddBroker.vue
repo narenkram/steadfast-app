@@ -4,7 +4,7 @@
       <div class="col-6">
         <h3>Steps to add your broker 💰</h3>
 
-        <div class="card w-100 h-75 bg-light">
+        <div class="card w-100 h-75 border">
           <div class="card-body">
             <p class="card-text">YouTube Video</p>
           </div>
