@@ -135,7 +135,7 @@
             </p>
           </div>
           <div class="text-center">
-            <span class="bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
               {{ killSwitchRemainingTime }}
             </span>
           </div>
@@ -220,7 +220,7 @@
 
         <div class="row mt-3">
           <!-- Order Type -->
-          <div class="col-4 col-md-3 col-lg-3">
+          <div class="col-6 col-md-3 col-lg-3">
             <label for="OrderType" class="form-label mb-0">Order Type</label>
             <div class="input-group">
               <select id="OrderType" class="form-select w-50" aria-label="OrderType" v-model="selectedOrderType"
@@ -247,7 +247,7 @@
             </select>
           </div> -->
           <!-- Stoploss -->
-          <div class="col-4 col-md-3 col-lg-3">
+          <div class="col-6 col-md-3 col-lg-3">
             <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -261,7 +261,7 @@
             </div>
           </div>
           <!-- Target -->
-          <div class="col-4 col-md-3 col-lg-3">
+          <div class="col-6 col-md-3 col-lg-3">
             <label for="enableTarget" class="form-label mb-0">Target</label>
             <div class="input-group mb-3">
               <div class="input-group-text">
@@ -274,7 +274,7 @@
             </div>
           </div>
           <!-- 1 Click Keys -->
-          <div class="col-12 col-md-3 col-lg-3">
+          <div class="col-6 col-md-3 col-lg-3">
             <div class="d-flex align-items-center float-end h-100">
               <label class="ToggleSwitch">
                 <input class="ToggleInput" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
