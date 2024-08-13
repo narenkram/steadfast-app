@@ -124,8 +124,8 @@
     </div>
   </section>
 
-  <section class="row py-1">
-    <div class="col-12" v-if="killSwitchActive">
+  <section v-if="killSwitchActive" class="row py-1">
+    <div class="col-12">
       <div class="bg-danger text-white p-3 rounded-3 shadow">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -361,7 +361,8 @@
                 <span v-if="enableHotKeys">⬆️</span>
                 Buy CE
               </button>
-              <button type="button" class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button"
+                class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -377,7 +378,8 @@
                 <span v-if="enableHotKeys">⬅️</span>
                 Sell CE
               </button>
-              <button type="button" class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button"
+                class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -415,7 +417,8 @@
                 <span v-if="enableHotKeys">⬇️</span>
                 Buy PE
               </button>
-              <button type="button" class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button"
+                class="btn btn-md btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -431,7 +434,8 @@
                 <span v-if="enableHotKeys">➡️</span>
                 Sell PE
               </button>
-              <button type="button" class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+              <button type="button"
+                class="btn btn-md btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
