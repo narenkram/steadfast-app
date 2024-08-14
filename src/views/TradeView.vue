@@ -2880,7 +2880,7 @@ const subscribeToPositionLTPs = () => {
           return null;
         }
 
-        const exchange = position.exch || position.exchangeSegment || 'NFO' || NSE_NFO;
+        const exchange = position.exch || position.exchangeSegment;
         return `${exchange}|${token}`;
       })
       .filter(Boolean);
