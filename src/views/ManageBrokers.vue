@@ -1,3 +1,178 @@
+<template>
+  <section class="row py-5">
+    <div class="col-8 text-start">
+      <RouterLink to="/add-broker">
+        <button class="btn btn-primary">Add New Broker</button>
+      </RouterLink>
+    </div>
+    <div class="col-4 text-end">
+      <RouterLink to="/steadfast">
+        <button class="btn btn-primary">
+          Open 1 Click Trade View
+        </button>
+      </RouterLink>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="col-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Broker</th>
+            <th scope="col">Broker Client ID</th>
+            <th scope="col">API Token</th>
+            <th scope="col">Validity</th>
+            <th scope="col" class="text-center">Activation</th>
+            <th scope="col">Status</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="brokers.length === 0">
+            <td colspan="7" class="text-center">No brokers added yet. Please add a broker to get started.</td>
+          </tr>
+          <tr v-else v-for="broker in brokers" :key="broker.id">
+            <td>{{ broker.brokerName }}</td>
+            <td>
+              <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
+            </td>
+            <td>
+              <span v-if="broker.brokerName === 'Flattrade'">{{ maskTokenSecret(broker.apiToken) }}</span>
+              <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
+            </td>
+            <td>
+              <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
+              <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
+            </td>
+            <td class="text-center">
+              <template v-if="broker.brokerName === 'Shoonya'">
+                <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
+                  data-bs-target="#ShoonyaLogin">
+                  Login
+                </button>
+              </template>
+              <template v-else-if="broker.brokerName == 'Flattrade'">
+                <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
+              </template>
+            </td>
+            <td>
+              <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
+            </td>
+            <td>
+              <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                data-bs-target="#DeleteBrokerConfirmationModal" @click="selectedBrokerToDelete = broker">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="col-12">
+      <div>
+        <span v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</span>
+        <span v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shoonya Login -->
+  <div class="modal fade" id="ShoonyaLogin" tabindex="-1" aria-labelledby="ShoonyaLoginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
+            Shoonya Login
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-12">
+            <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
+            <input type="text" id="ShoonyaBrokerUserId" class="form-control"
+              :value="maskBrokerClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
+
+            <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
+            <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
+              placeholder="Enter Broker Password">
+
+            <label for="ShoonyaOneTimePassword" class="form-label mb-0">One time password</label>
+            <input type="password" id="ShoonyaOneTimePassword" class="form-control" v-model="shoonyaOneTimePassword"
+              placeholder="Enter One time password">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="handleShoonyaLogin">
+            Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Token -->
+  <div class="modal fade" id="UpdateToken" tabindex="-1" aria-labelledby="UpdateTokenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="UpdateTokenLabel">
+            Update Token
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-12">
+            <label for="ApiToken" class="form-label mb-0">API Token</label>
+            <input type="text" id="ApiToken" class="form-control" v-model="API_TOKEN" placeholder="Enter API Token">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" @click="updateToken" data-bs-dismiss="modal">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Broker Confirmation Modal -->
+  <div class="modal fade" id="DeleteBrokerConfirmationModal" tabindex="-1"
+    aria-labelledby="DeleteBrokerConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="DeleteBrokerConfirmationModalLabel">Confirm Broker Deletion</h5>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the broker "{{ selectedBrokerToDelete?.brokerName }}"? This action cannot
+            be
+            undone.</p>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex flex-row justify-content-between w-100">
+            <button type="button" class="btn btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger w-50 ms-1" data-bs-dismiss="modal"
+              @click="deleteBroker(selectedBrokerToDelete)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
@@ -48,6 +223,8 @@ const brokers = computed(() => {
   return brokersArray;
 });
 
+const selectedBrokerToDelete = ref(null); // Store the broker to be deleted
+
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -61,7 +238,6 @@ onMounted(() => {
   SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
   SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
   SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
-
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
@@ -108,6 +284,7 @@ watch(SHOONYA_API_TOKEN, (newToken) => {
 
 const openFlattradeAuthUrl = () => {
   statusMessage.value = 'Waiting for broker auth to complete...';
+
   localStorage.setItem('statusMessage', statusMessage.value);
 
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -339,151 +516,3 @@ const deleteBroker = (broker) => {
   // This will automatically update the table
 };
 </script>
-
-
-
-<template>
-  <section class="row py-5">
-    <div class="col-8 text-start">
-      <RouterLink to="/add-broker">
-        <button class="btn btn-primary">Add New Broker</button>
-      </RouterLink>
-    </div>
-    <div class="col-4 text-end">
-      <RouterLink to="/steadfast">
-        <button class="btn btn-primary">
-          Open 1 Click Trade View
-        </button>
-      </RouterLink>
-    </div>
-  </section>
-
-  <section class="row">
-    <div class="col-12">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Broker</th>
-            <th scope="col">Broker Client ID</th>
-            <th scope="col">API Token</th>
-            <th scope="col">Validity</th>
-            <th scope="col" class="text-center">Activation</th>
-            <th scope="col">Status</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="brokers.length === 0">
-            <td colspan="7" class="text-center">No brokers added yet. Please add a broker to get started.</td>
-          </tr>
-          <tr v-else v-for="broker in brokers" :key="broker.id">
-            <td>{{ broker.brokerName }}</td>
-            <td>
-              <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
-            </td>
-            <td>
-              <span v-if="broker.brokerName === 'Flattrade'">{{ maskTokenSecret(broker.apiToken) }}</span>
-              <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
-            </td>
-            <td>
-              <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
-              <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
-            </td>
-            <td class="text-center">
-              <template v-if="broker.brokerName === 'Shoonya'">
-                <button class="btn btn-outline-primary btn-sm w-75" data-bs-toggle="modal"
-                  data-bs-target="#ShoonyaLogin">
-                  Login
-                </button>
-              </template>
-              <template v-else-if="broker.brokerName == 'Flattrade'">
-                <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
-              </template>
-            </td>
-            <td>
-              <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
-            </td>
-            <td>
-              <button class="btn btn-outline-danger btn-sm" @click="deleteBroker(broker)">🗑️</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="row">
-    <div class="col-12">
-      <div>
-        <span v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</span>
-        <span v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Shoonya Login -->
-  <div class="modal fade" id="ShoonyaLogin" tabindex="-1" aria-labelledby="ShoonyaLoginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
-            Shoonya Login
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="col-12">
-            <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
-            <input type="text" id="ShoonyaBrokerUserId" class="form-control"
-              :value="maskBrokerClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
-
-            <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
-            <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
-              placeholder="Enter Broker Password">
-
-            <label for="ShoonyaOneTimePassword" class="form-label mb-0">One time password</label>
-            <input type="password" id="ShoonyaOneTimePassword" class="form-control" v-model="shoonyaOneTimePassword"
-              placeholder="Enter One time password">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="handleShoonyaLogin">
-            Login
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Update Token -->
-  <div class="modal fade" id="UpdateToken" tabindex="-1" aria-labelledby="UpdateTokenLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="UpdateTokenLabel">
-            Update Token
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="col-12">
-            <label for="ApiToken" class="form-label mb-0">API Token</label>
-            <input type="text" id="ApiToken" class="form-control" v-model="API_TOKEN" placeholder="Enter API Token">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" @click="updateToken" data-bs-dismiss="modal">
-            Update
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</template>
