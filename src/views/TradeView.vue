@@ -3212,6 +3212,8 @@ watch(enableHotKeys, (newValue) => {
   localStorage.setItem('EnableHotKeys', newValue.toString());
 });
 
+// Debounce the checkStoplossAndTarget function
+const debouncedCheckStoplossAndTarget = debounce(checkStoplossAndTarget, 500); // Debounce with a 500ms delay
 
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
@@ -3223,7 +3225,7 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
         .find(p => (p.tsym || p.tradingSymbol) === tsym);
       if (position) {
         console.log(`Found position for ${tsym}:`, position);
-        checkStoplossAndTarget(position, ltp);
+        debouncedCheckStoplossAndTarget(position, ltp);
       } else {
         console.log(`No position found for ${tsym}`);
       }
