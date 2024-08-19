@@ -2171,7 +2171,9 @@ const closeAllPositions = async () => {
     let positionsClosed = false;
 
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      for (const position of flatTradePositionBook.value) {
+      // Sort positions by netqty (descending) to prioritize 'S' positions
+      const sortedPositions = [...flatTradePositionBook.value].sort((a, b) => Number(b.netqty) - Number(a.netqty));
+      for (const position of sortedPositions) {
         const netqty = Number(position.netqty);
         if (netqty !== 0) {
           const transactionType = netqty > 0 ? 'S' : 'B';
@@ -2181,7 +2183,9 @@ const closeAllPositions = async () => {
         }
       }
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      for (const position of shoonyaPositionBook.value) {
+      // Sort positions by netqty (descending) to prioritize 'S' positions
+      const sortedPositions = [...shoonyaPositionBook.value].sort((a, b) => Number(b.netqty) - Number(a.netqty));
+      for (const position of sortedPositions) {
         const netqty = Number(position.netqty);
         if (netqty !== 0) {
           const transactionType = netqty > 0 ? 'S' : 'B';
