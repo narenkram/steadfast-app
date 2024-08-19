@@ -48,6 +48,8 @@ const brokers = computed(() => {
   return brokersArray;
 });
 
+const selectedBrokerToDelete = ref(null); // Store the broker to be deleted
+
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -61,7 +63,6 @@ onMounted(() => {
   SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
   SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
   SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
-
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
@@ -108,6 +109,7 @@ watch(SHOONYA_API_TOKEN, (newToken) => {
 
 const openFlattradeAuthUrl = () => {
   statusMessage.value = 'Waiting for broker auth to complete...';
+
   localStorage.setItem('statusMessage', statusMessage.value);
 
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -404,7 +406,10 @@ const deleteBroker = (broker) => {
               <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
             </td>
             <td>
-              <button class="btn btn-outline-danger btn-sm" @click="deleteBroker(broker)">🗑️</button>
+              <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                data-bs-target="#DeleteBrokerConfirmationModal" @click="selectedBrokerToDelete = broker">
+                🗑️
+              </button>
             </td>
           </tr>
         </tbody>
@@ -481,6 +486,32 @@ const deleteBroker = (broker) => {
           <button type="button" class="btn btn-primary" @click="updateToken" data-bs-dismiss="modal">
             Update
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Broker Confirmation Modal -->
+  <div class="modal fade" id="DeleteBrokerConfirmationModal" tabindex="-1"
+    aria-labelledby="DeleteBrokerConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="DeleteBrokerConfirmationModalLabel">Confirm Broker Deletion</h5>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the broker "{{ selectedBrokerToDelete?.brokerName }}"? This action cannot
+            be
+            undone.</p>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex flex-row justify-content-between w-100">
+            <button type="button" class="btn btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger w-50 ms-1" data-bs-dismiss="modal"
+              @click="deleteBroker(selectedBrokerToDelete)">
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
