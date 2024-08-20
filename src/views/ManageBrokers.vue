@@ -308,7 +308,7 @@ const handleShoonyaLogin = async () => {
     const jDataString = JSON.stringify(jData);
     const payload = `jData=${jDataString}&jKey=${apiKey}`;
 
-    const response = await axios.post('https://api.shoonya.com/NorenWClientTP/QuickAuth', payload, {
+    const response = await axios.post('/shoonyaApi/NorenWClientTP/QuickAuth', payload, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
