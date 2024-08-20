@@ -261,6 +261,10 @@ function maskBrokerClientId(brokerClientId) {
 }
 
 const getStatus = (broker) => {
+  if (!broker || !broker.brokerName) {
+    return { status: 'Unknown', statusClass: 'bg-secondary' };
+  }
+
   const status = getBrokerStatus(broker.brokerName);
   let statusText = 'Activated';
   let statusClass = 'bg-success';
