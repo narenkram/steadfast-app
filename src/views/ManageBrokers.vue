@@ -10,6 +10,8 @@ const FLATTRADE_API_TOKEN = ref('');
 const SHOONYA_API_KEY = ref('');
 const SHOONYA_CLIENT_ID = ref('');
 const SHOONYA_API_TOKEN = ref('');
+const PAPERTRADING_API_KEY = ref('logicGate'); // Default value for PaperTrading
+const PAPERTRADING_CLIENT_ID = ref('Sp0ck'); // Default value for PaperTrading
 
 const flattradeReqCode = ref('');
 const shoonyaBrokerUserId = ref('');
@@ -45,6 +47,17 @@ const brokers = computed(() => {
     });
   }
 
+  // Add PaperTrading broker
+  if (PAPERTRADING_CLIENT_ID.value && PAPERTRADING_API_KEY.value) {
+    brokersArray.push({
+      id: 'PaperTrading',
+      brokerName: 'PaperTrading',
+      brokerClientId: PAPERTRADING_CLIENT_ID.value,
+      apiKey: PAPERTRADING_API_KEY.value,
+      apiToken: '' // PaperTrading does not have an API token
+    });
+  }
+
   return brokersArray;
 });
 
@@ -63,6 +76,11 @@ onMounted(() => {
   SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
   SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
   SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
+
+  // Retrieve PaperTrading details
+  const paperTradingDetails = JSON.parse(localStorage.getItem('broker_PaperTrading') || '{}');
+  PAPERTRADING_API_KEY.value = paperTradingDetails.apiKey || 'logicGate';
+  PAPERTRADING_CLIENT_ID.value = paperTradingDetails.clientId || 'Sp0ck';
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
@@ -335,14 +353,16 @@ const deleteBroker = (broker) => {
     SHOONYA_API_TOKEN.value = '';
     SHOONYA_API_KEY.value = '';
     SHOONYA_CLIENT_ID.value = '';
+  } else if (broker.brokerName === 'PaperTrading') {
+    localStorage.removeItem('PAPERTRADING_API_TOKEN');
+    PAPERTRADING_API_KEY.value = '';
+    PAPERTRADING_CLIENT_ID.value = '';
   }
 
   // Update the brokers computed property
   // This will automatically update the table
 };
 </script>
-
-
 
 <template>
   <section class="row py-5">

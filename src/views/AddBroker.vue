@@ -21,6 +21,7 @@
             <option value="">Select a broker</option>
             <option value="Flattrade">Flattrade</option>
             <option value="Shoonya">Shoonya</option>
+            <option value="PaperTrading">Paper Trading</option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
@@ -30,7 +31,7 @@
             </button>
           </div>
 
-          <!-- API Key (for Flattrade and Shoonya) -->
+          <!-- API Key (for Flattrade, Shoonya, and Paper Trading) -->
           <label for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
           <input v-model="apiKey" type="text" class="form-control" id="APIKey" required>
 
@@ -68,7 +69,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -78,12 +79,25 @@ const apiKey = ref('');
 const apiSecret = ref('');
 const clientId = ref('');
 
+// Watch for changes in selectedBroker to prefill default values
+watch(selectedBroker, (newBroker) => {
+  if (newBroker === 'PaperTrading') {
+    apiKey.value = 'simulate123';
+    clientId.value = 'VIRTUAL001';
+  } else {
+    apiKey.value = '';
+    clientId.value = '';
+  }
+});
+
 const getBrokerDashboardLink = computed(() => {
   switch (selectedBroker.value) {
     case 'Flattrade':
       return 'https://wall.flattrade.in/';
     case 'Shoonya':
       return 'https://prism.shoonya.com/';
+    case 'PaperTrading':
+      return 'https://papertrading.example.com/';
     default:
       return '#';
   }
