@@ -62,6 +62,7 @@ const brokers = computed(() => {
 });
 
 const selectedBrokerToDelete = ref(null); // Store the broker to be deleted
+const selectedBrokerForPaper = ref(null); // Add this line to store the selected broker for PaperTrading
 
 onMounted(() => {
   // Retrieve Flattrade details
@@ -79,8 +80,12 @@ onMounted(() => {
 
   // Retrieve PaperTrading details
   const paperTradingDetails = JSON.parse(localStorage.getItem('broker_PaperTrading') || '{}');
-  PAPERTRADING_API_KEY.value = paperTradingDetails.apiKey || 'logicGate';
-  PAPERTRADING_CLIENT_ID.value = paperTradingDetails.clientId || 'Sp0ck';
+  PAPERTRADING_API_KEY.value = paperTradingDetails.apiKey || '';
+  PAPERTRADING_CLIENT_ID.value = paperTradingDetails.clientId || '';
+  const storedSelectedBrokerForPaper = localStorage.getItem('selectedBrokerForPaper');
+  if (storedSelectedBrokerForPaper) {
+    selectedBrokerForPaper.value = JSON.parse(storedSelectedBrokerForPaper);
+  }
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
@@ -104,6 +109,14 @@ onMounted(() => {
     }
   });
   checkAllTokens();
+});
+// Watch for changes in selectedBrokerForPaper and update localStorage
+watch(selectedBrokerForPaper, (newBroker) => {
+  if (newBroker) {
+    localStorage.setItem('selectedBrokerForPaper', JSON.stringify(newBroker));
+  } else {
+    localStorage.removeItem('selectedBrokerForPaper');
+  }
 });
 
 // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
@@ -418,12 +431,24 @@ const deleteBroker = (broker) => {
                   Login
                 </button>
               </template>
-              <template v-else-if="broker.brokerName == 'Flattrade'">
+              <template v-else-if="broker.brokerName === 'Flattrade'">
                 <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
+              </template>
+              <template v-else-if="broker.brokerName === 'PaperTrading'">
+                <select class="form-select form-select-sm w-100" v-model="selectedBrokerForPaper">
+                  <option selected>Select Broker</option>
+                  <option v-for="broker in brokers.filter(b => b.brokerName !== 'PaperTrading')" :key="broker.id"
+                    :value="broker">{{ broker.brokerName }}</option>
+                </select>
               </template>
             </td>
             <td>
-              <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
+              <span v-if="broker.brokerName !== 'PaperTrading'" :class="`badge ${getStatus(broker).statusClass}`">{{
+                getStatus(broker).status }}</span>
+              <span v-else-if="selectedBrokerForPaper"
+                :class="`badge ${getStatus(selectedBrokerForPaper).statusClass}`">{{
+                  getStatus(selectedBrokerForPaper).status }}</span>
+              <span v-else class="badge bg-warning text-dark">No broker selected</span>
             </td>
             <td>
               <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
