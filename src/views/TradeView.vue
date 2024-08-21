@@ -519,7 +519,7 @@
                       <div class="d-flex flex-column align-items-start">
                         <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
                           v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
-                          :disabled="flattradePosition.netqty <= 0" />
+                          :disabled="flattradePosition.netqty == 0" />
 
                         <div class="d-flex ">
                           {{ flattradePosition.tsym }}
@@ -633,7 +633,7 @@
                       <div class="d-flex flex-column align-items-start">
                         <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
                           v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
-                          :disabled="shoonyaPosition.netqty <= 0" />
+                          :disabled="shoonyaPosition.netqty == 0" />
                         <div class="d-flex ">
                           {{ shoonyaPosition.tsym }}
                         </div>
