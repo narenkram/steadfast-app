@@ -862,21 +862,23 @@
               </p>
             </div>
             <div class="col-lg-4">
-              <!-- Total Capital Risk Percentage -->
-              <label for="totalCapitalRiskPercentage" class="form-label">Total Capital Risk Percentage</label>
+              <!-- Total Risk by Capital Or Amount -->
+              <label for="totalRiskType" class="form-label">Total Risk by</label>
               <div class="input-group">
-                <input type="number" min="0.1" max="5" step="0.1" class="form-control"
-                  v-model="totalCapitalRiskPercentage" placeholder="Enter a value between 0.1 and 5">
-                <span class="input-group-text">%</span>
-              </div>
-            </div>
-            <div class="col-lg-4">
-              <!-- Total Loss Risk Amount -->
-              <label for="totalLossRiskAmount" class="form-label">Total Loss Risk Amount</label>
-              <div class="input-group">
-                <input type="number" min="100" class="form-control" v-model="totalLossRiskAmount"
-                  placeholder="Enter a amount">
-                <span class="input-group-text">₹</span>
+                <select class="form-select" v-model="totalRiskType">
+                  <option value="percentage">Percentage</option>
+                  <option value="amount">Amount</option>
+                </select>
+                <template v-if="totalRiskType === 'amount'">
+                  <input type="number" min="100" class="form-control" v-model="totalRiskAmount"
+                    placeholder="Enter an amount">
+                  <span class="input-group-text">₹</span>
+                </template>
+                <template v-if="totalRiskType === 'percentage'">
+                  <input type="number" min="0.1" max="5" step="0.1" class="form-control" v-model="totalRiskPercentage"
+                    placeholder="Enter a value between 0.1 and 5">
+                  <span class="input-group-text">%</span>
+                </template>
               </div>
             </div>
             <div class="col-lg-4">
@@ -3016,10 +3018,11 @@ let timer;
 let positionCheckInterval;
 
 // Discipline Automations
-const totalLossRiskAmount = ref(null);
+const totalRiskType = ref(null);
 const mtmProfitTrailingToggle = ref(false);
 const mtmProfitTrailingType = ref(null);
-const totalCapitalRiskPercentage = ref(null);
+const totalRiskAmount = ref(null);
+const totalRiskPercentage = ref(null);
 
 // Lifecycle hooks
 onMounted(async () => {
