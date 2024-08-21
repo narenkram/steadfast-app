@@ -881,10 +881,13 @@
             </div>
             <div class="col-lg-4">
               <!-- MTM Profit Trailing ON/OFF -->
-              <label for="mtmProfitTrailing" class="form-label">MTM Profit Trailing</label>
+              <label for="mtmProfitTrailingToggle" class="form-label">MTM Profit Trailing</label>
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="mtmProfitTrailing" v-model="mtmProfitTrailing">
-                <label class="form-check-label" for="mtmProfitTrailing">{{ mtmProfitTrailing ? 'Enabled' : 'Disabled'
+                <input class="form-check-input" type="checkbox" id="mtmProfitTrailingToggle"
+                  v-model="mtmProfitTrailingToggle">
+
+                <label class="form-check-label" for="mtmProfitTrailingToggle">{{ mtmProfitTrailingToggle ? 'Enabled' :
+                  'Disabled'
                   }}</label>
               </div>
             </div>
@@ -3011,6 +3014,12 @@ const totalSellValue = computed(() => {
 
 let timer;
 let positionCheckInterval;
+
+// Discipline Automations
+const totalLossRiskAmount = ref(null);
+const mtmProfitTrailingToggle = ref(false);
+const mtmProfitTrailingType = ref(null);
+const totalCapitalRiskPercentage = ref(null);
 
 // Lifecycle hooks
 onMounted(async () => {
