@@ -470,7 +470,7 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation-tab-pane"
             type="button" role="tab" aria-controls="automation-tab-pane" aria-selected="false">
-            🤖 Automations
+            😇 Discipline Automations
           </button>
         </li>
       </ul>
@@ -856,19 +856,34 @@
         <div class="tab-pane fade" id="automation-tab-pane" role="tabpanel" aria-labelledby="automation-tab"
           tabindex="0">
 
-          <div class="card text-center py-3">
-            <div class="card-body text-start">
-              <span class="fs-5 text-danger">Coming Soon</span>
-              <h5>Smart Automations for Risk Management.</h5>
-              <ul class="text-secondary">
-                <li>if deployment value higher than 25% of total capital, positions will be force closed.</li>
-                <li>if loss higher than 3% of total capital, activates kill switch to halt trading.</li>
-                <li>kill switch activates if total buy/sell value crosses above 5 times of allowed deployment value
-                </li>
-              </ul>
-              <span class="p-1 rounded bg-warning text-dark">This is a rough draft and will be updated in the next
-                release.
-              </span>
+          <div class="row py-3">
+            <div class="col-12">
+              <p class="text-danger">
+                <b>This section is under development.</b>
+              </p>
+            </div>
+            <div class="col-lg-4">
+              <!-- Total Capital Risk Percentage -->
+              <label for="totalCapitalRiskPercentage" class="form-label">Total Capital Risk Percentage</label>
+              <div class="input-group">
+                <input type="number" min="0.1" max="5" step="0.1" class="form-control"
+                  v-model="totalCapitalRiskPercentage" placeholder="Enter a value between 0.1 and 5">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <!-- Total Loss Risk Amount -->
+              <label for="totalLossRiskAmount" class="form-label">Total Loss Risk Amount</label>
+              <div class="input-group">
+                <input type="number" min="100" class="form-control" v-model="totalLossRiskAmount"
+                  placeholder="Enter a amount">
+                <span class="input-group-text">₹</span>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <!-- MTM Profit Trailing -->
+              <label for="mtmProfitTrailing" class="form-label">MTM Profit Trailing</label>
+              <input type="checkbox" class="form-check-input" v-model="mtmProfitTrailing" id="mtmProfitTrailing">
             </div>
           </div>
         </div>
