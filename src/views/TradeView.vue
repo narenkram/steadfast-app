@@ -470,7 +470,7 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation-tab-pane"
             type="button" role="tab" aria-controls="automation-tab-pane" aria-selected="false">
-            😇 Discipline Automations
+            🤖 Discipline Automations
           </button>
         </li>
       </ul>
@@ -859,7 +859,7 @@
           <div class="row py-3">
             <div class="col-12">
               <p class="text-danger">
-                <b>This section is under development.</b>
+                <b>This section is under development,</b> Following features will not work as expected.
               </p>
             </div>
             <div class="col-lg-4">
@@ -881,9 +881,26 @@
               </div>
             </div>
             <div class="col-lg-4">
-              <!-- MTM Profit Trailing -->
+              <!-- MTM Profit Trailing ON/OFF -->
               <label for="mtmProfitTrailing" class="form-label">MTM Profit Trailing</label>
-              <input type="checkbox" class="form-check-input" v-model="mtmProfitTrailing" id="mtmProfitTrailing">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="mtmProfitTrailing" v-model="mtmProfitTrailing">
+                <label class="form-check-label" for="mtmProfitTrailing">{{ mtmProfitTrailing ? 'Enabled' : 'Disabled'
+                  }}</label>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <!-- Trail by percentage or amount. -->
+              <label for="mtmProfitTrailingType" class="form-label">Trail by</label>
+              <select class="form-select" v-model="mtmProfitTrailingType">
+                <option value="percentage">Percentage</option>
+                <option value="amount">Amount</option>
+              </select>
+            </div>
+            <div class="col-12 py-2 text-center">
+              <p class="text-secondary">
+                These settings are automatically saved.
+              </p>
             </div>
           </div>
         </div>
