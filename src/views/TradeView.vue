@@ -257,7 +257,7 @@
               </div>
               <input type="number" class="form-control" id="stoplossValue" v-model.number="tradeSettings.stoplossValue"
                 aria-label="Stoploss (points)" :class="{ 'disabled-form': isFormDisabled }">
-
+              <span class="input-group-text">₹ Points</span>
             </div>
           </div>
           <!-- Target -->
@@ -271,6 +271,7 @@
               </div>
               <input type="number" class="form-control" id="targetValue" v-model.number="tradeSettings.targetValue"
                 aria-label="Target (points)" :class="{ 'disabled-form': isFormDisabled }">
+              <span class="input-group-text">₹ Points</span>
             </div>
           </div>
           <!-- 1 Click Keys -->
