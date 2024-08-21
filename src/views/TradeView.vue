@@ -882,24 +882,19 @@
               </div>
             </div>
             <div class="col-lg-4">
-              <!-- MTM Profit Trailing ON/OFF -->
-              <label for="mtmProfitTrailingToggle" class="form-label">MTM Profit Trailing</label>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="mtmProfitTrailingToggle"
-                  v-model="mtmProfitTrailingToggle">
-
-                <label class="form-check-label" for="mtmProfitTrailingToggle">{{ mtmProfitTrailingToggle ? 'Enabled' :
-                  'Disabled'
-                  }}</label>
+              <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->
+              <label for="mtmProfitTrailingToggle" class="form-label">MTM Profit Trailing by</label>
+              <div class="input-group">
+                <div class="input-group-text">
+                  <input class="form-check-input mt-0" type="checkbox" id="mtmProfitTrailingToggle"
+                    v-model="mtmProfitTrailingToggle">
+                </div>
+                <select class="form-select" v-model="mtmProfitTrailingType">
+                  <option value="percentage">Percentage</option>
+                  <option value="amount">Amount</option>
+                </select>
               </div>
-            </div>
-            <div class="col-lg-4">
-              <!-- Trail by percentage or amount. -->
-              <label for="mtmProfitTrailingType" class="form-label">Trail by</label>
-              <select class="form-select" v-model="mtmProfitTrailingType">
-                <option value="percentage">Percentage</option>
-                <option value="amount">Amount</option>
-              </select>
+              <small class="form-text text-muted">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
             <div class="col-12 py-2 text-center">
               <p class="text-secondary">
