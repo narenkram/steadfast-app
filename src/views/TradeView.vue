@@ -865,6 +865,10 @@
               <!-- Total Risk by Capital Or Amount -->
               <label for="totalRiskType" class="form-label">Total Risk by</label>
               <div class="input-group">
+                <div class="input-group-text">
+                  <input class="form-check-input mt-0" type="checkbox" id="totalRiskTypeToggle"
+                    v-model="totalRiskTypeToggle">
+                </div>
                 <select class="form-select" v-model="totalRiskType">
                   <option value="percentage">Percentage</option>
                   <option value="amount">Amount</option>
@@ -880,6 +884,7 @@
                   <span class="input-group-text">%</span>
                 </template>
               </div>
+              <small class="form-text text-secondary">{{ totalRiskTypeToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
               <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->
@@ -894,7 +899,7 @@
                   <option value="amount">Amount</option>
                 </select>
               </div>
-              <small class="form-text text-muted">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
+              <small class="form-text text-secondary">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
               <!-- Close Positions if Risk is reached -->
@@ -3024,6 +3029,7 @@ let positionCheckInterval;
 // Discipline Automations
 const totalRiskType = ref(null);
 const mtmProfitTrailingToggle = ref(false);
+const totalRiskTypeToggle = ref(false);
 const mtmProfitTrailingType = ref(null);
 const totalRiskAmount = ref(null);
 const totalRiskPercentage = ref(null);
