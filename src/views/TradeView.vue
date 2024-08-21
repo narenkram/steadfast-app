@@ -898,6 +898,16 @@
                   <option value="percentage">Percentage</option>
                   <option value="amount">Amount</option>
                 </select>
+                <template v-if="mtmProfitTrailingType === 'amount'">
+                  <input type="number" min="100" class="form-control" v-model="mtmProfitTrailingAmount"
+                    placeholder="Enter an amount">
+                  <span class="input-group-text">₹</span>
+                </template>
+                <template v-if="mtmProfitTrailingType === 'percentage'">
+                  <input type="number" min="0.1" max="5" step="0.1" class="form-control"
+                    v-model="mtmProfitTrailingPercentage" placeholder="Enter a value between 0.1 and 5">
+                  <span class="input-group-text">%</span>
+                </template>
               </div>
               <small class="form-text text-secondary">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
