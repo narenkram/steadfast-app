@@ -861,7 +861,7 @@
                 <b>This section is under development,</b> Following features will not work as expected.
               </p>
             </div>
-            <div class="col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
               <!-- Total Risk by Capital Or Amount -->
               <label for="totalRiskType" class="form-label">Total Risk by</label>
               <div class="input-group">
@@ -881,7 +881,7 @@
                 </template>
               </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
               <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->
               <label for="mtmProfitTrailingToggle" class="form-label">MTM Profit Trailing by</label>
               <div class="input-group">
@@ -896,7 +896,7 @@
               </div>
               <small class="form-text text-muted">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
-            <div class="col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
               <!-- Close Positions if Risk is reached -->
               <label for="closePositionsRisk" class="form-label">Close Positions if Risk is reached</label>
               <div class="form-check form-switch">
