@@ -370,6 +370,9 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Add to Basket</a>
+                </li>
               </ul>
             </div>
             <div class="btn-group w-100">
@@ -387,6 +390,9 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Add to Basket</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -426,6 +432,9 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Add to Basket</a>
+                </li>
               </ul>
             </div>
             <div class="btn-group w-100">
@@ -443,6 +452,9 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWindow">Place Limit Order</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Add to Basket</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -472,6 +484,12 @@
           <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation-tab-pane"
             type="button" role="tab" aria-controls="automation-tab-pane" aria-selected="false">
             🤖 Discipline Automations
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="basket-tab" data-bs-toggle="tab" data-bs-target="#basket-tab-pane" type="button"
+            role="tab" aria-controls="basket-tab-pane" aria-selected="false">
+            🧺 Basket Orders
           </button>
         </li>
       </ul>
@@ -925,6 +943,13 @@
               <p class="text-secondary">
                 These settings are automatically saved.
               </p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="basket-tab-pane" role="tabpanel" aria-labelledby="basket-tab" tabindex="0">
+          <div class="row py-3">
+            <div class="col-12 text-center">
+              <p class="text-secondary">Coming Soon</p>
             </div>
           </div>
         </div>
