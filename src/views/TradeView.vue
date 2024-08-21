@@ -516,7 +516,7 @@
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                     <td>
-                      <div class="d-flex flex-column align-items-start">
+                      <label class="d-flex flex-column align-items-start">
                         <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
                           v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
                           :disabled="flattradePosition.netqty == 0" />
@@ -538,8 +538,7 @@
                             Type: {{ flattradePosition.prd }}
                           </span>
                         </div>
-
-                      </div>
+                      </label>
                     </td>
                     <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
@@ -630,7 +629,7 @@
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
-                      <div class="d-flex flex-column align-items-start">
+                      <label class="d-flex flex-column align-items-start">
                         <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
                           v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
                           :disabled="shoonyaPosition.netqty == 0" />
@@ -650,7 +649,7 @@
                             Type: {{ shoonyaPosition.prd }}
                           </span>
                         </div>
-                      </div>
+                      </label>
                     </td>
                     <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
