@@ -896,6 +896,15 @@
               </div>
               <small class="form-text text-muted">{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small>
             </div>
+            <div class="col-lg-4">
+              <!-- Close Positions if Risk is reached -->
+              <label for="closePositionsRisk" class="form-label">Close Positions if Risk is reached</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="closePositionsRisk" v-model="closePositionsRisk">
+                <label class="form-check-label" for="closePositionsRisk">{{ closePositionsRisk ? 'Enabled' : 'Disabled'
+                  }}</label>
+              </div>
+            </div>
             <div class="col-12 py-2 text-center">
               <p class="text-secondary">
                 These settings are automatically saved.
@@ -3018,6 +3027,7 @@ const mtmProfitTrailingToggle = ref(false);
 const mtmProfitTrailingType = ref(null);
 const totalRiskAmount = ref(null);
 const totalRiskPercentage = ref(null);
+const closePositionsRisk = ref(true);
 
 // Lifecycle hooks
 onMounted(async () => {
