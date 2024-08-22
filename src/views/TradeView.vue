@@ -564,18 +564,15 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableStoploss === true">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2 d-flex flex-row">
-                            <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success ms-2"
-                              @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">➕</button>
+                          <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
+                            <span class="btn-step btn-step-danger me-2"
+                              @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)">-</span>
+                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}</b>
+                            <span class="btn-step btn-step-success ms-2"
+                              @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)">+</span>
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-danger">
-                            <b>{{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)]) }}</b>
-                          </span>
-                          <br />
                           <span class="text-secondary">
                             ( {{ formatPrice(positionStoplosses[getSymbol(flattradePosition)]) }} pts)
                           </span>
@@ -588,18 +585,15 @@
                     <td>
                       <template v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableTarget === true">
                         <div class="d-flex align-items-center">
-                          <div class="ms-2 d-flex flex-row">
-                            <button class="btn btn-sm btn-outline-danger"
-                              @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">➖</button>
-                            <button class="btn btn-sm btn-outline-success ms-2"
-                              @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">➕</button>
+                          <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
+                            <span class="btn-step btn-step-danger me-2"
+                              @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)">-</span>
+                            <b>{{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}</b>
+                            <span class="btn-step btn-step-success ms-2"
+                              @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)">+</span>
                           </div>
                         </div>
                         <div class="text-center mt-2">
-                          <span class="text-success">
-                            <b>{{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}</b>
-                          </span>
-                          <br />
                           <span class="text-secondary">
                             ( {{ formatPrice(positionTargets[getSymbol(flattradePosition)]) }} pts)
                           </span>

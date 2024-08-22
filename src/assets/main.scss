@@ -259,3 +259,23 @@ input:focus {
   max-height: 200px;
   width: auto;
 }
+.btn-step {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 1px solid;
+}
+.btn-step-success {
+  color: var(--bs-success);
+  border-color: var(--bs-success);
+}
+.btn-step-danger {
+  color: var(--bs-danger);
+  border-color: var(--bs-danger);
+}
