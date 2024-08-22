@@ -319,12 +319,10 @@
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">Nifty 50: <b>{{ niftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">Bank Nifty: <b>{{ bankNiftyPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">Fin Nifty: <b>{{ finniftyPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTYNXT50'">Nifty Next 50: <b>{{ niftynxt50Price }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">Nifty Mid Select: <b>{{ midcpniftyPrice }}</b>
             </p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">Sensex: <b>{{ sensexPrice }}</b></p>
             <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">Bankex: <b>{{ bankexPrice }}</b></p>
-            <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX50'">Sensex 50: <b>{{ sensex50Price }}</b></p>
           </div>
 
           <!-- Put Strike Selection -->
@@ -1205,16 +1203,14 @@ const updateExchangeSymbols = () => {
     BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009' },
     FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037' },
     MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074' },
-    NIFTYNXT50: { exchangeCode: 'NSE', exchangeSecurityId: '26013' },
     SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1' },
     BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12' },
-    SENSEX50: { exchangeCode: 'BSE', exchangeSecurityId: '47' },
   };
 
   if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     exchangeSymbols.value = {
-      NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50'],
-      BFO: ['SENSEX', 'BANKEX', 'SENSEX50'],
+      NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'],
+      BFO: ['SENSEX', 'BANKEX'],
     };
   }
 
@@ -1255,11 +1251,9 @@ const synchronizeOnLoad = ref(true);
 const niftyPrice = ref('N/A');
 const bankNiftyPrice = ref('N/A');
 const finniftyPrice = ref('N/A');
-const niftynxt50Price = ref('N/A');
 const midcpniftyPrice = ref('N/A');
 const sensexPrice = ref('N/A');
 const bankexPrice = ref('N/A');
-const sensex50Price = ref('N/A');
 // Add a new function to get the initial price
 const getInitialPrice = (symbol) => {
   const strike = callStrikes.value.find(s =>
@@ -1301,17 +1295,15 @@ const fetchTradingData = async () => {
   if (niftyPrice.value === 'N/A') niftyPrice.value = getInitialPrice('NIFTY');
   if (bankNiftyPrice.value === 'N/A') bankNiftyPrice.value = getInitialPrice('BANKNIFTY');
   if (finniftyPrice.value === 'N/A') finniftyPrice.value = getInitialPrice('FINNIFTY');
-  if (niftynxt50Price.value === 'N/A') niftynxt50Price.value = getInitialPrice('NIFTYNXT50');
   if (midcpniftyPrice.value === 'N/A') midcpniftyPrice.value = getInitialPrice('MIDCPNIFTY');
   if (sensexPrice.value === 'N/A') sensexPrice.value = getInitialPrice('SENSEX');
   if (bankexPrice.value === 'N/A') bankexPrice.value = getInitialPrice('BANKEX');
-  if (sensex50Price.value === 'N/A') sensex50Price.value = getInitialPrice('SENSEX50');
 
   updateStrikesForExpiry(selectedExpiry.value);
   dataFetched.value = true;
 };
 // Add watchers for the price values
-watch([niftyPrice, bankNiftyPrice, finniftyPrice, niftynxt50Price, midcpniftyPrice, sensexPrice, bankexPrice, sensex50Price], () => {
+watch([niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice], () => {
   if (selectedExpiry.value) {
     updateStrikesForExpiry(selectedExpiry.value);
   }
@@ -1365,16 +1357,12 @@ const updateStrikesForExpiry = (expiryDate) => {
       currentPrice = parseFloat(bankNiftyPrice.value);
     } else if (selectedMasterSymbol.value === 'FINNIFTY') {
       currentPrice = parseFloat(finniftyPrice.value);
-    } else if (selectedMasterSymbol.value === 'NIFTYNXT50') {
-      currentPrice = parseFloat(niftynxt50Price.value);
     } else if (selectedMasterSymbol.value === 'MIDCPNIFTY') {
       currentPrice = parseFloat(midcpniftyPrice.value);
     } else if (selectedMasterSymbol.value === 'SENSEX') {
       currentPrice = parseFloat(sensexPrice.value);
     } else if (selectedMasterSymbol.value === 'BANKEX') {
       currentPrice = parseFloat(bankexPrice.value);
-    } else if (selectedMasterSymbol.value === 'SENSEX50') {
-      currentPrice = parseFloat(sensex50Price.value);
     }
 
     if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
@@ -1570,8 +1558,8 @@ const fetchFlattradeOrdersTradesBook = async () => {
 
     flatOrderBook.value = response.data.orderBook;
     flatTradeBook.value = response.data.tradeBook;
-    console.log('Flattrade Order Book:', response.data.orderBook);
-    console.log('Flattrade Trade Book:', response.data.tradeBook);
+    // console.log('Flattrade Order Book:', response.data.orderBook);
+    // console.log('Flattrade Trade Book:', response.data.tradeBook);
   } catch (error) {
     toastMessage.value = 'Error fetching trades: ' + error.message;
     showToast.value = true;
@@ -1608,8 +1596,8 @@ const fetchShoonyaOrdersTradesBook = async () => {
 
     shoonyaOrderBook.value = response.data.orderBook;
     shoonyaTradeBook.value = response.data.tradeBook;
-    console.log('Shoonya Order Book:', response.data.orderBook);
-    console.log('Shoonya Trade Book:', response.data.tradeBook);
+    // console.log('Shoonya Order Book:', response.data.orderBook);
+    // console.log('Shoonya Trade Book:', response.data.tradeBook);
   } catch (error) {
     toastMessage.value = 'Error fetching trades: ' + error.message;
     showToast.value = true;
@@ -1759,7 +1747,7 @@ const fetchShoonyaPositions = async () => {
       subscribeToOptions();
     } else if (positionBookRes.data.emsg === 'no data' || positionBookRes.data.emsg.includes('no data')) {
       shoonyaPositionBook.value = [];
-      console.log('No positions in Shoonya Position Book');
+      // console.log('No positions in Shoonya Position Book');
     } else {
       const errorMsg = positionBookRes.data.emsg || 'Unknown error';
       console.error('Error fetching position book:', errorMsg);
@@ -1863,10 +1851,8 @@ const quantities = ref({
   BANKNIFTY: { lotSize: 15, maxLots: 60 },
   FINNIFTY: { lotSize: 25, maxLots: 72 },
   MIDCPNIFTY: { lotSize: 50, maxLots: 56 },
-  NIFTYNXT50: { lotSize: 10, maxLots: 60 },
   SENSEX: { lotSize: 10, maxLots: 100 },
   BANKEX: { lotSize: 15, maxLots: 60 },
-  SENSEX50: { lotSize: 25, maxLots: 72 }
 });
 const availableQuantities = ref([]);
 
@@ -2086,7 +2072,6 @@ const placeOrder = async (transactionType, drvOptionType) => {
     const exchangeSegment = getExchangeSegment();
     const orderData = prepareOrderPayload(transactionType, drvOptionType, selectedStrike, exchangeSegment);
 
-    console.log("Placing order with data:", orderData);
     let response;
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
@@ -2117,6 +2102,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
       });
     }
 
+    console.log("Placing order with data:", orderData); // placed here to prevent delay and debugging if required
     console.log("Order placed successfully:", response.data);
     toastMessage.value = 'Order placed successfully';
     showToast.value = true;
@@ -2198,7 +2184,6 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       };
     }
 
-    console.log("Placing order for position with data:", orderData);
     let response;
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
@@ -2221,6 +2206,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       });
     }
 
+    console.log("Placing order for position with data:", orderData);    // placed here to prevent delay and debugging if required
     console.log(`Order placed successfully for ${getSymbol(position)}`, response.data);
     toastMessage.value = `Order placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
@@ -2370,7 +2356,7 @@ const cancelOrder = async (order) => {
   const orderStatus = order.status;
 
   console.log(`Attempting to cancel order ${orderId} with status ${orderStatus}`);
-  console.log(`Broker: ${selectedBroker.value?.brokerName}`);
+  // console.log(`Broker: ${selectedBroker.value?.brokerName}`);
 
   if (orderStatus !== 'OPEN') {
     console.log(`Order ${orderId} is not in a cancellable state and cannot be canceled.`);
@@ -2416,7 +2402,6 @@ const cancelOrder = async (order) => {
 };
 
 const cancelPendingOrders = async () => {
-  console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);
 
   // Fetch orders based on the selected broker
   if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -2435,9 +2420,9 @@ const cancelPendingOrders = async () => {
     return;
   }
 
-  console.log(`Pending orders:`, pendingOrders);
-
   const cancelPromises = pendingOrders.map(order => cancelOrder(order));
+  console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`);  // placed here to prevent delay and debugging if required
+  console.log(`Pending orders:`, pendingOrders); // placed here to prevent delay and debugging if required
 
   try {
     await Promise.all(cancelPromises);
@@ -2756,15 +2741,13 @@ const setFlattradeCredentials = async () => {
 
     const response = await axios.post('http://localhost:3000/api/set-flattrade-credentials', {
       usersession: apiToken,
-      userid: clientId,
-      defaultCallSecurityId: defaultCallSecurityId.value,
-      defaultPutSecurityId: defaultPutSecurityId.value
+      userid: clientId
     });
-    console.log('Credentials and security IDs set successfully:', response.data);
+    // console.log('Credentials set successfully:', response.data);
     toastMessage.value = 'Flattrade credentials set successfully';
     showToast.value = true;
   } catch (error) {
-    console.error('Error setting credentials and security IDs:', error);
+    console.error('Error setting credentials :', error);
     toastMessage.value = 'Failed to set Flattrade credentials';
     showToast.value = true;
   }
@@ -2797,15 +2780,13 @@ const setShoonyaCredentials = async () => {
 
     const response = await axios.post('http://localhost:3000/api/set-shoonya-credentials', {
       usersession: apiToken,
-      userid: clientId,
-      defaultCallSecurityId: defaultCallSecurityId.value,
-      defaultPutSecurityId: defaultPutSecurityId.value
+      userid: clientId
     });
-    console.log('Credentials and security IDs set successfully:', response.data);
+    // console.log('Credentials set successfully:', response.data);
     toastMessage.value = 'Shoonya credentials set successfully';
     showToast.value = true;
   } catch (error) {
-    console.error('Error setting credentials and security IDs:', error);
+    console.error('Error setting credentials: ', error);
     toastMessage.value = 'Failed to set Shoonya credentials';
     showToast.value = true;
   }
@@ -2821,9 +2802,9 @@ const defaultPutSecurityId = ref(null);
 const connectWebSocket = () => {
   let websocketUrl;
 
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' && brokerStatus.value === 'Connected') {
     websocketUrl = 'ws://localhost:8765';
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+  } else if (selectedBroker.value?.brokerName === 'Shoonya' && brokerStatus.value === 'Connected') {
     websocketUrl = 'ws://localhost:8766';
   }
 
@@ -2842,11 +2823,9 @@ const connectWebSocket = () => {
           case 'NIFTY': niftyPrice.value = quoteData.lp; break;
           case 'BANKNIFTY': bankNiftyPrice.value = quoteData.lp; break;
           case 'FINNIFTY': finniftyPrice.value = quoteData.lp; break;
-          case 'NIFTYNXT50': niftynxt50Price.value = quoteData.lp; break;
           case 'MIDCPNIFTY': midcpniftyPrice.value = quoteData.lp; break;
           case 'SENSEX': sensexPrice.value = quoteData.lp; break;
           case 'BANKEX': bankexPrice.value = quoteData.lp; break;
-          case 'SENSEX50': sensex50Price.value = quoteData.lp; break;
         }
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
