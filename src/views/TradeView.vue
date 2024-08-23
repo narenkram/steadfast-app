@@ -490,6 +490,12 @@
             🧺 Basket Orders
           </button>
         </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-tab-pane"
+            type="button" role="tab" aria-controls="settings-tab-pane" aria-selected="false">
+            ⚙️ Settings
+          </button>
+        </li>
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
@@ -936,6 +942,63 @@
           <div class="row py-3">
             <div class="col-12 text-center">
               <p class="text-secondary">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="settings-tab-pane" role="tabpanel" aria-labelledby="settings-tab" tabindex="0">
+          <div class="row py-3">
+            <div class="col-12">
+              <p class="text-danger"><b>This section is under development,</b> features will not work as expected.</p>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <!-- Select Call Strike Offset -->
+              <label for="callStrikeOffset" class="form-label">Call Strike Offset</label>
+              <select name="" id="" class="form-select">
+                <option value="+3">ITM +3</option>
+                <option value="+2">ITM +2</option>
+                <option value="+1">ITM +1</option>
+                <option value="0" selected>ATM 0</option>
+                <option value="-1">OTM -1</option>
+                <option value="-2">OTM -2</option>
+                <option value="-3">OTM -3</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <!-- Select Put Strike Offset -->
+              <label for="putStrikeOffset" class="form-label">Put Strike Offset</label>
+              <select name="" id="" class="form-select">
+                <option value="+3">ITM +3</option>
+                <option value="+2">ITM +2</option>
+                <option value="+1">ITM +1</option>
+                <option value="0" selected>ATM 0</option>
+                <option value="-1">OTM -1</option>
+                <option value="-2">OTM -2</option>
+                <option value="-3">OTM -3</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <!-- Show all positions Including Equity and Futures and Options -->
+              <label for="showAllPositions" class="form-label">Show Positions</label>
+              <select name="" id="" class="form-select">
+                <option value="all">All Positions</option>
+                <option value="futures">Futures Only</option>
+                <option value="options" selected>Options Only</option>
+                <option value="equity">Equity Only</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <!-- Show LTP Range Bar -->
+              <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showLTPRangeBar" v-model="showLTPRangeBar">
+                <label class="form-check-label" for="showLTPRangeBar">{{ showLTPRangeBar ? 'Enabled' : 'Disabled'
+                  }}</label>
+              </div>
+            </div>
+            <div class="col-12 py-2 text-center">
+              <p class="text-secondary">
+                These settings are automatically saved.
+              </p>
             </div>
           </div>
         </div>
