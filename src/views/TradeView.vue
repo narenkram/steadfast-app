@@ -42,11 +42,11 @@
       </p>
     </div>
 
-    <!-- Total Funds -->
+    <!-- Available Funds -->
     <div class="col-6 col-md-4 col-lg-3 text-center">
-      <p class="mb-1"><b>Total Funds</b></p>
+      <p class="mb-1"><b>Available Funds</b></p>
       <p class="mt-2 mb-0">
-        ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 }) :
+        ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 }) :
           'N/A' }}
       </p>
     </div>
@@ -1861,7 +1861,11 @@ const fetchFundLimit = async () => {
       // Make sure the response data has the correct structure
       fundLimits.value = {
         cash: response.data.cash,
-        marginused: response.data.marginused
+        marginused: response.data.marginused,
+        spanMargin: response.data.span,
+        expoMargin: response.data.expo,
+        premiumMargin: response.data.premium,
+        equityMargin: response.data.varelm
         // Add any other relevant fields from the Shoonya response
       };
     }
@@ -2611,16 +2615,16 @@ const availableBalance = computed(() => {
   // console.log('Selected Broker:', selectedBroker.value?.brokerName);
 
   if (selectedBroker.value?.brokerName === 'Flattrade') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+    const cash = (Number(fundLimits.value.cash) || 0) + (Number(fundLimits.value.payin) || 0);
     const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
+    const balance = cash - marginUsed;
     // console.log('Flattrade Available Balance:', balance);
     return balance;
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+    const cash = (Number(fundLimits.value.cash) || 0) + (Number(fundLimits.value.payin) || 0);
     const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
+    const balance = cash - marginUsed;
     // console.log('Shoonya Available Balance:', balance);
     return balance;
   }
@@ -2629,12 +2633,22 @@ const availableBalance = computed(() => {
 // Computed property to get the correct utilized amount based on the selected broker
 const usedAmount = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    return marginUsed;
+    const spanMargin = Number(fundLimits.value.span) || 0;
+    const expoMargin = Number(fundLimits.value.expo) || 0;
+    const premiumMargin = Number(fundLimits.value.premium) || 0;
+    const equityMargin = Number(fundLimits.value.varelm) || 0;
+    const marginUsed = Number(fundLimits.value.marginUsed) || 0;
+    const utilizedMargin = (spanMargin + expoMargin + premiumMargin + equityMargin + marginUsed);
+    return utilizedMargin;
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    return marginUsed;
+    const spanMargin = Number(fundLimits.value.span) || 0;
+    const expoMargin = Number(fundLimits.value.expo) || 0;
+    const premiumMargin = Number(fundLimits.value.premium) || 0;
+    const equityMargin = Number(fundLimits.value.varelm) || 0;
+    const marginUsed = Number(fundLimits.value.marginUsed) || 0;
+    const utilizedMargin = (spanMargin + expoMargin + premiumMargin + equityMargin + marginUsed);
+    return utilizedMargin;
   }
   return 0;
 });
