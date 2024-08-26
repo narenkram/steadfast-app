@@ -105,9 +105,6 @@
       background-color: var(--bs-dark);
     }
   }
-  .accordion-button:not(.collapsed) {
-    border-color: var(--bs-dark);
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -150,9 +147,6 @@
   }
   a {
     color: var(--bs-primary);
-  }
-  .accordion-button:not(.collapsed) {
-    border-color: var(--bs-dark);
   }
 }
 
@@ -265,9 +259,23 @@ input:focus {
   max-height: 200px;
   width: auto;
 }
-
-.accordion-button:not(.collapsed) {
+.btn-step {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
   border: 1px solid;
-  background-color: unset !important;
-  color: unset !important;
+}
+.btn-step-success {
+  color: var(--bs-success);
+  border-color: var(--bs-success);
+}
+.btn-step-danger {
+  color: var(--bs-danger);
+  border-color: var(--bs-danger);
 }
