@@ -9,7 +9,7 @@ import qs from 'qs';
 import { debounce } from 'lodash';
 
 // Reactive Variables
-const BASE_URL = 'http://localhost:3000'; 
+const BASE_URL = 'http://localhost:3000';
 const showLTPRangeBar = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
@@ -97,7 +97,18 @@ const totalRiskAmount = ref(null);
 const totalRiskPercentage = ref(null);
 const closePositionsRisk = ref(true);
 const activeFetchFunction = ref(null);
-
+const masterOpenPrice = ref(null);
+const masterHighPrice = ref(null);
+const masterLowPrice = ref(null);
+const masterClosePrice = ref(null);
+const callOpenPrice = ref(null);
+const callHighPrice = ref(null);
+const callLowPrice = ref(null);
+const callClosePrice = ref(null);
+const putOpenPrice = ref(null);
+const putHighPrice = ref(null);
+const putLowPrice = ref(null);
+const putClosePrice = ref(null);
 
 
 // Computed Variables
@@ -1779,19 +1790,63 @@ const connectWebSocket = () => {
       if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
         // Update the price for the selected master symbol
         switch (selectedMasterSymbol.value) {
-          case 'NIFTY': niftyPrice.value = quoteData.lp; break;
-          case 'BANKNIFTY': bankNiftyPrice.value = quoteData.lp; break;
-          case 'FINNIFTY': finniftyPrice.value = quoteData.lp; break;
-          case 'MIDCPNIFTY': midcpniftyPrice.value = quoteData.lp; break;
-          case 'SENSEX': sensexPrice.value = quoteData.lp; break;
-          case 'BANKEX': bankexPrice.value = quoteData.lp; break;
+          case 'NIFTY':
+            niftyPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
+          case 'BANKNIFTY':
+            bankNiftyPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
+          case 'FINNIFTY':
+            finniftyPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
+          case 'MIDCPNIFTY':
+            midcpniftyPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
+          case 'SENSEX':
+            sensexPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
+          case 'BANKEX':
+            bankexPrice.value = quoteData.lp;
+            masterOpenPrice.value = quoteData.o;
+            masterHighPrice.value = quoteData.h;
+            masterLowPrice.value = quoteData.l;
+            masterClosePrice.value = quoteData.c;
+            break;
         }
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
+        callOpenPrice.value = quoteData.o;
+        callHighPrice.value = quoteData.h;
+        callLowPrice.value = quoteData.l;
+        callClosePrice.value = quoteData.c;
         // console.log('Updated Call LTP:', latestCallLTP.value);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
+        putOpenPrice.value = quoteData.o;
+        putHighPrice.value = quoteData.h;
+        putLowPrice.value = quoteData.l;
+        putClosePrice.value = quoteData.c;
         // console.log('Updated Put LTP:', latestPutLTP.value);
       }
 

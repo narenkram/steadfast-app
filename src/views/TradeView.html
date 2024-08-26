@@ -415,11 +415,13 @@
             </select>
             <span class="input-group-text">{{ latestCallLTP }}</span>
           </div>
-          <!-- DO NOT REMOVE, USEFUL FOR DEBUGGING -->
-          <!-- <div>
-              Security ID: {{ defaultCallSecurityId }}
-            </div> -->
           <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
+          <div class="mt-2">
+            <p>Open: {{ callOpenPrice }}</p>
+            <p>High: {{ callHighPrice }}</p>
+            <p>Low: {{ callLowPrice }}</p>
+            <p>Close: {{ callClosePrice }}</p>
+          </div>
         </div>
 
         <!-- Live Underlying Price -->
@@ -442,6 +444,12 @@
           <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">
             Bankex: <b>{{ bankexPrice }}</b>
           </p>
+          <div class="mt-2">
+            <p>Open: {{ masterOpenPrice }}</p>
+            <p>High: {{ masterHighPrice }}</p>
+            <p>Low: {{ masterLowPrice }}</p>
+            <p>Close: {{ masterClosePrice }}</p>
+          </div>
         </div>
 
         <!-- Put Strike Selection -->
@@ -464,11 +472,13 @@
               </option>
             </select>
           </div>
-          <!-- DO NOT REMOVE, USEFUL FOR DEBUGGING -->
-          <!-- <div>
-              Security ID: {{ defaultPutSecurityId }}
-            </div> -->
           <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
+          <div class="mt-2">
+            <p>Open: {{ putOpenPrice }}</p>
+            <p>High: {{ putHighPrice }}</p>
+            <p>Low: {{ putLowPrice }}</p>
+            <p>Close: {{ putClosePrice }}</p>
+          </div>
         </div>
       </div>
 
