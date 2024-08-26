@@ -438,6 +438,77 @@ const totalDerivativeSellValue = computed(() => {
   }
   return 0;
 });
+const ltpRangeWidth = computed(() => {
+  const low = parseFloat(masterLowPrice.value);
+  const high = parseFloat(masterHighPrice.value);
+  const close = parseFloat(masterClosePrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+    return 0;
+  }
+
+  return ((close - low) / (high - low)) * 100;
+});
+const ltpMarkerPosition = computed(() => {
+  const low = parseFloat(masterLowPrice.value);
+  const high = parseFloat(masterHighPrice.value);
+  const ltp = parseFloat(niftyPrice.value); // Use the appropriate LTP value
+
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
+    return 0;
+  }
+
+  return ((ltp - low) / (high - low)) * 100;
+});
+// Computed Properties for LTP Range Bar for Call Strike
+const callLtpRangeWidth = computed(() => {
+  const low = parseFloat(callLowPrice.value);
+  const high = parseFloat(callHighPrice.value);
+  const close = parseFloat(callClosePrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+    return 0;
+  }
+
+  return ((close - low) / (high - low)) * 100;
+});
+
+const callLtpMarkerPosition = computed(() => {
+  const low = parseFloat(callLowPrice.value);
+  const high = parseFloat(callHighPrice.value);
+  const ltp = parseFloat(latestCallLTP.value); // Use the appropriate LTP value
+
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
+    return 0;
+  }
+
+  return ((ltp - low) / (high - low)) * 100;
+});
+
+// Computed Properties for LTP Range Bar for Put Strike
+const putLtpRangeWidth = computed(() => {
+  const low = parseFloat(putLowPrice.value);
+  const high = parseFloat(putHighPrice.value);
+  const close = parseFloat(putClosePrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+    return 0;
+  }
+
+  return ((close - low) / (high - low)) * 100;
+});
+
+const putLtpMarkerPosition = computed(() => {
+  const low = parseFloat(putLowPrice.value);
+  const high = parseFloat(putHighPrice.value);
+  const ltp = parseFloat(latestPutLTP.value); // Use the appropriate LTP value
+
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
+    return 0;
+  }
+
+  return ((ltp - low) / (high - low)) * 100;
+});
 
 
 

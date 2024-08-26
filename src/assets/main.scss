@@ -259,23 +259,34 @@ input:focus {
   max-height: 200px;
   width: auto;
 }
-.btn-step {
-  width: 20px;
-  height: 20px;
+.ltp-range-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 0;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 50%;
-  border: 1px solid;
+  justify-content: space-between;
+  margin-top: 10px;
 }
-.btn-step-success {
-  color: var(--bs-success);
-  border-color: var(--bs-success);
+
+.ltp-range {
+  position: relative;
+  flex-grow: 1;
+  height: 8px;
+  background-color: #d3b8ae;
+  margin: 0 10px;
+  border-radius: 4px;
 }
-.btn-step-danger {
-  color: var(--bs-danger);
-  border-color: var(--bs-danger);
+
+.ltp-range-fill {
+  height: 100%;
+  background-color: #5a2d2a;
+  border-radius: 4px 0 0 4px;
+}
+
+.ltp-range-marker {
+  position: absolute;
+  top: -4px;
+  width: 0;
+  height: 16px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #5a2d2a;
 }

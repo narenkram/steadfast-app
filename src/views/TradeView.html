@@ -422,6 +422,15 @@
             <p>Low: {{ callLowPrice }}</p>
             <p>Close: {{ callClosePrice }}</p>
           </div>
+          <!-- LTP Range Bar for Call Strike -->
+          <div class="ltp-range-bar">
+            <span class="ltp-range-low">L: {{ callLowPrice }}</span>
+            <div class="ltp-range">
+              <div class="ltp-range-fill" :style="{ width: callLtpRangeWidth + '%' }"></div>
+              <div class="ltp-range-marker" :style="{ left: callLtpMarkerPosition + '%' }"></div>
+            </div>
+            <span class="ltp-range-high">H: {{ callHighPrice }}</span>
+          </div>
         </div>
 
         <!-- Live Underlying Price -->
@@ -449,6 +458,15 @@
             <p>High: {{ masterHighPrice }}</p>
             <p>Low: {{ masterLowPrice }}</p>
             <p>Close: {{ masterClosePrice }}</p>
+          </div>
+          <!-- LTP Range Bar for Live Underlying Price -->
+          <div class="ltp-range-bar">
+            <span class="ltp-range-low">L: {{ masterLowPrice }}</span>
+            <div class="ltp-range">
+              <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
+              <div class="ltp-range-marker" :style="{ left: ltpMarkerPosition + '%' }"></div>
+            </div>
+            <span class="ltp-range-high">H: {{ masterHighPrice }}</span>
           </div>
         </div>
 
@@ -478,6 +496,15 @@
             <p>High: {{ putHighPrice }}</p>
             <p>Low: {{ putLowPrice }}</p>
             <p>Close: {{ putClosePrice }}</p>
+          </div>
+          <!-- LTP Range Bar for Put Strike -->
+          <div class="ltp-range-bar">
+            <span class="ltp-range-low">L: {{ putLowPrice }}</span>
+            <div class="ltp-range">
+              <div class="ltp-range-fill" :style="{ width: putLtpRangeWidth + '%' }"></div>
+              <div class="ltp-range-marker" :style="{ left: putLtpMarkerPosition + '%' }"></div>
+            </div>
+            <span class="ltp-range-high">H: {{ putHighPrice }}</span>
           </div>
         </div>
       </div>
