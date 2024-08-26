@@ -524,44 +524,39 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Symbol Details</th>
-                  <th scope="col">Net Avg</th>
+                  <th scope="col">Position</th>
+                  <th scope="col">Avg</th>
                   <th scope="col">LTP</th>
-                  <th scope="col" class="text-center">Stoploss</th>
+                  <th scope="col" class="text-center">Stop</th>
                   <th scope="col" class="text-center">Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
+                  <th scope="col">Select</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                     <td>
-                      <label class="d-flex flex-column align-items-start">
-                        <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
-                          v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
-                          :disabled="flattradePosition.netqty == 0" />
+                      <div class="d-flex ">
+                        {{ flattradePosition.tsym }}
+                      </div>
 
-                        <div class="d-flex ">
-                          {{ flattradePosition.tsym }}
-                        </div>
-
-                        <div class="d-flex flex-row">
-                          <span
-                            :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : null">
-                            Qty: {{ flattradePosition.netqty }}
-                          </span>
-                          <span class="ms-2">
-                            Side:
-                            <b>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</b>
-                          </span>
-                          <span class="ms-2">
-                            Type: {{ flattradePosition.prd }}
-                          </span>
-                        </div>
-                      </label>
+                      <div class="d-flex flex-row">
+                        <span
+                          :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : null">
+                          Qty: {{ flattradePosition.netqty }}
+                        </span>
+                        <span class="ms-2">
+                          Side:
+                          <b>{{ flattradePosition.netqty > 0 ? 'B' : flattradePosition.netqty < 0 ? 'S' : '-' }}</b>
+                        </span>
+                        <span class="ms-2">
+                          Type: {{ flattradePosition.prd }}
+                        </span>
+                      </div>
                     </td>
                     <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
@@ -617,6 +612,14 @@
                       :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                     </td>
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
+                          v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
+                          :disabled="flattradePosition.netqty == 0" />
+                      </label>
+                    </td>
                   </tr>
                 </template>
                 <tr v-else>
@@ -631,42 +634,39 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Symbol Details</th>
-                  <th scope="col">Net Avg</th>
+                  <th scope="col">Position</th>
+                  <th scope="col">Avg</th>
                   <th scope="col">LTP</th>
-                  <th scope="col" class="text-center">Stoploss</th>
+                  <th scope="col" class="text-center">Stop</th>
                   <th scope="col" class="text-center">Target</th>
                   <th scope="col">Buy Value</th>
                   <th scope="col">Sell Value</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
+                  <th scope="col">Select</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
-                      <label class="d-flex flex-column align-items-start">
-                        <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
-                          v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
-                          :disabled="shoonyaPosition.netqty == 0" />
-                        <div class="d-flex ">
-                          {{ shoonyaPosition.tsym }}
-                        </div>
-                        <div class="d-flex flex-row">
-                          <span
-                            :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : null">
-                            Qty: {{ shoonyaPosition.netqty }}
-                          </span>
-                          <span class="ms-2">
-                            Side:
-                            <b>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</b>
-                          </span>
-                          <span class="ms-2">
-                            Type: {{ shoonyaPosition.prd }}
-                          </span>
-                        </div>
-                      </label>
+
+                      <div class="d-flex ">
+                        {{ shoonyaPosition.tsym }}
+                      </div>
+                      <div class="d-flex flex-row">
+                        <span
+                          :class="shoonyaPosition.netqty > 0 ? 'text-success' : shoonyaPosition.netqty < 0 ? 'text-danger' : null">
+                          Qty: {{ shoonyaPosition.netqty }}
+                        </span>
+                        <span class="ms-2">
+                          Side:
+                          <b>{{ shoonyaPosition.netqty > 0 ? 'B' : shoonyaPosition.netqty < 0 ? 'S' : '-' }}</b>
+                        </span>
+                        <span class="ms-2">
+                          Type: {{ shoonyaPosition.prd }}
+                        </span>
+                      </div>
                     </td>
                     <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
@@ -721,6 +721,14 @@
                     <td
                       :class="shoonyaPosition.calculatedUrmtom > 0 ? 'text-success' : shoonyaPosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ shoonyaPosition.calculatedUrmtom.toFixed(2) }}
+                    </td>
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
+                          v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
+                          :disabled="shoonyaPosition.netqty == 0" />
+                      </label>
                     </td>
                   </tr>
                 </template>
