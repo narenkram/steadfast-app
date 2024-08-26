@@ -2719,19 +2719,27 @@ const totalBrokerage = computed(() => {
   let total = 0;
 
   // Calculate totalValue based on totalBuyValue and totalSellValue
-  const totalValue = totalBuyValue.value + totalSellValue.value;
+  const totalEquityValue = totalEquityBuyValue.value + totalEquitySellValue.value;
+  const totalDerivativeValue = totalDerivativeBuyValue.value + totalDerivativeSellValue.value;  
 
   if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     // Calculate charges for Flattrade and Shoonya (they have the same structure)
-    const exchangeCharge = Math.round(totalValue * 0.000495 * 100) / 100;
-    const ipftCharge = Math.round(totalValue * 0.000005 * 100) / 100;
-    const sebiCharge = Math.round(totalValue * 0.000001 * 100) / 100;
-    const gstCharge = Math.round((exchangeCharge + sebiCharge + ipftCharge) * 18) / 100;
-    const stampdutyCharge = Math.round(totalBuyValue.value * 0.00003);
-    const sttCharge = Math.round(totalSellValue.value * 0.000625);
+    const equityExchangeCharge = Math.round(totalEquityValue * 0.00003485 * 100) / 100; //avage price from both exchange
+    const equityIpftCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
+    const equitySebiCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
+    const equityGstCharge = Math.round((equityExchangeCharge + equitySebiCharge + equityIpftCharge) * 18) / 100;
+    const equityStampdutyCharge = Math.round(totalEquityBuyValue.value * 0.00003);
+    const equitySttCharge = Math.round(totalEquitySellValue.value * 0.00025);
+
+    const derivativesExchangeCharge = Math.round(totalDerivativeValue * 0.000495 * 100) / 100;
+    const derivativesIpftCharge = Math.round(totalDerivativeValue * 0.000005 * 100) / 100;
+    const derivativesSebiCharge = Math.round(totalDerivativeValue * 0.000001 * 100) / 100;
+    const derivativesGstCharge = Math.round((derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge) * 18) / 100;
+    const derivativesStampdutyCharge = Math.round(totalDerivativeBuyValue.value * 0.00003);
+    const derivativesSttCharge = Math.round(totalDerivativeSellValue.value * 0.000625);
 
     // Add charges to total for Flattrade and Shoonya
-    total += (exchangeCharge + ipftCharge + sebiCharge + gstCharge + stampdutyCharge + sttCharge);
+    total += (equityExchangeCharge + equityIpftCharge + equitySebiCharge + equityGstCharge + equityStampdutyCharge + equitySttCharge + derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge + derivativesGstCharge + derivativesStampdutyCharge + derivativesSttCharge);
 
     // No additional brokerage for Flattrade and Shoonya
   }
@@ -3092,6 +3100,58 @@ const totalSellValue = computed(() => {
   }
   if (selectedBroker.value?.brokerName === 'Shoonya') {
     return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
+
+const totalEquityBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+
+const totalEquitySellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE') 
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
+
+const totalDerivativeBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+
+const totalDerivativeSellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO') 
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
   }
   return 0;
 });
