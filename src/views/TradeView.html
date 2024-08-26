@@ -314,9 +314,9 @@
               <option value="5">5%</option>
             </select>
           </div> -->
-        <!-- Stoploss -->
+        <!-- Predefined Stoploss -->
         <div class="col-6 col-md-3 col-lg-3">
-          <label for="enableStoploss" class="form-label mb-0">Stoploss</label>
+          <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
           <div class="input-group mb-3">
             <div class="input-group-text">
               <input
@@ -324,7 +324,7 @@
                 type="checkbox"
                 id="enableStoploss"
                 v-model="tradeSettings.enableStoploss"
-                aria-label="Enable Stoploss"
+                aria-label="Enable Predefined Stoploss"
                 :class="{ 'disabled-form': isFormDisabled }"
               />
             </div>
@@ -333,15 +333,15 @@
               class="form-control"
               id="stoplossValue"
               v-model.number="tradeSettings.stoplossValue"
-              aria-label="Stoploss (points)"
+              aria-label="Predefined Stoploss (points)"
               :class="{ 'disabled-form': isFormDisabled }"
             />
             <span class="input-group-text">₹ Points</span>
           </div>
         </div>
-        <!-- Target -->
+        <!-- Predefined Target -->
         <div class="col-6 col-md-3 col-lg-3">
-          <label for="enableTarget" class="form-label mb-0">Target</label>
+          <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
           <div class="input-group mb-3">
             <div class="input-group-text">
               <input
@@ -349,7 +349,7 @@
                 type="checkbox"
                 id="enableTarget"
                 v-model="tradeSettings.enableTarget"
-                aria-label="Enable Target"
+                aria-label="Enable Predefined Target"
                 :class="{ 'disabled-form': isFormDisabled }"
               />
             </div>
@@ -358,7 +358,7 @@
               class="form-control"
               id="targetValue"
               v-model.number="tradeSettings.targetValue"
-              aria-label="Target (points)"
+              aria-label="Predefined Target (points)"
               :class="{ 'disabled-form': isFormDisabled }"
             />
             <span class="input-group-text">₹ Points</span>

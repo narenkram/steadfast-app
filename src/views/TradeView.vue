@@ -67,8 +67,8 @@ const tradeSettings = reactive({
   stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
   enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
   targetValue: Number(localStorage.getItem('targetValue') || '30'),
-  stoplossStep: 1, // The step size for increasing/decreasing stoploss price
-  targetStep: 1, // The step size for increasing/decreasing target price
+  stoplossStep: 1, // The step size for increasing/decreasing predefined stoploss price
+  targetStep: 1, // The step size for increasing/decreasing predefined target price
 });
 const positionStoplosses = ref({});
 const positionTargets = ref({});
@@ -1127,14 +1127,14 @@ const adjustStoplossPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For long positions, decrease stoploss price. For short positions, increase it.
+  // For long positions, decrease predefined stoploss price. For short positions, increase it.
   positionStoplossesPrice.value[tsym] += isLong ? -adjustment : adjustment;
 
-  // Recalculate the points-based stoploss
+  // Recalculate the points-based predefined stoploss
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionStoplosses.value[tsym] = Math.abs(currentLTP - positionStoplossesPrice.value[tsym]);
 
-  console.log(`Adjusted stoploss for ${tsym}: Price=${positionStoplossesPrice.value[tsym]}, Points=${positionStoplosses.value[tsym]}`);
+  console.log(`Adjusted predefined stoploss for ${tsym}: Price=${positionStoplossesPrice.value[tsym]}, Points=${positionStoplosses.value[tsym]}`);
 
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
@@ -1150,14 +1150,14 @@ const adjustTargetPrice = (tsym, adjustment) => {
   const netQty = Number(position.netQty || position.netqty);
   const isLong = netQty > 0;
 
-  // For long positions, increase target price. For short positions, decrease it.
+  // For long positions, increase predefined target price. For short positions, decrease it.
   positionTargetsPrice.value[tsym] += isLong ? adjustment : -adjustment;
 
-  // Recalculate the points-based target
+  // Recalculate the points-based predefined target
   const currentLTP = Number(positionLTPs.value[tsym] || 0);
   positionTargets.value[tsym] = Math.abs(currentLTP - positionTargetsPrice.value[tsym]);
 
-  console.log(`Adjusted target for ${tsym}: Price=${positionTargetsPrice.value[tsym]}, Points=${positionTargets.value[tsym]}`);
+  console.log(`Adjusted predefined target for ${tsym}: Price=${positionTargetsPrice.value[tsym]}, Points=${positionTargets.value[tsym]}`);
 
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
@@ -1559,9 +1559,9 @@ const setStoplossAndTarget = (position) => {
       ? currentLTP - tradeSettings.stoplossValue
       : currentLTP + tradeSettings.stoplossValue;
 
-    // Ensure stoploss price is not negative for long positions
+    // Ensure predefined stoploss price is not negative for long positions
     if (isLong && stoplossPrice <= 0) {
-      console.log(`Stoploss for ${tsym} would be negative or zero. Disabling stoploss.`);
+      console.log(`Predefined stoploss for ${tsym} would be negative or zero. Disabling predefined stoploss.`);
       delete positionStoplossesPrice.value[tsym];
       tradeSettings.enableStoploss = false;
     } else {
@@ -1579,7 +1579,7 @@ const setStoplossAndTarget = (position) => {
     delete positionTargetsPrice.value[tsym];
   }
 
-  console.log(`Set SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
+  console.log(`Set Predefined SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
 
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
@@ -1615,15 +1615,15 @@ const checkStoplossAndTarget = (position, currentLTP) => {
 
   if (isLong) {
     if (tradeSettings.enableStoploss && stoplossPrice && currentLTP <= stoplossPrice) {
-      executeOrder('S', 'Stoploss hit');
+      executeOrder('S', 'Predefined Stoploss hit');
     } else if (tradeSettings.enableTarget && targetPrice && currentLTP >= targetPrice) {
-      executeOrder('S', 'Target hit');
+      executeOrder('S', 'Predefined Target hit');
     }
   } else {
     if (tradeSettings.enableStoploss && stoplossPrice && currentLTP >= stoplossPrice) {
-      executeOrder('B', 'Stoploss hit');
+      executeOrder('B', 'Predefined Stoploss hit');
     } else if (tradeSettings.enableTarget && targetPrice && currentLTP <= targetPrice) {
-      executeOrder('B', 'Target hit');
+      executeOrder('B', 'Predefined Target hit');
     }
   }
 };
