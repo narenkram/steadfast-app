@@ -1087,8 +1087,7 @@ import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import { debounce } from 'lodash';
-// import LineChart from '../components/LineChart.vue';
-// const showLineChart = ref(false);
+const showLTPRangeBar = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
 const updateToastVisibility = (value) => {
