@@ -7,12 +7,99 @@ import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import { debounce } from 'lodash';
+
+// Reactive Variables
 const showLTPRangeBar = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
-const updateToastVisibility = (value) => {
-  showToast.value = value;
-};
+const activeTab = ref('positions');
+const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
+const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
+const currentTime = ref(Date.now());
+const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false');
+const selectedBroker = ref(null);
+const selectedBrokerName = ref('');
+const selectedExchange = ref({});
+const selectedMasterSymbol = ref('');
+const selectedQuantity = ref(0);
+const selectedExpiry = ref(null);
+const selectedCallStrike = ref({});
+const selectedPutStrike = ref({});
+const exchangeSymbols = ref({});
+const callStrikes = ref([]);
+const putStrikes = ref([]);
+const expiryDates = ref([]);
+const synchronizeOnLoad = ref(true);
+const niftyPrice = ref('N/A');
+const bankNiftyPrice = ref('N/A');
+const finniftyPrice = ref('N/A');
+const midcpniftyPrice = ref('N/A');
+const sensexPrice = ref('N/A');
+const bankexPrice = ref('N/A');
+const dataFetched = ref(false);
+const lotsPerSymbol = ref({});
+const flatOrderBook = ref([]);
+const flatTradeBook = ref([]);
+const token = ref('');
+const shoonyaOrderBook = ref([]);
+const shoonyaTradeBook = ref([]);
+const flatTradePositionBook = ref([]);
+const shoonyaPositionBook = ref([]);
+const fundLimits = ref({});
+const showBrokerClientId = ref(false);
+const quantities = ref({
+  NIFTY: { lotSize: 25, maxLots: 72 },
+  BANKNIFTY: { lotSize: 15, maxLots: 60 },
+  FINNIFTY: { lotSize: 25, maxLots: 72 },
+  MIDCPNIFTY: { lotSize: 50, maxLots: 56 },
+  SENSEX: { lotSize: 10, maxLots: 100 },
+  BANKEX: { lotSize: 15, maxLots: 60 },
+});
+const availableQuantities = ref([]);
+
+const selectedStrike = ref({});
+const selectedProductType = ref('');
+const limitPrice = ref(null);
+const modalTransactionType = ref('');
+const modalOptionType = ref('');
+const tradeSettings = reactive({
+  enableStoploss: JSON.parse(localStorage.getItem('enableStoploss') || 'true'),
+  stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
+  enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
+  targetValue: Number(localStorage.getItem('targetValue') || '30'),
+  stoplossStep: 1, // The step size for increasing/decreasing stoploss price
+  targetStep: 1, // The step size for increasing/decreasing target price
+});
+const positionStoplosses = ref({});
+const positionTargets = ref({});
+const positionStoplossesPrice = ref({});
+const positionTargetsPrice = ref({});
+const selectedShoonyaPositionsSet = ref(new Set());
+const selectedFlattradePositionsSet = ref(new Set());
+const positionsInExecution = ref({});
+const clockEmojis = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚'];
+const currentClockEmoji = ref(clockEmojis[new Date().getHours() % clockEmojis.length]);
+const socket = ref(null);
+const latestCallLTP = ref('N/A');
+const latestPutLTP = ref('N/A');
+const defaultCallSecurityId = ref(null);
+const defaultPutSecurityId = ref(null);
+const positionLTPs = ref({});
+const positionSecurityIds = ref({});
+let timer;
+let positionCheckInterval;
+const totalRiskType = ref(null);
+const mtmProfitTrailingToggle = ref(false);
+const totalRiskTypeToggle = ref(false);
+const mtmProfitTrailingType = ref(null);
+const totalRiskAmount = ref(null);
+const totalRiskPercentage = ref(null);
+const closePositionsRisk = ref(true);
+const activeFetchFunction = ref(null);
+
+
+
+// Computed Variables
 const brokerStatus = computed(() => {
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
   const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
@@ -36,18 +123,319 @@ const brokerStatus = computed(() => {
   }
   return 'Not Connected';
 });
+const isFormDisabled = computed(() => killSwitchActive.value);
+const remainingTimeInMs = computed(() => {
+  if (!activationTime.value || !killSwitchActive.value) return 0;
+  const sixHoursInMillis = 6 * 60 * 60 * 1000;
+  return Math.max(0, sixHoursInMillis - (currentTime.value - activationTime.value));
+});
+const killSwitchRemainingTime = computed(() => {
+  if (remainingTimeInMs.value === 0) return '';
 
-const activeTab = ref('positions');
+  const hours = Math.floor(remainingTimeInMs.value / (60 * 60 * 1000));
+  const minutes = Math.floor((remainingTimeInMs.value % (60 * 60 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((remainingTimeInMs.value % (60 * 1000)) / 1000);
+
+  return `${hours}h ${minutes}m ${seconds}s`;
+});
+const killSwitchButtonText = computed(() => killSwitchActive.value ? 'Deactivate' : 'Activate');
+const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-sm btn-danger shadow fs-5' : 'btn btn-sm btn-success shadow fs-5');
+const availableBrokers = computed(() => {
+  return Object.keys(localStorage)
+    .filter(key => key.startsWith('broker_'))
+    .map(key => key.replace('broker_', ''));
+});
+const exchangeOptions = computed(() => {
+  return Object.keys(exchangeSymbols.value).filter(key => key !== 'symbolData');
+});
+const isExpiryToday = computed(() => {
+  const comparableSelectedExpiry = convertToComparableDate(formatDate(selectedExpiry.value));
+  const comparableFormattedDate = convertToComparableDate(formattedDate.value);
+  // console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
+  // console.log('Comparable Formatted Date:', comparableFormattedDate);
+  return comparableSelectedExpiry === comparableFormattedDate;
+});
+const selectedLots = computed({
+  get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
+  set: (value) => {
+    lotsPerSymbol.value[selectedMasterSymbol.value] = value;
+    saveLots();
+  }
+});
+const maxLots = computed(() => {
+  const instrument = quantities.value[selectedMasterSymbol.value];
+  return instrument ? instrument.maxLots : 56; // maxlots 56 is conditional...
+});
+const combinedOrdersAndTrades = computed(() => {
+  const combined = {};
+
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    // Process Flattrade orders and trades
+    if (Array.isArray(flatOrderBook.value)) {
+      flatOrderBook.value.forEach(order => {
+        combined[order.norenordno] = { order, trade: null };
+      });
+    }
+
+    if (Array.isArray(flatTradeBook.value)) {
+      flatTradeBook.value.forEach(trade => {
+        if (combined[trade.norenordno]) {
+          combined[trade.norenordno].trade = trade;
+        } else {
+          combined[trade.norenordno] = { order: null, trade };
+        }
+      });
+    }
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    // Process Shoonya orders and trades
+    if (Array.isArray(shoonyaOrderBook.value)) {
+      shoonyaOrderBook.value.forEach(order => {
+        combined[order.norenordno] = { order, trade: null };
+      });
+    }
+
+    if (Array.isArray(shoonyaTradeBook.value)) {
+      shoonyaTradeBook.value.forEach(trade => {
+        if (combined[trade.norenordno]) {
+          combined[trade.norenordno].trade = trade;
+        } else {
+          combined[trade.norenordno] = { order: null, trade };
+        }
+      });
+    }
+  }
+
+  return Object.values(combined).sort((a, b) => {
+    const aTime = a.order?.norentm || a.trade?.norentm;
+    const bTime = b.order?.norentm || b.trade?.norentm;
+    return new Date(bTime) - new Date(aTime); // Sort in descending order (most recent first)
+  });
+});
+const sortedPositions = computed(() => {
+  return [...positionsWithCalculatedProfit.value].sort((a, b) => {
+    // First, sort by open/closed status
+    if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1;
+    if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1;
+
+    // Then, for open positions, sort by absolute quantity in descending order
+    if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
+      return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty));
+    }
+
+    // For closed positions, maintain their original order
+    return 0;
+  });
+});
+const orderTypes = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['MKT', 'LMT'];
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['MKT', 'LMT'];
+  }
+  return [];
+});
+const selectedOrderType = ref(orderTypes.value[0]);
+const previousOrderType = ref(orderTypes.value[0]);
+const productTypes = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['Intraday', 'Margin'];
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['Intraday', 'Margin'];
+  }
+  return [];
+});
+const availableBalance = computed(() => {
+  // console.log('Fund Limits:', fundLimits.value);
+  // console.log('Selected Broker:', selectedBroker.value?.brokerName);
+
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    const balance = Math.floor(cash - marginUsed);
+    // console.log('Flattrade Available Balance:', balance);
+    return balance;
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    const balance = Math.floor(cash - marginUsed);
+    // console.log('Shoonya Available Balance:', balance);
+    return balance;
+  }
+  return null;
+});
+const usedAmount = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    return marginUsed;
+  }
+  else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
+    return marginUsed;
+  }
+  return 0;
+});
+const formattedDate = computed(() => {
+  const today = new Date();
+  const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+  return today.toLocaleDateString('en-US', options).replace(/,/g, '');
+});
+const totalNetQty = computed(() => {
+  const calculateTotalQty = (positions) => {
+    return positions.reduce((total, position) => {
+      const qty = Math.abs(parseInt(position.netQty || position.netqty, 10));
+      return total + qty;
+    }, 0);
+  };
+
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return calculateTotalQty(flatTradePositionBook.value);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return calculateTotalQty(shoonyaPositionBook.value);
+  }
+  return 0;
+});
+const totalProfit = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    return positionsWithCalculatedProfit.value.reduce((acc, position) => {
+      const unrealizedProfit = position.calculatedUrmtom;
+      const realizedProfit = parseFloat(position.rpnl) || 0;
+      return acc + unrealizedProfit + realizedProfit;
+    }, 0);
+  }
+  return 0;
+});
+const positionsWithCalculatedProfit = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.map(position => ({
+      ...position,
+      calculatedUrmtom: calculateUnrealizedProfit(position)
+    }));
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.map(position => ({
+      ...position,
+      calculatedUrmtom: calculateUnrealizedProfit(position)
+    }));
+  }
+  return [];
+});
+const totalCapitalPercentage = computed(() => {
+  const totalMoney = Number(availableBalance.value) + Number(usedAmount.value);
+  return totalMoney ? (Number(totalProfit.value) / totalMoney) * 100 : 0;
+});
+const deployedCapitalPercentage = computed(() => {
+  const totalUsedAmount = usedAmount.value || 0;
+  return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
+});
+const totalBrokerage = computed(() => {
+  let total = 0;
+
+  // Calculate totalValue based on totalBuyValue and totalSellValue
+  const totalEquityValue = totalEquityBuyValue.value + totalEquitySellValue.value;
+  const totalDerivativeValue = totalDerivativeBuyValue.value + totalDerivativeSellValue.value;
+
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    // Calculate charges for Flattrade and Shoonya (they have the same structure)
+    const equityExchangeCharge = Math.round(totalEquityValue * 0.00003485 * 100) / 100; //avage price from both exchange
+    const equityIpftCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
+    const equitySebiCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
+    const equityGstCharge = Math.round((equityExchangeCharge + equitySebiCharge + equityIpftCharge) * 18) / 100;
+    const equityStampdutyCharge = Math.round(totalEquityBuyValue.value * 0.00003);
+    const equitySttCharge = Math.round(totalEquitySellValue.value * 0.00025);
+
+    const derivativesExchangeCharge = Math.round(totalDerivativeValue * 0.000495 * 100) / 100;
+    const derivativesIpftCharge = Math.round(totalDerivativeValue * 0.000005 * 100) / 100;
+    const derivativesSebiCharge = Math.round(totalDerivativeValue * 0.000001 * 100) / 100;
+    const derivativesGstCharge = Math.round((derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge) * 18) / 100;
+    const derivativesStampdutyCharge = Math.round(totalDerivativeBuyValue.value * 0.00003);
+    const derivativesSttCharge = Math.round(totalDerivativeSellValue.value * 0.000625);
+
+    // Add charges to total for Flattrade and Shoonya
+    total += (equityExchangeCharge + equityIpftCharge + equitySebiCharge + equityGstCharge + equityStampdutyCharge + equitySttCharge + derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge + derivativesGstCharge + derivativesStampdutyCharge + derivativesSttCharge);
+
+    // No additional brokerage for Flattrade and Shoonya
+  }
+
+  return total;
+});
+const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
+const totalBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+const totalSellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
+const totalEquityBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+const totalEquitySellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
+const totalDerivativeBuyValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
+  }
+  return 0;
+});
+const totalDerivativeSellValue = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value
+      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
+      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
+  }
+  return 0;
+});
+
+
+
+// Functions
+const updateToastVisibility = (value) => {
+  showToast.value = value;
+};
 const setActiveTab = (tab) => {
   activeTab.value = tab;
 };
-
-// Kill Switch - Client Side
-const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
-const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
-const currentTime = ref(Date.now());
-
-// Initialize kill switch state
 const initKillSwitch = () => {
   const storedStatus = localStorage.getItem('KillSwitchStatus');
   const storedActivationTime = localStorage.getItem('KillSwitchActivationTime');
@@ -63,10 +451,6 @@ const initKillSwitch = () => {
     localStorage.removeItem('KillSwitchActivationTime');
   }
 };
-
-const isFormDisabled = computed(() => killSwitchActive.value);
-const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false'); // Default to true if not set
-
 const handleKillSwitchClick = () => {
   if (killSwitchActive.value) {
     // If the kill switch is already active, deactivate it directly
@@ -74,7 +458,6 @@ const handleKillSwitchClick = () => {
   }
   // If it's not active, the modal will be shown due to data-bs-target and data-bs-toggle
 };
-// Modify the toggleKillSwitch function
 const toggleKillSwitch = async () => {
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED';
   if (newStatus === 'ACTIVATED') {
@@ -107,44 +490,6 @@ const toggleKillSwitch = async () => {
 
   showToast.value = true;
 };
-const remainingTimeInMs = computed(() => {
-  if (!activationTime.value || !killSwitchActive.value) return 0;
-  const sixHoursInMillis = 6 * 60 * 60 * 1000;
-  return Math.max(0, sixHoursInMillis - (currentTime.value - activationTime.value));
-});
-const killSwitchRemainingTime = computed(() => {
-  if (remainingTimeInMs.value === 0) return '';
-
-  const hours = Math.floor(remainingTimeInMs.value / (60 * 60 * 1000));
-  const minutes = Math.floor((remainingTimeInMs.value % (60 * 60 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((remainingTimeInMs.value % (60 * 1000)) / 1000);
-
-  return `${hours}h ${minutes}m ${seconds}s`;
-});
-// Watch for changes in killSwitchRemainingTime
-watch(killSwitchRemainingTime, (newValue) => {
-  if (newValue === '' && killSwitchActive.value) {
-    toggleKillSwitch();
-  }
-});
-// Watch for changes in remainingTimeInMs
-watch(remainingTimeInMs, (newValue) => {
-  if (newValue === 0 && killSwitchActive.value) {
-    toggleKillSwitch();
-  }
-});
-const killSwitchButtonText = computed(() => killSwitchActive.value ? 'Deactivate' : 'Activate');
-const killSwitchButtonClass = computed(() => killSwitchActive.value ? 'btn btn-sm btn-danger shadow fs-5' : 'btn btn-sm btn-success shadow fs-5');
-
-// Fetch brokers and set selectedBroker
-const selectedBroker = ref(null);
-const selectedBrokerName = ref('');
-const availableBrokers = computed(() => {
-  return Object.keys(localStorage)
-    .filter(key => key.startsWith('broker_'))
-    .map(key => key.replace('broker_', ''));
-});
-// Function to set selected broker and save to localStorage
 const updateSelectedBroker = () => {
   const availableBrokerNames = availableBrokers.value;
 
@@ -164,17 +509,6 @@ const updateSelectedBroker = () => {
     selectedBrokerName.value = '';
   }
 };
-
-
-// Fetch trading symbols and strikes
-const selectedExchange = ref({});
-const selectedMasterSymbol = ref('');
-const selectedQuantity = ref(0);
-const selectedExpiry = ref(null);
-const selectedCallStrike = ref({});
-const selectedPutStrike = ref({});
-const exchangeSymbols = ref({});
-
 const updateExchangeSymbols = () => {
   const symbolData = {
     NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000' },
@@ -195,10 +529,6 @@ const updateExchangeSymbols = () => {
   // Store symbolData separately
   exchangeSymbols.value.symbolData = symbolData;
 };
-// Add this computed property
-const exchangeOptions = computed(() => {
-  return Object.keys(exchangeSymbols.value).filter(key => key !== 'symbolData');
-});
 const setDefaultExchangeAndMasterSymbol = () => {
   const exchanges = exchangeOptions.value;
   if (exchanges.length > 0) {
@@ -217,22 +547,10 @@ const setDefaultExchangeAndMasterSymbol = () => {
     }
   }
 };
-// New function to save user's choice
 const saveUserChoice = () => {
   localStorage.setItem('selectedExchange', selectedExchange.value);
   localStorage.setItem('selectedMasterSymbol', selectedMasterSymbol.value);
 };
-const callStrikes = ref([]);
-const putStrikes = ref([]);
-const expiryDates = ref([]);
-const synchronizeOnLoad = ref(true);
-const niftyPrice = ref('N/A');
-const bankNiftyPrice = ref('N/A');
-const finniftyPrice = ref('N/A');
-const midcpniftyPrice = ref('N/A');
-const sensexPrice = ref('N/A');
-const bankexPrice = ref('N/A');
-// Add a new function to get the initial price
 const getInitialPrice = (symbol) => {
   const strike = callStrikes.value.find(s =>
     s.tradingSymbol.includes(symbol) &&
@@ -240,7 +558,6 @@ const getInitialPrice = (symbol) => {
   );
   return strike ? parseFloat(strike.strikePrice) : null;
 };
-const dataFetched = ref(false);
 const fetchTradingData = async () => {
   let response;
   if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -280,12 +597,6 @@ const fetchTradingData = async () => {
   updateStrikesForExpiry(selectedExpiry.value);
   dataFetched.value = true;
 };
-// Add watchers for the price values
-watch([niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice], () => {
-  if (selectedExpiry.value) {
-    updateStrikesForExpiry(selectedExpiry.value);
-  }
-});
 const formatDate = (dateString) => {
   if (!dataFetched.value || !dateString) {
     return ''; // Return empty string if data hasn't been fetched or dateString is null
@@ -301,14 +612,6 @@ const convertToComparableDate = (dateString) => {
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
   return date.toLocaleDateString('en-US', options).replace(/,/g, '');
 };
-const isExpiryToday = computed(() => {
-  const comparableSelectedExpiry = convertToComparableDate(formatDate(selectedExpiry.value));
-  const comparableFormattedDate = convertToComparableDate(formattedDate.value);
-  // console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
-  // console.log('Comparable Formatted Date:', comparableFormattedDate);
-  return comparableSelectedExpiry === comparableFormattedDate;
-});
-
 const updateStrikesForExpiry = (expiryDate) => {
   // console.log('Updating strikes for expiry:', expiryDate);
 
@@ -368,7 +671,6 @@ const synchronizeStrikes = () => {
   synchronizeCallStrikes();
   synchronizePutStrikes();
 };
-
 const synchronizeCallStrikes = () => {
   if (selectedPutStrike.value && selectedPutStrike.value.tradingSymbol) {
     let baseSymbol;
@@ -387,7 +689,6 @@ const synchronizeCallStrikes = () => {
   }
   updateSecurityIds();
 };
-
 const synchronizePutStrikes = () => {
   if (selectedCallStrike.value && selectedCallStrike.value.tradingSymbol) {
     let baseSymbol;
@@ -406,38 +707,20 @@ const synchronizePutStrikes = () => {
   }
   updateSecurityIds();
 };
-
 const updateSecurityIds = () => {
   // console.log('Updating Security IDs');
   defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
   defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
 };
-const lotsPerSymbol = ref({});
-const selectedLots = computed({
-  get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
-  set: (value) => {
-    lotsPerSymbol.value[selectedMasterSymbol.value] = value;
-    saveLots();
-  }
-});
-// Function to save lots to localStorage
 const saveLots = () => {
   localStorage.setItem('lotsPerSymbol', JSON.stringify(lotsPerSymbol.value));
 };
-
-// Function to load lots from localStorage
 const loadLots = () => {
   const savedLots = localStorage.getItem('lotsPerSymbol');
   if (savedLots) {
     lotsPerSymbol.value = JSON.parse(savedLots);
   }
 };
-// maxlots computation....
-const maxLots = computed(() => {
-  const instrument = quantities.value[selectedMasterSymbol.value];
-  return instrument ? instrument.maxLots : 56; // maxlots 56 is conditional...
-});
-// Modify the updateAvailableQuantities function
 const updateAvailableQuantities = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
   if (instrument) {
@@ -453,7 +736,6 @@ const updateAvailableQuantities = () => {
     selectedQuantity.value = availableQuantities.value[0]?.quantity || 0;
   }
 };
-// Update the updateSelectedQuantity function
 const updateSelectedQuantity = () => {
   const instrument = quantities.value[selectedMasterSymbol.value];
   if (instrument) {
@@ -464,11 +746,6 @@ const updateSelectedQuantity = () => {
     saveLots();
   }
 };
-
-watch(selectedLots, () => {
-  updateSelectedQuantity();
-});
-
 const handleHotKeys = (event) => {
   if (!enableHotKeys.value) return;
 
@@ -504,11 +781,6 @@ const handleHotKeys = (event) => {
       break;
   }
 };
-
-const flatOrderBook = ref([]);
-const flatTradeBook = ref([]);
-const token = ref('');
-
 const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
@@ -544,9 +816,6 @@ const fetchFlattradeOrdersTradesBook = async () => {
     console.error('Error fetching trades:', error);
   }
 };
-
-const shoonyaOrderBook = ref([]);
-const shoonyaTradeBook = ref([]);
 const fetchShoonyaOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
@@ -582,53 +851,6 @@ const fetchShoonyaOrdersTradesBook = async () => {
     console.error('Error fetching trades:', error);
   }
 };
-
-const combinedOrdersAndTrades = computed(() => {
-  const combined = {};
-
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    // Process Flattrade orders and trades
-    if (Array.isArray(flatOrderBook.value)) {
-      flatOrderBook.value.forEach(order => {
-        combined[order.norenordno] = { order, trade: null };
-      });
-    }
-
-    if (Array.isArray(flatTradeBook.value)) {
-      flatTradeBook.value.forEach(trade => {
-        if (combined[trade.norenordno]) {
-          combined[trade.norenordno].trade = trade;
-        } else {
-          combined[trade.norenordno] = { order: null, trade };
-        }
-      });
-    }
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    // Process Shoonya orders and trades
-    if (Array.isArray(shoonyaOrderBook.value)) {
-      shoonyaOrderBook.value.forEach(order => {
-        combined[order.norenordno] = { order, trade: null };
-      });
-    }
-
-    if (Array.isArray(shoonyaTradeBook.value)) {
-      shoonyaTradeBook.value.forEach(trade => {
-        if (combined[trade.norenordno]) {
-          combined[trade.norenordno].trade = trade;
-        } else {
-          combined[trade.norenordno] = { order: null, trade };
-        }
-      });
-    }
-  }
-
-  return Object.values(combined).sort((a, b) => {
-    const aTime = a.order?.norentm || a.trade?.norentm;
-    const bTime = b.order?.norentm || b.trade?.norentm;
-    return new Date(bTime) - new Date(aTime); // Sort in descending order (most recent first)
-  });
-});
-
 const formatTime = (timeString) => {
   if (!timeString) return '';
 
@@ -642,8 +864,6 @@ const formatTime = (timeString) => {
   const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
   return `${formattedTime}`;
 };
-
-const flatTradePositionBook = ref([]);
 const fetchFlattradePositions = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
 
@@ -689,8 +909,6 @@ const fetchFlattradePositions = async () => {
     flatTradePositionBook.value = [];
   }
 };
-
-const shoonyaPositionBook = ref([]);
 const fetchShoonyaPositions = async () => {
   let jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
 
@@ -736,25 +954,6 @@ const fetchShoonyaPositions = async () => {
     shoonyaPositionBook.value = [];
   }
 };
-
-const sortedPositions = computed(() => {
-  return [...positionsWithCalculatedProfit.value].sort((a, b) => {
-    // First, sort by open/closed status
-    if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1;
-    if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1;
-
-    // Then, for open positions, sort by absolute quantity in descending order
-    if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
-      return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty));
-    }
-
-    // For closed positions, maintain their original order
-    return 0;
-  });
-});
-
-const fundLimits = ref({});
-// Update the fetchFundLimit function
 const fetchFundLimit = async () => {
   try {
     if (!selectedBroker.value) {
@@ -804,7 +1003,6 @@ const updateFundLimits = async () => {
   await fetchFundLimit();
   // console.log('Updated Fund Limits:', fundLimits.value);
 };
-const showBrokerClientId = ref(false);
 const toggleBrokerClientIdVisibility = () => {
   showBrokerClientId.value = !showBrokerClientId.value;
 };
@@ -821,31 +1019,6 @@ const maskBrokerClientId = (clientId) => {
   const middleMask = '*'.repeat(maskLength);
   return `${firstPart}${middleMask}${lastPart}`;
 };
-
-
-// Update the quantities object
-const quantities = ref({
-  NIFTY: { lotSize: 25, maxLots: 72 },
-  BANKNIFTY: { lotSize: 15, maxLots: 60 },
-  FINNIFTY: { lotSize: 25, maxLots: 72 },
-  MIDCPNIFTY: { lotSize: 50, maxLots: 56 },
-  SENSEX: { lotSize: 10, maxLots: 100 },
-  BANKEX: { lotSize: 15, maxLots: 60 },
-});
-const availableQuantities = ref([]);
-
-const orderTypes = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return ['MKT', 'LMT'];
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return ['MKT', 'LMT'];
-  }
-  return [];
-});
-const selectedOrderType = ref(orderTypes.value[0]);
-const previousOrderType = ref(orderTypes.value[0]);
-
-const selectedStrike = ref({});
 const setOrderDetails = (transactionType, optionType) => {
   modalTransactionType.value = getTransactionType(transactionType); // Use getTransactionType to set modalTransactionType
   modalOptionType.value = optionType;
@@ -861,16 +1034,6 @@ const resetOrderTypeIfNeeded = () => {
 const resetOrderType = () => {
   selectedOrderType.value = orderTypes.value[0]; // Set selectedOrderType to MARKET or MKT based on broker
 };
-
-const productTypes = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return ['Intraday', 'Margin'];
-  }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return ['Intraday', 'Margin'];
-  }
-  return [];
-});
 const getProductTypeValue = (productType) => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return productType === 'Intraday' ? 'I' : 'M';
@@ -880,9 +1043,6 @@ const getProductTypeValue = (productType) => {
   }
   return productType;
 };
-
-const selectedProductType = ref(''); // Initialize with an empty string
-
 const getTransactionType = (type) => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return type === 'BUY' ? 'B' : 'S';
@@ -891,11 +1051,6 @@ const getTransactionType = (type) => {
   }
   return type;
 };
-
-const limitPrice = ref(null);
-const modalTransactionType = ref('');
-const modalOptionType = ref('');
-// Get Exchange Segment for Flattrade & Shoonya
 const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
     throw new Error("Broker or exchange not selected");
@@ -923,8 +1078,6 @@ const getExchangeSegment = () => {
     throw new Error("Unsupported broker");
   }
 };
-
-// Prepare Order Payload for Flattrade & Shoonya
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return {
@@ -957,30 +1110,12 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     throw new Error("Unsupported broker");
   }
 };
-// With a reactive object
-// Modify the tradeSettings reactive object
-const tradeSettings = reactive({
-  enableStoploss: JSON.parse(localStorage.getItem('enableStoploss') || 'true'),
-  stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
-  enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
-  targetValue: Number(localStorage.getItem('targetValue') || '30'),
-  stoplossStep: 1, // The step size for increasing/decreasing stoploss price
-  targetStep: 1, // The step size for increasing/decreasing target price
-});
-// Add this function to save trade settings to localStorage
 const saveTradeSettings = () => {
   localStorage.setItem('enableStoploss', JSON.stringify(tradeSettings.enableStoploss));
   localStorage.setItem('stoplossValue', tradeSettings.stoplossValue.toString());
   localStorage.setItem('enableTarget', JSON.stringify(tradeSettings.enableTarget));
   localStorage.setItem('targetValue', tradeSettings.targetValue.toString());
 };
-// Add these to your existing reactive variables
-const positionStoplosses = ref({});
-const positionTargets = ref({});
-// Add these to your reactive variables
-const positionStoplossesPrice = ref({});
-const positionTargetsPrice = ref({});
-// Add these helper functions
 const adjustStoplossPrice = (tsym, adjustment) => {
   if (!tsym || !positionStoplossesPrice.value[tsym]) return;
 
@@ -1004,7 +1139,6 @@ const adjustStoplossPrice = (tsym, adjustment) => {
   localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
   localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
 };
-
 const adjustTargetPrice = (tsym, adjustment) => {
   if (!tsym || !positionTargetsPrice.value[tsym]) return;
 
@@ -1028,8 +1162,6 @@ const adjustTargetPrice = (tsym, adjustment) => {
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
 };
-
-// Place Order for Flattrade & Shoonya
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -1110,8 +1242,6 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true;
   }
 };
-
-// New function to update both orders and positions
 const updateOrdersAndPositions = async () => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     await Promise.all([
@@ -1125,8 +1255,6 @@ const updateOrdersAndPositions = async () => {
     ]);
   }
 };
-
-// Add this helper function to find the new position
 const findNewPosition = (tradingSymbol) => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     return flatTradePositionBook.value.find(p => p.tsym === tradingSymbol);
@@ -1135,8 +1263,6 @@ const findNewPosition = (tradingSymbol) => {
   }
   return null;
 };
-
-// Place Order for Flattrade & Shoonya for each position
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty));
@@ -1209,8 +1335,6 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     showToast.value = true;
   }
 };
-
-// Close all positions for Flattrade & Shoonya
 const closeAllPositions = async () => {
   try {
     let positionsClosed = false;
@@ -1262,12 +1386,6 @@ const closeAllPositions = async () => {
     showToast.value = true;
   }
 };
-
-// Add this to your reactive variables
-const selectedShoonyaPositionsSet = ref(new Set());
-const selectedFlattradePositionsSet = ref(new Set());
-
-// Function to close selected positions based on the selected broker
 const closeSelectedPositions = async () => {
   try {
     let positionsClosed = false;
@@ -1378,7 +1496,6 @@ const cancelOrder = async (order) => {
     throw error; // Rethrow to handle in cancelPendingOrders
   }
 };
-
 const cancelPendingOrders = async () => {
 
   // Fetch orders based on the selected broker
@@ -1429,7 +1546,6 @@ const formatPrice = (price) => {
 const getSymbol = (position) => {
   return position.tsym || position.tradingSymbol || '';
 };
-// Modify the setStoplossAndTarget function
 const setStoplossAndTarget = (position) => {
   const tsym = getSymbol(position);
   if (!tsym) return;
@@ -1469,10 +1585,6 @@ const setStoplossAndTarget = (position) => {
   localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
   saveTradeSettings();
 };
-// Add this to your reactive variables
-const positionsInExecution = ref({});
-
-// Modify the checkStoplossAndTarget function
 const checkStoplossAndTarget = (position, currentLTP) => {
   const tsym = getSymbol(position);
   if (!tsym) {
@@ -1532,73 +1644,6 @@ const continuouslyCheckPositions = () => {
     }
   });
 };
-
-const availableBalance = computed(() => {
-  // console.log('Fund Limits:', fundLimits.value);
-  // console.log('Selected Broker:', selectedBroker.value?.brokerName);
-
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
-    // console.log('Flattrade Available Balance:', balance);
-    return balance;
-  }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
-    // console.log('Shoonya Available Balance:', balance);
-    return balance;
-  }
-  return null;
-});
-// Computed property to get the correct utilized amount based on the selected broker
-const usedAmount = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    return marginUsed;
-  }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    return marginUsed;
-  }
-  return 0;
-});
-
-const formattedDate = computed(() => {
-  const today = new Date();
-  const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-  return today.toLocaleDateString('en-US', options).replace(/,/g, '');
-});
-
-const totalNetQty = computed(() => {
-  const calculateTotalQty = (positions) => {
-    return positions.reduce((total, position) => {
-      const qty = Math.abs(parseInt(position.netQty || position.netqty, 10));
-      return total + qty;
-    }, 0);
-  };
-
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return calculateTotalQty(flatTradePositionBook.value);
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return calculateTotalQty(shoonyaPositionBook.value);
-  }
-  return 0;
-});
-
-const totalProfit = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
-    return positionsWithCalculatedProfit.value.reduce((acc, position) => {
-      const unrealizedProfit = position.calculatedUrmtom;
-      const realizedProfit = parseFloat(position.rpnl) || 0;
-      return acc + unrealizedProfit + realizedProfit;
-    }, 0);
-  }
-  return 0;
-});
-
 const calculateUnrealizedProfit = (position) => {
   const ltp = positionLTPs.value[position.tsym || position.tradingSymbol] || position.lp || position.lastPrice;
   const netQty = parseFloat(position.netqty || position.netQty);
@@ -1610,75 +1655,11 @@ const calculateUnrealizedProfit = (position) => {
   }
   return 0;
 };
-
-const positionsWithCalculatedProfit = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.map(position => ({
-      ...position,
-      calculatedUrmtom: calculateUnrealizedProfit(position)
-    }));
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value.map(position => ({
-      ...position,
-      calculatedUrmtom: calculateUnrealizedProfit(position)
-    }));
-  }
-  return [];
-});
-
-const totalCapitalPercentage = computed(() => {
-  const totalMoney = Number(availableBalance.value) + Number(usedAmount.value);
-  return totalMoney ? (Number(totalProfit.value) / totalMoney) * 100 : 0;
-});
-const deployedCapitalPercentage = computed(() => {
-  const totalUsedAmount = usedAmount.value || 0;
-  return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0;
-});
-
-const totalBrokerage = computed(() => {
-  let total = 0;
-
-  // Calculate totalValue based on totalBuyValue and totalSellValue
-  const totalEquityValue = totalEquityBuyValue.value + totalEquitySellValue.value;
-  const totalDerivativeValue = totalDerivativeBuyValue.value + totalDerivativeSellValue.value;
-
-  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
-    // Calculate charges for Flattrade and Shoonya (they have the same structure)
-    const equityExchangeCharge = Math.round(totalEquityValue * 0.00003485 * 100) / 100; //avage price from both exchange
-    const equityIpftCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
-    const equitySebiCharge = Math.round(totalEquityValue * 0.000001 * 100) / 100;
-    const equityGstCharge = Math.round((equityExchangeCharge + equitySebiCharge + equityIpftCharge) * 18) / 100;
-    const equityStampdutyCharge = Math.round(totalEquityBuyValue.value * 0.00003);
-    const equitySttCharge = Math.round(totalEquitySellValue.value * 0.00025);
-
-    const derivativesExchangeCharge = Math.round(totalDerivativeValue * 0.000495 * 100) / 100;
-    const derivativesIpftCharge = Math.round(totalDerivativeValue * 0.000005 * 100) / 100;
-    const derivativesSebiCharge = Math.round(totalDerivativeValue * 0.000001 * 100) / 100;
-    const derivativesGstCharge = Math.round((derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge) * 18) / 100;
-    const derivativesStampdutyCharge = Math.round(totalDerivativeBuyValue.value * 0.00003);
-    const derivativesSttCharge = Math.round(totalDerivativeSellValue.value * 0.000625);
-
-    // Add charges to total for Flattrade and Shoonya
-    total += (equityExchangeCharge + equityIpftCharge + equitySebiCharge + equityGstCharge + equityStampdutyCharge + equitySttCharge + derivativesExchangeCharge + derivativesIpftCharge + derivativesSebiCharge + derivativesGstCharge + derivativesStampdutyCharge + derivativesSttCharge);
-
-    // No additional brokerage for Flattrade and Shoonya
-  }
-
-  return total;
-});
-
-
-const netPnl = computed(() => totalProfit.value - totalBrokerage.value);
-
 const setDefaultExpiry = () => {
   if (expiryDates.value.length > 0) {
     selectedExpiry.value = expiryDates.value[0];
   }
 };
-
-const clockEmojis = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚'];
-const currentClockEmoji = ref(clockEmojis[new Date().getHours() % clockEmojis.length]);
-
 const cycleClockEmoji = () => {
   const currentHour = new Date().getHours();
   let index = currentHour % clockEmojis.length;
@@ -1698,7 +1679,6 @@ const cycleClockEmoji = () => {
     }
   }, 100); // Adjust the interval time for desired speed
 };
-
 const setFlattradeCredentials = async () => {
   try {
     if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
@@ -1777,14 +1757,6 @@ const setShoonyaCredentials = async () => {
     showToast.value = true;
   }
 };
-
-const socket = ref(null);
-const latestCallLTP = ref('N/A');
-const latestPutLTP = ref('N/A');
-
-const defaultCallSecurityId = ref(null);
-const defaultPutSecurityId = ref(null);
-
 const connectWebSocket = () => {
   let websocketUrl;
 
@@ -1849,11 +1821,6 @@ const currentSubscriptions = ref({
   callOption: null,
   putOption: null
 });
-
-// Add these new reactive variables
-const positionLTPs = ref({});
-const positionSecurityIds = ref({});
-
 const subscribeToMasterSymbol = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
@@ -1873,7 +1840,6 @@ const subscribeToMasterSymbol = () => {
     }
   }
 };
-
 const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = [];
@@ -1902,7 +1868,6 @@ const subscribeToOptions = () => {
   // Subscribe to position LTPs separately
   subscribeToPositionLTPs();
 };
-// Add a new function to update position security IDs
 const updatePositionSecurityIds = () => {
   flatTradePositionBook.value.forEach(position => {
     if (position.tsym && !positionSecurityIds.value[position.tsym]) {
@@ -1945,17 +1910,6 @@ const subscribeToPositionLTPs = () => {
     }
   }
 };
-// Add a watcher for flatTradePositionBook
-watch(flatTradePositionBook, () => {
-  updatePositionSecurityIds();
-  subscribeToOptions();
-}, { deep: true });
-// Add this watcher after the existing watcher for flatTradePositionBook
-watch(shoonyaPositionBook, () => {
-  updatePositionSecurityIds();
-  subscribeToOptions();
-}, { deep: true });
-
 const unsubscribeFromSymbols = (symbols) => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN && symbols.length > 0) {
     const data = {
@@ -1966,7 +1920,6 @@ const unsubscribeFromSymbols = (symbols) => {
     socket.value.send(JSON.stringify(data));
   }
 };
-
 const updateSubscriptions = () => {
   const symbolsToUnsubscribe = [];
 
@@ -1998,95 +1951,13 @@ const updateSubscriptions = () => {
   subscribeToOptions();
   subscribeToPositionLTPs();
 };
+const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300);
 const initializeSubscriptions = () => {
   subscribeToMasterSymbol();
   subscribeToOptions();
 };
-const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300);
+const debouncedCheckStoplossAndTarget = debounce(checkStoplossAndTarget, 500);
 
-const totalBuyValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  }
-  if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  }
-  return 0;
-});
-
-const totalSellValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  }
-  if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value.reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  }
-  return 0;
-});
-
-const totalEquityBuyValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value
-      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
-      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value
-      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
-      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  }
-  return 0;
-});
-
-const totalEquitySellValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value
-      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
-      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value
-      .filter(position => position.exch === 'BSE' || position.exch === 'NSE')
-      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  }
-  return 0;
-});
-
-const totalDerivativeBuyValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value
-      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
-      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value
-      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
-      .reduce((total, position) => total + parseFloat(position.daybuyamt || 0), 0);
-  }
-  return 0;
-});
-
-const totalDerivativeSellValue = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return flatTradePositionBook.value
-      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
-      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return shoonyaPositionBook.value
-      .filter(position => position.exch === 'BFO' || position.exch === 'NFO')
-      .reduce((total, position) => total + parseFloat(position.daysellamt || 0), 0);
-  }
-  return 0;
-});
-
-let timer;
-let positionCheckInterval;
-
-// Discipline Automations
-const totalRiskType = ref(null);
-const mtmProfitTrailingToggle = ref(false);
-const totalRiskTypeToggle = ref(false);
-const mtmProfitTrailingType = ref(null);
-const totalRiskAmount = ref(null);
-const totalRiskPercentage = ref(null);
-const closePositionsRisk = ref(true);
 
 // Lifecycle hooks
 onMounted(async () => {
@@ -2158,6 +2029,35 @@ onBeforeUnmount(() => {
 });
 
 // Watchers
+// Watch for changes in killSwitchRemainingTime
+watch(killSwitchRemainingTime, (newValue) => {
+  if (newValue === '' && killSwitchActive.value) {
+    toggleKillSwitch();
+  }
+});
+// Watch for changes in remainingTimeInMs
+watch(remainingTimeInMs, (newValue) => {
+  if (newValue === 0 && killSwitchActive.value) {
+    toggleKillSwitch();
+  }
+});
+// Watch for the price values
+watch([niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice], () => {
+  if (selectedExpiry.value) {
+    updateStrikesForExpiry(selectedExpiry.value);
+  }
+});
+watch(selectedLots, () => {
+  updateSelectedQuantity();
+});
+watch(flatTradePositionBook, () => {
+  updatePositionSecurityIds();
+  subscribeToOptions();
+}, { deep: true });
+watch(shoonyaPositionBook, () => {
+  updatePositionSecurityIds();
+  subscribeToOptions();
+}, { deep: true });
 // Watch for changes in selectedBrokerName
 watch(selectedBrokerName, () => {
   updateSelectedBroker();
@@ -2195,27 +2095,23 @@ watch(selectedBroker, async (newBroker) => {
     }
   }
 });
-
 // Watcher for selectedExpiry to repopulate strike prices
 watch(selectedExpiry, async (newExpiry) => {
   await fetchTradingData();
   updateStrikesForExpiry(newExpiry);
 });
-
 watch(selectedCallStrike, (newStrike, oldStrike) => {
   // console.log('Selected Call Strike changed:', newStrike);
   if (newStrike !== oldStrike) {
     defaultCallSecurityId.value = newStrike.securityId || 'N/A';
   }
 });
-
 watch(selectedPutStrike, (newStrike, oldStrike) => {
   // console.log('Selected Put Strike changed:', newStrike);
   if (newStrike !== oldStrike) {
     defaultPutSecurityId.value = newStrike.securityId || 'N/A';
   }
 });
-
 // Watchers for defaultCallSecurityId and defaultPutSecurityId
 // This watcher handles unsubscribing and subscribing to new security IDs,
 // setting Flattrade credentials, and sending WebSocket data when either ID changes.
@@ -2247,7 +2143,6 @@ watch(
   },
   { deep: true }
 );
-
 // Modify the watcher for selectedMasterSymbol
 watch(selectedMasterSymbol, async (newValue, oldValue) => {
   // console.log('selectedMasterSymbol changed:', newValue);
@@ -2266,15 +2161,12 @@ watch(selectedMasterSymbol, async (newValue, oldValue) => {
   // Update subscriptions
   debouncedUpdateSubscriptions();
 });
-
-
 // Watch productTypes to set the default selectedProductType
 watch(productTypes, (newProductTypes) => {
   if (newProductTypes.length > 0) {
     selectedProductType.value = getProductTypeValue(newProductTypes[1]); // Default to 'Margin' or 'M'
   }
 }, { immediate: true });
-
 // Add a watcher for selectedExchange
 watch(selectedExchange, (newValue) => {
   saveUserChoice(); // Save the user's choice
@@ -2288,13 +2180,9 @@ watch(selectedExchange, (newValue) => {
   }
   updateAvailableQuantities();
 });
-
 watch(selectedOrderType, (newValue, oldValue) => {
   previousOrderType.value = oldValue;
 });
-
-const activeFetchFunction = ref(null);
-
 watch(activeTab, async (newTab) => {
   // Update activeFetchFunction based on the new broker
   if (newTab === 'positions') {
@@ -2317,15 +2205,10 @@ watch(activeTab, async (newTab) => {
     }
   }
 });
-
 // Watcher to update localStorage when enableHotKeys changes
 watch(enableHotKeys, (newValue) => {
   localStorage.setItem('EnableHotKeys', newValue.toString());
 });
-
-// Debounce the checkStoplossAndTarget function
-const debouncedCheckStoplossAndTarget = debounce(checkStoplossAndTarget, 500); // Debounce with a 500ms delay
-
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
   // console.log('positionLTPs updated:', newLTPs);
@@ -2343,18 +2226,11 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
     }
   });
 }, { deep: true });
-
 // Add watchers for enableStoploss, stoplossValue, enableTarget, and targetValue
 watch(() => [tradeSettings.enableStoploss, tradeSettings.stoplossValue, tradeSettings.enableTarget, tradeSettings.targetValue], () => {
   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
   allPositions.forEach(setStoplossAndTarget);
 });
-// // Modify the existing watchers for position books to set initial stoploss and target
-// watch([flatTradePositionBook, shoonyaPositionBook, positionLTPs], () => {
-//   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
-//   allPositions.forEach(setStoplossAndTarget);
-// }, { deep: true });
-// Modify the existing watcher for tradeSettings
 watch(tradeSettings, (newSettings, oldSettings) => {
   console.log('Trade settings changed:', newSettings, oldSettings);
   saveTradeSettings();
