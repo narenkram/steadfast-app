@@ -416,11 +416,11 @@
             <span class="input-group-text">{{ latestCallLTP }}</span>
           </div>
           <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
-          <div class="mt-2">
-            <p>Open: {{ callOpenPrice }}</p>
-            <p>High: {{ callHighPrice }}</p>
-            <p>Low: {{ callLowPrice }}</p>
-            <p>Close: {{ callClosePrice }}</p>
+          <div class="d-flex">
+            <span class="text-primary">O: {{ callOpenPrice }}</span>
+            <span class="text-success">H: {{ callHighPrice }}</span>
+            <span class="text-danger">L: {{ callLowPrice }}</span>
+            <span class="text-warning">C: {{ callClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Call Strike -->
           <div class="ltp-range-bar">
@@ -453,11 +453,11 @@
           <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">
             Bankex: <b>{{ bankexPrice }}</b>
           </p>
-          <div class="mt-2">
-            <p>Open: {{ masterOpenPrice }}</p>
-            <p>High: {{ masterHighPrice }}</p>
-            <p>Low: {{ masterLowPrice }}</p>
-            <p>Close: {{ masterClosePrice }}</p>
+          <div class="d-flex w-100 justify-content-around">
+            <span class="text-primary">O: {{ masterOpenPrice }}</span>
+            <span class="text-success">H: {{ masterHighPrice }}</span>
+            <span class="text-danger">L: {{ masterLowPrice }}</span>
+            <span class="text-warning">C: {{ masterClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Live Underlying Price -->
           <div class="ltp-range-bar">
@@ -491,11 +491,11 @@
             </select>
           </div>
           <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
-          <div class="mt-2">
-            <p>Open: {{ putOpenPrice }}</p>
-            <p>High: {{ putHighPrice }}</p>
-            <p>Low: {{ putLowPrice }}</p>
-            <p>Close: {{ putClosePrice }}</p>
+          <div class="d-flex w-100 justify-content-around">
+            <span class="text-primary">O: {{ putOpenPrice }}</span>
+            <span class="text-success">H: {{ putHighPrice }}</span>
+            <span class="text-danger">L: {{ putLowPrice }}</span>
+            <span class="text-warning">C: {{ putClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Put Strike -->
           <div class="ltp-range-bar">
