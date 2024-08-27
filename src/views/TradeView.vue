@@ -474,7 +474,6 @@ const callLtpRangeWidth = computed(() => {
 
   return ((close - low) / (high - low)) * 100;
 });
-
 const callLtpMarkerPosition = computed(() => {
   const low = parseFloat(callLowPrice.value);
   const high = parseFloat(callHighPrice.value);
@@ -486,7 +485,6 @@ const callLtpMarkerPosition = computed(() => {
 
   return ((ltp - low) / (high - low)) * 100;
 });
-
 // Computed Properties for LTP Range Bar for Put Strike
 const putLtpRangeWidth = computed(() => {
   const low = parseFloat(putLowPrice.value);
@@ -499,7 +497,6 @@ const putLtpRangeWidth = computed(() => {
 
   return ((close - low) / (high - low)) * 100;
 });
-
 const putLtpMarkerPosition = computed(() => {
   const low = parseFloat(putLowPrice.value);
   const high = parseFloat(putHighPrice.value);
@@ -510,6 +507,14 @@ const putLtpMarkerPosition = computed(() => {
   }
 
   return ((ltp - low) / (high - low)) * 100;
+});
+const riskReached = computed(() => {
+  if (totalRiskType.value === 'amount' && totalRiskAmount.value > 0) {
+    return totalProfit.value <= -totalRiskAmount.value;
+  } else if (totalRiskType.value === 'percentage' && totalRiskPercentage.value > 0) {
+    return totalCapitalPercentage.value <= -totalRiskPercentage.value;
+  }
+  return false;
 });
 
 

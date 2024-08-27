@@ -96,6 +96,7 @@
         :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null"
       >
         ₹ {{ totalProfit.toFixed(2) }}
+        <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
       </blockquote>
       <small>
         <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
@@ -112,6 +113,7 @@
           :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null"
         >
           {{ totalCapitalPercentage.toFixed(2) }}%
+          <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
         </span>
         <br />
         <small> on Total Capital</small>
@@ -1230,6 +1232,7 @@
             <small class="form-text text-secondary"
               >{{ totalRiskTypeToggle ? 'Enabled' : 'Disabled' }}</small
             >
+            <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
             <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->
