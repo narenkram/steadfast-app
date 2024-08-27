@@ -52,12 +52,12 @@ const shoonyaPositionBook = ref([]);
 const fundLimits = ref({});
 const showBrokerClientId = ref(false);
 const quantities = ref({
-  NIFTY: { lotSize: 25, maxLots: 72 },
-  BANKNIFTY: { lotSize: 15, maxLots: 60 },
-  FINNIFTY: { lotSize: 25, maxLots: 72 },
-  MIDCPNIFTY: { lotSize: 50, maxLots: 56 },
-  SENSEX: { lotSize: 10, maxLots: 100 },
-  BANKEX: { lotSize: 15, maxLots: 60 },
+  NIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
+  BANKNIFTY: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
+  FINNIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
+  MIDCPNIFTY: { lotSize: 50, maxLots: 280, freezeLimit: 56 },
+  SENSEX: { lotSize: 10, maxLots: 500, freezeLimit: 100 },
+  BANKEX: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
 });
 const availableQuantities = ref([]);
 
@@ -182,7 +182,7 @@ const selectedLots = computed({
 });
 const maxLots = computed(() => {
   const instrument = quantities.value[selectedMasterSymbol.value];
-  return instrument ? instrument.maxLots : 56; // maxlots 56 is conditional...
+  return instrument ? instrument.maxLots : 280;
 });
 const combinedOrdersAndTrades = computed(() => {
   const combined = {};
@@ -1318,42 +1318,61 @@ const placeOrder = async (transactionType, drvOptionType) => {
     }
 
     const exchangeSegment = getExchangeSegment();
-    const orderData = prepareOrderPayload(transactionType, drvOptionType, selectedStrike, exchangeSegment);
+    const instrument = quantities.value[selectedMasterSymbol.value];
+    const freezeLimit = instrument.freezeLimit;
+    const orderLots = selectedLots.value;
+    const fullOrderQuantity = selectedQuantity.value;
 
-    let response;
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-      const payload = qs.stringify({
-        ...orderData,
-        uid: selectedBroker.value.clientId,
-        actid: selectedBroker.value.clientId
-      });
-      response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
-        headers: {
-          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-    }
-    else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
-      const payload = qs.stringify({
-        ...orderData,
-        uid: selectedBroker.value.clientId,
-        actid: selectedBroker.value.clientId
-      });
-      response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
-        headers: {
-          'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
+    let remainingLots = orderLots;
+    let placedLots = 0;
+
+    while (remainingLots > 0) {
+      const lotsToPlace = Math.min(remainingLots, freezeLimit);
+      const quantityToPlace = lotsToPlace * instrument.lotSize;
+
+      const orderData = prepareOrderPayload(transactionType, drvOptionType, selectedStrike, exchangeSegment);
+      orderData.qty = quantityToPlace.toString();
+
+      let response;
+      if (selectedBroker.value?.brokerName === 'Flattrade') {
+        const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
+        const payload = qs.stringify({
+          ...orderData,
+          uid: selectedBroker.value.clientId,
+          actid: selectedBroker.value.clientId
+        });
+        response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+          headers: {
+            'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+      }
+      else if (selectedBroker.value?.brokerName === 'Shoonya') {
+        const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+        const payload = qs.stringify({
+          ...orderData,
+          uid: selectedBroker.value.clientId,
+          actid: selectedBroker.value.clientId
+        });
+        response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+          headers: {
+            'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+      }
+
+      console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`); // placed here to prevent delay and debugging if required
+      console.log("Order placed successfully:", response.data); // Log the response data for debugging if required
+      remainingLots -= lotsToPlace;
+      placedLots += lotsToPlace;
     }
 
-    console.log("Placing order with data:", orderData); // placed here to prevent delay and debugging if required
-    console.log("Order placed successfully:", response.data);
-    toastMessage.value = 'Order placed successfully';
+    console.log(`All orders placed successfully. Total: ${placedLots} lots (${fullOrderQuantity} quantity)`); // Log the final result
+    toastMessage.value = `Order(s) placed successfully for ${placedLots} lots`;
     showToast.value = true;
+
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -1404,53 +1423,66 @@ const findNewPosition = (tradingSymbol) => {
 const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty));
+    const instrument = quantities.value[selectedMasterSymbol.value];
+    const freezeLimit = instrument.freezeLimit * instrument.lotSize;
 
     if (quantity === 0) {
       console.log('Quantity is zero, no order will be placed.');
       return;
     }
 
-    let orderData;
-    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
-      orderData = {
-        uid: selectedBroker.value.clientId,
-        actid: selectedBroker.value.clientId,
-        exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
-        tsym: position.tsym,
-        qty: quantity.toString(),
-        prc: "0",
-        prd: position.prd,
-        trantype: transactionType,
-        prctyp: 'MKT',
-        ret: "DAY"
-      };
+    let remainingQuantity = quantity;
+    let placedQuantity = 0;
+
+    while (remainingQuantity > 0) {
+      const quantityToPlace = Math.min(remainingQuantity, freezeLimit);
+
+      let orderData;
+      if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+        orderData = {
+          uid: selectedBroker.value.clientId,
+          actid: selectedBroker.value.clientId,
+          exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
+          tsym: position.tsym,
+          qty: quantityToPlace.toString(),
+          prc: "0",
+          prd: position.prd,
+          trantype: transactionType,
+          prctyp: 'MKT',
+          ret: "DAY"
+        };
+      }
+
+      let response;
+      if (selectedBroker.value?.brokerName === 'Flattrade') {
+        const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
+        const payload = qs.stringify(orderData);
+        response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+          headers: {
+            'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+      }
+      else if (selectedBroker.value?.brokerName === 'Shoonya') {
+        const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+        const payload = qs.stringify(orderData);
+        response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+          headers: {
+            'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+      }
+
+      console.log(`Placed order for ${quantityToPlace} quantity`);
+
+      remainingQuantity -= quantityToPlace;
+      placedQuantity += quantityToPlace;
     }
 
-    let response;
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-      const payload = qs.stringify(orderData);
-      response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
-        headers: {
-          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-    }
-    else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
-      const payload = qs.stringify(orderData);
-      response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
-        headers: {
-          'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-    }
-
-    console.log("Placing order for position with data:", orderData);    // placed here to prevent delay and debugging if required
-    console.log(`Order placed successfully for ${getSymbol(position)}`, response.data);
-    toastMessage.value = `Order placed successfully for ${getSymbol(position)}`;
+    console.log(`All orders placed successfully. Total: ${placedQuantity} quantity`);
+    toastMessage.value = `Order(s) placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
 
     // Remove stoploss and target for this position
