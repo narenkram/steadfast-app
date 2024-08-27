@@ -418,7 +418,8 @@
             <span class="input-group-text">{{ latestCallLTP }}</span>
           </div>
           <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
-          <div class="d-flex">
+          <!-- Call OHLC Values -->
+          <div class="d-flex" v-if="showOHLCValues">
             <span class="text-primary">O: {{ callOpenPrice }}</span>
             <span class="text-success">H: {{ callHighPrice }}</span>
             <span class="text-danger">L: {{ callLowPrice }}</span>
@@ -455,7 +456,8 @@
           <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">
             Bankex: <b>{{ bankexPrice }}</b>
           </p>
-          <div class="d-flex w-100 justify-content-around">
+          <!-- Master OHLC Values -->
+          <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
             <span class="text-primary">O: {{ masterOpenPrice }}</span>
             <span class="text-success">H: {{ masterHighPrice }}</span>
             <span class="text-danger">L: {{ masterLowPrice }}</span>
@@ -493,7 +495,8 @@
             </select>
           </div>
           <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
-          <div class="d-flex w-100 justify-content-around">
+          <!-- Put OHLC Values -->
+          <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
             <span class="text-primary">O: {{ putOpenPrice }}</span>
             <span class="text-success">H: {{ putHighPrice }}</span>
             <span class="text-danger">L: {{ putLowPrice }}</span>
@@ -1365,8 +1368,8 @@
               <option value="equity">Equity Only</option>
             </select>
           </div>
-          <!-- Show LTP Range Bar Toggle -->
-          <div class="col-12 col-md-6 col-lg-4">
+          <!-- Show/Hide LTP Range Bar Toggle -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
             <!-- Show LTP Range Bar -->
             <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
             <div class="form-check form-switch">
@@ -1378,6 +1381,21 @@
               />
               <label class="form-check-label" for="showLTPRangeBar">
                 {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+          </div>
+          <!-- Show/Hide OHLC Values -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="showOHLCValues" class="form-label">Show OHLC Values</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="showOHLCValues"
+                v-model="showOHLCValues"
+              />
+              <label class="form-check-label" for="showOHLCValues">
+                {{ showOHLCValues ? 'Enabled' : 'Disabled' }}
               </label>
             </div>
           </div>

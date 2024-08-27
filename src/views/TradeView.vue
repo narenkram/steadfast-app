@@ -111,6 +111,8 @@ const putOpenPrice = ref(null);
 const putHighPrice = ref(null);
 const putLowPrice = ref(null);
 const putClosePrice = ref(null);
+const showOHLCValues = ref(false);
+
 
 
 // Computed Variables
@@ -2158,9 +2160,13 @@ onMounted(async () => {
   // Start continuous position checking
   positionCheckInterval = setInterval(continuouslyCheckPositions, 1000); // Check every second
 
-  const savedPreference = localStorage.getItem('showLTPRangeBar');
-  if (savedPreference !== null) {
-    showLTPRangeBar.value = JSON.parse(savedPreference);
+  const ltpBarsavedPreference = localStorage.getItem('showLTPRangeBar');
+  if (ltpBarsavedPreference !== null) {
+    showLTPRangeBar.value = JSON.parse(ltpBarsavedPreference);
+  }
+  const ohlcValuesSavedPreference = localStorage.getItem('showOHLCValues');
+  if (ohlcValuesSavedPreference !== null) {
+    showOHLCValues.value = JSON.parse(ohlcValuesSavedPreference);
   }
 });
 
@@ -2388,5 +2394,9 @@ watch([callStrikeOffset, putStrikeOffset], saveOffsets);
 // Watch for changes to showLTPRangeBar and save to localStorage
 watch(showLTPRangeBar, (newValue) => {
   localStorage.setItem('showLTPRangeBar', JSON.stringify(newValue));
+});
+// Watch for changes to showOHLCValues and save to localStorage
+watch(showOHLCValues, (newValue) => {
+  localStorage.setItem('showOHLCValues', JSON.stringify(newValue));
 });
 </script>
