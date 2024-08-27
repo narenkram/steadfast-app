@@ -447,7 +447,7 @@ const totalDerivativeSellValue = computed(() => {
 const ltpRangeWidth = computed(() => {
   const low = parseFloat(masterLowPrice.value);
   const high = parseFloat(masterHighPrice.value);
-  const ltp = parseFloat(niftyPrice.value); // Use the appropriate LTP value
+  const ltp = getMasterSymbolPrice(); // New helper function
 
   if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
     return 0;
@@ -458,7 +458,7 @@ const ltpRangeWidth = computed(() => {
 const ltpMarkerPosition = computed(() => {
   const low = parseFloat(masterLowPrice.value);
   const high = parseFloat(masterHighPrice.value);
-  const ltp = parseFloat(niftyPrice.value); // Use the appropriate LTP value
+  const ltp = getMasterSymbolPrice(); // New helper function
 
   if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
     return 0;
@@ -2136,6 +2136,26 @@ const initializeSubscriptions = () => {
   subscribeToOptions();
 };
 const debouncedCheckStoplossAndTarget = debounce(checkStoplossAndTarget, 500);
+// Helper function to get the correct price for the selected master symbol
+const getMasterSymbolPrice = () => {
+  switch (selectedMasterSymbol.value) {
+    case 'NIFTY':
+      return parseFloat(niftyPrice.value);
+    case 'BANKNIFTY':
+      return parseFloat(bankNiftyPrice.value);
+    case 'FINNIFTY':
+      return parseFloat(finniftyPrice.value);
+    case 'MIDCPNIFTY':
+      return parseFloat(midcpniftyPrice.value);
+    case 'SENSEX':
+      return parseFloat(sensexPrice.value);
+    case 'BANKEX':
+      return parseFloat(bankexPrice.value);
+    default:
+      return 0;
+  }
+};
+
 
 
 // Lifecycle hooks
@@ -2477,4 +2497,13 @@ watch([putOpenPrice, putHighPrice, putLowPrice, putClosePrice],
     localStorage.setItem('putClosePrice', close);
   }
 );
+// Add this in your component's setup or mounted hook
+watch([selectedMasterSymbol, masterLowPrice, masterHighPrice, niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice], () => {
+  console.log('Master Symbol:', selectedMasterSymbol.value);
+  console.log('Low:', masterLowPrice.value);
+  console.log('High:', masterHighPrice.value);
+  console.log('LTP:', getMasterSymbolPrice());
+  console.log('Range Width:', ltpRangeWidth.value);
+  console.log('Marker Position:', ltpMarkerPosition.value);
+});
 </script>
