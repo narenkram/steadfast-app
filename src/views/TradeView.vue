@@ -705,7 +705,7 @@ const convertToComparableDate = (dateString) => {
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
   return date.toLocaleDateString('en-US', options).replace(/,/g, '');
 };
-const updateStrikesForExpiry = (expiryDate) => {
+const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
   // console.log('Updating strikes for expiry:', expiryDate);
 
   let filteredCallStrikes, filteredPutStrikes;
@@ -721,8 +721,8 @@ const updateStrikesForExpiry = (expiryDate) => {
   // console.log('Filtered Call Strikes:', filteredCallStrikes);
   // console.log('Filtered Put Strikes:', filteredPutStrikes);
 
-  // Only set initial strikes if they haven't been set yet or if the expiry date has changed
-  if (!selectedCallStrike.value.securityId || !selectedPutStrike.value.securityId || selectedCallStrike.value.expiryDate !== expiryDate) {
+  // Change this condition to include forceUpdate
+  if (forceUpdate || !selectedCallStrike.value.securityId || !selectedPutStrike.value.securityId || selectedCallStrike.value.expiryDate !== expiryDate) {
     // Get the current underlying price based on the selected master symbol
     let currentPrice;
     if (selectedMasterSymbol.value === 'NIFTY') {
@@ -2166,6 +2166,9 @@ onMounted(async () => {
   if (ohlcValuesSavedPreference !== null) {
     showOHLCValues.value = JSON.parse(ohlcValuesSavedPreference);
   }
+  if (selectedExpiry.value) {
+    updateStrikesForExpiry(selectedExpiry.value, true);
+  }
 });
 
 onBeforeUnmount(() => {
@@ -2388,7 +2391,13 @@ watch(tradeSettings, (newSettings, oldSettings) => {
   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
   allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
-watch([callStrikeOffset, putStrikeOffset], saveOffsets);
+watch([callStrikeOffset, putStrikeOffset], () => {
+  saveOffsets();
+  updateStrikesForExpiry(selectedExpiry.value, true);
+});
+watch(selectedExpiry, (newExpiry) => {
+  updateStrikesForExpiry(newExpiry, true);
+});
 watch(expiryOffset, (newValue) => {
   saveExpiryOffset();
   setDefaultExpiry();
