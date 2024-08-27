@@ -447,13 +447,13 @@ const totalDerivativeSellValue = computed(() => {
 const ltpRangeWidth = computed(() => {
   const low = parseFloat(masterLowPrice.value);
   const high = parseFloat(masterHighPrice.value);
-  const close = parseFloat(masterClosePrice.value);
+  const ltp = parseFloat(niftyPrice.value); // Use the appropriate LTP value
 
-  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
     return 0;
   }
 
-  return ((close - low) / (high - low)) * 100;
+  return ((ltp - low) / (high - low)) * 100;
 });
 const ltpMarkerPosition = computed(() => {
   const low = parseFloat(masterLowPrice.value);
@@ -470,13 +470,13 @@ const ltpMarkerPosition = computed(() => {
 const callLtpRangeWidth = computed(() => {
   const low = parseFloat(callLowPrice.value);
   const high = parseFloat(callHighPrice.value);
-  const close = parseFloat(callClosePrice.value);
+  const ltp = parseFloat(latestCallLTP.value);
 
-  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
     return 0;
   }
 
-  return ((close - low) / (high - low)) * 100;
+  return ((ltp - low) / (high - low)) * 100;
 });
 const callLtpMarkerPosition = computed(() => {
   const low = parseFloat(callLowPrice.value);
@@ -493,13 +493,13 @@ const callLtpMarkerPosition = computed(() => {
 const putLtpRangeWidth = computed(() => {
   const low = parseFloat(putLowPrice.value);
   const high = parseFloat(putHighPrice.value);
-  const close = parseFloat(putClosePrice.value);
+  const ltp = parseFloat(latestPutLTP.value);
 
-  if (isNaN(low) || isNaN(high) || isNaN(close) || high === low) {
+  if (isNaN(low) || isNaN(high) || isNaN(ltp) || high === low) {
     return 0;
   }
 
-  return ((close - low) / (high - low)) * 100;
+  return ((ltp - low) / (high - low)) * 100;
 });
 const putLtpMarkerPosition = computed(() => {
   const low = parseFloat(putLowPrice.value);
