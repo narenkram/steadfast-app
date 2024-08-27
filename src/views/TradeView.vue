@@ -1869,10 +1869,8 @@ const connectWebSocket = () => {
   console.log(`Connecting to WebSocket at ${websocketUrl}`);
   socket.value = new WebSocket(websocketUrl);
 
-  // Modify the existing socket.onmessage handler
   socket.value.onmessage = (event) => {
     const quoteData = JSON.parse(event.data);
-    // console.log('WebSocket message received:', quoteData);
     if (quoteData.lp) {
       const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value];
       if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
@@ -1880,62 +1878,36 @@ const connectWebSocket = () => {
         switch (selectedMasterSymbol.value) {
           case 'NIFTY':
             niftyPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
           case 'BANKNIFTY':
             bankNiftyPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
           case 'FINNIFTY':
             finniftyPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
           case 'MIDCPNIFTY':
             midcpniftyPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
           case 'SENSEX':
             sensexPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
           case 'BANKEX':
             bankexPrice.value = quoteData.lp;
-            masterOpenPrice.value = quoteData.o;
-            masterHighPrice.value = quoteData.h;
-            masterLowPrice.value = quoteData.l;
-            masterClosePrice.value = quoteData.c;
+            updateOHLCIfNotEmpty('master', quoteData);
             break;
         }
       }
       else if (quoteData.tk === defaultCallSecurityId.value) {
         latestCallLTP.value = quoteData.lp;
-        callOpenPrice.value = quoteData.o;
-        callHighPrice.value = quoteData.h;
-        callLowPrice.value = quoteData.l;
-        callClosePrice.value = quoteData.c;
-        // console.log('Updated Call LTP:', latestCallLTP.value);
+        updateOHLCIfNotEmpty('call', quoteData);
       } else if (quoteData.tk === defaultPutSecurityId.value) {
         latestPutLTP.value = quoteData.lp;
-        putOpenPrice.value = quoteData.o;
-        putHighPrice.value = quoteData.h;
-        putLowPrice.value = quoteData.l;
-        putClosePrice.value = quoteData.c;
-        // console.log('Updated Put LTP:', latestPutLTP.value);
+        updateOHLCIfNotEmpty('put', quoteData);
       }
 
       // Update position LTPs
@@ -1959,6 +1931,26 @@ const connectWebSocket = () => {
     console.log('WebSocket disconnected. Attempting to reconnect...');
     setTimeout(connectWebSocket, 5000);
   };
+};
+
+// Helper function to update OHLC values if they are not empty
+const updateOHLCIfNotEmpty = (type, data) => {
+  if (type === 'master') {
+    if (data.o) masterOpenPrice.value = data.o;
+    if (data.h) masterHighPrice.value = data.h;
+    if (data.l) masterLowPrice.value = data.l;
+    if (data.c) masterClosePrice.value = data.c;
+  } else if (type === 'call') {
+    if (data.o) callOpenPrice.value = data.o;
+    if (data.h) callHighPrice.value = data.h;
+    if (data.l) callLowPrice.value = data.l;
+    if (data.c) callClosePrice.value = data.c;
+  } else if (type === 'put') {
+    if (data.o) putOpenPrice.value = data.o;
+    if (data.h) putHighPrice.value = data.h;
+    if (data.l) putLowPrice.value = data.l;
+    if (data.c) putClosePrice.value = data.c;
+  }
 };
 const currentSubscriptions = ref({
   masterSymbol: null,
