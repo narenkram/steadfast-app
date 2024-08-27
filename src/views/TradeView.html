@@ -423,7 +423,7 @@
             <span class="text-warning">C: {{ callClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Call Strike -->
-          <div class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar">
             <span class="ltp-range-low">L: {{ callLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: callLtpRangeWidth + '%' }"></div>
@@ -460,7 +460,7 @@
             <span class="text-warning">C: {{ masterClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Live Underlying Price -->
-          <div class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar">
             <span class="ltp-range-low">L: {{ masterLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
@@ -498,7 +498,7 @@
             <span class="text-warning">C: {{ putClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Put Strike -->
-          <div class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar">
             <span class="ltp-range-low">L: {{ putLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: putLtpRangeWidth + '%' }"></div>
@@ -1362,6 +1362,7 @@
               <option value="equity">Equity Only</option>
             </select>
           </div>
+          <!-- Show LTP Range Bar Toggle -->
           <div class="col-12 col-md-6 col-lg-4">
             <!-- Show LTP Range Bar -->
             <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
@@ -1372,9 +1373,9 @@
                 id="showLTPRangeBar"
                 v-model="showLTPRangeBar"
               />
-              <label class="form-check-label" for="showLTPRangeBar"
-                >{{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}</label
-              >
+              <label class="form-check-label" for="showLTPRangeBar">
+                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+              </label>
             </div>
           </div>
           <div class="col-12 py-2 text-center">

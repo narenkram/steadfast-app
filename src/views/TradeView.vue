@@ -2152,6 +2152,11 @@ onMounted(async () => {
   positionTargetsPrice.value = JSON.parse(localStorage.getItem('positionTargetsPrice') || '{}');
   // Start continuous position checking
   positionCheckInterval = setInterval(continuouslyCheckPositions, 1000); // Check every second
+
+  const savedPreference = localStorage.getItem('showLTPRangeBar');
+  if (savedPreference !== null) {
+    showLTPRangeBar.value = JSON.parse(savedPreference);
+  }
 });
 
 onBeforeUnmount(() => {
@@ -2375,4 +2380,8 @@ watch(tradeSettings, (newSettings, oldSettings) => {
   allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], saveOffsets);
+// Watch for changes to showLTPRangeBar and save to localStorage
+watch(showLTPRangeBar, (newValue) => {
+  localStorage.setItem('showLTPRangeBar', JSON.stringify(newValue));
+});
 </script>
