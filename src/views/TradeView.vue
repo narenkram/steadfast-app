@@ -113,6 +113,7 @@ const putHighPrice = ref(localStorage.getItem('putHighPrice') || null);
 const putLowPrice = ref(localStorage.getItem('putLowPrice') || null);
 const putClosePrice = ref(localStorage.getItem('putClosePrice') || null);
 const showOHLCValues = ref(false);
+const showStrikeDetails = ref(false);
 
 
 
@@ -2409,6 +2410,9 @@ watch(showLTPRangeBar, (newValue) => {
 // Watch for changes to showOHLCValues and save to localStorage
 watch(showOHLCValues, (newValue) => {
   localStorage.setItem('showOHLCValues', JSON.stringify(newValue));
+});
+watch(showStrikeDetails, (newValue) => {
+  localStorage.setItem('showStrikeDetails', JSON.stringify(newValue));
 });
 // Watch for changes and update localStorage
 watch([masterOpenPrice, masterHighPrice, masterLowPrice, masterClosePrice],

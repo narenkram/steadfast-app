@@ -417,7 +417,10 @@
             </select>
             <span class="input-group-text">{{ latestCallLTP }}</span>
           </div>
-          <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
+          <div v-if="showStrikeDetails">
+            <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
+            <div class="text-muted">Security ID: {{ selectedCallStrike.securityId }}</div>
+          </div>
           <!-- Call OHLC Values -->
           <div class="d-flex" v-if="showOHLCValues">
             <span class="text-primary">O: {{ callOpenPrice }}</span>
@@ -427,12 +430,14 @@
           </div>
           <!-- LTP Range Bar for Call Strike -->
           <div v-if="showLTPRangeBar" class="ltp-range-bar">
-            <span class="ltp-range-low">L: {{ callLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: callLtpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: callLtpMarkerPosition + '%' }"></div>
             </div>
-            <span class="ltp-range-high">H: {{ callHighPrice }}</span>
+            <div class="d-flex justify-content-between">
+              <span class="ltp-range-low">L: {{ callLowPrice }}</span>
+              <span class="ltp-range-high">H: {{ callHighPrice }}</span>
+            </div>
           </div>
         </div>
 
@@ -465,12 +470,14 @@
           </div>
           <!-- LTP Range Bar for Live Underlying Price -->
           <div v-if="showLTPRangeBar" class="ltp-range-bar">
-            <span class="ltp-range-low">L: {{ masterLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: ltpMarkerPosition + '%' }"></div>
             </div>
-            <span class="ltp-range-high">H: {{ masterHighPrice }}</span>
+            <div class="d-flex justify-content-between">
+              <span class="ltp-range-low">L: {{ masterLowPrice }}</span>
+              <span class="ltp-range-high">H: {{ masterHighPrice }}</span>
+            </div>
           </div>
         </div>
 
@@ -494,7 +501,10 @@
               </option>
             </select>
           </div>
-          <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
+          <div v-if="showStrikeDetails">
+            <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
+            <div class="text-muted">Security ID: {{ selectedPutStrike.securityId }}</div>
+          </div>
           <!-- Put OHLC Values -->
           <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
             <span class="text-primary">O: {{ putOpenPrice }}</span>
@@ -504,12 +514,14 @@
           </div>
           <!-- LTP Range Bar for Put Strike -->
           <div v-if="showLTPRangeBar" class="ltp-range-bar">
-            <span class="ltp-range-low">L: {{ putLowPrice }}</span>
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: putLtpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: putLtpMarkerPosition + '%' }"></div>
             </div>
-            <span class="ltp-range-high">H: {{ putHighPrice }}</span>
+            <div class="d-flex justify-content-between">
+              <span class="ltp-range-low">L: {{ putLowPrice }}</span>
+              <span class="ltp-range-high">H: {{ putHighPrice }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1409,6 +1421,22 @@
               </label>
             </div>
             <small class="text-muted">Reload Required</small>
+          </div>
+          <!-- Show/Hide Strike Details - Security ID, Trading Symbol -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="showStrikeDetails" class="form-label">Show Strike Details</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="showStrikeDetails"
+                v-model="showStrikeDetails"
+              />
+              <label class="form-check-label" for="showStrikeDetails">
+                {{ showStrikeDetails ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+            <small class="text-muted">For development purposes only</small>
           </div>
           <div class="col-12 py-2 text-center">
             <p class="text-secondary">These settings are automatically saved.</p>

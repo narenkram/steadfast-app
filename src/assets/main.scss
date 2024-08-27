@@ -260,9 +260,6 @@ input:focus {
   width: auto;
 }
 .ltp-range-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-top: 10px;
 }
 
@@ -285,8 +282,9 @@ input:focus {
 .ltp-range-marker {
   position: absolute;
   top: -4px;
-  width: 0;
+  width: 16px; // Changed from 0 to 16px
   height: 16px;
+  transform: translateX(-50%); // Center the marker on its position
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-bottom: 8px solid var(--bs-secondary);
