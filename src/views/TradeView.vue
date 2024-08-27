@@ -1645,7 +1645,7 @@ const reversePositions = async () => {
 
         // Open a new position in the opposite direction
         const openTransactionType = netqty > 0 ? 'B' : 'S';
-        const reversedPosition = { ...position, netqty: -netqty }; // Reverse the quantity
+        const reversedPosition = { ...position, netqty: Math.abs(netqty) }; // Always use positive quantity
         await placeOrderForPosition(openTransactionType, position.tsym.includes('C') ? 'CALL' : 'PUT', reversedPosition);
 
         positionsReversed = true;
