@@ -796,7 +796,7 @@
         tabindex="0"
       >
         <div class="row align-items-center">
-          <div class="col-4 text-center py-2">
+          <div class="col-md-4 col-lg-4 text-center py-2">
             <p class="mb-0">
               <b
                 >Net Qty:
@@ -808,12 +808,32 @@
               </b>
             </p>
           </div>
-          <div class="col-8 text-center py-2">
+          <div class="col-md-4 col-lg-6 text-center py-2">
             <p class="mb-0">
               <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
               <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
             </p>
             <p class="mb-0"></p>
+          </div>
+          <!-- 1 Click Reverse Positions for Reverse All & Selected positions -->
+          <div class="col-md-4 col-lg-2 text-center">
+            <button
+              class="btn btn-sm btn-outline-secondary me-1"
+              data-bs-toggle="modal"
+              data-bs-target="#ReversePositionsConfirmationModal"
+              @click="setReverseMode('selected')"
+              v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
+            >
+              🔃 Selected
+            </button>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              data-bs-toggle="modal"
+              data-bs-target="#ReversePositionsConfirmationModal"
+              @click="setReverseMode('all')"
+            >
+              🔃 All
+            </button>
           </div>
         </div>
         <!-- Flattrade Positions -->
@@ -1543,6 +1563,49 @@
             class="btn btn-danger w-50 ms-1"
             data-bs-dismiss="modal"
             @click="toggleKillSwitch"
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reverse All/Selected Positions Confirmation Modal -->
+<div
+  class="modal fade"
+  id="ReversePositionsConfirmationModal"
+  tabindex="-1"
+  aria-labelledby="ReversePositionsConfirmationModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ReversePositionsConfirmationModalLabel">
+          Confirm Reverse Positions
+        </h5>
+      </div>
+      <div class="modal-body">
+        <blockquote class="blockquote">
+          This action will
+          <b class="text-danger"
+            >reverse {{ reverseMode === 'all' ? 'all' : 'selected' }} positions</b
+          >
+        </blockquote>
+        <p>Are you sure you want to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex flex-row justify-content-between w-100">
+          <button type="button" class="btn btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
+            No
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary w-50 ms-1"
+            data-bs-dismiss="modal"
+            @click="reversePositions"
           >
             Yes
           </button>
