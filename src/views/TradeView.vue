@@ -99,18 +99,18 @@ const totalRiskAmount = ref(null);
 const totalRiskPercentage = ref(null);
 const closePositionsRisk = ref(true);
 const activeFetchFunction = ref(null);
-const masterOpenPrice = ref(null);
-const masterHighPrice = ref(null);
-const masterLowPrice = ref(null);
-const masterClosePrice = ref(null);
-const callOpenPrice = ref(null);
-const callHighPrice = ref(null);
-const callLowPrice = ref(null);
-const callClosePrice = ref(null);
-const putOpenPrice = ref(null);
-const putHighPrice = ref(null);
-const putLowPrice = ref(null);
-const putClosePrice = ref(null);
+const masterOpenPrice = ref(localStorage.getItem('masterOpenPrice') || null);
+const masterHighPrice = ref(localStorage.getItem('masterHighPrice') || null);
+const masterLowPrice = ref(localStorage.getItem('masterLowPrice') || null);
+const masterClosePrice = ref(localStorage.getItem('masterClosePrice') || null);
+const callOpenPrice = ref(localStorage.getItem('callOpenPrice') || null);
+const callHighPrice = ref(localStorage.getItem('callHighPrice') || null);
+const callLowPrice = ref(localStorage.getItem('callLowPrice') || null);
+const callClosePrice = ref(localStorage.getItem('callClosePrice') || null);
+const putOpenPrice = ref(localStorage.getItem('putOpenPrice') || null);
+const putHighPrice = ref(localStorage.getItem('putHighPrice') || null);
+const putLowPrice = ref(localStorage.getItem('putLowPrice') || null);
+const putClosePrice = ref(localStorage.getItem('putClosePrice') || null);
 const showOHLCValues = ref(false);
 
 
@@ -2399,4 +2399,31 @@ watch(showLTPRangeBar, (newValue) => {
 watch(showOHLCValues, (newValue) => {
   localStorage.setItem('showOHLCValues', JSON.stringify(newValue));
 });
+// Watch for changes and update localStorage
+watch([masterOpenPrice, masterHighPrice, masterLowPrice, masterClosePrice],
+  ([open, high, low, close]) => {
+    localStorage.setItem('masterOpenPrice', open);
+    localStorage.setItem('masterHighPrice', high);
+    localStorage.setItem('masterLowPrice', low);
+    localStorage.setItem('masterClosePrice', close);
+  }
+);
+
+watch([callOpenPrice, callHighPrice, callLowPrice, callClosePrice],
+  ([open, high, low, close]) => {
+    localStorage.setItem('callOpenPrice', open);
+    localStorage.setItem('callHighPrice', high);
+    localStorage.setItem('callLowPrice', low);
+    localStorage.setItem('callClosePrice', close);
+  }
+);
+
+watch([putOpenPrice, putHighPrice, putLowPrice, putClosePrice],
+  ([open, high, low, close]) => {
+    localStorage.setItem('putOpenPrice', open);
+    localStorage.setItem('putHighPrice', high);
+    localStorage.setItem('putLowPrice', low);
+    localStorage.setItem('putClosePrice', close);
+  }
+);
 </script>
