@@ -270,14 +270,15 @@ input:focus {
   position: relative;
   flex-grow: 1;
   height: 8px;
-  background-color: #d3b8ae;
+  background-color: var(--bs-light);
+  border: 1px solid var(--bs-border-color);
   margin: 0 10px;
   border-radius: 4px;
 }
 
 .ltp-range-fill {
   height: 100%;
-  background-color: #5a2d2a;
+  background-color: #adb5bd;
   border-radius: 4px 0 0 4px;
 }
 
@@ -288,5 +289,5 @@ input:focus {
   height: 16px;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid #5a2d2a;
+  border-bottom: 8px solid var(--bs-secondary);
 }
