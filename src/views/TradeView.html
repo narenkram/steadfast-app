@@ -1358,8 +1358,18 @@
               <option value="-4">OTM -4</option>
             </select>
           </div>
+          <!-- Select Expiry Offset -->
           <div class="col-12 col-md-6 col-lg-4">
-            <!-- Show all positions Including Equity and Futures and Options -->
+            <label for="expiryOffset" class="form-label">Expiry Offset</label>
+            <select id="expiryOffset" class="form-select" v-model="expiryOffset">
+              <option value="0">Current Expiry</option>
+              <option value="1">+1 Expiry</option>
+              <option value="2">+2 Expiry</option>
+              <option value="3">+3 Expiry</option>
+            </select>
+          </div>
+          <!-- Show all positions Including Equity and Futures and Options -->
+          <!-- <div class="col-12 col-md-6 col-lg-4">
             <label for="showAllPositions" class="form-label">Show Positions</label>
             <select name="" id="" class="form-select">
               <option value="all">All Positions</option>
@@ -1367,7 +1377,7 @@
               <option value="options" selected>Options Only</option>
               <option value="equity">Equity Only</option>
             </select>
-          </div>
+          </div> -->
           <!-- Show/Hide LTP Range Bar Toggle -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <!-- Show LTP Range Bar -->

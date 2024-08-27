@@ -28,6 +28,7 @@ const selectedCallStrike = ref({});
 const selectedPutStrike = ref({});
 const callStrikeOffset = ref(localStorage.getItem('callStrikeOffset') || '0');
 const putStrikeOffset = ref(localStorage.getItem('putStrikeOffset') || '0');
+const expiryOffset = ref(localStorage.getItem('expiryOffset') || '0');
 const exchangeSymbols = ref({});
 const callStrikes = ref([]);
 const putStrikes = ref([]);
@@ -1757,8 +1758,13 @@ const calculateUnrealizedProfit = (position) => {
 };
 const setDefaultExpiry = () => {
   if (expiryDates.value.length > 0) {
-    selectedExpiry.value = expiryDates.value[0];
+    const offsetIndex = parseInt(expiryOffset.value);
+    const selectedIndex = Math.min(offsetIndex, expiryDates.value.length - 1);
+    selectedExpiry.value = expiryDates.value[selectedIndex];
   }
+};
+const saveExpiryOffset = () => {
+  localStorage.setItem('expiryOffset', expiryOffset.value);
 };
 const cycleClockEmoji = () => {
   const currentHour = new Date().getHours();
@@ -2383,6 +2389,10 @@ watch(tradeSettings, (newSettings, oldSettings) => {
   allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], saveOffsets);
+watch(expiryOffset, (newValue) => {
+  saveExpiryOffset();
+  setDefaultExpiry();
+});
 // Watch for changes to showLTPRangeBar and save to localStorage
 watch(showLTPRangeBar, (newValue) => {
   localStorage.setItem('showLTPRangeBar', JSON.stringify(newValue));
