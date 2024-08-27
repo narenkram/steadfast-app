@@ -289,3 +289,14 @@ input:focus {
   border-right: 8px solid transparent;
   border-bottom: 8px solid var(--bs-secondary);
 }
+.ltp-range-open-marker {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--bs-secondary); /* Orange color for open price */
+  border: 2px solid #fff;
+  z-index: 2;
+}

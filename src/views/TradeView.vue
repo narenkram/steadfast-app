@@ -512,6 +512,42 @@ const putLtpMarkerPosition = computed(() => {
 
   return ((ltp - low) / (high - low)) * 100;
 });
+// Computed Properties for LTP Range Bar for Live Underlying Price
+const openMarkerPosition = computed(() => {
+  const low = parseFloat(masterLowPrice.value);
+  const high = parseFloat(masterHighPrice.value);
+  const open = parseFloat(masterOpenPrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(open) || high === low) {
+    return 0;
+  }
+
+  return ((open - low) / (high - low)) * 100;
+});
+// Computed Properties for LTP Range Bar for Call Strike
+const callOpenMarkerPosition = computed(() => {
+  const low = parseFloat(callLowPrice.value);
+  const high = parseFloat(callHighPrice.value);
+  const open = parseFloat(callOpenPrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(open) || high === low) {
+    return 0;
+  }
+
+  return ((open - low) / (high - low)) * 100;
+});
+// Computed Properties for LTP Range Bar for Put Strike
+const putOpenMarkerPosition = computed(() => {
+  const low = parseFloat(putLowPrice.value);
+  const high = parseFloat(putHighPrice.value);
+  const open = parseFloat(putOpenPrice.value);
+
+  if (isNaN(low) || isNaN(high) || isNaN(open) || high === low) {
+    return 0;
+  }
+
+  return ((open - low) / (high - low)) * 100;
+});
 const riskReached = computed(() => {
   if (totalRiskType.value === 'amount' && totalRiskAmount.value > 0) {
     return totalProfit.value <= -totalRiskAmount.value;
