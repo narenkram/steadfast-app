@@ -429,7 +429,7 @@
             <span class="text-warning">C: {{ callClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Call Strike -->
-          <div v-if="showLTPRangeBar" class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: callLtpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: callLtpMarkerPosition + '%' }"></div>
@@ -469,7 +469,7 @@
             <span class="text-warning">C: {{ masterClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Live Underlying Price -->
-          <div v-if="showLTPRangeBar" class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: ltpMarkerPosition + '%' }"></div>
@@ -513,7 +513,7 @@
             <span class="text-warning">C: {{ putClosePrice }}</span>
           </div>
           <!-- LTP Range Bar for Put Strike -->
-          <div v-if="showLTPRangeBar" class="ltp-range-bar">
+          <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
             <div class="ltp-range">
               <div class="ltp-range-fill" :style="{ width: putLtpRangeWidth + '%' }"></div>
               <div class="ltp-range-marker" :style="{ left: putLtpMarkerPosition + '%' }"></div>
