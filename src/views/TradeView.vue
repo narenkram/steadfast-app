@@ -26,6 +26,8 @@ const selectedQuantity = ref(0);
 const selectedExpiry = ref(null);
 const selectedCallStrike = ref({});
 const selectedPutStrike = ref({});
+const callStrikeOffset = ref(localStorage.getItem('callStrikeOffset') || '0');
+const putStrikeOffset = ref(localStorage.getItem('putStrikeOffset') || '0');
 const exchangeSymbols = ref({});
 const callStrikes = ref([]);
 const putStrikes = ref([]);
@@ -730,12 +732,16 @@ const updateStrikesForExpiry = (expiryDate) => {
     }
 
     if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
-      const nearestStrike = filteredCallStrikes.reduce((prev, curr) =>
-        Math.abs(curr.strikePrice - currentPrice) < Math.abs(prev.strikePrice - currentPrice) ? curr : prev
+      const nearestStrikeIndex = filteredCallStrikes.findIndex(strike =>
+        Math.abs(strike.strikePrice - currentPrice) === Math.min(...filteredCallStrikes.map(s => Math.abs(s.strikePrice - currentPrice)))
       );
 
-      selectedCallStrike.value = nearestStrike;
-      selectedPutStrike.value = filteredPutStrikes.find(strike => strike.strikePrice === nearestStrike.strikePrice) || {};
+      // Reverse the logic for call and put offsets
+      const callOffsetIndex = nearestStrikeIndex - parseInt(callStrikeOffset.value);
+      const putOffsetIndex = nearestStrikeIndex + parseInt(putStrikeOffset.value);
+
+      selectedCallStrike.value = filteredCallStrikes[callOffsetIndex] || {};
+      selectedPutStrike.value = filteredPutStrikes[putOffsetIndex] || {};
     }
 
     // console.log('Selected Call Strike:', selectedCallStrike.value);
@@ -749,6 +755,10 @@ const updateStrikesForExpiry = (expiryDate) => {
     defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A';
     defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A';
   }
+};
+const saveOffsets = () => {
+  localStorage.setItem('callStrikeOffset', callStrikeOffset.value);
+  localStorage.setItem('putStrikeOffset', putStrikeOffset.value);
 };
 const synchronizeStrikes = () => {
   synchronizeCallStrikes();
@@ -2364,4 +2374,5 @@ watch(tradeSettings, (newSettings, oldSettings) => {
   const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
   allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
+watch([callStrikeOffset, putStrikeOffset], saveOffsets);
 </script>

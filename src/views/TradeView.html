@@ -1325,27 +1325,31 @@
           <div class="col-12 col-md-6 col-lg-4">
             <!-- Select Call Strike Offset -->
             <label for="callStrikeOffset" class="form-label">Call Strike Offset</label>
-            <select name="" id="" class="form-select">
+            <select name="" id="callStrikeOffset" class="form-select" v-model="callStrikeOffset">
+              <option value="+4">ITM +4</option>
               <option value="+3">ITM +3</option>
               <option value="+2">ITM +2</option>
               <option value="+1">ITM +1</option>
-              <option value="0" selected>ATM 0</option>
+              <option value="0">ATM 0</option>
               <option value="-1">OTM -1</option>
               <option value="-2">OTM -2</option>
               <option value="-3">OTM -3</option>
+              <option value="-4">OTM -4</option>
             </select>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
             <!-- Select Put Strike Offset -->
             <label for="putStrikeOffset" class="form-label">Put Strike Offset</label>
-            <select name="" id="" class="form-select">
+            <select name="" id="putStrikeOffset" class="form-select" v-model="putStrikeOffset">
+              <option value="+4">ITM +4</option>
               <option value="+3">ITM +3</option>
               <option value="+2">ITM +2</option>
               <option value="+1">ITM +1</option>
-              <option value="0" selected>ATM 0</option>
+              <option value="0">ATM 0</option>
               <option value="-1">OTM -1</option>
               <option value="-2">OTM -2</option>
               <option value="-3">OTM -3</option>
+              <option value="-4">OTM -4</option>
             </select>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
