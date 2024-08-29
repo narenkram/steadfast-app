@@ -569,7 +569,7 @@
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="#">Add to Basket</a>
+                <a class="dropdown-item" @click="addToBasket('BUY', 'CALL')">Add to Basket</a>
               </li>
             </ul>
           </div>
@@ -603,7 +603,7 @@
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="#">Add to Basket</a>
+                <a class="dropdown-item" @click="addToBasket('SELL', 'CALL')">Add to Basket</a>
               </li>
             </ul>
           </div>
@@ -666,7 +666,7 @@
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="#">Add to Basket</a>
+                <a class="dropdown-item" @click="addToBasket('BUY', 'PUT')">Add to Basket</a>
               </li>
             </ul>
           </div>
@@ -700,7 +700,7 @@
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="#">Add to Basket</a>
+                <a class="dropdown-item" @click="addToBasket('SELL', 'PUT')">Add to Basket</a>
               </li>
             </ul>
           </div>
@@ -1351,8 +1351,48 @@
         tabindex="0"
       >
         <div class="row py-3">
-          <div class="col-12 text-center">
-            <p class="text-secondary">Coming Soon</p>
+          <div class="col-12">
+            <h5>Basket Orders</h5>
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Type</th>
+                  <th>Quantity</th>
+                  <th>Product</th>
+                  <th>Order Type</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="order in sortedBasketOrders" :key="order.id">
+                  <td>{{ order.tradingSymbol }}</td>
+                  <td>
+                    {{ order.transactionType === 'B' ? 'BUY' : 'SELL' }} {{ order.optionType }}
+                  </td>
+                  <td>{{ order.quantity }}</td>
+                  <td>{{ order.productType }}</td>
+                  <td>{{ order.orderType }}</td>
+                  <td>{{ order.price }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary me-2" @click="placeBasketOrder(order)">
+                      Place
+                    </button>
+                    <button class="btn btn-sm btn-danger" @click="removeFromBasket(order.id)">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button
+              class="btn btn-success"
+              @click="placeAllBasketOrders"
+              :disabled="basketOrders.length === 0"
+            >
+              Place All Orders
+            </button>
           </div>
         </div>
       </div>
@@ -1610,6 +1650,38 @@
             Yes
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this modal for basket orders -->
+<div
+  class="modal fade"
+  id="basketOrderModal"
+  tabindex="-1"
+  aria-labelledby="basketOrderModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="basketOrderModalLabel">Basket Orders</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add the same table content as in the basket tab -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          @click="placeAllBasketOrders"
+          :disabled="basketOrders.length === 0"
+        >
+          Place All Orders
+        </button>
       </div>
     </div>
   </div>

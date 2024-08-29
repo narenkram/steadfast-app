@@ -7,6 +7,8 @@ import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import { debounce } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
+
 
 // Reactive Variables
 const BASE_URL = 'http://localhost:3000';
@@ -115,6 +117,8 @@ const putClosePrice = ref(localStorage.getItem('putClosePrice') || null);
 const showOHLCValues = ref(false);
 const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
+const basketOrders = ref([]);
+const showBasketOrderModal = ref(false);
 
 
 
@@ -558,6 +562,14 @@ const riskReached = computed(() => {
   }
   return false;
 });
+const sortedBasketOrders = computed(() => {
+  return [...basketOrders.value].sort((a, b) => {
+    if (a.transactionType === 'B' && b.transactionType !== 'B') return -1;
+    if (a.transactionType !== 'B' && b.transactionType === 'B') return 1;
+    return 0;
+  });
+});
+
 
 
 
@@ -1505,6 +1517,100 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     console.error('Failed to place order for position:', error);
     toastMessage.value = 'Failed to place order for SL/Target';
     showToast.value = true;
+  }
+};
+const addToBasket = (transactionType, optionType) => {
+  let selectedStrike = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
+
+  basketOrders.value.push({
+    id: uuidv4(),
+    tradingSymbol: selectedStrike.tradingSymbol,
+    transactionType: getTransactionType(transactionType),
+    optionType,
+    quantity: selectedQuantity.value,
+    productType: selectedProductType.value,
+    orderType: 'MKT',
+    price: 0
+  });
+
+  showBasketOrderModal.value = true;
+};
+const removeFromBasket = (id) => {
+  basketOrders.value = basketOrders.value.filter(order => order.id !== id);
+};
+const placeBasketOrder = async (order) => {
+  try {
+    const exchangeSegment = getExchangeSegment();
+    const orderData = prepareOrderPayload(order.transactionType, order.optionType, { tradingSymbol: order.tradingSymbol }, exchangeSegment);
+    orderData.qty = order.quantity.toString();
+    orderData.prd = order.productType;
+    orderData.prctyp = order.orderType;
+    orderData.prc = order.price.toString();
+
+    let response;
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
+      const payload = qs.stringify({
+        ...orderData,
+        uid: selectedBroker.value.clientId,
+        actid: selectedBroker.value.clientId
+      });
+      response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+        headers: {
+          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+    }
+    else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
+      const payload = qs.stringify({
+        ...orderData,
+        uid: selectedBroker.value.clientId,
+        actid: selectedBroker.value.clientId
+      });
+      response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+        headers: {
+          'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+    }
+
+    console.log(`Placed basket order for ${order.tradingSymbol}`);
+    console.log("Basket order placed successfully:", response.data);
+
+    return true;
+  } catch (error) {
+    console.error("Error placing basket order:", error);
+    return false;
+  }
+};
+const placeAllBasketOrders = async () => {
+  for (const order of sortedBasketOrders.value) {
+    const success = await placeBasketOrder(order);
+    if (success) {
+      removeFromBasket(order.id);
+    } else {
+      toastMessage.value = `Failed to place order for ${order.tradingSymbol}`;
+      showToast.value = true;
+      break;
+    }
+  }
+
+  // Add a delay before fetching updated data
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Update both orders and positions
+  await updateOrdersAndPositions();
+
+  // Update fund limits
+  await updateFundLimits();
+
+  if (basketOrders.value.length === 0) {
+    toastMessage.value = 'All basket orders placed successfully';
+    showToast.value = true;
+    showBasketOrderModal.value = false;
   }
 };
 const closeAllPositions = async () => {
