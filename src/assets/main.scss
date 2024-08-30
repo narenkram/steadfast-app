@@ -300,3 +300,10 @@ input:focus {
   border: 2px solid #fff;
   z-index: 2;
 }
+
+#events-iframe {
+  width: 100%;
+  height: 80vh;
+  min-height: 300px;
+  max-height: 800px;
+}
