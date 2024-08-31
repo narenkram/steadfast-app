@@ -119,7 +119,7 @@ const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
 const basketOrders = ref([]);
 const showBasketOrderModal = ref(false);
-const additionalSymbols = ref(true);
+const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols')) || false);
 const additionalStrikeLTPs = ref({
   call: {},
   put: {}
@@ -2431,6 +2431,10 @@ const getMasterSymbolPrice = () => {
       return 0;
   }
 };
+const toggleAdditionalSymbols = () => {
+  additionalSymbols.value = !additionalSymbols.value;
+};
+
 
 
 
@@ -2783,11 +2787,12 @@ watch([selectedMasterSymbol, masterLowPrice, masterHighPrice, niftyPrice, bankNi
   console.log('Marker Position:', ltpMarkerPosition.value);
 });
 watch(additionalSymbols, (newValue) => {
+  localStorage.setItem('additionalSymbols', JSON.stringify(newValue));
   if (newValue) {
     subscribeToOptions();
   } else {
     unsubscribeFromAdditionalStrikes();
-    additionalStrikeLTPs.value = {};
+    additionalStrikeLTPs.value = { call: {}, put: {} };
   }
 });
 </script>

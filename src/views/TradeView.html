@@ -1548,10 +1548,10 @@
                 id="additionalSymbols"
                 v-model="additionalSymbols"
               />
+              <label class="form-check-label" for="additionalSymbols">
+                {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
+              </label>
             </div>
-            <label class="form-check-label" for="additionalSymbols">
-              {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
-            </label>
           </div>
           <div class="col-12 pt-5 text-center">
             <p class="text-secondary">These settings are automatically saved.</p>
