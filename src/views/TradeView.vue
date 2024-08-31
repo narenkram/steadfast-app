@@ -579,8 +579,8 @@ const additionalStrikes = computed(() => {
   if (!additionalSymbols.value) return [];
 
   const currentPrice = getMasterSymbolPrice();
-  const allStrikes = [...callStrikes.value, ...putStrikes.value]
-    .map(strike => strike.strikePrice)
+  const allStrikes = [...new Set([...callStrikes.value, ...putStrikes.value]
+    .map(strike => strike.strikePrice))]
     .sort((a, b) => a - b);
 
   const currentIndex = allStrikes.findIndex(strike => strike >= currentPrice);
@@ -589,7 +589,6 @@ const additionalStrikes = computed(() => {
 
   return allStrikes.slice(startIndex, endIndex + 1);
 });
-
 
 
 

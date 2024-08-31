@@ -536,12 +536,23 @@
         <!-- Add this after the Put Strike Selection -->
         <div v-if="additionalSymbols" class="col-12 mt-3">
           <h5>Additional Strike LTPs</h5>
-          <div class="d-flex flex-wrap justify-content-around">
-            <div v-for="strike in additionalStrikes" :key="strike" class="me-3 mb-2">
-              <strong>{{ strike }}:</strong>
-              Call: {{ additionalStrikeLTPs.call[strike] || 'N/A' }} | Put: {{
-              additionalStrikeLTPs.put[strike] || 'N/A' }}
-            </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>Call LTP</th>
+                  <th>Strike</th>
+                  <th>Put LTP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="strike in additionalStrikes" :key="strike">
+                  <td>{{ additionalStrikeLTPs.call[strike] || 'N/A' }}</td>
+                  <td><strong>{{ strike }}</strong></td>
+                  <td>{{ additionalStrikeLTPs.put[strike] || 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
