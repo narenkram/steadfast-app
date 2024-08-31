@@ -119,6 +119,12 @@ const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
 const basketOrders = ref([]);
 const showBasketOrderModal = ref(false);
+const additionalSymbols = ref(true);
+const additionalStrikeLTPs = ref({
+  call: {},
+  put: {}
+});
+const ltpCallbacks = ref({});
 
 
 
@@ -568,6 +574,20 @@ const sortedBasketOrders = computed(() => {
     if (a.transactionType !== 'B' && b.transactionType === 'B') return 1;
     return 0;
   });
+});
+const additionalStrikes = computed(() => {
+  if (!additionalSymbols.value) return [];
+
+  const currentPrice = getMasterSymbolPrice();
+  const allStrikes = [...callStrikes.value, ...putStrikes.value]
+    .map(strike => strike.strikePrice)
+    .sort((a, b) => a - b);
+
+  const currentIndex = allStrikes.findIndex(strike => strike >= currentPrice);
+  const startIndex = Math.max(0, currentIndex - 3);
+  const endIndex = Math.min(allStrikes.length - 1, currentIndex + 3);
+
+  return allStrikes.slice(startIndex, endIndex + 1);
 });
 
 
@@ -2161,6 +2181,10 @@ const connectWebSocket = () => {
       if (positionTsym) {
         positionLTPs.value[positionTsym] = quoteData.lp;
       }
+      // Handle additional strike LTPs
+      if (ltpCallbacks.value[quoteData.tk]) {
+        ltpCallbacks.value[quoteData.tk](quoteData);
+      }
     }
   };
 
@@ -2240,10 +2264,19 @@ const subscribeToOptions = () => {
         action: 'subscribe',
         symbols: symbolsToSubscribe
       };
-      // console.log('Sending options subscribe data:', data);
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
+    }
+
+    if (additionalSymbols.value) {
+      additionalStrikes.value.forEach(strike => {
+        const callStrike = callStrikes.value.find(s => s.strikePrice === strike);
+        const putStrike = putStrikes.value.find(s => s.strikePrice === strike);
+
+        if (callStrike) subscribeToLTP(callStrike.securityId, updateAdditionalStrikeLTP);
+        if (putStrike) subscribeToLTP(putStrike.securityId, updateAdditionalStrikeLTP);
+      });
     }
   }
 
@@ -2332,6 +2365,47 @@ const updateSubscriptions = () => {
   subscribeToMasterSymbol();
   subscribeToOptions();
   subscribeToPositionLTPs();
+};
+const subscribeToLTP = (securityId, callback) => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const exchangeSegment = getExchangeSegment();
+    const symbolToSubscribe = `${exchangeSegment}|${securityId}`;
+    const data = {
+      action: 'subscribe',
+      symbols: [symbolToSubscribe]
+    };
+    socket.value.send(JSON.stringify(data));
+
+    // Store the callback for this security ID
+    ltpCallbacks.value[securityId] = callback;
+  }
+};
+const updateAdditionalStrikeLTP = (data) => {
+  const callStrike = callStrikes.value.find(s => s.securityId === data.tk);
+  const putStrike = putStrikes.value.find(s => s.securityId === data.tk);
+
+  if (callStrike) {
+    additionalStrikeLTPs.value.call[callStrike.strikePrice] = data.lp;
+  } else if (putStrike) {
+    additionalStrikeLTPs.value.put[putStrike.strikePrice] = data.lp;
+  }
+};
+const unsubscribeFromAdditionalStrikes = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const exchangeSegment = getExchangeSegment();
+    const symbolsToUnsubscribe = Object.keys(ltpCallbacks.value).map(securityId => `${exchangeSegment}|${securityId}`);
+
+    if (symbolsToUnsubscribe.length > 0) {
+      const data = {
+        action: 'unsubscribe',
+        symbols: symbolsToUnsubscribe
+      };
+      socket.value.send(JSON.stringify(data));
+    }
+
+    // Clear the callbacks
+    ltpCallbacks.value = {};
+  }
 };
 const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300);
 const initializeSubscriptions = () => {
@@ -2708,5 +2782,13 @@ watch([selectedMasterSymbol, masterLowPrice, masterHighPrice, niftyPrice, bankNi
   console.log('LTP:', getMasterSymbolPrice());
   console.log('Range Width:', ltpRangeWidth.value);
   console.log('Marker Position:', ltpMarkerPosition.value);
+});
+watch(additionalSymbols, (newValue) => {
+  if (newValue) {
+    subscribeToOptions();
+  } else {
+    unsubscribeFromAdditionalStrikes();
+    additionalStrikeLTPs.value = {};
+  }
 });
 </script>
