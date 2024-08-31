@@ -119,13 +119,13 @@ const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
 const basketOrders = ref([]);
 const showBasketOrderModal = ref(false);
-const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols')) || false);
+const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols') || 'false'));
 const additionalStrikeLTPs = ref({
   call: {},
   put: {}
 });
 const ltpCallbacks = ref({});
-
+const customStrikePrice = ref('');
 
 
 
@@ -589,6 +589,15 @@ const additionalStrikes = computed(() => {
 
   return allStrikes.slice(startIndex, endIndex + 1);
 });
+const availableStrikes = computed(() => {
+  const allStrikes = new Set([
+    ...callStrikes.value.map(strike => strike.strikePrice),
+    ...putStrikes.value.map(strike => strike.strikePrice)
+  ]);
+  return Array.from(allStrikes).sort((a, b) => a - b);
+});
+
+
 
 
 

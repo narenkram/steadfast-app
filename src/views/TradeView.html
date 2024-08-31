@@ -1546,7 +1546,8 @@
                 class="form-check-input"
                 type="checkbox"
                 id="additionalSymbols"
-                v-model="additionalSymbols"
+                :checked="additionalSymbols"
+                @change="toggleAdditionalSymbols"
               />
               <label class="form-check-label" for="additionalSymbols">
                 {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
