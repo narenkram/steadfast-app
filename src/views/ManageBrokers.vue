@@ -3,6 +3,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { validateToken, checkAllTokens, getBrokerStatus, tokenStatus } from '../utils/brokerTokenValidator';
 
+const API_TOKEN = ref(''); // Not used right now
 const FLATTRADE_API_KEY = ref('');
 const FLATTRADE_API_SECRET = ref('');
 const FLATTRADE_CLIENT_ID = ref('');
@@ -63,7 +64,18 @@ const brokers = computed(() => {
 
 const selectedBrokerToDelete = ref(null); // Store the broker to be deleted
 const selectedBrokerForPaper = ref(null); // Add this line to store the selected broker for PaperTrading
-
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    statusMessage.value = 'Token copied to clipboard';
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 3000);
+  }, (err) => {
+    console.error('Could not copy text: ', err);
+    errorMessage.value = 'Failed to copy token';
+    clearErrorMessage();
+  });
+};
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -379,6 +391,7 @@ const deleteBroker = (broker) => {
   // Update the brokers computed property
   // This will automatically update the table
 };
+
 </script>
 
 <template>
@@ -421,8 +434,15 @@ const deleteBroker = (broker) => {
               <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
             </td>
             <td>
-              <span v-if="broker.brokerName === 'Flattrade'">{{ maskTokenSecret(broker.apiToken) }}</span>
-              <span v-if="broker.brokerName === 'Shoonya'">{{ maskTokenSecret(broker.apiToken) }}</span>
+              <div class="d-flex align-items-center">
+                <span v-if="broker.brokerName === 'Flattrade' || broker.brokerName === 'Shoonya'">
+                  {{ maskTokenSecret(broker.apiToken) }}
+                </span>
+                <button v-if="broker.apiToken" class="btn btn-sm btn-outline-secondary ms-2"
+                  @click="copyToClipboard(broker.apiToken)" title="Copy token">
+                  📋
+                </button>
+              </div>
             </td>
             <td>
               <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
