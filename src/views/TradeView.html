@@ -415,7 +415,14 @@
                 {{ strike.strikePrice }}
               </option>
             </select>
-            <span class="input-group-text">{{ latestCallLTP }}</span>
+            <span
+              class="input-group-text"
+              :class="{
+              'text-success': parseFloat(latestCallLTP) > parseFloat(callOpenPrice),
+              'text-danger': parseFloat(latestCallLTP) < parseFloat(callOpenPrice)
+            }"
+              >{{ latestCallLTP }}
+            </span>
           </div>
           <div v-if="showStrikeDetails">
             <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
@@ -448,22 +455,64 @@
         <!-- Live Underlying Price -->
         <div class="col-12 col-md-4 col-lg-4 text-center">
           <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">
-            Nifty 50: <b>{{ niftyPrice }}</b>
+            Nifty 50:
+            <b
+              :class="{
+              'text-success': parseFloat(niftyPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(niftyPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ niftyPrice }}</b
+            >
           </p>
           <p class="mb-0" v-if="selectedMasterSymbol === 'BANKNIFTY'">
-            Bank Nifty: <b>{{ bankNiftyPrice }}</b>
+            Bank Nifty:
+            <b
+              :class="{
+              'text-success': parseFloat(bankNiftyPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(bankNiftyPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ bankNiftyPrice }}</b
+            >
           </p>
           <p class="mb-0" v-if="selectedMasterSymbol === 'FINNIFTY'">
-            Fin Nifty: <b>{{ finniftyPrice }}</b>
+            Fin Nifty:
+            <b
+              :class="{
+              'text-success': parseFloat(finniftyPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(finniftyPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ finniftyPrice }}</b
+            >
           </p>
           <p class="mb-0" v-if="selectedMasterSymbol === 'MIDCPNIFTY'">
-            Nifty Mid Select: <b>{{ midcpniftyPrice }}</b>
+            Nifty Mid Select:
+            <b
+              :class="{
+              'text-success': parseFloat(midcpniftyPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(midcpniftyPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ midcpniftyPrice }}</b
+            >
           </p>
           <p class="mb-0" v-if="selectedMasterSymbol === 'SENSEX'">
-            Sensex: <b>{{ sensexPrice }}</b>
+            Sensex:
+            <b
+              :class="{
+              'text-success': parseFloat(sensexPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(sensexPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ sensexPrice }}</b
+            >
           </p>
           <p class="mb-0" v-if="selectedMasterSymbol === 'BANKEX'">
-            Bankex: <b>{{ bankexPrice }}</b>
+            Bankex:
+            <b
+              :class="{
+              'text-success': parseFloat(bankexPrice) > parseFloat(masterOpenPrice),
+              'text-danger': parseFloat(bankexPrice) < parseFloat(masterOpenPrice)
+            }"
+              >{{ bankexPrice }}</b
+            >
           </p>
           <!-- Master OHLC Values -->
           <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
@@ -493,7 +542,14 @@
             <span>Put Strike</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text">{{ latestPutLTP }}</span>
+            <span
+              class="input-group-text"
+              :class="{
+              'text-success': parseFloat(latestPutLTP) > parseFloat(putOpenPrice),
+              'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
+            }"
+              >{{ latestPutLTP }}
+            </span>
             <select
               id="PutStrike"
               class="form-select"
