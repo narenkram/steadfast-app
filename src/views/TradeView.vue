@@ -178,12 +178,17 @@ const availableBrokers = computed(() => {
 const exchangeOptions = computed(() => {
   return Object.keys(exchangeSymbols.value).filter(key => key !== 'symbolData');
 });
-const isExpiryToday = computed(() => {
-  const comparableSelectedExpiry = convertToComparableDate(formatDate(selectedExpiry.value));
-  const comparableFormattedDate = convertToComparableDate(formattedDate.value);
-  // console.log('Comparable Selected Expiry:', comparableSelectedExpiry);
-  // console.log('Comparable Formatted Date:', comparableFormattedDate);
-  return comparableSelectedExpiry === comparableFormattedDate;
+const todayExpirySymbol = computed(() => {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+
+  for (const [symbol, data] of Object.entries(symbolData)) {
+    if (data.expiryDay === dayOfWeek) {
+      return symbol;
+    }
+  }
+
+  return null; // No expiry today
 });
 const selectedLots = computed({
   get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
@@ -681,16 +686,15 @@ const updateSelectedBroker = () => {
     selectedBrokerName.value = '';
   }
 };
+const symbolData = reactive({
+  NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000', expiryDay: 4 }, // Thursday
+  BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009', expiryDay: 3 }, // Wednesday
+  FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037', expiryDay: 2 }, // Tuesday
+  MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074', expiryDay: 1 }, // Monday
+  SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1', expiryDay: 5 }, // Friday
+  BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12', expiryDay: null }, // No specific expiry day
+});
 const updateExchangeSymbols = () => {
-  const symbolData = {
-    NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000' },
-    BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009' },
-    FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037' },
-    MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074' },
-    SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1' },
-    BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12' },
-  };
-
   if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
     exchangeSymbols.value = {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'],
@@ -698,7 +702,7 @@ const updateExchangeSymbols = () => {
     };
   }
 
-  // Store symbolData separately
+  // Store symbolData in exchangeSymbols
   exchangeSymbols.value.symbolData = symbolData;
 };
 const setDefaultExchangeAndMasterSymbol = () => {

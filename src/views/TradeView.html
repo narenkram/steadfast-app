@@ -66,8 +66,8 @@
   <!-- Today's Expiry -->
   <div class="col-6 col-md-6 col-lg-2 text-end">
     <p class="mb-1"><b>Today's Expiry</b></p>
-    <p v-if="isExpiryToday" class="text-danger">
-      <b>{{ selectedMasterSymbol }}</b>
+    <p v-if="todayExpirySymbol" class="text-danger">
+      <b>{{ todayExpirySymbol }}</b>
     </p>
     <p v-else class="text-danger">
       <b>-</b>
