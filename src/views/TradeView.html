@@ -149,6 +149,7 @@
   </div>
 </section>
 
+<!-- Kill Switch MessageWindow -->
 <section v-if="killSwitchActive" class="row py-1">
   <div class="col-12">
     <div class="bg-danger text-white p-3 rounded-3 shadow">
@@ -162,6 +163,25 @@
         <div class="text-center">
           <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
             {{ killSwitchRemainingTime }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trade Warning MessageWindow -->
+<section class="row py-1">
+  <div class="col-12">
+    <div class="bg-warning text-dark p-3 rounded-3 shadow">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <h5 class="mb-2">Trade Warning</h5>
+          <p class="mb-0">Trade with caution.</p>
+        </div>
+        <div class="text-center">
+          <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+            Closing Positions in 30 seconds
           </span>
         </div>
       </div>
