@@ -122,7 +122,6 @@
           :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null"
         >
           {{ totalCapitalPercentage.toFixed(2) }}%
-          <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
         </span>
         <br />
         <small> on Total Capital</small>
@@ -171,7 +170,7 @@
 </section>
 
 <!-- Trade Warning MessageWindow -->
-<section class="row py-1">
+<section v-if="riskReached" class="row py-1">
   <div class="col-12">
     <div class="bg-warning text-dark p-3 rounded-3 shadow">
       <div class="d-flex align-items-center justify-content-between">
