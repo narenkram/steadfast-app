@@ -126,6 +126,10 @@ const additionalStrikeLTPs = ref({
 });
 const ltpCallbacks = ref({});
 const customStrikePrice = ref('');
+const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false');
+const selectedSound = ref(localStorage.getItem('selectedSound') || 'cyberpunk-notification.mp3');
+
+
 
 
 
@@ -2447,6 +2451,13 @@ const getMasterSymbolPrice = () => {
 const toggleAdditionalSymbols = () => {
   additionalSymbols.value = !additionalSymbols.value;
 };
+const playNotificationSound = () => {
+  localStorage.setItem('notificationSound', notificationSound.value);
+  if (notificationSound.value) {
+    const audio = new Audio(`/${selectedSound.value}`);
+    audio.play();
+  }
+};
 
 
 
@@ -2807,5 +2818,8 @@ watch(additionalSymbols, (newValue) => {
     unsubscribeFromAdditionalStrikes();
     additionalStrikeLTPs.value = { call: {}, put: {} };
   }
+});
+watch(selectedSound, (newValue) => {
+  localStorage.setItem('selectedSound', newValue);
 });
 </script>

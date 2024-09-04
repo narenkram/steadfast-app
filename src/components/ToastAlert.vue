@@ -20,14 +20,24 @@ export default {
         message: {
             type: String,
             default: ''
+        },
+        soundEnabled: {
+            type: Boolean,
+            default: true
+        },
+        selectedSound: {
+            type: String,
+            default: 'long-pop.wav'
         }
     },
     watch: {
         show(newVal) {
             if (newVal) {
-                // Play notification sound
-                const audio = new Audio('/cyberpunk-notification.mp3');
-                audio.play();
+                if (this.soundEnabled) {
+                    // Play selected notification sound
+                    const audio = new Audio(`/${this.selectedSound}`);
+                    audio.play();
+                }
 
                 setTimeout(() => {
                     this.hide();

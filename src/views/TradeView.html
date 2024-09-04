@@ -1599,6 +1599,28 @@
               </label>
             </div>
           </div>
+          <!-- Notification Sound -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="notificationSound" class="form-label">Notification Sound</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="notificationSound"
+                v-model="notificationSound"
+                @change="playNotificationSound"
+              />
+              <label class="form-check-label" for="notificationSound">
+                {{ notificationSound ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+            <select v-model="selectedSound" class="form-select mt-2" :disabled="!notificationSound">
+              <option value="cyberpunk-notification.mp3">Cyberpunk</option>
+              <option value="long-pop.wav">Long Pop</option>
+              <option value="classical.mp3">Classical</option>
+              <!-- Add more sound options as needed -->
+            </select>
+          </div>
           <div class="col-12 pt-5 text-center">
             <p class="text-secondary">These settings are automatically saved.</p>
           </div>
@@ -1609,7 +1631,13 @@
 </section>
 
 <!-- Toast Alert -->
-<ToastAlert :show="showToast" :message="toastMessage" @update:show="updateToastVisibility" />
+<ToastAlert
+  :show="showToast"
+  :message="toastMessage"
+  :sound-enabled="notificationSound"
+  :selected-sound="selectedSound"
+  @update:show="showToast = $event"
+/>
 
 <!-- Limit Price Input Modal (conditionally rendered) -->
 <div
