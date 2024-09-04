@@ -366,33 +366,6 @@
             <span class="input-group-text">₹ Points</span>
           </div>
         </div>
-        <!-- 1 Click Keys -->
-        <div class="col-6 col-md-3 col-lg-3">
-          <div class="d-flex align-items-center float-end h-100">
-            <label class="ToggleSwitch">
-              <input
-                class="ToggleInput"
-                type="checkbox"
-                id="enableHotKeys"
-                v-model="enableHotKeys"
-                :class="{ 'disabled-form': isFormDisabled }"
-              />
-              <span
-                class="ToggleSlider SliderRound"
-                :class="{ 'disabled-form': isFormDisabled }"
-              ></span>
-            </label>
-            <label
-              class="ToggleLabel"
-              for="enableHotKeys"
-              :class="{ 'disabled-form': isFormDisabled }"
-              ><b>
-                1 Click <br />
-                Keys ⌨️</b
-              ></label
-            >
-          </div>
-        </div>
       </div>
 
       <!-- Trading Symbols & Strikes -->
@@ -1559,6 +1532,22 @@
               />
               <label class="form-check-label" for="showLTPRangeBar">
                 {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+          </div>
+          <!-- 1 Click Keys -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="enableHotKeys" class="form-label">1 Click Keys ⌨️</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="enableHotKeys"
+                v-model="enableHotKeys"
+                :class="{ 'disabled-form': isFormDisabled }"
+              />
+              <label class="form-check-label" for="enableHotKeys">
+                {{ enableHotKeys ? 'Enabled' : 'Disabled' }}
               </label>
             </div>
           </div>
