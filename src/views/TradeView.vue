@@ -127,7 +127,7 @@ const additionalStrikeLTPs = ref({
 const ltpCallbacks = ref({});
 const customStrikePrice = ref('');
 const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false');
-const selectedSound = ref(localStorage.getItem('selectedSound') || 'cyberpunk-notification.mp3');
+const selectedSound = ref(localStorage.getItem('selectedSound'));
 
 
 
@@ -2452,12 +2452,23 @@ const toggleAdditionalSymbols = () => {
   additionalSymbols.value = !additionalSymbols.value;
 };
 const playNotificationSound = () => {
-  localStorage.setItem('notificationSound', notificationSound.value);
+  localStorage.setItem('notificationSound', notificationSound.value.toString());
   if (notificationSound.value) {
     const audio = new Audio(`/${selectedSound.value}`);
     audio.play();
+    showToastNotification('Notification sound enabled');
+  } else {
+    showToastNotification('Notification sound disabled');
   }
 };
+const showToastNotification = (message) => {
+  toastMessage.value = message;
+  updateToastVisibility(true);
+  setTimeout(() => {
+    updateToastVisibility(false);
+  }, 3000);
+};
+
 
 
 
@@ -2821,5 +2832,10 @@ watch(additionalSymbols, (newValue) => {
 });
 watch(selectedSound, (newValue) => {
   localStorage.setItem('selectedSound', newValue);
+  if (notificationSound.value) {
+    const audio = new Audio(`/${newValue}`);
+    audio.play();
+  }
+  showToastNotification(`Sound changed to ${newValue.replace('.mp3', '')}`);
 });
 </script>

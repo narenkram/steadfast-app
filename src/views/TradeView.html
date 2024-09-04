@@ -1636,7 +1636,7 @@
   :message="toastMessage"
   :sound-enabled="notificationSound"
   :selected-sound="selectedSound"
-  @update:show="showToast = $event"
+  @update:show="updateToastVisibility"
 />
 
 <!-- Limit Price Input Modal (conditionally rendered) -->
