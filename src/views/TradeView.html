@@ -67,6 +67,15 @@
   <div class="col-6 col-md-6 col-lg-2 text-end">
     <p class="mb-1"><b>Today's Expiry</b></p>
     <p v-if="todayExpirySymbol" class="text-danger">
+      <span
+        class="fs-4 text-decoration-none me-2"
+        id="events-tab"
+        type="button"
+        data-bs-toggle="modal"
+        data-bs-target="#eventsModal"
+      >
+        📅
+      </span>
       <b>{{ todayExpirySymbol }}</b>
     </p>
     <p v-else class="text-danger">
@@ -835,20 +844,6 @@
           aria-selected="false"
         >
           ⚙️ Settings
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link"
-          id="events-tab"
-          type="button"
-          role="tab"
-          aria-controls="events-tab-pane"
-          aria-selected="false"
-          data-bs-toggle="modal"
-          data-bs-target="#eventsModal"
-        >
-          📅 Events
         </button>
       </li>
     </ul>
@@ -1827,6 +1822,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <div class="bg-danger p-3">
+          <h4>Event days = Big price swings. Option premiums go wild.</h4>
+          <ul class="fs-5">
+            <li>Trade small, limit losses.</li>
+            <li>Use limit orders, not market orders.</li>
+            <li>Stay informed, react fast.</li>
+            <li>Not suitable for most traders.</li>
+          </ul>
+        </div>
         <div class="iframe-container">
           <iframe
             id="events-iframe"
