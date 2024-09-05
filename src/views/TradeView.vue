@@ -1608,17 +1608,53 @@ const addToBasket = (transactionType, optionType) => {
     tradingSymbol: selectedStrike.tradingSymbol,
     transactionType: getTransactionType(transactionType),
     optionType,
+    lots: selectedLots.value,
     quantity: selectedQuantity.value,
     productType: selectedProductType.value,
-    orderType: 'MKT',
-    price: 0
+    orderType: selectedOrderType.value,
+    price: selectedOrderType.value === 'LMT' ? limitPrice.value : 0
   });
 
   showBasketOrderModal.value = true;
   subscribeToBasketLTPs();
 };
+const updateBasketOrderQuantity = (order) => {
+  const instrument = quantities.value[selectedMasterSymbol.value];
+  if (instrument) {
+    order.quantity = order.lots * instrument.lotSize;
+  }
+};
 const removeFromBasket = (id) => {
   basketOrders.value = basketOrders.value.filter(order => order.id !== id);
+};
+const placeBasket = async (basketId) => {
+  const basket = savedBaskets.value.find(b => b.id === basketId);
+  if (!basket) {
+    toastMessage.value = 'Basket not found';
+    showToast.value = true;
+    return;
+  }
+
+  for (const order of basket.orders) {
+    const success = await placeBasketOrder(order);
+    if (!success) {
+      toastMessage.value = `Failed to place order for ${order.tradingSymbol}`;
+      showToast.value = true;
+      break;
+    }
+  }
+
+  // Add a delay before fetching updated data
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Update both orders and positions
+  await updateOrdersAndPositions();
+
+  // Update fund limits
+  await updateFundLimits();
+
+  toastMessage.value = `Basket "${basket.name}" orders placed successfully`;
+  showToast.value = true;
 };
 const placeBasketOrder = async (order) => {
   try {
@@ -1627,7 +1663,7 @@ const placeBasketOrder = async (order) => {
     orderData.qty = order.quantity.toString();
     orderData.prd = order.productType;
     orderData.prctyp = order.orderType;
-    orderData.prc = order.price.toString();
+    orderData.prc = order.orderType === 'LMT' ? order.price.toString() : "0";
 
     let response;
     if (selectedBroker.value?.brokerName === 'Flattrade') {
