@@ -1466,6 +1466,14 @@
         <div class="row py-3">
           <div class="col-12">
             <h5>Basket Orders</h5>
+            <div class="mb-3">
+              <input
+                v-model="basketName"
+                placeholder="Enter basket name"
+                class="form-control mb-2"
+              />
+              <button @click="saveBasket" class="btn btn-primary">Save Basket</button>
+            </div>
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
@@ -1475,6 +1483,7 @@
                   <th>Product</th>
                   <th>Order Type</th>
                   <th>Price</th>
+                  <th>LTP</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -1484,10 +1493,18 @@
                   <td>
                     {{ order.transactionType === 'B' ? 'BUY' : 'SELL' }} {{ order.optionType }}
                   </td>
-                  <td>{{ order.quantity }}</td>
+                  <td>
+                    <input
+                      v-model.number="order.quantity"
+                      type="number"
+                      class="form-control form-control-sm"
+                      style="width: 80px"
+                    />
+                  </td>
                   <td>{{ order.productType }}</td>
                   <td>{{ order.orderType }}</td>
                   <td>{{ order.price }}</td>
+                  <td>{{ basketLTPs[order.id] }}</td>
                   <td>
                     <button class="btn btn-sm btn-primary me-2" @click="placeBasketOrder(order)">
                       Place
@@ -1506,6 +1523,57 @@
             >
               Place All Orders
             </button>
+          </div>
+        </div>
+        <div class="row py-3">
+          <div class="col-12">
+            <h5>Saved Baskets</h5>
+            <div v-for="basket in savedBaskets" :key="basket.id" class="card mb-3">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">{{ basket.name }}</h6>
+                <div>
+                  <button @click="loadBasket(basket.id)" class="btn btn-sm btn-primary me-2">
+                    Load
+                  </button>
+                  <button @click="deleteBasket(basket.id)" class="btn btn-sm btn-danger me-2">
+                    Delete
+                  </button>
+                  <button
+                    @click="toggleBasketExpansion(basket.id)"
+                    class="btn btn-sm btn-secondary"
+                  >
+                    {{ expandedBaskets[basket.id] ? 'Collapse' : 'Expand' }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="expandedBaskets[basket.id]" class="card-body">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Symbol</th>
+                      <th>Type</th>
+                      <th>Quantity</th>
+                      <th>Product</th>
+                      <th>Order Type</th>
+                      <th>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="order in basket.orders" :key="order.id">
+                      <td>{{ order.tradingSymbol }}</td>
+                      <td>
+                        {{ order.transactionType === 'B' ? 'BUY' : 'SELL' }} {{ order.optionType }}
+                      </td>
+                      <td>{{ order.quantity }}</td>
+                      <td>{{ order.productType }}</td>
+                      <td>{{ order.orderType }}</td>
+                      <td>{{ order.price }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button @click="loadBasket(basket.id)" class="btn btn-primary">Load Basket</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

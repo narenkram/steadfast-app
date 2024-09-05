@@ -115,7 +115,6 @@ const putClosePrice = ref(localStorage.getItem('putClosePrice') || null);
 const showOHLCValues = ref(false);
 const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
-const basketOrders = ref([]);
 const showBasketOrderModal = ref(false);
 const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols') || 'false'));
 const additionalStrikeLTPs = ref({
@@ -133,6 +132,11 @@ const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount')) || 0
 const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 0);
 const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 0);
 const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 0);
+const savedBaskets = ref([]);
+const basketName = ref('');
+const editingBasketId = ref(null);
+const expandedBaskets = ref({});
+const basketOrders = ref([]);
 
 
 
@@ -638,6 +642,14 @@ const availableStrikes = computed(() => {
   ]);
   return Array.from(allStrikes).sort((a, b) => a - b);
 });
+const basketLTPs = computed(() => {
+  const ltps = {};
+  basketOrders.value.forEach(order => {
+    ltps[order.id] = positionLTPs.value[order.tradingSymbol] || 'N/A';
+  });
+  return ltps;
+});
+
 
 
 
@@ -1603,6 +1615,7 @@ const addToBasket = (transactionType, optionType) => {
   });
 
   showBasketOrderModal.value = true;
+  subscribeToBasketLTPs();
 };
 const removeFromBasket = (id) => {
   basketOrders.value = basketOrders.value.filter(order => order.id !== id);
@@ -1656,11 +1669,16 @@ const placeBasketOrder = async (order) => {
   }
 };
 const placeAllBasketOrders = async () => {
+  const executedBasket = {
+    id: uuidv4(),
+    name: basketName.value || `Basket ${new Date().toLocaleString()}`,
+    orders: [...basketOrders.value],
+    executionTime: new Date().toISOString()
+  };
+
   for (const order of sortedBasketOrders.value) {
     const success = await placeBasketOrder(order);
-    if (success) {
-      removeFromBasket(order.id);
-    } else {
+    if (!success) {
       toastMessage.value = `Failed to place order for ${order.tradingSymbol}`;
       showToast.value = true;
       break;
@@ -1676,11 +1694,15 @@ const placeAllBasketOrders = async () => {
   // Update fund limits
   await updateFundLimits();
 
-  if (basketOrders.value.length === 0) {
-    toastMessage.value = 'All basket orders placed successfully';
-    showToast.value = true;
-    showBasketOrderModal.value = false;
-  }
+  savedBaskets.value.push(executedBasket);
+  localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value));
+
+  basketOrders.value = [];
+  basketName.value = '';
+  editingBasketId.value = null;
+  toastMessage.value = 'All basket orders placed successfully';
+  showToast.value = true;
+  showBasketOrderModal.value = false;
 };
 const closeAllPositions = async () => {
   try {
@@ -2501,6 +2523,82 @@ const showToastNotification = (message) => {
     updateToastVisibility(false);
   }, 3000);
 };
+const subscribeToBasketLTPs = () => {
+  basketOrders.value.forEach(order => {
+    const securityId = getSecurityIdForSymbol(order.tradingSymbol);
+    if (securityId) {
+      subscribeToLTP(securityId, updateBasketLTP);
+    }
+  });
+};
+
+const updateBasketLTP = (data) => {
+  const order = basketOrders.value.find(o => getSecurityIdForSymbol(o.tradingSymbol) === data.tk);
+  if (order) {
+    positionLTPs.value[order.tradingSymbol] = data.lp;
+  }
+};
+
+const getSecurityIdForSymbol = (symbol) => {
+  const strike = [...callStrikes.value, ...putStrikes.value].find(s => s.tradingSymbol === symbol);
+  return strike ? strike.securityId : null;
+};
+
+const saveBasket = () => {
+  if (basketName.value.trim() === '') {
+    toastMessage.value = 'Please enter a basket name';
+    showToast.value = true;
+    return;
+  }
+
+  if (editingBasketId.value !== null) {
+    const index = savedBaskets.value.findIndex(b => b.id === editingBasketId.value);
+    if (index !== -1) {
+      savedBaskets.value[index] = {
+        id: editingBasketId.value,
+        name: basketName.value,
+        orders: [...basketOrders.value]
+      };
+    }
+  } else {
+    savedBaskets.value.push({
+      id: uuidv4(),
+      name: basketName.value,
+      orders: [...basketOrders.value]
+    });
+  }
+
+  localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value));
+  basketName.value = '';
+  editingBasketId.value = null;
+  toastMessage.value = 'Basket saved successfully';
+  showToast.value = true;
+};
+
+const loadBasket = (basketId) => {
+  const basket = savedBaskets.value.find(b => b.id === basketId);
+  if (basket) {
+    basketOrders.value = [...basket.orders];
+    basketName.value = basket.name;
+    editingBasketId.value = basketId;
+    subscribeToBasketLTPs();
+  }
+};
+
+const deleteBasket = (basketId) => {
+  savedBaskets.value = savedBaskets.value.filter(b => b.id !== basketId);
+  localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value));
+  if (editingBasketId.value === basketId) {
+    basketName.value = '';
+    editingBasketId.value = null;
+  }
+};
+
+const toggleBasketExpansion = (basketId) => {
+  expandedBaskets.value[basketId] = !expandedBaskets.value[basketId];
+};
+
+
 
 
 
@@ -2573,6 +2671,10 @@ onMounted(async () => {
   }
   if (selectedExpiry.value) {
     updateStrikesForExpiry(selectedExpiry.value, true);
+  }
+  const storedBaskets = localStorage.getItem('savedBaskets');
+  if (storedBaskets) {
+    savedBaskets.value = JSON.parse(storedBaskets);
   }
 });
 
