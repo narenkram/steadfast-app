@@ -1560,15 +1560,9 @@
                   <button @click="deleteBasket(basket.id)" class="btn btn-sm btn-danger me-2">
                     Delete
                   </button>
-                  <button
-                    @click="toggleBasketExpansion(basket.id)"
-                    class="btn btn-sm btn-secondary"
-                  >
-                    {{ expandedBaskets[basket.id] ? 'Collapse' : 'Expand' }}
-                  </button>
                 </div>
               </div>
-              <div v-if="expandedBaskets[basket.id]" class="card-body">
+              <div class="card-body">
                 <table class="table table-sm">
                   <thead>
                     <tr>
@@ -1593,7 +1587,6 @@
                     </tr>
                   </tbody>
                 </table>
-                <button @click="loadBasket(basket.id)" class="btn btn-primary">Load Basket</button>
               </div>
             </div>
           </div>
