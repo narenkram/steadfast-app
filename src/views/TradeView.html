@@ -105,7 +105,6 @@
         :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null"
       >
         ₹ {{ totalProfit.toFixed(2) }}
-        <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
       </blockquote>
       <small>
         <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
@@ -172,15 +171,15 @@
 <!-- Trade Warning MessageWindow -->
 <section v-if="riskReached" class="row py-1">
   <div class="col-12">
-    <div class="bg-warning text-dark p-3 rounded-3 shadow">
+    <div :class="['p-3 rounded-3 shadow', riskReachedClass]">
       <div class="d-flex align-items-center justify-content-between">
         <div>
-          <h5 class="mb-2">Trade Warning</h5>
-          <p class="mb-0">Trade with caution.</p>
+          <h5 class="mb-2">Trade {{ riskReachedType }}</h5>
+          <p class="mb-0">{{ riskReachedMessage }}</p>
         </div>
         <div class="text-center">
           <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
-            Closing Positions in 30 seconds
+            {{ riskReachedAction }}
           </span>
         </div>
       </div>
@@ -1314,32 +1313,37 @@
             </p>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
-            <!-- Total Risk by Capital Or Amount -->
-            <label for="totalRiskType" class="form-label">Total Risk by</label>
+            <!-- Total Risk and Target by Capital Or Amount -->
+            <label for="totalRiskTargetType" class="form-label">Total Risk/Target by</label>
             <div class="input-group">
               <div class="input-group-text">
                 <input
                   class="form-check-input mt-0"
                   type="checkbox"
-                  id="totalRiskTypeToggle"
-                  v-model="totalRiskTypeToggle"
+                  id="totalRiskTargetToggle"
+                  v-model="totalRiskTargetToggle"
                 />
               </div>
-              <select class="form-select" v-model="totalRiskType">
+              <select class="form-select" v-model="totalRiskTargetType">
                 <option value="percentage">Percentage</option>
                 <option value="amount">Amount</option>
               </select>
-              <template v-if="totalRiskType === 'amount'">
+            </div>
+
+            <!-- Risk Input -->
+            <div class="input-group mt-2">
+              <span class="input-group-text">Risk</span>
+              <template v-if="totalRiskTargetType === 'amount'">
                 <input
                   type="number"
                   min="100"
                   class="form-control"
                   v-model="totalRiskAmount"
-                  placeholder="Enter an amount"
+                  placeholder="Enter risk amount"
                 />
                 <span class="input-group-text">₹</span>
               </template>
-              <template v-if="totalRiskType === 'percentage'">
+              <template v-if="totalRiskTargetType === 'percentage'">
                 <input
                   type="number"
                   min="0.1"
@@ -1347,15 +1351,44 @@
                   step="0.1"
                   class="form-control"
                   v-model="totalRiskPercentage"
-                  placeholder="Enter a value between 0.1 and 5"
+                  placeholder="Enter risk percentage"
                 />
                 <span class="input-group-text">%</span>
               </template>
             </div>
-            <small class="form-text text-secondary"
-              >{{ totalRiskTypeToggle ? 'Enabled' : 'Disabled' }}</small
-            >
-            <span v-if="riskReached" class="text-danger">Risk threshold reached!</span>
+
+            <!-- Target Input -->
+            <div class="input-group mt-2">
+              <span class="input-group-text">Target</span>
+              <template v-if="totalRiskTargetType === 'amount'">
+                <input
+                  type="number"
+                  min="100"
+                  class="form-control"
+                  v-model="totalTargetAmount"
+                  placeholder="Enter target amount"
+                />
+                <span class="input-group-text">₹</span>
+              </template>
+              <template v-if="totalRiskTargetType === 'percentage'">
+                <input
+                  type="number"
+                  min="0.1"
+                  max="5"
+                  step="0.1"
+                  class="form-control"
+                  v-model="totalTargetPercentage"
+                  placeholder="Enter target %"
+                />
+                <span class="input-group-text">%</span>
+              </template>
+            </div>
+
+            <small class="form-text text-secondary mt-2">
+              {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
+            </small>
+            <span v-if="riskReached" class="text-danger d-block mt-1">Risk threshold reached!</span>
+            <span v-if="targetReached" class="text-success d-block mt-1">Target reached!</span>
           </div>
           <div class="col-12 col-md-6 col-lg-4">
             <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->

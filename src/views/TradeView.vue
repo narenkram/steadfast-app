@@ -98,8 +98,6 @@ const totalRiskType = ref(null);
 const mtmProfitTrailingToggle = ref(false);
 const totalRiskTypeToggle = ref(false);
 const mtmProfitTrailingType = ref(null);
-const totalRiskAmount = ref(null);
-const totalRiskPercentage = ref(null);
 const closePositionsRisk = ref(true);
 const activeFetchFunction = ref(null);
 const masterOpenPrice = ref(localStorage.getItem('masterOpenPrice') || null);
@@ -128,6 +126,13 @@ const ltpCallbacks = ref({});
 const customStrikePrice = ref('');
 const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false');
 const selectedSound = ref(localStorage.getItem('selectedSound'));
+const riskClosingCountdown = ref(30);
+const totalRiskTargetToggle = ref(JSON.parse(localStorage.getItem('totalRiskTargetToggle') || 'false'));
+const totalRiskTargetType = ref(localStorage.getItem('totalRiskTargetType') || 'percentage');
+const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount')) || 0);
+const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 0);
+const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 0);
+const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 0);
 
 
 
@@ -570,10 +575,38 @@ const putOpenMarkerPosition = computed(() => {
   return ((open - low) / (high - low)) * 100;
 });
 const riskReached = computed(() => {
-  if (totalRiskType.value === 'amount' && totalRiskAmount.value > 0) {
-    return totalProfit.value <= -totalRiskAmount.value;
-  } else if (totalRiskType.value === 'percentage' && totalRiskPercentage.value > 0) {
-    return totalCapitalPercentage.value <= -totalRiskPercentage.value;
+  if (totalRiskTargetToggle.value) {
+    if (totalRiskTargetType.value === 'amount' && totalRiskAmount.value > 0) {
+      return totalProfit.value <= -totalRiskAmount.value;
+    } else if (totalRiskTargetType.value === 'percentage' && totalRiskPercentage.value > 0) {
+      return totalCapitalPercentage.value <= -totalRiskPercentage.value;
+    }
+  }
+  return false;
+});
+const riskReachedClass = computed(() => {
+  return totalProfit.value >= 0 ? 'bg-success text-light' : 'bg-warning text-dark';
+});
+const riskReachedType = computed(() => {
+  return totalProfit.value >= 0 ? 'Target' : 'Warning';
+});
+const riskReachedMessage = computed(() => {
+  return totalProfit.value >= 0 ? 'Consider booking profits.' : 'Trade with caution.';
+});
+const riskReachedAction = computed(() => {
+  if (closePositionsRisk.value) {
+    return `Closing Positions in ${riskClosingCountdown.value} seconds`;
+  } else {
+    return totalProfit.value >= 0 ? 'Target Reached' : 'Risk Threshold Reached';
+  }
+});
+const targetReached = computed(() => {
+  if (totalRiskTargetToggle.value) {
+    if (totalRiskTargetType.value === 'amount' && totalTargetAmount.value > 0) {
+      return totalProfit.value >= totalTargetAmount.value;
+    } else if (totalRiskTargetType.value === 'percentage' && totalTargetPercentage.value > 0) {
+      return totalCapitalPercentage.value >= totalTargetPercentage.value;
+    }
   }
   return false;
 });
@@ -2837,5 +2870,42 @@ watch(selectedSound, (newValue) => {
     audio.play();
   }
   showToastNotification(`Sound changed to ${newValue.replace('.mp3', '')}`);
+});
+watch(totalRiskTargetToggle, (newValue) => {
+  localStorage.setItem('totalRiskTargetToggle', JSON.stringify(newValue));
+});
+
+watch(totalRiskTargetType, (newValue) => {
+  localStorage.setItem('totalRiskTargetType', newValue);
+});
+
+watch(totalRiskAmount, (newValue) => {
+  localStorage.setItem('totalRiskAmount', newValue.toString());
+});
+
+watch(totalRiskPercentage, (newValue) => {
+  localStorage.setItem('totalRiskPercentage', newValue.toString());
+});
+
+watch(totalTargetAmount, (newValue) => {
+  localStorage.setItem('totalTargetAmount', newValue.toString());
+});
+
+watch(totalTargetPercentage, (newValue) => {
+  localStorage.setItem('totalTargetPercentage', newValue.toString());
+});
+// Add a watch effect to handle the countdown when risk is reached
+watch(riskReached, (newValue) => {
+  if (newValue && closePositionsRisk.value) {
+    riskClosingCountdown.value = 30;
+    const timer = setInterval(() => {
+      riskClosingCountdown.value--;
+      if (riskClosingCountdown.value <= 0) {
+        clearInterval(timer);
+        // Implement the logic to close positions here
+        // closeAllPositions();
+      }
+    }, 1000);
+  }
 });
 </script>
