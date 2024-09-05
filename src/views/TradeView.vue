@@ -135,7 +135,6 @@ const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercen
 const savedBaskets = ref([]);
 const basketName = ref('');
 const editingBasketId = ref(null);
-const expandedBaskets = ref({});
 const basketOrders = ref([]);
 
 
@@ -2567,19 +2566,16 @@ const subscribeToBasketLTPs = () => {
     }
   });
 };
-
 const updateBasketLTP = (data) => {
   const order = basketOrders.value.find(o => getSecurityIdForSymbol(o.tradingSymbol) === data.tk);
   if (order) {
     positionLTPs.value[order.tradingSymbol] = data.lp;
   }
 };
-
 const getSecurityIdForSymbol = (symbol) => {
   const strike = [...callStrikes.value, ...putStrikes.value].find(s => s.tradingSymbol === symbol);
   return strike ? strike.securityId : null;
 };
-
 const saveBasket = () => {
   if (basketName.value.trim() === '') {
     toastMessage.value = 'Please enter a basket name';
@@ -2610,7 +2606,6 @@ const saveBasket = () => {
   toastMessage.value = 'Basket saved successfully';
   showToast.value = true;
 };
-
 const loadBasket = (basketId) => {
   const basket = savedBaskets.value.find(b => b.id === basketId);
   if (basket) {
@@ -2620,7 +2615,6 @@ const loadBasket = (basketId) => {
     subscribeToBasketLTPs();
   }
 };
-
 const deleteBasket = (basketId) => {
   savedBaskets.value = savedBaskets.value.filter(b => b.id !== basketId);
   localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value));
@@ -2630,9 +2624,6 @@ const deleteBasket = (basketId) => {
   }
 };
 
-const toggleBasketExpansion = (basketId) => {
-  expandedBaskets.value[basketId] = !expandedBaskets.value[basketId];
-};
 
 
 
