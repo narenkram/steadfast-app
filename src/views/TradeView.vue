@@ -133,7 +133,14 @@ const strategies = ref([
   { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/strategies/double-plateau.svg' },
   { id: 7, name: 'Jade Lizard', type: 'Bullish', image: '/strategies/jade-lizard.svg' },
   { id: 8, name: 'Reverse Jade Lizard', type: 'Bearish', image: '/strategies/jade-reverse-lizard.svg' },
-  // Add more strategies as needed
+  { id: 9, name: 'Buy Put', type: 'Bearish', image: '/strategies/buy-put.svg' },
+  { id: 10, name: 'Sell Call', type: 'Bearish', image: '/strategies/sell-call.svg' },
+  { id: 11, name: 'Bear Call Spread', type: 'Bearish', image: '/strategies/bear-call-spread.svg' },
+  { id: 12, name: 'Bear Put Spread', type: 'Bearish', image: '/strategies/bear-put-spread.svg' },
+  { id: 13, name: 'Put Ratio Back Spread', type: 'Bearish', image: '/strategies/put-ratio-back-spread.svg' },
+  { id: 14, name: 'Long Calendar with Puts', type: 'Bearish', image: '/strategies/long-calendar-with-puts.svg' },
+  { id: 15, name: 'Bear Condor', type: 'Bearish', image: '/strategies/bear-condor.svg' },
+  { id: 16, name: 'Bear Butterfly', type: 'Bearish', image: '/strategies/bear-butterfly.svg' },
 ]);
 
 
@@ -1539,7 +1546,72 @@ const loadStrategy = (strategy) => {
       addToBasket('SELL', 'CALL');
       addToBasket('BUY', 'CALL', 1);
       break;
-    // Implement other strategies similarly
+    case 'Short Strangle':
+      addToBasket('SELL', 'PUT', -1);
+      addToBasket('SELL', 'CALL', 1);
+      break;
+    case 'Short Iron Condor':
+      addToBasket('BUY', 'PUT', -2);
+      addToBasket('SELL', 'PUT', -1);
+      addToBasket('SELL', 'CALL', 1);
+      addToBasket('BUY', 'CALL', 2);
+      break;
+    case 'Batman':
+      addToBasket('BUY', 'PUT', -2);
+      addToBasket('SELL', 'PUT', -1);
+      addToBasket('SELL', 'CALL');
+      addToBasket('SELL', 'CALL', 1);
+      addToBasket('BUY', 'CALL', 2);
+      break;
+    case 'Double Plateau':
+      addToBasket('BUY', 'PUT', -2);
+      addToBasket('SELL', 'PUT', -1, 2); // Sell 2 contracts
+      addToBasket('SELL', 'CALL', 1, 2); // Sell 2 contracts
+      addToBasket('BUY', 'CALL', 2);
+      break;
+    case 'Jade Lizard':
+      addToBasket('SELL', 'PUT');
+      addToBasket('SELL', 'CALL', 1);
+      addToBasket('SELL', 'CALL', 2);
+      break;
+    case 'Reverse Jade Lizard':
+      addToBasket('SELL', 'CALL');
+      addToBasket('SELL', 'PUT', -1);
+      addToBasket('SELL', 'PUT', -2);
+      break;
+    case 'Buy Put':
+      addToBasket('BUY', 'PUT');
+      break;
+    case 'Sell Call':
+      addToBasket('SELL', 'CALL');
+      break;
+    case 'Bear Call Spread':
+      addToBasket('SELL', 'CALL');
+      addToBasket('BUY', 'CALL', 1);
+      break;
+    case 'Bear Put Spread':
+      addToBasket('BUY', 'PUT');
+      addToBasket('SELL', 'PUT', -1);
+      break;
+    case 'Put Ratio Back Spread':
+      addToBasket('SELL', 'PUT');
+      addToBasket('BUY', 'PUT', -1, 2); // Buy 2 contracts
+      break;
+    case 'Long Calendar with Puts':
+      addToBasket('SELL', 'PUT', 0, 1, 'near'); // Sell near-term expiry
+      addToBasket('BUY', 'PUT', 0, 1, 'far');  // Buy far-term expiry
+      break;
+    case 'Bear Condor':
+      addToBasket('BUY', 'PUT', -1);
+      addToBasket('SELL', 'PUT');
+      addToBasket('SELL', 'CALL', 1);
+      addToBasket('BUY', 'CALL', 2);
+      break;
+    case 'Bear Butterfly':
+      addToBasket('BUY', 'PUT', -1);
+      addToBasket('SELL', 'PUT', 0, 2); // Sell 2 contracts
+      addToBasket('BUY', 'PUT', 1);
+      break;
     default:
       console.log('Strategy not implemented');
   }
