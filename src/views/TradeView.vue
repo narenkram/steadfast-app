@@ -1705,7 +1705,7 @@ const loadStrategy = (strategy) => {
   // Update the basket name
   basketName.value = strategy.name;
 };
-const addToBasket = (transactionType, optionType, strikeOffset = 0) => {
+const addToBasket = (transactionType, optionType, strikeOffset = 0, contracts = 1) => {
   let selectedStrike = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
 
   // Adjust the strike based on the offset
@@ -1720,8 +1720,8 @@ const addToBasket = (transactionType, optionType, strikeOffset = 0) => {
     tradingSymbol: selectedStrike.tradingSymbol,
     transactionType: getTransactionType(transactionType),
     optionType,
-    lots: selectedLots.value,
-    quantity: selectedQuantity.value,
+    lots: selectedLots.value * contracts,
+    quantity: selectedQuantity.value * contracts,
     productType: selectedProductType.value,
     orderType: selectedOrderType.value,
     price: selectedOrderType.value === 'LMT' ? limitPrice.value : 0
