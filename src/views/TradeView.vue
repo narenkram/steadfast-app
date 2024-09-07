@@ -131,8 +131,8 @@ const strategies = ref([
   { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/strategies/short-iron-condor.svg' },
   { id: 5, name: 'Batman', type: 'Neutral', image: '/strategies/batman.svg' },
   { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/strategies/double-plateau.svg' },
-  { id: 7, name: 'Jade Lizard', type: 'Bullish', image: '/strategies/jade-lizard.svg' },
-  { id: 8, name: 'Reverse Jade Lizard', type: 'Bearish', image: '/strategies/jade-reverse-lizard.svg' },
+  { id: 7, name: 'Jade Lizard', type: 'Neutral', image: '/strategies/jade-lizard.svg' },
+  { id: 8, name: 'Reverse Jade Lizard', type: 'Neutral', image: '/strategies/jade-reverse-lizard.svg' },
   { id: 9, name: 'Buy Put', type: 'Bearish', image: '/strategies/buy-put.svg' },
   { id: 10, name: 'Sell Call', type: 'Bearish', image: '/strategies/sell-call.svg' },
   { id: 11, name: 'Bear Call Spread', type: 'Bearish', image: '/strategies/bear-call-spread.svg' },
@@ -141,6 +141,14 @@ const strategies = ref([
   { id: 14, name: 'Long Calendar with Puts', type: 'Bearish', image: '/strategies/long-calendar-with-puts.svg' },
   { id: 15, name: 'Bear Condor', type: 'Bearish', image: '/strategies/bear-condor.svg' },
   { id: 16, name: 'Bear Butterfly', type: 'Bearish', image: '/strategies/bear-butterfly.svg' },
+  { id: 17, name: 'Buy Call', type: 'Bullish', image: '/strategies/buy-call.svg' },
+  { id: 18, name: 'Sell Put', type: 'Bullish', image: '/strategies/sell-put.svg' },
+  { id: 19, name: 'Bull Call Spread', type: 'Bullish', image: '/strategies/bull-call-spread.svg' },
+  { id: 20, name: 'Bull Put Spread', type: 'Bullish', image: '/strategies/bull-put-spread.svg' },
+  { id: 21, name: 'Call Ratio Back Spread', type: 'Bullish', image: '/strategies/call-ratio-back-spread.svg' },
+  { id: 22, name: 'Long Calendar with Calls', type: 'Bullish', image: '/strategies/long-calendar-with-calls.svg' },
+  { id: 23, name: 'Bull Condor', type: 'Bullish', image: '/strategies/bull-condor.svg' },
+  { id: 24, name: 'Bull Butterfly', type: 'Bullish', image: '/strategies/bull-butterfly.svg' },
 ]);
 
 
@@ -1611,6 +1619,39 @@ const loadStrategy = (strategy) => {
       addToBasket('BUY', 'PUT', -1);
       addToBasket('SELL', 'PUT', 0, 2); // Sell 2 contracts
       addToBasket('BUY', 'PUT', 1);
+      break;
+    case 'Buy Call':
+      addToBasket('BUY', 'CALL');
+      break;
+    case 'Sell Put':
+      addToBasket('SELL', 'PUT');
+      break;
+    case 'Bull Call Spread':
+      addToBasket('BUY', 'CALL');
+      addToBasket('SELL', 'CALL', 1);
+      break;
+    case 'Bull Put Spread':
+      addToBasket('SELL', 'PUT');
+      addToBasket('BUY', 'PUT', -1);
+      break;
+    case 'Call Ratio Back Spread':
+      addToBasket('SELL', 'CALL');
+      addToBasket('BUY', 'CALL', 1, 2); // Buy 2 contracts
+      break;
+    case 'Long Calendar with Calls':
+      addToBasket('SELL', 'CALL', 0, 1, 'near'); // Sell near-term expiry
+      addToBasket('BUY', 'CALL', 0, 1, 'far');  // Buy far-term expiry
+      break;
+    case 'Bull Condor':
+      addToBasket('BUY', 'CALL', -1);
+      addToBasket('SELL', 'CALL');
+      addToBasket('SELL', 'CALL', 1);
+      addToBasket('BUY', 'CALL', 2);
+      break;
+    case 'Bull Butterfly':
+      addToBasket('BUY', 'CALL', -1);
+      addToBasket('SELL', 'CALL', 0, 2); // Sell 2 contracts
+      addToBasket('BUY', 'CALL', 1);
       break;
     default:
       console.log('Strategy not implemented');
