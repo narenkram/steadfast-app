@@ -863,20 +863,6 @@
       <li class="nav-item" role="presentation">
         <button
           class="nav-link"
-          id="automation-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#automation-tab-pane"
-          type="button"
-          role="tab"
-          aria-controls="automation-tab-pane"
-          aria-selected="false"
-        >
-          🤖 Discipline Automations
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-          class="nav-link"
           id="basket-tab"
           data-bs-toggle="tab"
           data-bs-target="#basket-tab-pane"
@@ -1249,86 +1235,6 @@
       </div>
       <div
         class="tab-pane fade"
-        id="automation-tab-pane"
-        role="tabpanel"
-        aria-labelledby="automation-tab"
-        tabindex="0"
-      >
-        <div class="row py-3">
-          <div class="col-12">
-            <p class="text-danger">
-              <b>This section is under development,</b> Following features will not work as
-              expected.
-            </p>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-            <!-- MTM Profit Trailing ON/OFF and Trail by percentage or amount -->
-            <label for="mtmProfitTrailingToggle" class="form-label">MTM Profit Trailing by</label>
-            <div class="input-group">
-              <div class="input-group-text">
-                <input
-                  class="form-check-input mt-0"
-                  type="checkbox"
-                  id="mtmProfitTrailingToggle"
-                  v-model="mtmProfitTrailingToggle"
-                />
-              </div>
-              <select class="form-select" v-model="mtmProfitTrailingType">
-                <option value="percentage">Percentage</option>
-                <option value="amount">Amount</option>
-              </select>
-              <template v-if="mtmProfitTrailingType === 'amount'">
-                <input
-                  type="number"
-                  min="100"
-                  class="form-control"
-                  v-model="mtmProfitTrailingAmount"
-                  placeholder="Enter an amount"
-                />
-                <span class="input-group-text">₹</span>
-              </template>
-              <template v-if="mtmProfitTrailingType === 'percentage'">
-                <input
-                  type="number"
-                  min="0.1"
-                  max="5"
-                  step="0.1"
-                  class="form-control"
-                  v-model="mtmProfitTrailingPercentage"
-                  placeholder="Enter a value between 0.1 and 5"
-                />
-                <span class="input-group-text">%</span>
-              </template>
-            </div>
-            <small class="form-text text-secondary"
-              >{{ mtmProfitTrailingToggle ? 'Enabled' : 'Disabled' }}</small
-            >
-          </div>
-          <div class="col-12 col-md-6 col-lg-4">
-            <!-- Close Positions if Risk is reached -->
-            <label for="closePositionsRisk" class="form-label"
-              >Close Positions if Risk is reached</label
-            >
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="closePositionsRisk"
-                v-model="closePositionsRisk"
-              />
-              <label class="form-check-label" for="closePositionsRisk"
-                >{{ closePositionsRisk ? 'Enabled' : 'Disabled' }}</label
-              >
-            </div>
-          </div>
-          <div class="col-12 py-2 text-center">
-            <p class="text-secondary">These settings are automatically saved.</p>
-          </div>
-        </div>
-      </div>
-      <div
-        class="tab-pane fade"
         id="basket-tab-pane"
         role="tabpanel"
         aria-labelledby="basket-tab"
@@ -1622,6 +1528,24 @@
               <option value="classical.mp3">Classical</option>
               <!-- Add more sound options as needed -->
             </select>
+          </div>
+          <!-- Close Positions if Risk is reached -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="closePositionsRisk" class="form-label"
+              >Close Positions if Risk is reached</label
+            >
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="closePositionsRisk"
+                v-model="closePositionsRisk"
+              />
+              <label class="form-check-label" for="closePositionsRisk"
+                >{{ closePositionsRisk ? 'Enabled' : 'Disabled' }}</label
+              >
+            </div>
+            <small class="text-danger">Implementation disabled for now</small>
           </div>
           <div class="col-12 pt-5 text-center">
             <p class="text-secondary">These settings are automatically saved.</p>
