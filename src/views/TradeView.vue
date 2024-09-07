@@ -1992,7 +1992,7 @@ const setFlattradeCredentials = async () => {
       userid: clientId
     });
     // console.log('Credentials set successfully:', response.data);
-    toastMessage.value = 'Flattrade credentials set successfully';
+    toastMessage.value = 'Flattrade changes set successfully';
     showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials :', error);
@@ -2031,7 +2031,7 @@ const setShoonyaCredentials = async () => {
       userid: clientId
     });
     // console.log('Credentials set successfully:', response.data);
-    toastMessage.value = 'Shoonya credentials set successfully';
+    toastMessage.value = 'Shoonya changes set successfully';
     showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials: ', error);
