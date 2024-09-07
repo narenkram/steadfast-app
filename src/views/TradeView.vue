@@ -125,14 +125,14 @@ const closePositionsRisk = ref(JSON.parse(localStorage.getItem('closePositionsRi
 const closePositionsTarget = ref(JSON.parse(localStorage.getItem('closePositionsTarget') || 'false'));
 const strategyType = ref('Bullish');
 const strategies = ref([
-  { id: 1, name: 'Short Straddle', type: 'Neutral', image: '/images/short-straddle.png' },
+  { id: 1, name: 'Short Straddle', type: 'Neutral', image: '/strategies/short-straddle.svg' },
   { id: 2, name: 'Iron Butterfly', type: 'Neutral', image: '/strategies/iron-butterfly.svg' },
-  { id: 3, name: 'Short Strangle', type: 'Neutral', image: '/images/short-strangle.png' },
-  { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/images/short-iron-condor.png' },
-  { id: 5, name: 'Batman', type: 'Neutral', image: '/images/batman.png' },
-  { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/images/double-plateau.png' },
-  { id: 7, name: 'Jade Lizard', type: 'Bullish', image: '/images/jade-lizard.png' },
-  { id: 8, name: 'Reverse Jade Lizard', type: 'Bearish', image: '/images/reverse-jade-lizard.png' },
+  { id: 3, name: 'Short Strangle', type: 'Neutral', image: '/strategies/short-strangle.svg' },
+  { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/strategies/short-iron-condor.svg' },
+  { id: 5, name: 'Batman', type: 'Neutral', image: '/strategies/batman.svg' },
+  { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/strategies/double-plateau.svg' },
+  { id: 7, name: 'Jade Lizard', type: 'Bullish', image: '/strategies/jade-lizard.svg' },
+  { id: 8, name: 'Reverse Jade Lizard', type: 'Bearish', image: '/strategies/jade-reverse-lizard.svg' },
   // Add more strategies as needed
 ]);
 
