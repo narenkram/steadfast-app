@@ -1241,6 +1241,57 @@
       >
         <div class="row py-3">
           <div class="col-12">
+            <h5>Ready Made Strategies</h5>
+            <div class="mb-3">
+              <div class="btn-group" role="group">
+                <button
+                  @click="setStrategyType('Bullish')"
+                  :class="['btn', 'btn-outline-primary', { active: strategyType === 'Bullish' }]"
+                >
+                  Bullish
+                </button>
+                <button
+                  @click="setStrategyType('Bearish')"
+                  :class="['btn', 'btn-outline-primary', { active: strategyType === 'Bearish' }]"
+                >
+                  Bearish
+                </button>
+                <button
+                  @click="setStrategyType('Neutral')"
+                  :class="['btn', 'btn-outline-primary', { active: strategyType === 'Neutral' }]"
+                >
+                  Neutral
+                </button>
+                <button
+                  @click="setStrategyType('Others')"
+                  :class="['btn', 'btn-outline-primary', { active: strategyType === 'Others' }]"
+                >
+                  Others
+                </button>
+              </div>
+              <select v-model="selectedExpiry" class="form-select d-inline-block w-auto ms-2">
+                <option v-for="expiry in expiryDates" :key="expiry" :value="expiry">
+                  {{ expiry }}
+                </option>
+              </select>
+            </div>
+            <div class="row">
+              <div v-for="strategy in filteredStrategies" :key="strategy.id" class="col-md-3 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">{{ strategy.name }}</h6>
+                    <img :src="strategy.image" class="img-fluid mb-2" :alt="strategy.name" />
+                    <button @click="loadStrategy(strategy)" class="btn btn-sm btn-primary">
+                      Load
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row py-3">
+          <div class="col-12">
             <h5>Basket Name</h5>
             <div class="mb-3">
               <input
@@ -1661,7 +1712,11 @@
       </div>
       <div class="modal-footer">
         <div class="d-flex flex-row justify-content-between w-100">
-          <button type="button" class="btn btn-sm fs-5 btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
+          <button
+            type="button"
+            class="btn btn-sm fs-5 btn-outline-secondary w-50 me-1"
+            data-bs-dismiss="modal"
+          >
             No
           </button>
           <button
@@ -1704,7 +1759,11 @@
       </div>
       <div class="modal-footer">
         <div class="d-flex flex-row justify-content-between w-100">
-          <button type="button" class="btn btn-sm btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary w-50 me-1"
+            data-bs-dismiss="modal"
+          >
             No
           </button>
           <button

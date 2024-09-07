@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="short-straddle" viewBox="0 0 100 100">
+        <!-- SVG path for short straddle -->
+        <path d="M10,90 L50,10 L90,90" stroke="black" fill="none" stroke-width="2" />
+    </symbol>
+
+    <symbol id="iron-butterfly" viewBox="0 0 100 100">
+        <!-- SVG path for iron butterfly -->
+        <path d="M10,50 Q50,10 90,50 Q50,90 10,50" stroke="black" fill="none" stroke-width="2" />
+    </symbol>
+
+    <symbol id="short-strangle" viewBox="0 0 100 100">
+        <!-- SVG path for short strangle -->
+        <path d="M10,90 L40,10 M60,10 L90,90" stroke="black" fill="none" stroke-width="2" />
+    </symbol>
+
+    <!-- Add more symbols for other strategies -->
+</svg>

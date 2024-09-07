@@ -123,6 +123,20 @@ const editingBasketId = ref(null);
 const basketOrders = ref([]);
 const closePositionsRisk = ref(JSON.parse(localStorage.getItem('closePositionsRisk') || 'false'));
 const closePositionsTarget = ref(JSON.parse(localStorage.getItem('closePositionsTarget') || 'false'));
+const strategyType = ref('Bullish');
+const strategies = ref([
+  { id: 1, name: 'Short Straddle', type: 'Neutral', image: '/images/short-straddle.png' },
+  { id: 2, name: 'Iron Butterfly', type: 'Neutral', image: '/strategies/iron-butterfly.svg' },
+  { id: 3, name: 'Short Strangle', type: 'Neutral', image: '/images/short-strangle.png' },
+  { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/images/short-iron-condor.png' },
+  { id: 5, name: 'Batman', type: 'Neutral', image: '/images/batman.png' },
+  { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/images/double-plateau.png' },
+  { id: 7, name: 'Jade Lizard', type: 'Bullish', image: '/images/jade-lizard.png' },
+  { id: 8, name: 'Reverse Jade Lizard', type: 'Bearish', image: '/images/reverse-jade-lizard.png' },
+  // Add more strategies as needed
+]);
+
+
 
 
 
@@ -616,7 +630,9 @@ const basketLTPs = computed(() => {
   });
   return ltps;
 });
-
+const filteredStrategies = computed(() => {
+  return strategies.value.filter(strategy => strategy.type === strategyType.value);
+});
 
 
 
@@ -1504,8 +1520,42 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     showToast.value = true;
   }
 };
-const addToBasket = (transactionType, optionType) => {
+const setStrategyType = (type) => {
+  strategyType.value = type;
+};
+const loadStrategy = (strategy) => {
+  // Clear existing basket orders
+  basketOrders.value = [];
+
+  // Implement the logic for each strategy
+  switch (strategy.name) {
+    case 'Short Straddle':
+      addToBasket('SELL', 'CALL');
+      addToBasket('SELL', 'PUT');
+      break;
+    case 'Iron Butterfly':
+      addToBasket('BUY', 'PUT', -1);
+      addToBasket('SELL', 'PUT');
+      addToBasket('SELL', 'CALL');
+      addToBasket('BUY', 'CALL', 1);
+      break;
+    // Implement other strategies similarly
+    default:
+      console.log('Strategy not implemented');
+  }
+
+  // Update the basket name
+  basketName.value = strategy.name;
+};
+const addToBasket = (transactionType, optionType, strikeOffset = 0) => {
   let selectedStrike = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
+
+  // Adjust the strike based on the offset
+  if (strikeOffset !== 0) {
+    const strikes = optionType === 'CALL' ? callStrikes.value : putStrikes.value;
+    const currentIndex = strikes.findIndex(strike => strike.strikePrice === selectedStrike.strikePrice);
+    selectedStrike = strikes[currentIndex + strikeOffset] || selectedStrike;
+  }
 
   basketOrders.value.push({
     id: uuidv4(),
@@ -1519,7 +1569,6 @@ const addToBasket = (transactionType, optionType) => {
     price: selectedOrderType.value === 'LMT' ? limitPrice.value : 0
   });
 
-  showBasketOrderModal.value = true;
   subscribeToBasketLTPs();
 };
 const updateBasketOrderQuantity = (order) => {
@@ -1916,7 +1965,6 @@ const formatPrice = (price) => {
 const getSymbol = (position) => {
   return position.tsym || position.tradingSymbol || '';
 };
-
 const calculateUnrealizedProfit = (position) => {
   const ltp = positionLTPs.value[position.tsym || position.tradingSymbol] || position.lp || position.lastPrice;
   const netQty = parseFloat(position.netqty || position.netQty);
