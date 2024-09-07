@@ -149,6 +149,15 @@ const strategies = ref([
   { id: 22, name: 'Long Calendar with Calls', type: 'Bullish', image: '/strategies/long-calendar-with-calls.svg' },
   { id: 23, name: 'Bull Condor', type: 'Bullish', image: '/strategies/bull-condor.svg' },
   { id: 24, name: 'Bull Butterfly', type: 'Bullish', image: '/strategies/bull-butterfly.svg' },
+  { id: 25, name: 'Call Ratio Spread', type: 'Others', image: '/strategies/call-ratio-spread.svg' },
+  { id: 26, name: 'Put Ratio Spread', type: 'Others', image: '/strategies/put-ratio-spread.svg' },
+  { id: 27, name: 'Long Straddle', type: 'Others', image: '/strategies/long-straddle.svg' },
+  { id: 28, name: 'Long Iron Butterfly', type: 'Others', image: '/strategies/long-iron-butterfly.svg' },
+  { id: 29, name: 'Long Strangle', type: 'Others', image: '/strategies/long-strangle.svg' },
+  { id: 30, name: 'Long Iron Condor', type: 'Others', image: '/strategies/long-iron-condor.svg' },
+  { id: 31, name: 'Strip', type: 'Others', image: '/strategies/strip.svg' },
+  { id: 32, name: 'Strap', type: 'Others', image: '/strategies/strap.svg' },
+
 ]);
 
 
@@ -1652,6 +1661,42 @@ const loadStrategy = (strategy) => {
       addToBasket('BUY', 'CALL', -1);
       addToBasket('SELL', 'CALL', 0, 2); // Sell 2 contracts
       addToBasket('BUY', 'CALL', 1);
+      break;
+    case 'Call Ratio Spread':
+      addToBasket('BUY', 'CALL');
+      addToBasket('SELL', 'CALL', 1, 2); // Sell 2 contracts
+      break;
+    case 'Put Ratio Spread':
+      addToBasket('BUY', 'PUT');
+      addToBasket('SELL', 'PUT', -1, 2); // Sell 2 contracts
+      break;
+    case 'Long Straddle':
+      addToBasket('BUY', 'CALL');
+      addToBasket('BUY', 'PUT');
+      break;
+    case 'Long Iron Butterfly':
+      addToBasket('SELL', 'PUT', -1);
+      addToBasket('BUY', 'PUT');
+      addToBasket('BUY', 'CALL');
+      addToBasket('SELL', 'CALL', 1);
+      break;
+    case 'Long Strangle':
+      addToBasket('BUY', 'PUT', -1);
+      addToBasket('BUY', 'CALL', 1);
+      break;
+    case 'Long Iron Condor':
+      addToBasket('SELL', 'PUT', -2);
+      addToBasket('BUY', 'PUT', -1);
+      addToBasket('BUY', 'CALL', 1);
+      addToBasket('SELL', 'CALL', 2);
+      break;
+    case 'Strip':
+      addToBasket('BUY', 'PUT', 0, 2); // Buy 2 puts
+      addToBasket('BUY', 'CALL');
+      break;
+    case 'Strap':
+      addToBasket('BUY', 'CALL', 0, 2); // Buy 2 calls
+      addToBasket('BUY', 'PUT');
       break;
     default:
       console.log('Strategy not implemented');
