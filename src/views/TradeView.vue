@@ -84,7 +84,6 @@ let timer;
 let positionCheckInterval;
 const totalRiskType = ref(null);
 const totalRiskTypeToggle = ref(false);
-const closePositionsRisk = ref(true);
 const activeFetchFunction = ref(null);
 const masterOpenPrice = ref(localStorage.getItem('masterOpenPrice') || null);
 const masterHighPrice = ref(localStorage.getItem('masterHighPrice') || null);
@@ -122,7 +121,8 @@ const savedBaskets = ref([]);
 const basketName = ref('');
 const editingBasketId = ref(null);
 const basketOrders = ref([]);
-
+const closePositionsRisk = ref(JSON.parse(localStorage.getItem('closePositionsRisk') || 'false'));
+const closePositionsTarget = ref(JSON.parse(localStorage.getItem('closePositionsTarget') || 'false'));
 
 
 
@@ -1651,7 +1651,6 @@ const closeAllPositions = async () => {
     let positionsClosed = false;
 
     if (selectedBroker.value?.brokerName === 'Flattrade') {
-      // Sort positions by netqty (descending) to prioritize 'S' positions
       const sortedPositions = [...flatTradePositionBook.value].sort((a, b) => Number(b.netqty) - Number(a.netqty));
       for (const position of sortedPositions) {
         const netqty = Number(position.netqty);
@@ -1663,7 +1662,6 @@ const closeAllPositions = async () => {
         }
       }
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      // Sort positions by netqty (descending) to prioritize 'S' positions
       const sortedPositions = [...shoonyaPositionBook.value].sort((a, b) => Number(b.netqty) - Number(a.netqty));
       for (const position of sortedPositions) {
         const netqty = Number(position.netqty);
@@ -2813,17 +2811,25 @@ watch(totalTargetPercentage, (newValue) => {
   localStorage.setItem('totalTargetPercentage', newValue.toString());
 });
 // Add a watch effect to handle the countdown when risk is reached
-watch(riskReached, (newValue) => {
+watch(riskReached, async (newValue) => {
   if (newValue && closePositionsRisk.value) {
-    riskClosingCountdown.value = 30;
-    const timer = setInterval(() => {
-      riskClosingCountdown.value--;
-      if (riskClosingCountdown.value <= 0) {
-        clearInterval(timer);
-        // Implement the logic to close positions here
-        // closeAllPositions();
-      }
-    }, 1000);
+    console.log('Risk threshold reached. Closing all positions.');
+    await closeAllPositions();
+    showToastNotification('All positions closed due to risk threshold');
   }
+});
+watch(targetReached, async (newValue) => {
+  if (newValue && closePositionsTarget.value) {
+    console.log('Target reached. Closing all positions.');
+    await closeAllPositions();
+    showToastNotification('All positions closed due to target reached');
+  }
+});
+watch(closePositionsRisk, (newValue) => {
+  localStorage.setItem('closePositionsRisk', JSON.stringify(newValue));
+});
+
+watch(closePositionsTarget, (newValue) => {
+  localStorage.setItem('closePositionsTarget', JSON.stringify(newValue));
 });
 </script>
