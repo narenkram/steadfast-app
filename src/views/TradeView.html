@@ -66,9 +66,9 @@
   <!-- Today's Expiry -->
   <div class="col-6 col-md-6 col-lg-2 text-end">
     <p class="mb-1"><b>Today's Expiry</b></p>
-    <p v-if="todayExpirySymbol" class="text-danger">
+    <p v-if="todayExpirySymbol" class="mb-0 d-flex align-items-center justify-content-center">
       <span
-        class="fs-4 text-decoration-none me-2"
+        class="fs-4 text-decoration-none me-2 text-danger"
         id="events-tab"
         type="button"
         data-bs-toggle="modal"
@@ -343,56 +343,6 @@
               <option value="5">5%</option>
             </select>
           </div> -->
-        <!-- Predefined Stoploss -->
-        <div class="col-6 col-md-3 col-lg-3">
-          <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
-          <div class="input-group mb-3">
-            <div class="input-group-text">
-              <input
-                class="form-check-input mt-0"
-                type="checkbox"
-                id="enableStoploss"
-                v-model="tradeSettings.enableStoploss"
-                aria-label="Enable Predefined Stoploss"
-                :class="{ 'disabled-form': isFormDisabled }"
-              />
-            </div>
-            <input
-              type="number"
-              class="form-control"
-              id="stoplossValue"
-              v-model.number="tradeSettings.stoplossValue"
-              aria-label="Predefined Stoploss (points)"
-              :class="{ 'disabled-form': isFormDisabled }"
-            />
-            <span class="input-group-text">₹ Points</span>
-          </div>
-        </div>
-        <!-- Predefined Target -->
-        <div class="col-6 col-md-3 col-lg-3">
-          <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
-          <div class="input-group mb-3">
-            <div class="input-group-text">
-              <input
-                class="form-check-input mt-0"
-                type="checkbox"
-                id="enableTarget"
-                v-model="tradeSettings.enableTarget"
-                aria-label="Enable Predefined Target"
-                :class="{ 'disabled-form': isFormDisabled }"
-              />
-            </div>
-            <input
-              type="number"
-              class="form-control"
-              id="targetValue"
-              v-model.number="tradeSettings.targetValue"
-              aria-label="Predefined Target (points)"
-              :class="{ 'disabled-form': isFormDisabled }"
-            />
-            <span class="input-group-text">₹ Points</span>
-          </div>
-        </div>
       </div>
 
       <!-- Trading Symbols & Strikes -->
@@ -922,8 +872,6 @@
                 <th scope="col">Position</th>
                 <th scope="col">Avg</th>
                 <th scope="col">LTP</th>
-                <th scope="col" class="text-center">Stop</th>
-                <th scope="col" class="text-center">Target</th>
                 <th scope="col">Buy Value</th>
                 <th scope="col">Sell Value</th>
                 <th scope="col">Realized</th>
@@ -955,49 +903,6 @@
                   </td>
                   <td>{{ flattradePosition.netavgprc }}</td>
                   <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
-                  <td>
-                    <template
-                      v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableStoploss === true"
-                    >
-                      <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
-                        <span
-                          class="btn btn-sm btn-outline-danger me-2"
-                          @click="adjustStoplossPrice(flattradePosition.tsym, tradeSettings.stoplossStep)"
-                          >-</span
-                        >
-                        <b
-                          >{{ formatPrice(positionStoplossesPrice[getSymbol(flattradePosition)])
-                          }}</b
-                        >
-                        <span
-                          class="btn btn-sm btn-outline-success ms-2"
-                          @click="adjustStoplossPrice(flattradePosition.tsym, -tradeSettings.stoplossStep)"
-                          >+</span
-                        >
-                      </div>
-                    </template>
-                    <template v-else> - </template>
-                  </td>
-                  <td>
-                    <template
-                      v-if="Number(flattradePosition.netqty) !== 0 && tradeSettings.enableTarget === true"
-                    >
-                      <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
-                        <span
-                          class="btn btn-sm btn-outline-danger me-2"
-                          @click="adjustTargetPrice(flattradePosition.tsym, -tradeSettings.targetStep)"
-                          >-</span
-                        >
-                        <b>{{ formatPrice(positionTargetsPrice[getSymbol(flattradePosition)]) }}</b>
-                        <span
-                          class="btn btn-sm btn-outline-success ms-2"
-                          @click="adjustTargetPrice(flattradePosition.tsym, tradeSettings.targetStep)"
-                          >+</span
-                        >
-                      </div>
-                    </template>
-                    <template v-else> - </template>
-                  </td>
                   <td>{{ flattradePosition.daybuyamt }}</td>
                   <td>{{ flattradePosition.daysellamt }}</td>
                   <td
@@ -1041,8 +946,6 @@
                 <th scope="col">Position</th>
                 <th scope="col">Avg</th>
                 <th scope="col">LTP</th>
-                <th scope="col" class="text-center">Stop</th>
-                <th scope="col" class="text-center">Target</th>
                 <th scope="col">Buy Value</th>
                 <th scope="col">Sell Value</th>
                 <th scope="col">Realized</th>
@@ -1073,48 +976,6 @@
                   </td>
                   <td>{{ shoonyaPosition.netavgprc }}</td>
                   <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
-                  <td>
-                    <template
-                      v-if="Number(shoonyaPosition.netqty) !== 0 && tradeSettings.enableStoploss === true"
-                    >
-                      <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
-                        <span
-                          class="btn btn-sm btn-outline-danger me-2"
-                          @click="adjustStoplossPrice(shoonyaPosition.tsym, tradeSettings.stoplossStep)"
-                          >-</span
-                        >
-                        <b
-                          >{{ formatPrice(positionStoplossesPrice[getSymbol(shoonyaPosition)]) }}</b
-                        >
-                        <span
-                          class="btn btn-sm btn-outline-success ms-2"
-                          @click="adjustStoplossPrice(shoonyaPosition.tsym, -tradeSettings.stoplossStep)"
-                          >+</span
-                        >
-                      </div>
-                    </template>
-                    <template v-else> - </template>
-                  </td>
-                  <td>
-                    <template
-                      v-if="Number(shoonyaPosition.netqty) !== 0 && tradeSettings.enableTarget === true"
-                    >
-                      <div class="ms-2 d-flex flex-row justify-content-center align-items-center">
-                        <span
-                          class="btn btn-sm btn-outline-danger me-2"
-                          @click="adjustTargetPrice(shoonyaPosition.tsym, -tradeSettings.targetStep)"
-                          >-</span
-                        >
-                        <b>{{ formatPrice(positionTargetsPrice[getSymbol(shoonyaPosition)]) }}</b>
-                        <span
-                          class="btn btn-sm btn-outline-success ms-2"
-                          @click="adjustTargetPrice(shoonyaPosition.tsym, tradeSettings.targetStep)"
-                          >+</span
-                        >
-                      </div>
-                    </template>
-                    <template v-else> - </template>
-                  </td>
                   <td>{{ shoonyaPosition.daybuyamt }}</td>
                   <td>{{ shoonyaPosition.daysellamt }}</td>
                   <td

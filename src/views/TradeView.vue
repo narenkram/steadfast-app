@@ -68,18 +68,6 @@ const selectedProductType = ref('');
 const limitPrice = ref(null);
 const modalTransactionType = ref('');
 const modalOptionType = ref('');
-const tradeSettings = reactive({
-  enableStoploss: JSON.parse(localStorage.getItem('enableStoploss') || 'true'),
-  stoplossValue: Number(localStorage.getItem('stoplossValue') || '20'),
-  enableTarget: JSON.parse(localStorage.getItem('enableTarget') || 'true'),
-  targetValue: Number(localStorage.getItem('targetValue') || '30'),
-  stoplossStep: 1, // The step size for increasing/decreasing predefined stoploss price
-  targetStep: 1, // The step size for increasing/decreasing predefined target price
-});
-const positionStoplosses = ref({});
-const positionTargets = ref({});
-const positionStoplossesPrice = ref({});
-const positionTargetsPrice = ref({});
 const selectedShoonyaPositionsSet = ref(new Set());
 const selectedFlattradePositionsSet = ref(new Set());
 const positionsInExecution = ref({});
@@ -1342,58 +1330,6 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     throw new Error("Unsupported broker");
   }
 };
-const saveTradeSettings = () => {
-  localStorage.setItem('enableStoploss', JSON.stringify(tradeSettings.enableStoploss));
-  localStorage.setItem('stoplossValue', tradeSettings.stoplossValue.toString());
-  localStorage.setItem('enableTarget', JSON.stringify(tradeSettings.enableTarget));
-  localStorage.setItem('targetValue', tradeSettings.targetValue.toString());
-};
-const adjustStoplossPrice = (tsym, adjustment) => {
-  if (!tsym || !positionStoplossesPrice.value[tsym]) return;
-
-  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
-    .find(p => getSymbol(p) === tsym);
-
-  if (!position) return;
-
-  const netQty = Number(position.netQty || position.netqty);
-  const isLong = netQty > 0;
-
-  // For long positions, decrease predefined stoploss price. For short positions, increase it.
-  positionStoplossesPrice.value[tsym] += isLong ? -adjustment : adjustment;
-
-  // Recalculate the points-based predefined stoploss
-  const currentLTP = Number(positionLTPs.value[tsym] || 0);
-  positionStoplosses.value[tsym] = Math.abs(currentLTP - positionStoplossesPrice.value[tsym]);
-
-  console.log(`Adjusted predefined stoploss for ${tsym}: Price=${positionStoplossesPrice.value[tsym]}, Points=${positionStoplosses.value[tsym]}`);
-
-  localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-  localStorage.setItem('positionStoplosses', JSON.stringify(positionStoplosses.value));
-};
-const adjustTargetPrice = (tsym, adjustment) => {
-  if (!tsym || !positionTargetsPrice.value[tsym]) return;
-
-  const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
-    .find(p => getSymbol(p) === tsym);
-
-  if (!position) return;
-
-  const netQty = Number(position.netQty || position.netqty);
-  const isLong = netQty > 0;
-
-  // For long positions, increase predefined target price. For short positions, decrease it.
-  positionTargetsPrice.value[tsym] += isLong ? adjustment : -adjustment;
-
-  // Recalculate the points-based predefined target
-  const currentLTP = Number(positionLTPs.value[tsym] || 0);
-  positionTargets.value[tsym] = Math.abs(currentLTP - positionTargetsPrice.value[tsym]);
-
-  console.log(`Adjusted predefined target for ${tsym}: Price=${positionTargetsPrice.value[tsym]}, Points=${positionTargets.value[tsym]}`);
-
-  localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
-  localStorage.setItem('positionTargets', JSON.stringify(positionTargets.value));
-};
 const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike;
@@ -1475,12 +1411,6 @@ const placeOrder = async (transactionType, drvOptionType) => {
 
     // Update fund limits
     await updateFundLimits()
-
-    // Set stoploss and target for the new position
-    const newPosition = findNewPosition(selectedStrike.tradingSymbol);
-    if (newPosition) {
-      setStoplossAndTarget(newPosition);
-    }
 
   } catch (error) {
     console.error("Error placing order:", error); // Log the full error
@@ -1578,11 +1508,6 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     console.log(`All orders placed successfully. Total: ${placedQuantity} quantity`);
     toastMessage.value = `Order(s) placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
-
-    // Remove stoploss and target for this position
-    const tsym = getSymbol(position);
-    delete positionStoplossesPrice.value[tsym];
-    delete positionTargetsPrice.value[tsym];
 
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -2013,104 +1938,7 @@ const formatPrice = (price) => {
 const getSymbol = (position) => {
   return position.tsym || position.tradingSymbol || '';
 };
-const setStoplossAndTarget = (position) => {
-  const tsym = getSymbol(position);
-  if (!tsym) return;
 
-  const netQty = Number(position.netQty || position.netqty);
-  const isLong = netQty > 0;
-  const currentLTP = Number(positionLTPs.value[tsym] || 0);
-
-  if (tradeSettings.enableStoploss) {
-    let stoplossPrice = isLong
-      ? currentLTP - tradeSettings.stoplossValue
-      : currentLTP + tradeSettings.stoplossValue;
-
-    // Ensure predefined stoploss price is not negative for long positions
-    if (isLong && stoplossPrice <= 0) {
-      console.log(`Predefined stoploss for ${tsym} would be negative or zero. Disabling predefined stoploss.`);
-      delete positionStoplossesPrice.value[tsym];
-      tradeSettings.enableStoploss = false;
-    } else {
-      positionStoplossesPrice.value[tsym] = stoplossPrice;
-    }
-  } else {
-    delete positionStoplossesPrice.value[tsym];
-  }
-
-  if (tradeSettings.enableTarget) {
-    positionTargetsPrice.value[tsym] = isLong
-      ? currentLTP + tradeSettings.targetValue
-      : currentLTP - tradeSettings.targetValue;
-  } else {
-    delete positionTargetsPrice.value[tsym];
-  }
-
-  console.log(`Set Predefined SL/Target for ${tsym}: LTP=${currentLTP}, SL Price=${positionStoplossesPrice.value[tsym]}, Target Price=${positionTargetsPrice.value[tsym]}`);
-
-  localStorage.setItem('positionStoplossesPrice', JSON.stringify(positionStoplossesPrice.value));
-  localStorage.setItem('positionTargetsPrice', JSON.stringify(positionTargetsPrice.value));
-  saveTradeSettings();
-};
-const checkStoplossAndTarget = (position, currentLTP) => {
-  const tsym = getSymbol(position);
-  if (!tsym) {
-    console.error('Invalid position object:', position);
-    return;
-  }
-  const netQty = Number(position.netQty || position.netqty);
-
-  if (netQty === 0 || positionsInExecution.value[tsym]) {
-    return;
-  }
-
-  const stoplossPrice = positionStoplossesPrice.value[tsym];
-  const targetPrice = positionTargetsPrice.value[tsym];
-
-  const isLong = netQty > 0;
-
-  console.log(`Checking ${tsym}: LTP=${currentLTP}, SL Price=${stoplossPrice}, Target Price=${targetPrice}, IsLong=${isLong}`);
-
-  const executeOrder = (orderType, reason) => {
-    console.log(`${reason} for ${isLong ? 'long' : 'short'} position ${tsym}`);
-    positionsInExecution.value[tsym] = true;
-    placeOrderForPosition(orderType, tsym.includes('CE') || tsym.includes('C') ? 'C' : 'P', position)
-      .finally(() => {
-        delete positionsInExecution.value[tsym];
-      });
-  };
-
-  if (isLong) {
-    if (tradeSettings.enableStoploss && stoplossPrice && currentLTP <= stoplossPrice) {
-      executeOrder('S', 'Predefined Stoploss hit');
-    } else if (tradeSettings.enableTarget && targetPrice && currentLTP >= targetPrice) {
-      executeOrder('S', 'Predefined Target hit');
-    }
-  } else {
-    if (tradeSettings.enableStoploss && stoplossPrice && currentLTP >= stoplossPrice) {
-      executeOrder('B', 'Predefined Stoploss hit');
-    } else if (tradeSettings.enableTarget && targetPrice && currentLTP <= targetPrice) {
-      executeOrder('B', 'Predefined Target hit');
-    }
-  }
-};
-const continuouslyCheckPositions = () => {
-  [...flatTradePositionBook.value, ...shoonyaPositionBook.value].forEach(position => {
-    const tsym = getSymbol(position);
-    const stoplossPrice = positionStoplossesPrice.value[tsym];
-    const targetPrice = positionTargetsPrice.value[tsym];
-
-    // Skip if both stoploss and target are undefined or disabled
-    if ((!stoplossPrice && !targetPrice) || (!tradeSettings.enableStoploss && !tradeSettings.enableTarget)) {
-      return;
-    }
-
-    const currentLTP = positionLTPs.value[tsym];
-    if (currentLTP) {
-      checkStoplossAndTarget(position, currentLTP);
-    }
-  });
-};
 const calculateUnrealizedProfit = (position) => {
   const ltp = positionLTPs.value[position.tsym || position.tradingSymbol] || position.lp || position.lastPrice;
   const netQty = parseFloat(position.netqty || position.netQty);
@@ -2518,7 +2346,6 @@ const initializeSubscriptions = () => {
   subscribeToMasterSymbol();
   subscribeToOptions();
 };
-const debouncedCheckStoplossAndTarget = debounce(checkStoplossAndTarget, 500);
 // Helper function to get the correct price for the selected master symbol
 const getMasterSymbolPrice = () => {
   switch (selectedMasterSymbol.value) {
@@ -2679,14 +2506,6 @@ onMounted(async () => {
   }, 1000);
 
   connectWebSocket();
-
-  // Load stoploss and target values from localStorage
-  positionStoplosses.value = JSON.parse(localStorage.getItem('positionStoplosses') || '{}');
-  positionTargets.value = JSON.parse(localStorage.getItem('positionTargets') || '{}');
-  positionStoplossesPrice.value = JSON.parse(localStorage.getItem('positionStoplossesPrice') || '{}');
-  positionTargetsPrice.value = JSON.parse(localStorage.getItem('positionTargetsPrice') || '{}');
-  // Start continuous position checking
-  positionCheckInterval = setInterval(continuouslyCheckPositions, 1000); // Check every second
 
   const ltpBarsavedPreference = localStorage.getItem('showLTPRangeBar');
   if (ltpBarsavedPreference !== null) {
@@ -2907,23 +2726,11 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
         .find(p => (p.tsym || p.tradingSymbol) === tsym);
       if (position) {
         console.log(`Found position for ${tsym}:`, position);
-        debouncedCheckStoplossAndTarget(position, ltp);
       } else {
         console.log(`No position found for ${tsym}`);
       }
     }
   });
-}, { deep: true });
-// Add watchers for enableStoploss, stoplossValue, enableTarget, and targetValue
-watch(() => [tradeSettings.enableStoploss, tradeSettings.stoplossValue, tradeSettings.enableTarget, tradeSettings.targetValue], () => {
-  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
-  allPositions.forEach(setStoplossAndTarget);
-});
-watch(tradeSettings, (newSettings, oldSettings) => {
-  console.log('Trade settings changed:', newSettings, oldSettings);
-  saveTradeSettings();
-  const allPositions = [...flatTradePositionBook.value, ...shoonyaPositionBook.value];
-  allPositions.forEach(setStoplossAndTarget);
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], () => {
   saveOffsets();
