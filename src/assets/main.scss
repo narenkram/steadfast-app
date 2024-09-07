@@ -105,6 +105,14 @@
       background-color: var(--bs-dark);
     }
   }
+  .form-control::placeholder {
+    color: var(--bs-body-color);
+  }
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    color: var(--bs-body-color);
+    background-color: var(--bs-light);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -147,6 +155,14 @@
   }
   a {
     color: var(--bs-primary);
+  }
+  .form-control::placeholder {
+    color: var(--bs-body-color);
+  }
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    color: var(--bs-body-color);
+    background-color: var(--bs-light);
   }
 }
 
