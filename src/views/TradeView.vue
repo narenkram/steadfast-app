@@ -116,10 +116,10 @@ const selectedSound = ref(localStorage.getItem('selectedSound'));
 const riskClosingCountdown = ref(30);
 const totalRiskTargetToggle = ref(JSON.parse(localStorage.getItem('totalRiskTargetToggle') || 'false'));
 const totalRiskTargetType = ref(localStorage.getItem('totalRiskTargetType') || 'percentage');
-const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount')) || 0);
-const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 0);
-const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 0);
-const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 0);
+const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount')) || 1500);
+const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 1.5);
+const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 3000);
+const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 3);
 const savedBaskets = ref([]);
 const basketName = ref('');
 const editingBasketId = ref(null);
@@ -574,22 +574,6 @@ const riskReached = computed(() => {
     }
   }
   return false;
-});
-const riskReachedClass = computed(() => {
-  return totalProfit.value >= 0 ? 'bg-success text-light' : 'bg-warning text-dark';
-});
-const riskReachedType = computed(() => {
-  return totalProfit.value >= 0 ? 'Target' : 'Warning';
-});
-const riskReachedMessage = computed(() => {
-  return totalProfit.value >= 0 ? 'Consider booking profits.' : 'Trade with caution.';
-});
-const riskReachedAction = computed(() => {
-  if (closePositionsRisk.value) {
-    return `Closing Positions in ${riskClosingCountdown.value} seconds`;
-  } else {
-    return totalProfit.value >= 0 ? 'Target Reached' : 'Risk Threshold Reached';
-  }
 });
 const targetReached = computed(() => {
   if (totalRiskTargetToggle.value) {
