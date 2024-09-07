@@ -1312,7 +1312,18 @@
               </thead>
               <tbody>
                 <tr v-for="order in sortedBasketOrders" :key="order.id">
-                  <td>{{ order.tradingSymbol }}</td>
+                  <td>
+                    {{ order.tradingSymbol }}
+                    <select
+                      v-model="order.strikePrice"
+                      @change="updateTradingSymbol(order)"
+                      class="form-select form-select-sm mt-1"
+                    >
+                      <option v-for="strike in availableStrikes" :key="strike" :value="strike">
+                        {{ strike }}
+                      </option>
+                    </select>
+                  </td>
                   <td>
                     <select v-model="order.transactionType" class="form-select form-select-sm">
                       <option value="B">BUY</option>

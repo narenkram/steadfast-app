@@ -1720,14 +1720,13 @@ const addToBasket = (transactionType, optionType, strikeOffset = 0, contracts = 
     tradingSymbol: selectedStrike.tradingSymbol,
     transactionType: getTransactionType(transactionType),
     optionType,
+    strikePrice: selectedStrike.strikePrice,
     lots: selectedLots.value * contracts,
     quantity: selectedQuantity.value * contracts,
     productType: selectedProductType.value,
     orderType: selectedOrderType.value,
-    price: selectedOrderType.value === 'LMT' ? limitPrice.value : 0
+    price: limitPrice.value
   });
-
-  subscribeToBasketLTPs();
 };
 const updateBasketOrderQuantity = (order) => {
   const instrument = quantities.value[selectedMasterSymbol.value];
@@ -1850,6 +1849,13 @@ const placeAllBasketOrders = async () => {
   toastMessage.value = 'All basket orders placed successfully';
   showToast.value = true;
   showBasketOrderModal.value = false;
+};
+const updateTradingSymbol = (order) => {
+  const strikes = order.optionType === 'CALL' ? callStrikes.value : putStrikes.value;
+  const newStrike = strikes.find(strike => strike.strikePrice === order.strikePrice);
+  if (newStrike) {
+    order.tradingSymbol = newStrike.tradingSymbol;
+  }
 };
 const closeAllPositions = async () => {
   try {
