@@ -1277,13 +1277,10 @@
             </div>
             <div class="row">
               <div v-for="strategy in filteredStrategies" :key="strategy.id" class="col-md-3 mb-3">
-                <div class="card">
+                <div class="card strategy-card" @click="loadStrategy(strategy)">
                   <div class="card-body">
                     <h6 class="card-title">{{ strategy.name }}</h6>
                     <img :src="strategy.image" class="img-fluid mb-2" :alt="strategy.name" />
-                    <button @click="loadStrategy(strategy)" class="btn btn-sm btn-primary">
-                      Load
-                    </button>
                   </div>
                 </div>
               </div>
