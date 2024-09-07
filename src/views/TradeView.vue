@@ -282,18 +282,16 @@ const availableBalance = computed(() => {
   // console.log('Fund Limits:', fundLimits.value);
   // console.log('Selected Broker:', selectedBroker.value?.brokerName);
 
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    const cash = Number(fundLimits.value.cash) || 0;
+    const payin = Number(fundLimits.value.payin) || 0;
     const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
-    // console.log('Flattrade Available Balance:', balance);
-    return balance;
-  }
-  else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    const cash = Number(fundLimits.value.cash) || Number(fundLimits.value.payin) || 0;
-    const marginUsed = Number(fundLimits.value.marginused) || 0;
-    const balance = Math.floor(cash - marginUsed);
-    // console.log('Shoonya Available Balance:', balance);
+
+    // Use payin if cash is zero, otherwise use cash
+    const availableFunds = cash === 0 ? payin : cash;
+
+    const balance = Math.floor(availableFunds - marginUsed);
+    // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
     return balance;
   }
   return null;
