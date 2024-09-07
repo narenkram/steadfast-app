@@ -30,13 +30,21 @@ export default {
             default: 'long-pop.wav'
         }
     },
+    data() {
+        return {
+            audio: null
+        };
+    },
     watch: {
         show(newVal) {
             if (newVal) {
                 if (this.soundEnabled) {
-                    // Play selected notification sound
-                    const audio = new Audio(`/${this.selectedSound}`);
-                    audio.play();
+                    // Create audio object if not already created
+                    if (!this.audio) {
+                        this.audio = new Audio(`/${this.selectedSound}`);
+                    }
+                    // Attempt to play the sound
+                    this.playSound();
                 }
 
                 setTimeout(() => {
@@ -48,6 +56,12 @@ export default {
     methods: {
         hide() {
             this.$emit('update:show', false);
+        },
+        playSound() {
+            // Play the sound and catch any errors
+            this.audio.play().catch(error => {
+                console.warn('Audio playback failed:', error);
+            });
         }
     }
 };
