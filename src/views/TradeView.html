@@ -66,7 +66,7 @@
   <!-- Today's Expiry -->
   <div class="col-6 col-md-6 col-lg-2 text-end">
     <p class="mb-1"><b>Today's Expiry</b></p>
-    <p v-if="todayExpirySymbol" class="mb-0 d-flex align-items-center justify-content-center">
+    <p class="mb-0 d-flex align-items-center justify-content-center">
       <span
         class="fs-4 text-decoration-none me-2 text-danger"
         id="events-tab"
@@ -76,10 +76,8 @@
       >
         📅
       </span>
-      <b>{{ todayExpirySymbol }}</b>
-    </p>
-    <p v-else class="text-danger">
-      <b>-</b>
+      <b v-if="todayExpirySymbol" class="text-danger">{{ todayExpirySymbol }}</b>
+      <b v-else class="text-secondary">-</b>
     </p>
   </div>
 </section>
