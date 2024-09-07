@@ -373,9 +373,9 @@
         </div>
         <div class="col-6 col-md-3 col-lg-3">
           <!-- Risk Input -->
-          <label for="totalRiskAmount" class="form-label mb-0">Max Loss</label>
+          <label for="totalRiskAmount" class="form-label mb-0">Max Risk</label>
           <div class="input-group">
-            <span class="input-group-text">Risk</span>
+            <span class="input-group-text">Loss</span>
             <template v-if="totalRiskTargetType === 'amount'">
               <input
                 type="number"
@@ -403,9 +403,9 @@
         </div>
         <div class="col-6 col-md-3 col-lg-3">
           <!-- Target Input -->
-          <label for="totalTargetAmount" class="form-label mb-0">Max Profit</label>
+          <label for="totalTargetAmount" class="form-label mb-0">Max Target</label>
           <div class="input-group">
-            <span class="input-group-text">Target</span>
+            <span class="input-group-text">Profit</span>
             <template v-if="totalRiskTargetType === 'amount'">
               <input
                 type="number"
