@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <!-- Hero Section -->
-        <section class="row py-5 border">
+        <section class="row py-5 border border-success rounded">
             <div class="col-lg-8 mx-auto text-center">
                 <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
                 <h1 class="display-3 mb-4">Steadfast</h1>
@@ -21,9 +21,9 @@
             </div>
         </section>
         <!-- Sponsor to support development -->
-        <section class="row mt-3 py-4 border rounded" style="font-family: monospace;">
+        <section class="row mt-3 py-4 border border-danger rounded" style="font-family: monospace;">
             <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm border">
                     <div class="card-body text-center">
                         <h5 class="card-title mb-3">Quick & Easy Donation</h5>
                         <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mb-3 rounded shadow"
@@ -32,20 +32,18 @@
                             <span class="me-2 fw-bold">Scan to donate via</span>
                             <img src="/upi_logo.png" alt="UPI Logo" class="img-fluid" style="max-width: 60px;">
                         </div>
-                        <p class="text-muted small">Fast, secure, and convenient!</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-8 mb-3 mb-lg-0">
-                <h4 class="mb-3">Support Steadfast</h4>
-                <p class="mb-4">
+                <h3 class="mb-3 text-danger">Support Steadfast</h3>
+                <blockquote class="blockquote">
                     Join Steadfast's journey. Your support accelerates our progress and innovation.
                     Each contribution moves us forward in crafting a better trading experience for
                     our community.
-                </p>
+                </blockquote>
                 <a href="https://github.com/sponsors/narenkram" target="_blank"
-                    class="btn btn-outline-secondary btn-lg me-2 mb-2">
-                    <i class="fab fa-github me-2"></i>
+                    class="btn btn-outline-danger btn-md me-2 mt-2 ">
                     Donate via GitHub
                 </a>
             </div>
