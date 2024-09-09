@@ -10,13 +10,31 @@
                         Designed to survive and thrive in the options market.
                     </p>
                 </blockquote>
-                <button @click="openTradeView" class="btn btn-dark btn-lg">
+                <button @click="openTradeView" class="btn btn-success btn-lg">
                     ⚡ Launch App
                 </button>
                 <br />
                 <br />
                 <a href="https://t.me/steadfastapp" target="_blank" class="text-decoration-none">
                     💬 Join Telegram Community
+                </a>
+            </div>
+        </section>
+        <!-- Sponsor to support development -->
+        <section class="row mt-3 py-3 border">
+            <div class="col-lg-8">
+                <h5 style="font-family: monospace;">Support Steadfast</h5>
+                <p class="m-0" style="font-family: monospace;">
+                    Join Steadfast's journey. Your support accelerates our progress and innovation.
+                    Each contribution moves us forward in crafting a better trading experience for
+                    our community.
+                </p>
+            </div>
+            <div class="col-lg-4 d-flex justify-content-center align-items-center">
+                <a href="https://github.com/sponsors/narenkram" target="_blank"
+                    class="fs-5 btn btn-md btn-outline-danger w-100">
+                    <span>❤️</span>
+                    <span class="ms-2">Donate</span>
                 </a>
             </div>
         </section>
