@@ -315,6 +315,8 @@ const orderTypes = computed(() => {
     return ['MKT', 'LMT'];
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return ['MKT', 'LMT'];
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    return ['MKT', 'LMT'];
   }
   return [];
 });
@@ -325,6 +327,9 @@ const productTypes = computed(() => {
     return ['Intraday', 'Margin'];
   }
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['Intraday', 'Margin'];
+  }
+  else if (selectedBroker.value?.brokerName === 'PaperTrading') {
     return ['Intraday', 'Margin'];
   }
   return [];
@@ -346,9 +351,9 @@ const availableBalance = computed(() => {
     return balance;
   }
   if (selectedBroker.value?.brokerName === 'PaperTrading') {
-    const cash = 1000000;
-    const payin = 0;
-    const marginUsed = 0;
+    const cash = Number(fundLimits.value.cash) || 0;
+    const payin = Number(fundLimits.value.payin) || 0;
+    const marginUsed = Number(fundLimits.value.marginused) || 0;
 
     // Use payin if cash is zero, otherwise use cash
     const availableFunds = cash === 0 ? payin : cash;
@@ -796,7 +801,7 @@ const symbolData = reactive({
   BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12', expiryDay: null }, // No specific expiry day
 });
 const updateExchangeSymbols = () => {
-  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
     exchangeSymbols.value = {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'],
       BFO: ['SENSEX', 'BANKEX'],
@@ -844,7 +849,11 @@ const fetchTradingData = async () => {
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     response = await fetch(`${BASE_URL}/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     // console.log('Shoonya Symbols:', response);
-  } else {
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    response = await fetch(`${BASE_URL}/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    // console.log('Paper Trading Symbols:', response);
+  }
+  else {
     throw new Error('Unsupported broker');
   }
 
@@ -1257,6 +1266,10 @@ const fetchFundLimit = async () => {
           FLATTRADE_CLIENT_ID: selectedBroker.value.clientId
         }
       });
+      fundLimits.value = {
+        cash: response.data.cash,
+        marginused: response.data.marginused,
+      };
     }
     else if (selectedBroker.value?.brokerName === 'Shoonya') {
       const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
@@ -1276,10 +1289,17 @@ const fetchFundLimit = async () => {
         // Add any other relevant fields from the Shoonya response
       };
     }
+    else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+      fundLimits.value = {
+        cash: 1000000,
+        marginused: 0,
+        payin: 0,
+      };
+    }
     else {
       throw new Error('Unsupported broker');
     }
-    fundLimits.value = response.data;
+    // fundLimits.value = response.data;
   } catch (error) {
     console.error('Failed to fetch fund limits:', error);
   }
@@ -1326,6 +1346,9 @@ const getProductTypeValue = (productType) => {
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
     return productType === 'Intraday' ? 'I' : 'M';
   }
+  else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    return productType === 'Intraday' ? 'I' : 'M';
+  }
   return productType;
 };
 const getTransactionType = (type) => {
@@ -1357,6 +1380,15 @@ const getExchangeSegment = () => {
       return 'BFO';
     } else {
       throw new Error("Selected exchange is not valid for Shoonya");
+    }
+  }
+  else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    if (selectedExchange.value === 'NFO') {
+      return 'NFO';
+    } else if (selectedExchange.value === 'BFO') {
+      return 'BFO';
+    } else {
+      throw new Error("Selected exchange is not valid for Paper Trading");
     }
   }
   else {
