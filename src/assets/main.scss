@@ -277,11 +277,11 @@ input:focus {
 }
 .ltp-range-bar {
   display: block;
+  overflow: hidden;
 }
 
 .ltp-range {
   position: relative;
-  flex-grow: 1;
   height: 8px;
   background-color: var(--bs-light);
   border: 1px solid var(--bs-border-color);
