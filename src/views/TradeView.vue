@@ -888,7 +888,7 @@ const formatDate = (dateString) => {
     return ''; // Return empty string if data hasn't been fetched or dateString is null
   }
 
-  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+  if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
     return dateString;
   }
   return dateString;
@@ -907,6 +907,9 @@ const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
     filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
@@ -968,7 +971,7 @@ const synchronizeStrikes = () => {
 const synchronizeCallStrikes = () => {
   if (selectedPutStrike.value && selectedPutStrike.value.tradingSymbol) {
     let baseSymbol;
-    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
       baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '');
     }
     const matchingCallStrike = callStrikes.value.find(strike =>
@@ -986,7 +989,7 @@ const synchronizeCallStrikes = () => {
 const synchronizePutStrikes = () => {
   if (selectedCallStrike.value && selectedCallStrike.value.tradingSymbol) {
     let baseSymbol;
-    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya') {
+    if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
       baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '');
     }
     const matchingPutStrike = putStrikes.value.find(strike =>
@@ -2331,6 +2334,8 @@ const connectWebSocket = () => {
     websocketUrl = 'ws://localhost:8765';
   } else if (selectedBroker.value?.brokerName === 'Shoonya' && brokerStatus.value === 'Connected') {
     websocketUrl = 'ws://localhost:8766';
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading' && brokerStatus.value === 'Connected') {
+    websocketUrl = 'ws://localhost:8766';
   }
 
   console.log(`Connecting to WebSocket at ${websocketUrl}`);
@@ -2912,6 +2917,9 @@ watch(
       }
       if (selectedBroker.value?.brokerName === 'Shoonya') {
         setShoonyaCredentials();
+      }
+      if (selectedBroker.value?.brokerName === 'PaperTrading') {
+        // based on selection of broker, the credentials will be set
       }
     }
   },
