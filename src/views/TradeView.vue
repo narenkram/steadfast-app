@@ -733,12 +733,11 @@ const toggleOvertradeProtection = () => {
 const checkOvertradeProtection = () => {
   if (!overtradeProtection.value) return;
 
-  const maxAllowedLoss = -1500; // Set your desired maximum allowed loss
-  const maxAllowedProfit = 3000; // Set your desired maximum allowed profit
+  const totalValue = Math.max(totalBuyValue.value, totalSellValue.value);
 
-  if (totalProfit.value <= maxAllowedLoss || totalProfit.value >= maxAllowedProfit) {
+  if (totalValue > availableBalance.value) {
     if (!killSwitchActive.value) {
-      toastMessage.value = `Overtrade protection activated. Total P&L: ${totalProfit.value.toFixed(2)}`;
+      toastMessage.value = `Overtrade protection activated. Total value: ₹${totalValue.toFixed(2)} exceeds available balance: ₹${availableBalance.value.toFixed(2)}`;
       showToast.value = true;
       toggleKillSwitch();
     }
