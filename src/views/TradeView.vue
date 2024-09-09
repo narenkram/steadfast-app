@@ -2327,6 +2327,56 @@ const setShoonyaCredentials = async () => {
     showToast.value = true;
   }
 };
+const setPaperTradingCredentials = async () => {
+  try {
+    if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'PaperTrading') {
+      toastMessage.value = 'PaperTrading broker is not selected';
+      showToast.value = true;
+      return;
+    }
+
+    // Check if the broker status is 'Connected'
+    if (brokerStatus.value !== 'Connected') {
+      console.error('PaperTrading broker is not connected');
+      toastMessage.value = 'PaperTrading broker is not connected';
+      showToast.value = true;
+      return;
+    }
+
+    const clientId = selectedBroker.value.clientId;
+    const apiKey = selectedBroker.value.apiKey;
+
+    if (!clientId || !apiKey) {
+      console.error('PaperTrading client ID or API key is missing');
+      toastMessage.value = 'PaperTrading credentials are missing';
+      showToast.value = true;
+      return;
+    }
+
+    // Get the selected broker for paper trading
+    const selectedPaperBroker = localStorage.getItem('selectedBrokerForPaper');
+    if (!selectedPaperBroker) {
+      console.error('No broker selected for paper trading');
+      toastMessage.value = 'No broker selected for paper trading';
+      showToast.value = true;
+      return;
+    }
+
+    // Set credentials based on the selected broker
+    if (selectedPaperBroker.brokerName === 'Flattrade') {
+      await setFlattradeCredentials();
+    } else if (selectedPaperBroker.brokerName === 'Shoonya') {
+      await setShoonyaCredentials();
+    }
+    toastMessage.value = 'PaperTrading credentials set successfully';
+    showToast.value = true;
+
+  } catch (error) {
+    console.error('Error setting PaperTrading credentials:', error);
+    toastMessage.value = 'Failed to set PaperTrading credentials';
+    showToast.value = true;
+  }
+};
 const connectWebSocket = () => {
   let websocketUrl;
 
@@ -2335,7 +2385,16 @@ const connectWebSocket = () => {
   } else if (selectedBroker.value?.brokerName === 'Shoonya' && brokerStatus.value === 'Connected') {
     websocketUrl = 'ws://localhost:8766';
   } else if (selectedBroker.value?.brokerName === 'PaperTrading' && brokerStatus.value === 'Connected') {
-    websocketUrl = 'ws://localhost:8766';
+    // Get the selected broker for paper trading
+    const selectedPaperBroker = JSON.parse(localStorage.getItem('selectedBrokerForPaper') || '{}');
+    if (selectedPaperBroker.brokerName === 'Flattrade') {
+      websocketUrl = 'ws://localhost:8765';
+    } else if (selectedPaperBroker.brokerName === 'Shoonya') {
+      websocketUrl = 'ws://localhost:8766';
+    } else {
+      console.error('Invalid broker selected for paper trading');
+      return;
+    }
   }
 
   console.log(`Connecting to WebSocket at ${websocketUrl}`);
@@ -2919,7 +2978,7 @@ watch(
         setShoonyaCredentials();
       }
       if (selectedBroker.value?.brokerName === 'PaperTrading') {
-        // based on selection of broker, the credentials will be set
+        setPaperTradingCredentials();
       }
     }
   },

@@ -76,6 +76,16 @@ const copyToClipboard = (text) => {
     clearErrorMessage();
   });
 };
+const saveSelectedBrokerForPaper = () => {
+  if (selectedBrokerForPaper.value) {
+    localStorage.setItem('selectedBrokerForPaper', selectedBrokerForPaper.value);
+    toastMessage.value = 'Selected broker for paper trading saved';
+    showToast.value = true;
+  } else {
+    toastMessage.value = 'Please select a broker for paper trading';
+    showToast.value = true;
+  }
+};
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -126,6 +136,10 @@ onMounted(() => {
 watch(selectedBrokerForPaper, (newBroker) => {
   if (newBroker) {
     localStorage.setItem('selectedBrokerForPaper', JSON.stringify(newBroker));
+    statusMessage.value = 'Selected broker for paper trading saved';
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 3000);
   } else {
     localStorage.removeItem('selectedBrokerForPaper');
   }
