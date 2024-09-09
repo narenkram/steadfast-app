@@ -18,6 +18,7 @@ const toastMessage = ref('');
 const activeTab = ref('positions');
 const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
 const overtradeProtection = ref(localStorage.getItem('OvertradeProtection') === 'true');
+const experimentalFeatures = ref(JSON.parse(localStorage.getItem('ExperimentalFeatures') || 'false'));
 const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
 const currentTime = ref(Date.now());
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false');
@@ -730,6 +731,10 @@ const toggleKillSwitch = async () => {
 const toggleOvertradeProtection = () => {
   overtradeProtection.value = !overtradeProtection.value;
   localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString());
+};
+const toggleExperimentalFeatures = () => {
+  experimentalFeatures.value = !experimentalFeatures.value;
+  localStorage.setItem('ExperimentalFeatures', JSON.stringify(experimentalFeatures.value));
 };
 const checkOvertradeProtection = () => {
   if (!overtradeProtection.value) return;
@@ -3081,5 +3086,8 @@ watch(targetAction, (newValue) => {
 });
 watch([totalBuyValue, totalSellValue, availableBalance], () => {
   checkOvertradeProtection();
+});
+watch(experimentalFeatures, (newValue) => {
+  localStorage.setItem('ExperimentalFeatures', JSON.stringify(newValue));
 });
 </script>

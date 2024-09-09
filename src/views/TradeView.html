@@ -1237,7 +1237,7 @@
         aria-labelledby="basket-tab"
         tabindex="0"
       >
-        <div class="row py-3">
+        <div class="row py-3" v-if="experimentalFeatures">
           <div class="col-12">
             <h5>Ready Made Strategies</h5>
             <div class="mb-3">
@@ -1273,6 +1273,8 @@
                 </option>
               </select>
             </div>
+          </div>
+          <div class="col-12">
             <div class="row">
               <div v-for="strategy in filteredStrategies" :key="strategy.id" class="col-md-3 mb-3">
                 <div class="card strategy-card" @click="loadStrategy(strategy)">
@@ -1682,6 +1684,21 @@
               />
               <label class="form-check-label" for="overtradeProtection">
                 {{ overtradeProtection ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+          </div>
+          <!-- Enable / Disable Experimental Features -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="experimentalFeatures" class="form-label">Experimental Features</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="experimentalFeatures"
+                v-model="experimentalFeatures"
+              />
+              <label class="form-check-label" for="experimentalFeatures">
+                {{ experimentalFeatures ? 'Enabled' : 'Disabled' }}
               </label>
             </div>
           </div>
