@@ -174,11 +174,13 @@ const targetAction = ref(localStorage.getItem('targetAction') || 'close');
 const brokerStatus = computed(() => {
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
   const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
+  const paperTradingDetails = JSON.parse(localStorage.getItem('broker_PaperTrading') || '{}');
 
   const flattradeClientId = flattradeDetails.clientId;
   const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN');
   const shoonyaApiToken = localStorage.getItem('SHOONYA_API_TOKEN');
   const shoonyaClientId = shoonyaDetails.clientId;
+  const paperTradingClientId = paperTradingDetails.clientId;
 
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (flattradeClientId && flattradeApiToken) {
@@ -189,6 +191,12 @@ const brokerStatus = computed(() => {
   else if (selectedBroker.value?.brokerName === 'Shoonya') {
     if (shoonyaClientId && shoonyaApiToken) {
       return tokenStatus.Shoonya === 'valid' ? 'Connected' : 'Token Expired';
+    }
+    return 'Not Connected';
+  }
+  else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    if (paperTradingClientId) {
+      return 'Connected'; // PaperTrading is always connected if a client ID exists
     }
     return 'Not Connected';
   }
@@ -335,6 +343,17 @@ const availableBalance = computed(() => {
 
     const balance = Math.floor(availableFunds - marginUsed);
     // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
+    return balance;
+  }
+  if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    const cash = 1000000;
+    const payin = 0;
+    const marginUsed = 0;
+
+    // Use payin if cash is zero, otherwise use cash
+    const availableFunds = cash === 0 ? payin : cash;
+
+    const balance = Math.floor(availableFunds - marginUsed);
     return balance;
   }
   return null;
