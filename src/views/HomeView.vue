@@ -29,13 +29,17 @@
                     Each contribution moves us forward in crafting a better trading experience for
                     our community.
                 </p>
-            </div>
-            <div class="col-lg-4 d-flex justify-content-center align-items-center">
                 <a href="https://github.com/sponsors/narenkram" target="_blank"
-                    class="fs-5 btn btn-md btn-outline-danger w-100">
+                    class="btn btn-md mt-3 btn-outline-danger">
                     <span>❤️</span>
-                    <span class="ms-2">Donate</span>
+                    <span class="ms-2">Donate via GitHub</span>
                 </a>
+            </div>
+            <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
+                <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mt-2" style="max-width: 150px;">
+                <h4 class="text-center mt-1" style="font-size: 0.9rem;">Scan to donate via UPI <img src="/upi_logo.png"
+                        alt="UPI Logo" class="img-fluid mt-2" style="max-width: 60px;">
+                </h4>
             </div>
         </section>
 
