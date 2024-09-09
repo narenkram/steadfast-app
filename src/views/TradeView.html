@@ -167,7 +167,7 @@
 </section>
 
 <!-- Trade Warning MessageWindow -->
-<section v-if="riskReached" class="row py-1">
+<section v-if="riskReached && !killSwitchActive" class="row py-1">
   <div class="col-12">
     <div class="bg-warning text-dark p-3 rounded-3 shadow">
       <div class="d-flex align-items-center justify-content-between">
@@ -186,7 +186,7 @@
 </section>
 
 <!-- Trade Success MessageWindow -->
-<section v-if="targetReached" class="row py-1">
+<section v-if="targetReached && !killSwitchActive" class="row py-1">
   <div class="col-12">
     <div class="bg-success text-white p-3 rounded-3 shadow">
       <div class="d-flex align-items-center justify-content-between">
