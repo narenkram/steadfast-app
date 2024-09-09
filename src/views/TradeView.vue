@@ -17,6 +17,7 @@ const showToast = ref(false);
 const toastMessage = ref('');
 const activeTab = ref('positions');
 const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
+const overtradeProtection = ref(localStorage.getItem('OvertradeProtection') === 'true');
 const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
 const currentTime = ref(Date.now());
 const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false');
@@ -699,10 +700,12 @@ const toggleKillSwitch = async () => {
   }
 
   if (newStatus === 'DEACTIVATED' && remainingTimeInMs.value > 0) {
-    cycleClockEmoji();
-    toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation';
-    showToast.value = true;
-    return;
+    if (!overtradeProtection.value) {
+      cycleClockEmoji();
+      toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation';
+      showToast.value = true;
+      return;
+    }
   }
 
   // Handle different response messages
@@ -722,6 +725,24 @@ const toggleKillSwitch = async () => {
   }
 
   showToast.value = true;
+};
+const toggleOvertradeProtection = () => {
+  overtradeProtection.value = !overtradeProtection.value;
+  localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString());
+};
+const checkOvertradeProtection = () => {
+  if (!overtradeProtection.value) return;
+
+  const maxAllowedLoss = -1500; // Set your desired maximum allowed loss
+  const maxAllowedProfit = 3000; // Set your desired maximum allowed profit
+
+  if (totalProfit.value <= maxAllowedLoss || totalProfit.value >= maxAllowedProfit) {
+    if (!killSwitchActive.value) {
+      toastMessage.value = `Overtrade protection activated. Total P&L: ${totalProfit.value.toFixed(2)}`;
+      showToast.value = true;
+      toggleKillSwitch();
+    }
+  }
 };
 const updateSelectedBroker = () => {
   const availableBrokerNames = availableBrokers.value;
@@ -3041,5 +3062,8 @@ watch(closePositionsRisk, (newValue) => {
 
 watch(closePositionsTarget, (newValue) => {
   localStorage.setItem('closePositionsTarget', JSON.stringify(newValue));
+});
+watch(totalProfit, (newValue) => {
+  checkOvertradeProtection();
 });
 </script>
