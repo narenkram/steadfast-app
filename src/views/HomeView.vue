@@ -21,25 +21,33 @@
             </div>
         </section>
         <!-- Sponsor to support development -->
-        <section class="row mt-3 py-3 border">
-            <div class="col-lg-8">
-                <h5 style="font-family: monospace;">Support Steadfast</h5>
-                <p class="m-0" style="font-family: monospace;">
+        <section class="row mt-3 py-4 border rounded" style="font-family: monospace;">
+            <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-3">Quick & Easy Donation</h5>
+                        <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mb-3 rounded shadow"
+                            style="max-width: 200px;">
+                        <div class="d-flex justify-content-center align-items-center mb-2">
+                            <span class="me-2 fw-bold">Scan to donate via</span>
+                            <img src="/upi_logo.png" alt="UPI Logo" class="img-fluid" style="max-width: 60px;">
+                        </div>
+                        <p class="text-muted small">Fast, secure, and convenient!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 mb-3 mb-lg-0">
+                <h4 class="mb-3">Support Steadfast</h4>
+                <p class="mb-4">
                     Join Steadfast's journey. Your support accelerates our progress and innovation.
                     Each contribution moves us forward in crafting a better trading experience for
                     our community.
                 </p>
                 <a href="https://github.com/sponsors/narenkram" target="_blank"
-                    class="btn btn-md mt-3 btn-outline-danger">
-                    <span>❤️</span>
-                    <span class="ms-2">Donate via GitHub</span>
+                    class="btn btn-outline-secondary btn-lg me-2 mb-2">
+                    <i class="fab fa-github me-2"></i>
+                    Donate via GitHub
                 </a>
-            </div>
-            <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
-                <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mt-2" style="max-width: 150px;">
-                <h4 class="text-center mt-1" style="font-size: 0.9rem;">Scan to donate via UPI <img src="/upi_logo.png"
-                        alt="UPI Logo" class="img-fluid mt-2" style="max-width: 60px;">
-                </h4>
             </div>
         </section>
 
