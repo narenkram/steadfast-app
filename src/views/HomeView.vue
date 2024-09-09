@@ -15,13 +15,13 @@
                 </button>
                 <br />
                 <br />
-                <a href="https://t.me/steadfastapp" target="_blank" class="text-decoration-none">
+                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline btn-md">
                     💬 Join Telegram Community
                 </a>
             </div>
         </section>
         <!-- Sponsor to support development -->
-        <section class="row mt-3 py-4 border border-danger rounded" style="font-family: monospace;">
+        <section class="row mt-3 py-4 border border-danger rounded">
             <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
                 <div class="card shadow-sm border">
                     <div class="card-body text-center">
@@ -43,7 +43,7 @@
                     our community.
                 </blockquote>
                 <a href="https://github.com/sponsors/narenkram" target="_blank"
-                    class="btn btn-outline-danger btn-md me-2 mt-2 ">
+                    class="btn btn-danger btn-md me-2 mt-2 ">
                     Donate via GitHub
                 </a>
             </div>
