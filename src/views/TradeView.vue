@@ -160,6 +160,9 @@ const strategies = ref([
   { id: 32, name: 'Strap', type: 'Others', image: '/strategies/strap.svg' },
 
 ]);
+const riskAction = ref(localStorage.getItem('riskAction') || 'close');
+const targetAction = ref(localStorage.getItem('targetAction') || 'close');
+
 
 
 
@@ -3041,16 +3044,24 @@ watch(totalTargetPercentage, (newValue) => {
 // Add a watch effect to handle the countdown when risk is reached
 watch(riskReached, async (newValue) => {
   if (newValue && closePositionsRisk.value) {
-    console.log('Risk threshold reached. Closing all positions.');
-    await closeAllPositions();
-    showToastNotification('All positions closed due to risk threshold');
+    console.log('Risk threshold reached. Taking action.');
+    if (riskAction.value === 'close') {
+      await closeAllPositions();
+      showToastNotification('All positions closed due to risk threshold');
+    } else if (riskAction.value === 'killSwitch') {
+      await toggleKillSwitch();
+    }
   }
 });
 watch(targetReached, async (newValue) => {
   if (newValue && closePositionsTarget.value) {
-    console.log('Target reached. Closing all positions.');
-    await closeAllPositions();
-    showToastNotification('All positions closed due to target reached');
+    console.log('Target reached. Taking action.');
+    if (targetAction.value === 'close') {
+      await closeAllPositions();
+      showToastNotification('All positions closed due to target reached');
+    } else if (targetAction.value === 'killSwitch') {
+      await toggleKillSwitch();
+    }
   }
 });
 watch(closePositionsRisk, (newValue) => {
@@ -3059,6 +3070,14 @@ watch(closePositionsRisk, (newValue) => {
 
 watch(closePositionsTarget, (newValue) => {
   localStorage.setItem('closePositionsTarget', JSON.stringify(newValue));
+});
+
+watch(riskAction, (newValue) => {
+  localStorage.setItem('riskAction', newValue);
+});
+
+watch(targetAction, (newValue) => {
+  localStorage.setItem('targetAction', newValue);
 });
 watch([totalBuyValue, totalSellValue, availableBalance], () => {
   checkOvertradeProtection();
