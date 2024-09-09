@@ -700,12 +700,10 @@ const toggleKillSwitch = async () => {
   }
 
   if (newStatus === 'DEACTIVATED' && remainingTimeInMs.value > 0) {
-    if (!overtradeProtection.value) {
-      cycleClockEmoji();
-      toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation';
-      showToast.value = true;
-      return;
-    }
+    cycleClockEmoji();
+    toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation';
+    showToast.value = true;
+    return;
   }
 
   // Handle different response messages
