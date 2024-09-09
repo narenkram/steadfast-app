@@ -3062,7 +3062,7 @@ watch(closePositionsRisk, (newValue) => {
 watch(closePositionsTarget, (newValue) => {
   localStorage.setItem('closePositionsTarget', JSON.stringify(newValue));
 });
-watch(totalProfit, (newValue) => {
+watch([totalBuyValue, totalSellValue, availableBalance], () => {
   checkOvertradeProtection();
 });
 </script>
