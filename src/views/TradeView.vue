@@ -763,11 +763,11 @@ const toggleExperimentalFeatures = () => {
 const checkOvertradeProtection = () => {
   if (!overtradeProtection.value) return;
 
-  const totalValue = Math.max(totalBuyValue.value, totalSellValue.value);
+  const totalValue = Math.max(totalBuyValue, totalSellValue);
 
-  if (totalValue > availableBalance.value) {
+  if (totalValue > availableBalance) {
     if (!killSwitchActive.value) {
-      toastMessage.value = `Overtrade protection activated. Total value: ₹${totalValue.toFixed(2)} exceeds available balance: ₹${availableBalance.value.toFixed(2)}`;
+      toastMessage.value = `Overtrade protection activated. Total value: ₹${totalValue.toFixed(2)} exceeds available balance: ₹${availableBalance}`;
       showToast.value = true;
       toggleKillSwitch();
     }
