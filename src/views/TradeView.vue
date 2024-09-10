@@ -3202,7 +3202,8 @@ watch(riskAction, (newValue) => {
 watch(targetAction, (newValue) => {
   localStorage.setItem('targetAction', newValue);
 });
-watch([totalBuyValue, totalSellValue, availableBalance], () => {
+watch([totalBuyValue, totalSellValue, availableBalance], async () => {
+  await fetchFundLimit();
   checkOvertradeProtection();
 });
 watch(experimentalFeatures, (newValue) => {
