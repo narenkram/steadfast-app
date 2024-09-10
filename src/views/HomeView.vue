@@ -26,7 +26,7 @@
                 <div class="card shadow-sm border">
                     <div class="card-body text-center">
                         <h5 class="card-title mb-3">Quick & Easy Donation</h5>
-                        <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mb-3 rounded shadow"
+                        <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mb-3 rounded"
                             style="max-width: 200px;">
                         <div class="d-flex justify-content-center align-items-center mb-2">
                             <span class="me-2 fw-bold">Scan to donate via</span>
