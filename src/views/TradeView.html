@@ -334,8 +334,12 @@
               :class="{ 'disabled-form': isFormDisabled }"
               @change="handleOrderTypeChange"
             >
-              <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">
-                {{ orderType }}
+              <option
+                v-for="(type, index) in displayOrderTypes"
+                :key="index"
+                :value="orderTypes[index]"
+              >
+                {{ type }}
               </option>
             </select>
           </div>

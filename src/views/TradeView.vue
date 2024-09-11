@@ -320,6 +320,18 @@ const orderTypes = computed(() => {
   }
   return [];
 });
+const displayOrderTypes = computed(() => {
+  return orderTypes.value.map(type => {
+    switch (type) {
+      case 'MKT':
+        return 'Market';
+      case 'LMT':
+        return 'Limit';
+      default:
+        return type;
+    }
+  });
+});
 const selectedOrderType = ref(orderTypes.value[0]);
 const previousOrderType = ref(orderTypes.value[0]);
 const productTypes = computed(() => {
