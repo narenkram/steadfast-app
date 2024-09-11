@@ -164,6 +164,9 @@
     color: var(--bs-body-color);
     background-color: var(--bs-light);
   }
+  .text-muted {
+    color: var(--bs-secondary) !important;
+  }
 }
 
 // Styles that don't change based on color scheme
