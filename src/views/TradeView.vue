@@ -698,6 +698,19 @@ const basketLTPs = computed(() => {
 const filteredStrategies = computed(() => {
   return strategies.value.filter(strategy => strategy.type === strategyType.value);
 });
+const isValidLimitPrice = computed(() => {
+  return limitPrice.value > 0 && limitPrice.value !== '';
+});
+const limitPriceErrorMessage = computed(() => {
+  if (limitPrice.value === '') {
+    return 'Limit price is required.';
+  } else if (limitPrice.value <= 0) {
+    return 'Enter a limit price.';
+  }
+  return '';
+});
+
+
 
 
 
@@ -2801,7 +2814,12 @@ const deleteBasket = (basketId) => {
     editingBasketId.value = null;
   }
 };
-
+const validateAndPlaceOrder = () => {
+  if (isValidLimitPrice.value) {
+    placeOrder(modalTransactionType.value, modalOptionType.value);
+    // The modal will be dismissed automatically due to the data-bs-dismiss attribute
+  }
+};
 
 
 
