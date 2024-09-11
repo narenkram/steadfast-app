@@ -1334,6 +1334,13 @@ const setOrderDetails = (transactionType, optionType) => {
   selectedOrderType.value = orderTypes.value[1]; // Set selectedOrderType to LIMIT or LMT based on broker
   selectedStrike.value = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value;
 };
+const handleOrderClick = (transactionType, optionType) => {
+  if (selectedOrderType.value !== orderTypes.value[1]) { // If not LMT order
+    placeOrder(getTransactionType(transactionType), optionType);
+  } else {
+    setOrderDetails(transactionType, optionType);
+  }
+};
 const resetOrderTypeIfNeeded = () => {
   if (previousOrderType.value === orderTypes.value[0]) { // Check if previousOrderType is MARKET or MKT
     resetOrderType();

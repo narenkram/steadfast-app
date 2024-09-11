@@ -328,24 +328,16 @@
           <div class="input-group">
             <select
               id="OrderType"
-              class="form-select w-50"
+              class="form-select"
               aria-label="OrderType"
               v-model="selectedOrderType"
               :class="{ 'disabled-form': isFormDisabled }"
+              @change="handleOrderTypeChange"
             >
               <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">
                 {{ orderType }}
               </option>
             </select>
-            <span class="input-group-text p-0 w-50" v-if="selectedOrderType === 'LMT'">
-              <input
-                type="number"
-                id="DirectLimitPrice"
-                class="form-control"
-                v-model="limitPrice"
-                placeholder="Price"
-              />
-            </span>
           </div>
         </div>
         <!-- Total Risk and Target by Capital Or Amount -->
@@ -656,8 +648,9 @@
             <button
               type="button"
               class="btn btn-sm btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'CALL')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}"
+              @click="handleOrderClick('BUY', 'CALL')"
+              :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
+              :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null"
             >
               <span v-if="enableHotKeys">⬆️</span>
               Buy CE
@@ -691,8 +684,9 @@
             <button
               type="button"
               class="btn btn-sm btn-danger fs-5 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'CALL')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}"
+              @click="handleOrderClick('SELL', 'CALL')"
+              :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
+              :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null"
             >
               <span v-if="enableHotKeys">⬅️</span>
               Sell CE
@@ -753,8 +747,9 @@
             <button
               type="button"
               class="btn btn-sm btn-success fs-5 my-2 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('BUY'), 'PUT')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}"
+              @click="handleOrderClick('BUY', 'PUT')"
+              :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
+              :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null"
             >
               <span v-if="enableHotKeys">⬇️</span>
               Buy PE
@@ -788,8 +783,9 @@
             <button
               type="button"
               class="btn btn-sm btn-danger fs-5 w-75"
-              @click="selectedOrderType !== (orderTypes.value && orderTypes.value[1]) && placeOrder(getTransactionType('SELL'), 'PUT')"
-              v-bind="selectedOrderType === (orderTypes.value && orderTypes.value[1]) ? { 'data-bs-toggle': 'modal', 'data-bs-target': '#PlaceLimitOrderWindow' } : {}"
+              @click="handleOrderClick('SELL', 'PUT')"
+              :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
+              :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null"
             >
               <span v-if="enableHotKeys">➡️</span>
               Sell PE
