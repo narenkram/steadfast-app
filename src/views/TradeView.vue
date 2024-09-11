@@ -1920,6 +1920,15 @@ const placeBasketOrder = async (order) => {
 
     console.log(`Placed basket order for ${order.tradingSymbol}`);
     console.log("Basket order placed successfully:", response.data);
+    
+    // Add a delay before fetching updated data
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update both orders and positions
+    await updateOrdersAndPositions();
+
+    // Update fund limits
+    await updateFundLimits();
 
     return true;
   } catch (error) {
