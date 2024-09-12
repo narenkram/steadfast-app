@@ -648,7 +648,7 @@
       <div class="row align-items-center justify-content-between mt-3">
         <!-- Call Strike Buy/Sell Buttons -->
         <div class="order-1 order-md-1 order-lg-1 col-6 col-md-4 col-lg-4">
-          <div class="btn-group w-100">
+          <div class="btn-group col-12 col-md-10 col-lg-12">
             <button
               type="button"
               class="btn btn-sm btn-success fs-5 my-2 w-75"
@@ -684,7 +684,7 @@
               </li>
             </ul>
           </div>
-          <div class="btn-group w-100">
+          <div class="btn-group col-12 col-md-10 col-lg-12">
             <button
               type="button"
               class="btn btn-sm btn-danger fs-5 w-75"
@@ -727,7 +727,7 @@
             <div class="col-6 col-md-12 col-lg-12">
               <button
                 v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
-                class="btn btn-sm btn-outline fs-5 w-100 w-md-75 w-lg-75"
+                class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10"
                 @click="closeAllPositions"
               >
                 <span v-if="enableHotKeys">F6 / </span>
@@ -735,7 +735,7 @@
               </button>
               <button
                 v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
-                class="btn btn-sm btn-outline fs-5 w-100 w-md-75 w-lg-75"
+                class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10"
                 @click="closeSelectedPositions"
               >
                 <span v-if="enableHotKeys">F6 / </span>
@@ -744,7 +744,7 @@
             </div>
             <div class="col-6 col-md-12 col-lg-12">
               <button
-                class="btn btn-sm btn-outline fs-5 w-100 w-md-75 w-lg-75 mt-md-2 mt-lg-2"
+                class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10 mt-md-2 mt-lg-2"
                 @click="cancelPendingOrders"
               >
                 <span v-if="enableHotKeys">F7 / </span>
@@ -754,8 +754,8 @@
           </div>
         </div>
         <!-- Put Strike Buy/Sell Buttons -->
-        <div class="order-2 order-md-3 order-lg-3 col-6 col-md-4 col-lg-4">
-          <div class="btn-group w-100">
+        <div class="order-2 order-md-3 order-lg-3 col-6 col-md-4 col-lg-4 text-end">
+          <div class="btn-group col-12 col-md-10 col-lg-12">
             <button
               type="button"
               class="btn btn-sm btn-success fs-5 my-2 w-75"
@@ -791,7 +791,7 @@
               </li>
             </ul>
           </div>
-          <div class="btn-group w-100">
+          <div class="btn-group col-12 col-md-10 col-lg-12">
             <button
               type="button"
               class="btn btn-sm btn-danger fs-5 w-75"
