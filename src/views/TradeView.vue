@@ -1920,7 +1920,7 @@ const placeBasketOrder = async (order) => {
 
     console.log(`Placed basket order for ${order.tradingSymbol}`);
     console.log("Basket order placed successfully:", response.data);
-    
+
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -2829,6 +2829,22 @@ const validateAndPlaceOrder = () => {
     // The modal will be dismissed automatically due to the data-bs-dismiss attribute
   }
 };
+const checkAndShowAdaptabilityGuide = () => {
+  const lastShownDate = localStorage.getItem('adaptabilityGuideLastShown');
+  const today = new Date().toDateString();
+
+  if (lastShownDate !== today) {
+    // Trigger the modal
+    const showButton = document.getElementById('showAdaptabilityGuideBtn');
+    if (showButton) {
+      showButton.click();
+    }
+
+    // Update the last shown date
+    localStorage.setItem('adaptabilityGuideLastShown', today);
+  }
+};
+
 
 
 
@@ -2838,6 +2854,7 @@ const validateAndPlaceOrder = () => {
 
 // Lifecycle hooks
 onMounted(async () => {
+  checkAndShowAdaptabilityGuide();
   await checkAllTokens();
   initKillSwitch();
   const storedBroker = localStorage.getItem('selectedBroker');
