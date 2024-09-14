@@ -328,7 +328,10 @@
             <button @click="getOrderMargin" :disabled="selectedBroker?.brokerName !== 'Flattrade'">
               Get Order Margin
             </button>
-            <p v-if="orderMargin !== null">Margin: ₹{{ orderMargin }}</p>
+            <div v-if="orderMargin.call !== null && orderMargin.put !== null">
+              <p>Call Margin: ₹{{ orderMargin.call }}</p>
+              <p>Put Margin: ₹{{ orderMargin.put }}</p>
+            </div>
             <p v-else>Margin: Not available</p>
           </div>
         </div>
