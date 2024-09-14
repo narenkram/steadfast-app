@@ -167,7 +167,7 @@ const orderMargin = reactive({
   call: null,
   put: null
 });
-
+const limitOffset = ref(0);
 
 
 
@@ -315,22 +315,26 @@ const sortedPositions = computed(() => {
   });
 });
 const orderTypes = computed(() => {
-  if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return ['MKT', 'LMT'];
-  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return ['MKT', 'LMT'];
-  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-    return ['MKT', 'LMT'];
+  if (selectedBroker.value?.brokerName === 'Flattrade' ||
+    selectedBroker.value?.brokerName === 'Shoonya' ||
+    selectedBroker.value?.brokerName === 'PaperTrading') {
+    return ['MKT', 'LMT', 'LMT', 'LMT', 'MKT'];
   }
   return [];
 });
 const displayOrderTypes = computed(() => {
-  return orderTypes.value.map(type => {
-    switch (type) {
-      case 'MKT':
+  return orderTypes.value.map((type, index) => {
+    switch (index) {
+      case 0:
         return 'Market';
-      case 'LMT':
+      case 1:
         return 'Limit';
+      case 2:
+        return 'Limit at LTP';
+      case 3:
+        return 'Limit at Offset';
+      case 4:
+        return 'Market Protection';
       default:
         return type;
     }
@@ -713,7 +717,9 @@ const limitPriceErrorMessage = computed(() => {
   }
   return '';
 });
-
+const isOffsetOrderType = computed(() => {
+  return selectedOrderType.value === orderTypes.value[3]; // 'Limit at Offset'
+});
 
 
 
