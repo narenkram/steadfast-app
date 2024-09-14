@@ -1469,42 +1469,61 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
 };
 const getOrderMargin = async () => {
   try {
-    if (selectedBroker.value?.brokerName !== 'Flattrade') {
-      throw new Error('Order margin calculation is only available for Flattrade');
+    if (!['Flattrade', 'Shoonya'].includes(selectedBroker.value?.brokerName)) {
+      throw new Error('Order margin calculation is only available for Flattrade and Shoonya');
     }
 
-    const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
-    if (!FLATTRADE_API_TOKEN) {
-      throw new Error('Flattrade API Token is missing');
+    const API_TOKEN = localStorage.getItem(`${selectedBroker.value.brokerName.toUpperCase()}_API_TOKEN`);
+    if (!API_TOKEN) {
+      throw new Error(`${selectedBroker.value.brokerName} API Token is missing`);
     }
 
     const clientId = selectedBroker.value.clientId;
     if (!clientId) {
-      throw new Error('Flattrade client ID is missing');
+      throw new Error(`${selectedBroker.value.brokerName} client ID is missing`);
     }
 
     const exchangeSegment = getExchangeSegment();
 
     // Function to get margin for a single strike
     const getMarginForStrike = async (strike, type) => {
-      const orderData = {
-        uid: clientId,
-        actid: clientId,
-        exch: exchangeSegment,
-        tsym: strike.tradingSymbol,
-        qty: selectedQuantity.value.toString(),
-        prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : "0",
-        prd: selectedProductType.value,
-        trantype: getTransactionType('BUY'), // You might want to make this dynamic
-        prctyp: selectedOrderType.value,
-      };
+      let orderData, endpoint;
+
+      if (selectedBroker.value.brokerName === 'Flattrade') {
+        orderData = {
+          uid: clientId,
+          actid: clientId,
+          exch: exchangeSegment,
+          tsym: strike.tradingSymbol,
+          qty: selectedQuantity.value.toString(),
+          prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : "0",
+          prd: selectedProductType.value,
+          trantype: getTransactionType('BUY'),
+          prctyp: selectedOrderType.value,
+        };
+        endpoint = `${BASE_URL}/flattradeGetOrderMargin`;
+      } else if (selectedBroker.value.brokerName === 'Shoonya') {
+        orderData = {
+          uid: clientId,
+          actid: clientId,
+          exch: exchangeSegment,
+          tsym: strike.tradingSymbol,
+          qty: selectedQuantity.value.toString(),
+          prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : "0",
+          prd: selectedProductType.value,
+          trantype: getTransactionType('BUY'),
+          prctyp: selectedOrderType.value,
+          // Add any additional fields required by Shoonya
+        };
+        endpoint = `${BASE_URL}/shoonyaGetOrderMargin`;
+      }
 
       const jData = JSON.stringify(orderData);
-      const payload = `jKey=${FLATTRADE_API_TOKEN}&jData=${jData}`;
+      const payload = `jKey=${API_TOKEN}&jData=${jData}`;
 
-      const response = await axios.post(`${BASE_URL}/flattradeGetOrderMargin`, payload, {
+      const response = await axios.post(endpoint, payload, {
         headers: {
-          'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+          'Authorization': `Bearer ${API_TOKEN}`,
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
