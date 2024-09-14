@@ -54,7 +54,6 @@
     <p class="mt-2 mb-0">
       <span
         id="showAdaptabilityGuideBtn"
-        class="d-none"
         data-bs-toggle="modal"
         data-bs-target="#adaptabilityEnforcingGuideModal"
         >ℹ️</span
@@ -324,6 +323,13 @@
               :class="{ 'disabled-form': isFormDisabled }"
             />
             <span class="input-group-text">{{ selectedQuantity }}</span>
+          </div>
+          <div>
+            <button @click="getOrderMargin" :disabled="selectedBroker?.brokerName !== 'Flattrade'">
+              Get Order Margin
+            </button>
+            <p v-if="orderMargin !== null">Margin: ₹{{ orderMargin }}</p>
+            <p v-else>Margin: Not available</p>
           </div>
         </div>
       </div>

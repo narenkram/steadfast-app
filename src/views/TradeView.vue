@@ -163,7 +163,7 @@ const strategies = ref([
 ]);
 const riskAction = ref(localStorage.getItem('riskAction') || 'close');
 const targetAction = ref(localStorage.getItem('targetAction') || 'close');
-
+const orderMargin = ref(null);
 
 
 
@@ -1461,6 +1461,63 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
     };
   } else {
     throw new Error("Unsupported broker");
+  }
+};
+const getOrderMargin = async () => {
+  try {
+    if (selectedBroker.value?.brokerName !== 'Flattrade') {
+      throw new Error('Order margin calculation is only available for Flattrade');
+    }
+
+    const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
+    if (!FLATTRADE_API_TOKEN) {
+      throw new Error('Flattrade API Token is missing');
+    }
+
+    const clientId = selectedBroker.value.clientId;
+    if (!clientId) {
+      throw new Error('Flattrade client ID is missing');
+    }
+
+    // Prepare the order data based on the current selection
+    const orderData = {
+      exch: getExchangeSegment(),
+      tsym: selectedCallStrike.value.tradingSymbol, // You might want to adjust this based on which option is selected
+      qty: selectedQuantity.value.toString(),
+      prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : "0",
+      prd: selectedProductType.value,
+      trantype: getTransactionType('BUY'), // You might want to make this dynamic
+      prctyp: selectedOrderType.value,
+    };
+
+    const jData = JSON.stringify({
+      uid: clientId,
+      actid: clientId,
+      ...orderData,
+    });
+
+    const payload = `jKey=${FLATTRADE_API_TOKEN}&jData=${jData}`;
+
+    const response = await axios.post(`${BASE_URL}/flattradeGetOrderMargin`, payload, {
+      headers: {
+        'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (response.data.stat === 'Ok') {
+      console.log('Order margin:', response.data);
+      orderMargin.value = response.data.marginused;
+      return response.data;
+    } else {
+      throw new Error(response.data.emsg || 'Failed to get order margin');
+    }
+  } catch (error) {
+    console.error('Error getting order margin:', error);
+    toastMessage.value = 'Failed to get order margin';
+    showToast.value = true;
+    orderMargin.value = null;
+    throw error;
   }
 };
 const placeOrder = async (transactionType, drvOptionType) => {
