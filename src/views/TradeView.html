@@ -1457,8 +1457,8 @@
         tabindex="0"
       >
         <div class="row py-3">
+          <!-- Select Call Strike Offset -->
           <div class="col-12 col-md-6 col-lg-4">
-            <!-- Select Call Strike Offset -->
             <label for="callStrikeOffset" class="form-label">Call Strike Offset</label>
             <select name="" id="callStrikeOffset" class="form-select" v-model="callStrikeOffset">
               <option value="+4">ITM +4</option>
@@ -1472,8 +1472,8 @@
               <option value="-4">OTM -4</option>
             </select>
           </div>
+          <!-- Select Put Strike Offset -->
           <div class="col-12 col-md-6 col-lg-4">
-            <!-- Select Put Strike Offset -->
             <label for="putStrikeOffset" class="form-label">Put Strike Offset</label>
             <select name="" id="putStrikeOffset" class="form-select" v-model="putStrikeOffset">
               <option value="+4">ITM +4</option>
@@ -1507,20 +1507,51 @@
               <option value="equity">Equity Only</option>
             </select>
           </div> -->
-          <!-- Show/Hide LTP Range Bar Toggle -->
+
+          <!-- Predefined Stoploss -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <!-- Show LTP Range Bar -->
-            <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
-            <div class="form-check form-switch">
+            <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input
+                  class="form-check-input mt-0"
+                  type="checkbox"
+                  id="enableStoploss"
+                  aria-label="Enable Predefined Stoploss"
+                  :class="{ 'disabled-form': isFormDisabled }"
+                />
+              </div>
               <input
-                class="form-check-input"
-                type="checkbox"
-                id="showLTPRangeBar"
-                v-model="showLTPRangeBar"
+                type="number"
+                class="form-control"
+                id="stoplossValue"
+                aria-label="Predefined Stoploss (points)"
+                :class="{ 'disabled-form': isFormDisabled }"
               />
-              <label class="form-check-label" for="showLTPRangeBar">
-                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
-              </label>
+              <span class="input-group-text">₹ Points</span>
+            </div>
+          </div>
+          <!-- Predefined Target -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
+            <div class="input-group mb-3">
+              <div class="input-group-text">
+                <input
+                  class="form-check-input mt-0"
+                  type="checkbox"
+                  id="enableTarget"
+                  aria-label="Enable Predefined Target"
+                  :class="{ 'disabled-form': isFormDisabled }"
+                />
+              </div>
+              <input
+                type="number"
+                class="form-control"
+                id="targetValue"
+                aria-label="Predefined Target (points)"
+                :class="{ 'disabled-form': isFormDisabled }"
+              />
+              <span class="input-group-text">₹ Points</span>
             </div>
           </div>
           <!-- 1 Click Keys -->
@@ -1542,6 +1573,22 @@
                 </div>
               </fieldset>
             </form>
+          </div>
+          <!-- Show/Hide LTP Range Bar Toggle -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <!-- Show LTP Range Bar -->
+            <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="showLTPRangeBar"
+                v-model="showLTPRangeBar"
+              />
+              <label class="form-check-label" for="showLTPRangeBar">
+                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
           </div>
           <!-- Show/Hide OHLC Values -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
