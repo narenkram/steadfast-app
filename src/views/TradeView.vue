@@ -1071,6 +1071,7 @@ const updateSelectedQuantity = () => {
     lotsPerSymbol.value[selectedMasterSymbol.value] = lots;
     selectedQuantity.value = lots * instrument.lotSize;
     saveLots();
+    getOrderMargin();
   }
 };
 const handleHotKeys = (event) => {
