@@ -341,15 +341,27 @@
               @change="handleOrderTypeChange"
             >
               <option
-                v-for="(type, index) in displayOrderTypes"
-                :key="index"
+                v-for="(displayType, index) in displayOrderTypes"
+                :key="orderTypes[index]"
                 :value="orderTypes[index]"
               >
-                {{ type }}
+                {{ displayType }}
               </option>
             </select>
+            <!-- Offset input (only visible for 'Limit at Offset' order type) -->
+            <span class="input-group-text" v-if="isOffsetOrderType">
+              <input
+                type="number"
+                id="LimitOffset"
+                class="form-control"
+                v-model="limitOffset"
+                @input="handleOrderTypeChange"
+                :class="{ 'disabled-form': isFormDisabled }"
+              />
+            </span>
           </div>
         </div>
+
         <!-- Predefined Stoploss -->
         <div class="col-6 col-md-3 col-lg-3">
           <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>

@@ -318,22 +318,22 @@ const orderTypes = computed(() => {
   if (selectedBroker.value?.brokerName === 'Flattrade' ||
     selectedBroker.value?.brokerName === 'Shoonya' ||
     selectedBroker.value?.brokerName === 'PaperTrading') {
-    return ['MKT', 'LMT', 'LMT', 'LMT', 'MKT'];
+    return ['MKT', 'LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'];
   }
   return [];
 });
 const displayOrderTypes = computed(() => {
-  return orderTypes.value.map((type, index) => {
-    switch (index) {
-      case 0:
+  return orderTypes.value.map(type => {
+    switch (type) {
+      case 'MKT':
         return 'Market';
-      case 1:
+      case 'LMT':
         return 'Limit';
-      case 2:
+      case 'LMT_LTP':
         return 'Limit at LTP';
-      case 3:
+      case 'LMT_OFFSET':
         return 'Limit at Offset';
-      case 4:
+      case 'MKT_PROTECTION':
         return 'Market Protection';
       default:
         return type;
@@ -718,9 +718,10 @@ const limitPriceErrorMessage = computed(() => {
   return '';
 });
 const isOffsetOrderType = computed(() => {
-  return selectedOrderType.value === orderTypes.value[3]; // 'Limit at Offset'
+  const isOffset = selectedOrderType.value === 'LMT_OFFSET';
+  console.log('Is Offset Order Type:', isOffset, 'Selected Order Type:', selectedOrderType.value);
+  return isOffset;
 });
-
 
 
 
@@ -2942,7 +2943,35 @@ const checkAndShowAdaptabilityGuide = () => {
     localStorage.setItem('adaptabilityGuideLastShown', today);
   }
 };
+const handleOrderTypeChange = () => {
+  console.log('Order Type Changed:', selectedOrderType.value);
 
+  switch (selectedOrderType.value) {
+    case 'MKT':
+      limitPrice.value = null;
+      break;
+    case 'LMT':
+      if (!limitPrice.value) {
+        limitPrice.value = getCurrentLTP();
+      }
+      break;
+    case 'LMT_LTP':
+      limitPrice.value = getCurrentLTP();
+      break;
+    case 'LMT_OFFSET':
+      limitPrice.value = getCurrentLTP() + limitOffset.value;
+      break;
+    case 'MKT_PROTECTION':
+      limitPrice.value = getCurrentLTP() * 1.01;
+      break;
+    default:
+      limitPrice.value = null;
+      break;
+  }
+};
+const getCurrentLTP = () => {
+  return modalOptionType.value === 'CALL' ? parseFloat(latestCallLTP.value) : parseFloat(latestPutLTP.value);
+};
 
 
 
