@@ -1543,30 +1543,28 @@
                   </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
-                  <!-- spacer -->
+                  <label for="" class="form-label mt-2">Max Risk & Target</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="totalRiskTargetToggle"
+                      v-model="totalRiskTargetToggle"
+                    />
+                    <label class="form-check-label" for="totalRiskTargetToggle">
+                      {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
                 </div>
                 <!-- Total Risk and Target by Capital Or Amount -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
                   <label for="totalRiskTargetType" class="form-label mb-0">
                     Risk | Target Type
-                    <span class="badge" :class="totalRiskTargetToggle ? 'bg-success' : 'bg-danger'">
-                      {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
-                    </span>
                   </label>
-                  <div class="input-group">
-                    <div class="input-group-text">
-                      <input
-                        class="form-check-input mt-0"
-                        type="checkbox"
-                        id="totalRiskTargetToggle"
-                        v-model="totalRiskTargetToggle"
-                      />
-                    </div>
-                    <select class="form-select" v-model="totalRiskTargetType">
-                      <option value="percentage">Percentage</option>
-                      <option value="amount">Amount</option>
-                    </select>
-                  </div>
+                  <select class="form-select" v-model="totalRiskTargetType">
+                    <option value="percentage">Percentage</option>
+                    <option value="amount">Amount</option>
+                  </select>
                 </div>
                 <!-- Risk Input -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
@@ -1598,7 +1596,7 @@
                   </div>
                   <!-- Close Positions if Risk is reached -->
                   <label for="closePositionsRisk" class="form-label mt-2"
-                    >If Max Risk is reached</label
+                    >Action if Max Risk is reached</label
                   >
                   <div class="form-check form-switch">
                     <input
@@ -1666,7 +1664,7 @@
                   </div>
                   <!-- Close Positions if Target is reached -->
                   <label for="closePositionsTarget" class="form-label mt-2"
-                    >If Max Target is reached</label
+                    >Action if Max Target is reached</label
                   >
                   <div class="form-check form-switch">
                     <input
