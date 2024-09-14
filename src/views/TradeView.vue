@@ -2645,6 +2645,7 @@ const subscribeToOptions = () => {
       socket.value.send(JSON.stringify(data));
       currentSubscriptions.value.callOption = defaultCallSecurityId.value;
       currentSubscriptions.value.putOption = defaultPutSecurityId.value;
+      getOrderMargin();
     }
 
     if (additionalSymbols.value) {
