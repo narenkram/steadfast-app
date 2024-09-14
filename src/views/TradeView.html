@@ -1496,6 +1496,55 @@
             <div class="col-12 border rounded p-3">
               <h6 class="mb-0">Risk Management Settings</h6>
               <div class="row">
+                <!-- Predefined Stoploss -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
+                  <div class="input-group mb-3">
+                    <div class="input-group-text">
+                      <input
+                        class="form-check-input mt-0"
+                        type="checkbox"
+                        id="enableStoploss"
+                        aria-label="Enable Predefined Stoploss"
+                        :class="{ 'disabled-form': isFormDisabled }"
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="stoplossValue"
+                      aria-label="Predefined Stoploss (points)"
+                      :class="{ 'disabled-form': isFormDisabled }"
+                    />
+                    <span class="input-group-text">₹ Points</span>
+                  </div>
+                </div>
+                <!-- Predefined Target -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
+                  <div class="input-group mb-3">
+                    <div class="input-group-text">
+                      <input
+                        class="form-check-input mt-0"
+                        type="checkbox"
+                        id="enableTarget"
+                        aria-label="Enable Predefined Target"
+                        :class="{ 'disabled-form': isFormDisabled }"
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="targetValue"
+                      aria-label="Predefined Target (points)"
+                      :class="{ 'disabled-form': isFormDisabled }"
+                    />
+                    <span class="input-group-text">₹ Points</span>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <!-- spacer -->
+                </div>
                 <!-- Total Risk and Target by Capital Or Amount -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
                   <label for="totalRiskTargetType" class="form-label mb-0">
@@ -1547,6 +1596,45 @@
                       <span class="input-group-text">%</span>
                     </template>
                   </div>
+                  <!-- Close Positions if Risk is reached -->
+                  <label for="closePositionsRisk" class="form-label mt-2"
+                    >If Max Risk is reached</label
+                  >
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="closePositionsRisk"
+                      v-model="closePositionsRisk"
+                    />
+                    <label class="form-check-label" for="closePositionsRisk">
+                      {{ closePositionsRisk ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <div v-if="closePositionsRisk" class="mt-2">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="riskActionClose"
+                        value="close"
+                        v-model="riskAction"
+                      />
+                      <label class="form-check-label" for="riskActionClose">Close Positions</label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="riskActionKillSwitch"
+                        value="killSwitch"
+                        v-model="riskAction"
+                      />
+                      <label class="form-check-label" for="riskActionKillSwitch"
+                        >Activate Kill Switch</label
+                      >
+                    </div>
+                  </div>
                 </div>
                 <!-- Target Input -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
@@ -1576,277 +1664,211 @@
                       <span class="input-group-text">%</span>
                     </template>
                   </div>
-                </div>
-                <!-- Predefined Stoploss -->
-                <div class="col-12 col-md-6 col-lg-4 mt-3">
-                  <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
-                  <div class="input-group mb-3">
-                    <div class="input-group-text">
-                      <input
-                        class="form-check-input mt-0"
-                        type="checkbox"
-                        id="enableStoploss"
-                        aria-label="Enable Predefined Stoploss"
-                        :class="{ 'disabled-form': isFormDisabled }"
-                      />
-                    </div>
+                  <!-- Close Positions if Target is reached -->
+                  <label for="closePositionsTarget" class="form-label mt-2"
+                    >If Max Target is reached</label
+                  >
+                  <div class="form-check form-switch">
                     <input
-                      type="number"
-                      class="form-control"
-                      id="stoplossValue"
-                      aria-label="Predefined Stoploss (points)"
-                      :class="{ 'disabled-form': isFormDisabled }"
+                      class="form-check-input"
+                      type="checkbox"
+                      id="closePositionsTarget"
+                      v-model="closePositionsTarget"
                     />
-                    <span class="input-group-text">₹ Points</span>
+                    <label class="form-check-label" for="closePositionsTarget">
+                      {{ closePositionsTarget ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <div v-if="closePositionsTarget" class="mt-2">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="targetActionClose"
+                        value="close"
+                        v-model="targetAction"
+                      />
+                      <label class="form-check-label" for="targetActionClose"
+                        >Close Positions</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="targetActionKillSwitch"
+                        value="killSwitch"
+                        v-model="targetAction"
+                      />
+                      <label class="form-check-label" for="targetActionKillSwitch"
+                        >Activate Kill Switch</label
+                      >
+                    </div>
                   </div>
                 </div>
-                <!-- Predefined Target -->
+                <!-- Overtrade Protection (Auto-Kill Switch) -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
-                  <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
-                  <div class="input-group mb-3">
-                    <div class="input-group-text">
-                      <input
-                        class="form-check-input mt-0"
-                        type="checkbox"
-                        id="enableTarget"
-                        aria-label="Enable Predefined Target"
-                        :class="{ 'disabled-form': isFormDisabled }"
-                      />
-                    </div>
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="targetValue"
-                      aria-label="Predefined Target (points)"
-                      :class="{ 'disabled-form': isFormDisabled }"
-                    />
-                    <span class="input-group-text">₹ Points</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Show/Hide LTP Range Bar Toggle -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <!-- Show LTP Range Bar -->
-            <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="showLTPRangeBar"
-                v-model="showLTPRangeBar"
-              />
-              <label class="form-check-label" for="showLTPRangeBar">
-                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
-          <!-- 1 Click Keys -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <form @submit.prevent>
-              <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
-                <label for="enableHotKeys" class="form-label">1 Click Keys ⌨️</label>
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="enableHotKeys"
-                    v-model="enableHotKeys"
-                    :class="{ 'disabled-form': isFormDisabled }"
-                  />
-                  <label class="form-check-label" for="enableHotKeys">
-                    {{ enableHotKeys ? 'Enabled' : 'Disabled' }}
+                  <label for="overtradeProtection" class="form-label">
+                    Overtrade Protection (Auto-Kill Switch)
                   </label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="overtradeProtection"
+                      :checked="overtradeProtection"
+                      @change="toggleOvertradeProtection"
+                    />
+                    <label class="form-check-label" for="overtradeProtection">
+                      {{ overtradeProtection ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <small class="text-muted">
+                    Activates Kill Switch if your total Buy or Sell value exceeds your available
+                    funds, preventing overtrading.
+                  </small>
                 </div>
-              </fieldset>
-            </form>
-          </div>
-          <!-- Show/Hide OHLC Values -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="showOHLCValues" class="form-label">Show OHLC Values</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="showOHLCValues"
-                v-model="showOHLCValues"
-              />
-              <label class="form-check-label" for="showOHLCValues">
-                {{ showOHLCValues ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <small class="text-muted">Reload Required</small>
-          </div>
-          <!-- Show/Hide Strike Details - Security ID, Trading Symbol -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="showStrikeDetails" class="form-label">Show Strike Details</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="showStrikeDetails"
-                v-model="showStrikeDetails"
-              />
-              <label class="form-check-label" for="showStrikeDetails">
-                {{ showStrikeDetails ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <small class="text-muted">For development purposes only</small>
-          </div>
-          <!-- Subscibe LTP for 3 more additional symbols -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="additionalSymbols" class="form-label">Additional Symbols</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="additionalSymbols"
-                :checked="additionalSymbols"
-                @change="toggleAdditionalSymbols"
-              />
-              <label class="form-check-label" for="additionalSymbols">
-                {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
-          <!-- Notification Sound -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="notificationSound" class="form-label">Notification Sound</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="notificationSound"
-                v-model="notificationSound"
-                @change="playNotificationSound"
-              />
-              <label class="form-check-label" for="notificationSound">
-                {{ notificationSound ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <select v-model="selectedSound" class="form-select mt-2" :disabled="!notificationSound">
-              <option value="cyberpunk-notification.mp3">Cyberpunk</option>
-              <option value="long-pop.wav">Long Pop</option>
-              <option value="classical.mp3">Classical</option>
-              <!-- Add more sound options as needed -->
-            </select>
-          </div>
-          <!-- Close Positions if Risk is reached -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="closePositionsRisk" class="form-label">If Max Risk is reached</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="closePositionsRisk"
-                v-model="closePositionsRisk"
-              />
-              <label class="form-check-label" for="closePositionsRisk">
-                {{ closePositionsRisk ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <div v-if="closePositionsRisk" class="mt-2">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="riskActionClose"
-                  value="close"
-                  v-model="riskAction"
-                />
-                <label class="form-check-label" for="riskActionClose">Close Positions</label>
-              </div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="riskActionKillSwitch"
-                  value="killSwitch"
-                  v-model="riskAction"
-                />
-                <label class="form-check-label" for="riskActionKillSwitch"
-                  >Activate Kill Switch</label
-                >
               </div>
             </div>
           </div>
-          <!-- Close Positions if Target is reached -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="closePositionsTarget" class="form-label">If Max Target is reached</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="closePositionsTarget"
-                v-model="closePositionsTarget"
-              />
-              <label class="form-check-label" for="closePositionsTarget">
-                {{ closePositionsTarget ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <div v-if="closePositionsTarget" class="mt-2">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="targetActionClose"
-                  value="close"
-                  v-model="targetAction"
-                />
-                <label class="form-check-label" for="targetActionClose">Close Positions</label>
+
+          <!-- App Settings -->
+          <div class="row m-0 mt-3">
+            <div class="col-12 rounded border p-3">
+              <h6 class="mb-0">App Settings</h6>
+              <div class="row">
+                <!-- Show/Hide LTP Range Bar Toggle -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <!-- Show LTP Range Bar -->
+                  <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="showLTPRangeBar"
+                      v-model="showLTPRangeBar"
+                    />
+                    <label class="form-check-label" for="showLTPRangeBar">
+                      {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                </div>
+                <!-- 1 Click Keys -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <form @submit.prevent>
+                    <fieldset
+                      :disabled="isFormDisabled"
+                      :class="{ 'disabled-form': isFormDisabled }"
+                    >
+                      <label for="enableHotKeys" class="form-label">1 Click Keys ⌨️</label>
+                      <div class="form-check form-switch">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="enableHotKeys"
+                          v-model="enableHotKeys"
+                          :class="{ 'disabled-form': isFormDisabled }"
+                        />
+                        <label class="form-check-label" for="enableHotKeys">
+                          {{ enableHotKeys ? 'Enabled' : 'Disabled' }}
+                        </label>
+                      </div>
+                    </fieldset>
+                  </form>
+                </div>
+                <!-- Show/Hide OHLC Values -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="showOHLCValues" class="form-label">Show OHLC Values</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="showOHLCValues"
+                      v-model="showOHLCValues"
+                    />
+                    <label class="form-check-label" for="showOHLCValues">
+                      {{ showOHLCValues ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <small class="text-muted">Reload Required</small>
+                </div>
+                <!-- Show/Hide Strike Details - Security ID, Trading Symbol -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="showStrikeDetails" class="form-label">Show Strike Details</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="showStrikeDetails"
+                      v-model="showStrikeDetails"
+                    />
+                    <label class="form-check-label" for="showStrikeDetails">
+                      {{ showStrikeDetails ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <small class="text-muted">For development purposes only</small>
+                </div>
+                <!-- Subscibe LTP for 3 more additional symbols -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="additionalSymbols" class="form-label">Additional Symbols</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="additionalSymbols"
+                      :checked="additionalSymbols"
+                      @change="toggleAdditionalSymbols"
+                    />
+                    <label class="form-check-label" for="additionalSymbols">
+                      {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                </div>
+                <!-- Notification Sound -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="notificationSound" class="form-label">Notification Sound</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="notificationSound"
+                      v-model="notificationSound"
+                      @change="playNotificationSound"
+                    />
+                    <label class="form-check-label" for="notificationSound">
+                      {{ notificationSound ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                  <select
+                    v-model="selectedSound"
+                    class="form-select mt-2"
+                    :disabled="!notificationSound"
+                  >
+                    <option value="cyberpunk-notification.mp3">Cyberpunk</option>
+                    <option value="long-pop.wav">Long Pop</option>
+                    <option value="classical.mp3">Classical</option>
+                    <!-- Add more sound options as needed -->
+                  </select>
+                </div>
+                <!-- Enable / Disable Experimental Features -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="experimentalFeatures" class="form-label">Experimental Features</label>
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="experimentalFeatures"
+                      v-model="experimentalFeatures"
+                    />
+                    <label class="form-check-label" for="experimentalFeatures">
+                      {{ experimentalFeatures ? 'Enabled' : 'Disabled' }}
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  id="targetActionKillSwitch"
-                  value="killSwitch"
-                  v-model="targetAction"
-                />
-                <label class="form-check-label" for="targetActionKillSwitch"
-                  >Activate Kill Switch</label
-                >
-              </div>
             </div>
           </div>
-          <!-- Overtrade Protection (Auto-Kill Switch) -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="overtradeProtection" class="form-label">
-              Overtrade Protection (Auto-Kill Switch)
-            </label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="overtradeProtection"
-                :checked="overtradeProtection"
-                @change="toggleOvertradeProtection"
-              />
-              <label class="form-check-label" for="overtradeProtection">
-                {{ overtradeProtection ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-            <small class="text-muted">
-              Activates Kill Switch if your total Buy or Sell value exceeds your available funds,
-              preventing overtrading.
-            </small>
-          </div>
-          <!-- Enable / Disable Experimental Features -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="experimentalFeatures" class="form-label">Experimental Features</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="experimentalFeatures"
-                v-model="experimentalFeatures"
-              />
-              <label class="form-check-label" for="experimentalFeatures">
-                {{ experimentalFeatures ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
+
           <div class="col-12 pt-5 text-center">
             <p class="text-secondary">These settings are automatically saved.</p>
           </div>
