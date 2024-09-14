@@ -350,87 +350,6 @@
             </select>
           </div>
         </div>
-        <!-- Total Risk and Target by Capital Or Amount -->
-        <div class="col-6 col-md-3 col-lg-3">
-          <label for="totalRiskTargetType" class="form-label mb-0">
-            Risk | Target Type
-            <span class="badge" :class="totalRiskTargetToggle ? 'bg-success' : 'bg-danger'">
-              {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
-            </span>
-          </label>
-          <div class="input-group">
-            <div class="input-group-text">
-              <input
-                class="form-check-input mt-0"
-                type="checkbox"
-                id="totalRiskTargetToggle"
-                v-model="totalRiskTargetToggle"
-              />
-            </div>
-            <select class="form-select" v-model="totalRiskTargetType">
-              <option value="percentage">Percentage</option>
-              <option value="amount">Amount</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-6 col-md-3 col-lg-3">
-          <!-- Risk Input -->
-          <label for="totalRiskAmount" class="form-label mb-0">Max Risk</label>
-          <div class="input-group">
-            <span class="input-group-text">Loss</span>
-            <template v-if="totalRiskTargetType === 'amount'">
-              <input
-                type="number"
-                min="100"
-                class="form-control"
-                v-model="totalRiskAmount"
-                placeholder="Enter risk amount"
-              />
-              <span class="input-group-text">₹</span>
-            </template>
-            <template v-if="totalRiskTargetType === 'percentage'">
-              <input
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.1"
-                class="form-control"
-                v-model="totalRiskPercentage"
-                placeholder="Enter risk percentage"
-              />
-              <span class="input-group-text">%</span>
-            </template>
-          </div>
-        </div>
-        <div class="col-6 col-md-3 col-lg-3">
-          <!-- Target Input -->
-          <label for="totalTargetAmount" class="form-label mb-0">Max Target</label>
-          <div class="input-group">
-            <span class="input-group-text">Profit</span>
-            <template v-if="totalRiskTargetType === 'amount'">
-              <input
-                type="number"
-                min="100"
-                class="form-control"
-                v-model="totalTargetAmount"
-                placeholder="Enter target amount"
-              />
-              <span class="input-group-text">₹</span>
-            </template>
-            <template v-if="totalRiskTargetType === 'percentage'">
-              <input
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.1"
-                class="form-control"
-                v-model="totalTargetPercentage"
-                placeholder="Enter target %"
-              />
-              <span class="input-group-text">%</span>
-            </template>
-          </div>
-        </div>
       </div>
 
       <!-- Trading Symbols & Strikes -->
@@ -1554,6 +1473,103 @@
               <span class="input-group-text">₹ Points</span>
             </div>
           </div>
+          <!-- Show/Hide LTP Range Bar Toggle -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <!-- Show LTP Range Bar -->
+            <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="showLTPRangeBar"
+                v-model="showLTPRangeBar"
+              />
+              <label class="form-check-label" for="showLTPRangeBar">
+                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+          </div>
+          <!-- Total Risk and Target by Capital Or Amount -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="totalRiskTargetType" class="form-label mb-0">
+              Risk | Target Type
+              <span class="badge" :class="totalRiskTargetToggle ? 'bg-success' : 'bg-danger'">
+                {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
+              </span>
+            </label>
+            <div class="input-group">
+              <div class="input-group-text">
+                <input
+                  class="form-check-input mt-0"
+                  type="checkbox"
+                  id="totalRiskTargetToggle"
+                  v-model="totalRiskTargetToggle"
+                />
+              </div>
+              <select class="form-select" v-model="totalRiskTargetType">
+                <option value="percentage">Percentage</option>
+                <option value="amount">Amount</option>
+              </select>
+            </div>
+          </div>
+          <!-- Risk Input -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="totalRiskAmount" class="form-label mb-0">Max Risk</label>
+            <div class="input-group">
+              <span class="input-group-text">Loss</span>
+              <template v-if="totalRiskTargetType === 'amount'">
+                <input
+                  type="number"
+                  min="100"
+                  class="form-control"
+                  v-model="totalRiskAmount"
+                  placeholder="Enter risk amount"
+                />
+                <span class="input-group-text">₹</span>
+              </template>
+              <template v-if="totalRiskTargetType === 'percentage'">
+                <input
+                  type="number"
+                  min="0.1"
+                  max="5"
+                  step="0.1"
+                  class="form-control"
+                  v-model="totalRiskPercentage"
+                  placeholder="Enter risk percentage"
+                />
+                <span class="input-group-text">%</span>
+              </template>
+            </div>
+          </div>
+          <!-- Target Input -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="totalTargetAmount" class="form-label mb-0">Max Target</label>
+            <div class="input-group">
+              <span class="input-group-text">Profit</span>
+              <template v-if="totalRiskTargetType === 'amount'">
+                <input
+                  type="number"
+                  min="100"
+                  class="form-control"
+                  v-model="totalTargetAmount"
+                  placeholder="Enter target amount"
+                />
+                <span class="input-group-text">₹</span>
+              </template>
+              <template v-if="totalRiskTargetType === 'percentage'">
+                <input
+                  type="number"
+                  min="0.1"
+                  max="5"
+                  step="0.1"
+                  class="form-control"
+                  v-model="totalTargetPercentage"
+                  placeholder="Enter target %"
+                />
+                <span class="input-group-text">%</span>
+              </template>
+            </div>
+          </div>
           <!-- 1 Click Keys -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <form @submit.prevent>
@@ -1573,22 +1589,6 @@
                 </div>
               </fieldset>
             </form>
-          </div>
-          <!-- Show/Hide LTP Range Bar Toggle -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <!-- Show LTP Range Bar -->
-            <label for="showLTPRangeBar" class="form-label">Show LTP Range Bar</label>
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="showLTPRangeBar"
-                v-model="showLTPRangeBar"
-              />
-              <label class="form-check-label" for="showLTPRangeBar">
-                {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
           </div>
           <!-- Show/Hide OHLC Values -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
