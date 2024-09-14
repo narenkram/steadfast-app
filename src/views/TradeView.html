@@ -334,7 +334,7 @@
           <div class="input-group">
             <select
               id="OrderType"
-              class="form-select"
+              class="form-select w-75"
               aria-label="OrderType"
               v-model="selectedOrderType"
               :class="{ 'disabled-form': isFormDisabled }"
@@ -349,11 +349,13 @@
               </option>
             </select>
             <!-- Offset input (only visible for 'Limit at Offset' order type) -->
-            <span class="input-group-text" v-if="isOffsetOrderType">
+            <span class="input-group-text flex-shrink w-25 p-0 ps-2" v-if="isOffsetOrderType">
               <input
                 type="number"
                 id="LimitOffset"
-                class="form-control"
+                class="form-control border-0 p-1"
+                min="-9"
+                max="9"
                 v-model="limitOffset"
                 @input="handleOrderTypeChange"
                 :class="{ 'disabled-form': isFormDisabled }"
