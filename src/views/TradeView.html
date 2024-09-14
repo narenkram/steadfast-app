@@ -328,11 +328,6 @@
             <button @click="getOrderMargin" :disabled="selectedBroker?.brokerName !== 'Flattrade'">
               Get Order Margin
             </button>
-            <div v-if="orderMargin.call !== null && orderMargin.put !== null">
-              <p>Call Margin: ₹{{ orderMargin.call }}</p>
-              <p>Put Margin: ₹{{ orderMargin.put }}</p>
-            </div>
-            <p v-else>Margin: Not available</p>
           </div>
         </div>
       </div>
@@ -472,6 +467,10 @@
               >{{ latestCallLTP }}
             </span>
           </div>
+          <div class="mt-1">
+            <span v-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
+            <span v-else>Margin: Not available</span>
+          </div>
           <div v-if="showStrikeDetails">
             <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
             <div class="text-muted">Security ID: {{ selectedCallStrike.securityId }}</div>
@@ -609,6 +608,10 @@
                 {{ strike.strikePrice }}
               </option>
             </select>
+          </div>
+          <div class="mt-1">
+            <span v-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
+            <span v-else>Margin: Not available</span>
           </div>
           <div v-if="showStrikeDetails">
             <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
