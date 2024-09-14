@@ -1422,46 +1422,64 @@
         tabindex="0"
       >
         <div class="row py-3">
-          <!-- Select Call Strike Offset -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <label for="callStrikeOffset" class="form-label">Call Strike Offset</label>
-            <select name="" id="callStrikeOffset" class="form-select" v-model="callStrikeOffset">
-              <option value="+4">ITM +4</option>
-              <option value="+3">ITM +3</option>
-              <option value="+2">ITM +2</option>
-              <option value="+1">ITM +1</option>
-              <option value="0">ATM 0</option>
-              <option value="-1">OTM -1</option>
-              <option value="-2">OTM -2</option>
-              <option value="-3">OTM -3</option>
-              <option value="-4">OTM -4</option>
-            </select>
+          <div class="row m-0">
+            <div class="col-12 border rounded p-3">
+              <h6 class="mb-0">Offset Settings</h6>
+              <div class="row">
+                <!-- Select Call Strike Offset -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="callStrikeOffset" class="form-label">Call Strike Offset</label>
+                  <select
+                    name=""
+                    id="callStrikeOffset"
+                    class="form-select"
+                    v-model="callStrikeOffset"
+                  >
+                    <option value="+4">ITM +4</option>
+                    <option value="+3">ITM +3</option>
+                    <option value="+2">ITM +2</option>
+                    <option value="+1">ITM +1</option>
+                    <option value="0">ATM 0</option>
+                    <option value="-1">OTM -1</option>
+                    <option value="-2">OTM -2</option>
+                    <option value="-3">OTM -3</option>
+                    <option value="-4">OTM -4</option>
+                  </select>
+                </div>
+                <!-- Select Put Strike Offset -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="putStrikeOffset" class="form-label">Put Strike Offset</label>
+                  <select
+                    name=""
+                    id="putStrikeOffset"
+                    class="form-select"
+                    v-model="putStrikeOffset"
+                  >
+                    <option value="+4">ITM +4</option>
+                    <option value="+3">ITM +3</option>
+                    <option value="+2">ITM +2</option>
+                    <option value="+1">ITM +1</option>
+                    <option value="0">ATM 0</option>
+                    <option value="-1">OTM -1</option>
+                    <option value="-2">OTM -2</option>
+                    <option value="-3">OTM -3</option>
+                    <option value="-4">OTM -4</option>
+                  </select>
+                </div>
+                <!-- Select Expiry Offset -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="expiryOffset" class="form-label">Expiry Offset</label>
+                  <select id="expiryOffset" class="form-select" v-model="expiryOffset">
+                    <option value="0">Current Expiry</option>
+                    <option value="1">+1 Expiry</option>
+                    <option value="2">+2 Expiry</option>
+                    <option value="3">+3 Expiry</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
-          <!-- Select Put Strike Offset -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <label for="putStrikeOffset" class="form-label">Put Strike Offset</label>
-            <select name="" id="putStrikeOffset" class="form-select" v-model="putStrikeOffset">
-              <option value="+4">ITM +4</option>
-              <option value="+3">ITM +3</option>
-              <option value="+2">ITM +2</option>
-              <option value="+1">ITM +1</option>
-              <option value="0">ATM 0</option>
-              <option value="-1">OTM -1</option>
-              <option value="-2">OTM -2</option>
-              <option value="-3">OTM -3</option>
-              <option value="-4">OTM -4</option>
-            </select>
-          </div>
-          <!-- Select Expiry Offset -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <label for="expiryOffset" class="form-label">Expiry Offset</label>
-            <select id="expiryOffset" class="form-select" v-model="expiryOffset">
-              <option value="0">Current Expiry</option>
-              <option value="1">+1 Expiry</option>
-              <option value="2">+2 Expiry</option>
-              <option value="3">+3 Expiry</option>
-            </select>
-          </div>
+
           <!-- Show all positions Including Equity and Futures and Options -->
           <!-- <div class="col-12 col-md-6 col-lg-4">
             <label for="showAllPositions" class="form-label">Show Positions</label>
@@ -1473,50 +1491,139 @@
             </select>
           </div> -->
 
-          <!-- Predefined Stoploss -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
-            <div class="input-group mb-3">
-              <div class="input-group-text">
-                <input
-                  class="form-check-input mt-0"
-                  type="checkbox"
-                  id="enableStoploss"
-                  aria-label="Enable Predefined Stoploss"
-                  :class="{ 'disabled-form': isFormDisabled }"
-                />
+          <!-- Risk Management Settings -->
+          <div class="row m-0 mt-3">
+            <div class="col-12 border rounded p-3">
+              <h6 class="mb-0">Risk Management Settings</h6>
+              <div class="row">
+                <!-- Total Risk and Target by Capital Or Amount -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="totalRiskTargetType" class="form-label mb-0">
+                    Risk | Target Type
+                    <span class="badge" :class="totalRiskTargetToggle ? 'bg-success' : 'bg-danger'">
+                      {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
+                    </span>
+                  </label>
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <input
+                        class="form-check-input mt-0"
+                        type="checkbox"
+                        id="totalRiskTargetToggle"
+                        v-model="totalRiskTargetToggle"
+                      />
+                    </div>
+                    <select class="form-select" v-model="totalRiskTargetType">
+                      <option value="percentage">Percentage</option>
+                      <option value="amount">Amount</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- Risk Input -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="totalRiskAmount" class="form-label mb-0">Max Risk</label>
+                  <div class="input-group">
+                    <span class="input-group-text">Loss</span>
+                    <template v-if="totalRiskTargetType === 'amount'">
+                      <input
+                        type="number"
+                        min="100"
+                        class="form-control"
+                        v-model="totalRiskAmount"
+                        placeholder="Enter risk amount"
+                      />
+                      <span class="input-group-text">₹</span>
+                    </template>
+                    <template v-if="totalRiskTargetType === 'percentage'">
+                      <input
+                        type="number"
+                        min="0.1"
+                        max="5"
+                        step="0.1"
+                        class="form-control"
+                        v-model="totalRiskPercentage"
+                        placeholder="Enter risk percentage"
+                      />
+                      <span class="input-group-text">%</span>
+                    </template>
+                  </div>
+                </div>
+                <!-- Target Input -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="totalTargetAmount" class="form-label mb-0">Max Target</label>
+                  <div class="input-group">
+                    <span class="input-group-text">Profit</span>
+                    <template v-if="totalRiskTargetType === 'amount'">
+                      <input
+                        type="number"
+                        min="100"
+                        class="form-control"
+                        v-model="totalTargetAmount"
+                        placeholder="Enter target amount"
+                      />
+                      <span class="input-group-text">₹</span>
+                    </template>
+                    <template v-if="totalRiskTargetType === 'percentage'">
+                      <input
+                        type="number"
+                        min="0.1"
+                        max="5"
+                        step="0.1"
+                        class="form-control"
+                        v-model="totalTargetPercentage"
+                        placeholder="Enter target %"
+                      />
+                      <span class="input-group-text">%</span>
+                    </template>
+                  </div>
+                </div>
+                <!-- Predefined Stoploss -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
+                  <div class="input-group mb-3">
+                    <div class="input-group-text">
+                      <input
+                        class="form-check-input mt-0"
+                        type="checkbox"
+                        id="enableStoploss"
+                        aria-label="Enable Predefined Stoploss"
+                        :class="{ 'disabled-form': isFormDisabled }"
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="stoplossValue"
+                      aria-label="Predefined Stoploss (points)"
+                      :class="{ 'disabled-form': isFormDisabled }"
+                    />
+                    <span class="input-group-text">₹ Points</span>
+                  </div>
+                </div>
+                <!-- Predefined Target -->
+                <div class="col-12 col-md-6 col-lg-4 mt-3">
+                  <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
+                  <div class="input-group mb-3">
+                    <div class="input-group-text">
+                      <input
+                        class="form-check-input mt-0"
+                        type="checkbox"
+                        id="enableTarget"
+                        aria-label="Enable Predefined Target"
+                        :class="{ 'disabled-form': isFormDisabled }"
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="targetValue"
+                      aria-label="Predefined Target (points)"
+                      :class="{ 'disabled-form': isFormDisabled }"
+                    />
+                    <span class="input-group-text">₹ Points</span>
+                  </div>
+                </div>
               </div>
-              <input
-                type="number"
-                class="form-control"
-                id="stoplossValue"
-                aria-label="Predefined Stoploss (points)"
-                :class="{ 'disabled-form': isFormDisabled }"
-              />
-              <span class="input-group-text">₹ Points</span>
-            </div>
-          </div>
-          <!-- Predefined Target -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
-            <div class="input-group mb-3">
-              <div class="input-group-text">
-                <input
-                  class="form-check-input mt-0"
-                  type="checkbox"
-                  id="enableTarget"
-                  aria-label="Enable Predefined Target"
-                  :class="{ 'disabled-form': isFormDisabled }"
-                />
-              </div>
-              <input
-                type="number"
-                class="form-control"
-                id="targetValue"
-                aria-label="Predefined Target (points)"
-                :class="{ 'disabled-form': isFormDisabled }"
-              />
-              <span class="input-group-text">₹ Points</span>
             </div>
           </div>
           <!-- Show/Hide LTP Range Bar Toggle -->
@@ -1533,87 +1640,6 @@
               <label class="form-check-label" for="showLTPRangeBar">
                 {{ showLTPRangeBar ? 'Enabled' : 'Disabled' }}
               </label>
-            </div>
-          </div>
-          <!-- Total Risk and Target by Capital Or Amount -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="totalRiskTargetType" class="form-label mb-0">
-              Risk | Target Type
-              <span class="badge" :class="totalRiskTargetToggle ? 'bg-success' : 'bg-danger'">
-                {{ totalRiskTargetToggle ? 'Enabled' : 'Disabled' }}
-              </span>
-            </label>
-            <div class="input-group">
-              <div class="input-group-text">
-                <input
-                  class="form-check-input mt-0"
-                  type="checkbox"
-                  id="totalRiskTargetToggle"
-                  v-model="totalRiskTargetToggle"
-                />
-              </div>
-              <select class="form-select" v-model="totalRiskTargetType">
-                <option value="percentage">Percentage</option>
-                <option value="amount">Amount</option>
-              </select>
-            </div>
-          </div>
-          <!-- Risk Input -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="totalRiskAmount" class="form-label mb-0">Max Risk</label>
-            <div class="input-group">
-              <span class="input-group-text">Loss</span>
-              <template v-if="totalRiskTargetType === 'amount'">
-                <input
-                  type="number"
-                  min="100"
-                  class="form-control"
-                  v-model="totalRiskAmount"
-                  placeholder="Enter risk amount"
-                />
-                <span class="input-group-text">₹</span>
-              </template>
-              <template v-if="totalRiskTargetType === 'percentage'">
-                <input
-                  type="number"
-                  min="0.1"
-                  max="5"
-                  step="0.1"
-                  class="form-control"
-                  v-model="totalRiskPercentage"
-                  placeholder="Enter risk percentage"
-                />
-                <span class="input-group-text">%</span>
-              </template>
-            </div>
-          </div>
-          <!-- Target Input -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="totalTargetAmount" class="form-label mb-0">Max Target</label>
-            <div class="input-group">
-              <span class="input-group-text">Profit</span>
-              <template v-if="totalRiskTargetType === 'amount'">
-                <input
-                  type="number"
-                  min="100"
-                  class="form-control"
-                  v-model="totalTargetAmount"
-                  placeholder="Enter target amount"
-                />
-                <span class="input-group-text">₹</span>
-              </template>
-              <template v-if="totalRiskTargetType === 'percentage'">
-                <input
-                  type="number"
-                  min="0.1"
-                  max="5"
-                  step="0.1"
-                  class="form-control"
-                  v-model="totalTargetPercentage"
-                  placeholder="Enter target %"
-                />
-                <span class="input-group-text">%</span>
-              </template>
             </div>
           </div>
           <!-- 1 Click Keys -->
