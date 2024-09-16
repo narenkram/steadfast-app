@@ -1034,27 +1034,29 @@
                   </td>
                   <td>
                     <!-- TG -->
-                    <div class="my-1">
-                      <div v-if="targets[flattradePosition.tsym] !== null">
-                        Target: {{ targets[flattradePosition.tsym] }}
-                        <div class="btn-group mt-1" role="group">
+                    <div class="row">
+                      <div class="col-12" v-if="targets[flattradePosition.tsym] !== null">
+                        <div class="btn-group" role="group">
                           <button
-                            class="btn btn-sm btn-outline-secondary"
-                            @click="increaseTarget(flattradePosition)"
-                          >
-                            + TG
-                          </button>
-                          <button
-                            class="btn btn-sm btn-outline-secondary"
+                            class="btn btn-sm btn-outline-danger"
                             @click="decreaseTarget(flattradePosition)"
                           >
                             - TG
+                          </button>
+                          <span class="d-flex align-items-center bg-success text-white px-2">
+                            {{ targets[flattradePosition.tsym] }}
+                          </span>
+                          <button
+                            class="btn btn-sm btn-outline-success"
+                            @click="increaseTarget(flattradePosition)"
+                          >
+                            + TG
                           </button>
                         </div>
                       </div>
                       <div v-else>No Target set</div>
                     </div>
-                    <div class="btn-group" role="group">
+                    <div class="btn-group mt-2" role="group">
                       <button
                         v-if="targets[flattradePosition.tsym] === null"
                         class="btn btn-sm btn-outline-success"
