@@ -174,6 +174,13 @@ const stoplosses = useLocalStorage('stoplosses', {});
 const targets = useLocalStorage('targets', {});
 const trailingStoplosses = useLocalStorage('trailingStoplosses', {});
 
+const enableStoploss = useLocalStorage('enableStoploss', false);
+const stoplossValue = useLocalStorage('stoplossValue', 0);
+const enableTarget = useLocalStorage('enableTarget', false);
+const targetValue = useLocalStorage('targetValue', 0);
+
+
+
 
 
 

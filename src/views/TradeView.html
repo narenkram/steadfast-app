@@ -374,6 +374,7 @@
                 type="checkbox"
                 id="enableStoploss"
                 aria-label="Enable Predefined Stoploss"
+                v-model="enableStoploss"
                 :class="{ 'disabled-form': isFormDisabled }"
               />
             </div>
@@ -382,6 +383,7 @@
               class="form-control"
               id="stoplossValue"
               aria-label="Predefined Stoploss (points)"
+              v-model="stoplossValue"
               :class="{ 'disabled-form': isFormDisabled }"
             />
             <span class="input-group-text">₹ Points</span>
@@ -397,6 +399,7 @@
                 type="checkbox"
                 id="enableTarget"
                 aria-label="Enable Predefined Target"
+                v-model="enableTarget"
                 :class="{ 'disabled-form': isFormDisabled }"
               />
             </div>
@@ -405,6 +408,7 @@
               class="form-control"
               id="targetValue"
               aria-label="Predefined Target (points)"
+              v-model="targetValue"
               :class="{ 'disabled-form': isFormDisabled }"
             />
             <span class="input-group-text">₹ Points</span>
