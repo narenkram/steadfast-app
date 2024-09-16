@@ -2995,30 +2995,49 @@ const setStoploss = (position, type) => {
     trailingStoplosses.value[position.tsym] = null;
   }
 };
-
-const addStoploss = (position) => {
-  if (stoplosses.value[position.tsym] === null && trailingStoplosses.value[position.tsym] === null) {
-    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym] - stoplossValue.value;
-  }
-};
-
 const removeStoploss = (position) => {
   stoplosses.value[position.tsym] = null;
   trailingStoplosses.value[position.tsym] = null;
 };
-
 const increaseStoploss = (position) => {
   if (stoplosses.value[position.tsym] !== null) {
     stoplosses.value[position.tsym] += 1; // Adjust increment value as needed
   }
 };
-
 const decreaseStoploss = (position) => {
   if (stoplosses.value[position.tsym] !== null) {
     stoplosses.value[position.tsym] -= 1; // Adjust decrement value as needed
   }
 };
+const setTarget = (position) => {
+  const ltp = positionLTPs.value[position.tsym];
+  targets.value[position.tsym] = ltp + targetValue.value;
+};
+const removeTarget = (position) => {
+  targets.value[position.tsym] = null;
+};
+const increaseTarget = (position) => {
+  if (targets.value[position.tsym] !== null) {
+    targets.value[position.tsym] += 1; // Adjust increment value as needed
+  }
+};
+const decreaseTarget = (position) => {
+  if (targets.value[position.tsym] !== null) {
+    targets.value[position.tsym] -= 1; // Adjust decrement value as needed
+  }
+};
 
+const checkTargets = () => {
+  for (const [tsym, target] of Object.entries(targets.value)) {
+    if (positionLTPs.value[tsym] >= target) {
+      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+      if (position) {
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeTarget(position);
+      }
+    }
+  }
+};
 const checkStoplosses = () => {
   for (const [tsym, sl] of Object.entries(stoplosses.value)) {
     if (positionLTPs.value[tsym] <= sl) {
@@ -3048,7 +3067,10 @@ const checkStoplosses = () => {
     }
   }
 };
-
+const checkStoplossesAndTargets = () => {
+  checkStoplosses();
+  checkTargets();
+};
 
 
 
@@ -3332,7 +3354,7 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
       }
     }
   });
-  checkStoplosses();
+  checkStoplossesAndTargets();
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], () => {
   saveOffsets();

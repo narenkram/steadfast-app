@@ -998,25 +998,19 @@
                         class="btn btn-sm btn-outline-primary"
                         @click="setStoploss(flattradePosition, 'trailing')"
                       >
-                        T
+                        Set TSL
                       </button>
                       <button
                         class="btn btn-sm btn-outline-primary"
                         @click="setStoploss(flattradePosition, 'static')"
                       >
-                        S
-                      </button>
-                      <button
-                        class="btn btn-sm btn-outline-success"
-                        @click="addStoploss(flattradePosition)"
-                      >
-                        +
+                        Set SL
                       </button>
                       <button
                         class="btn btn-sm btn-outline-danger"
                         @click="removeStoploss(flattradePosition)"
                       >
-                        -
+                        Remove SL
                       </button>
                     </div>
                     <div class="mt-1">
@@ -1030,17 +1024,52 @@
                             class="btn btn-sm btn-outline-secondary"
                             @click="increaseStoploss(flattradePosition)"
                           >
-                            +
+                            + SL
                           </button>
                           <button
                             class="btn btn-sm btn-outline-secondary"
                             @click="decreaseStoploss(flattradePosition)"
                           >
-                            -
+                            - SL
                           </button>
                         </div>
                       </div>
                       <div v-else>No SL set</div>
+                    </div>
+                    <div class="btn-group" role="group">
+                      <button
+                        class="btn btn-sm btn-outline-success"
+                        @click="setTarget(flattradePosition)"
+                      >
+                        Set TG
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-danger"
+                        @click="removeTarget(flattradePosition)"
+                      >
+                        Remove TG
+                      </button>
+                    </div>
+                    <!-- Add this new section for targets -->
+                    <div class="mt-2">
+                      <div v-if="targets[flattradePosition.tsym] !== null">
+                        Target: {{ targets[flattradePosition.tsym] }}
+                        <div class="btn-group mt-1" role="group">
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            @click="increaseTarget(flattradePosition)"
+                          >
+                            + TG
+                          </button>
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            @click="decreaseTarget(flattradePosition)"
+                          >
+                            - TG
+                          </button>
+                        </div>
+                      </div>
+                      <div v-else>No Target set</div>
                     </div>
                   </td>
                   <td class="position-relative">
