@@ -8,6 +8,8 @@ import ToastAlert from '../components/ToastAlert.vue';
 import qs from 'qs';
 import { debounce } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import { useLocalStorage } from '@vueuse/core'; // Optional: for easier localStorage management
+
 
 
 // Reactive Variables
@@ -168,6 +170,10 @@ const orderMargin = reactive({
   put: null
 });
 const limitOffset = ref(0);
+const stoplosses = useLocalStorage('stoplosses', {});
+const targets = useLocalStorage('targets', {});
+const trailingStoplosses = useLocalStorage('trailingStoplosses', {});
+
 
 
 
@@ -2972,6 +2978,58 @@ const handleOrderTypeChange = () => {
 const getCurrentLTP = () => {
   return modalOptionType.value === 'CALL' ? parseFloat(latestCallLTP.value) : parseFloat(latestPutLTP.value);
 };
+const setStoploss = (position, type) => {
+  if (type === 'trailing') {
+    trailingStoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+    stoplosses.value[position.tsym] = null;
+  } else {
+    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+    trailingStoplosses.value[position.tsym] = null;
+  }
+};
+const addStoploss = (position) => {
+  if (stoplosses.value[position.tsym] === null && trailingStoplosses.value[position.tsym] === null) {
+    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+  }
+};
+
+const removeStoploss = (position) => {
+  stoplosses.value[position.tsym] = null;
+  trailingStoplosses.value[position.tsym] = null;
+};
+
+const increaseStoploss = (position) => {
+  if (stoplosses.value[position.tsym] !== null) {
+    stoplosses.value[position.tsym] += 1; // Adjust increment value as needed
+  }
+};
+
+const decreaseStoploss = (position) => {
+  if (stoplosses.value[position.tsym] !== null) {
+    stoplosses.value[position.tsym] -= 1; // Adjust decrement value as needed
+  }
+};
+
+const checkStoplosses = () => {
+  for (const [tsym, sl] of Object.entries(stoplosses.value)) {
+    if (positionLTPs.value[tsym] <= sl) {
+      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+      if (position) {
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeStoploss(position);
+      }
+    }
+  }
+  for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
+    if (positionLTPs.value[tsym] <= tsl) {
+      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+      if (position) {
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeStoploss(position);
+      }
+    }
+  }
+};
 
 
 
@@ -3400,4 +3458,8 @@ watch([totalBuyValue, totalSellValue, availableBalance], async () => {
 watch(experimentalFeatures, (newValue) => {
   localStorage.setItem('ExperimentalFeatures', JSON.stringify(newValue));
 });
+// Watchers
+watch(positionLTPs, () => {
+  checkStoplosses();
+}, { deep: true });
 </script>

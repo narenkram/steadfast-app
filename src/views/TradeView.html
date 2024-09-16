@@ -949,6 +949,7 @@
                 <th scope="col">Sell Value</th>
                 <th scope="col">Realized</th>
                 <th scope="col">Unrealized</th>
+                <th scope="col">SL/Target</th>
                 <th scope="col">Select</th>
               </tr>
             </thead>
@@ -957,7 +958,6 @@
                 <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                   <td>
                     <div class="d-flex">{{ flattradePosition.tsym }}</div>
-
                     <div class="d-flex flex-row">
                       <span
                         :class="flattradePosition.netqty > 0 ? 'text-success' : flattradePosition.netqty < 0 ? 'text-danger' : null"
@@ -987,6 +987,57 @@
                     :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null"
                   >
                     {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button
+                        class="btn btn-sm btn-outline-primary"
+                        @click="setStoploss(flattradePosition, 'trailing')"
+                      >
+                        T
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-primary"
+                        @click="setStoploss(flattradePosition, 'static')"
+                      >
+                        S
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-success"
+                        @click="addStoploss(flattradePosition)"
+                      >
+                        +
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-danger"
+                        @click="removeStoploss(flattradePosition)"
+                      >
+                        -
+                      </button>
+                    </div>
+                    <div class="mt-1">
+                      <div v-if="trailingStoplosses[flattradePosition.tsym] !== null">
+                        Trailing SL: {{ trailingStoplosses[flattradePosition.tsym] }}
+                      </div>
+                      <div v-else-if="stoplosses[flattradePosition.tsym] !== null">
+                        Static SL: {{ stoplosses[flattradePosition.tsym] }}
+                        <div class="btn-group mt-1" role="group">
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            @click="increaseStoploss(flattradePosition)"
+                          >
+                            +
+                          </button>
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            @click="decreaseStoploss(flattradePosition)"
+                          >
+                            -
+                          </button>
+                        </div>
+                      </div>
+                      <div v-else>No SL set</div>
+                    </div>
                   </td>
                   <td class="position-relative">
                     <label

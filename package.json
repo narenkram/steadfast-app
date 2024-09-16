@@ -12,9 +12,10 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@vueuse/core": "^11.0.3",
     "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
-    "@popperjs/core": "^2.11.8",
     "chart.js": "^4.4.3",
     "crypto-js": "^4.2.0",
     "lodash": "^4.17.21",
