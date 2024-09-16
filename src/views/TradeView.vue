@@ -2986,17 +2986,19 @@ const getCurrentLTP = () => {
   return modalOptionType.value === 'CALL' ? parseFloat(latestCallLTP.value) : parseFloat(latestPutLTP.value);
 };
 const setStoploss = (position, type) => {
+  const ltp = positionLTPs.value[position.tsym];
   if (type === 'trailing') {
-    trailingStoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+    trailingStoplosses.value[position.tsym] = ltp - stoplossValue.value;
     stoplosses.value[position.tsym] = null;
   } else {
-    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+    stoplosses.value[position.tsym] = ltp - stoplossValue.value;
     trailingStoplosses.value[position.tsym] = null;
   }
 };
+
 const addStoploss = (position) => {
   if (stoplosses.value[position.tsym] === null && trailingStoplosses.value[position.tsym] === null) {
-    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym];
+    stoplosses.value[position.tsym] = positionLTPs.value[position.tsym] - stoplossValue.value;
   }
 };
 
@@ -3028,9 +3030,18 @@ const checkStoplosses = () => {
     }
   }
   for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
-    if (positionLTPs.value[tsym] <= tsl) {
-      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-      if (position) {
+    const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+    if (position) {
+      const isLongPosition = position.netqty > 0;
+      const newLTP = positionLTPs.value[tsym];
+
+      if (isLongPosition && newLTP > tsl + stoplossValue.value) {
+        trailingStoplosses.value[tsym] = newLTP - stoplossValue.value;
+      } else if (!isLongPosition && newLTP < tsl - stoplossValue.value) {
+        trailingStoplosses.value[tsym] = newLTP + stoplossValue.value;
+      }
+
+      if (newLTP <= tsl) {
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
         removeStoploss(position);
       }
