@@ -175,9 +175,9 @@ const targets = useLocalStorage('targets', {});
 const trailingStoplosses = useLocalStorage('trailingStoplosses', {});
 
 const enableStoploss = useLocalStorage('enableStoploss', false);
-const stoplossValue = useLocalStorage('stoplossValue', 0);
+const stoplossValue = useLocalStorage('stoplossValue', 10);
 const enableTarget = useLocalStorage('enableTarget', false);
-const targetValue = useLocalStorage('targetValue', 0);
+const targetValue = useLocalStorage('targetValue', 50); 
 
 
 
@@ -3010,8 +3010,18 @@ const decreaseStoploss = (position) => {
   }
 };
 const setTarget = (position) => {
-  const ltp = positionLTPs.value[position.tsym];
-  targets.value[position.tsym] = ltp + targetValue.value;
+  if (enableTarget.value && targetValue.value > 0) {
+    const ltp = positionLTPs.value[position.tsym];
+    
+    // Set target above the LTP for all positions
+    targets.value[position.tsym] = parseFloat(ltp) + parseFloat(targetValue.value);
+    
+    console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
+  } else {
+    // If target is not enabled or targetValue is not set, remove any existing target
+    targets.value[position.tsym] = null;
+    console.log(`Target removed for ${position.tsym}`);
+  }
 };
 const removeTarget = (position) => {
   targets.value[position.tsym] = null;
