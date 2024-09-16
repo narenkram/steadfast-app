@@ -3041,6 +3041,10 @@ const checkTargets = () => {
   for (const [tsym, target] of Object.entries(targets.value)) {
     if (positionLTPs.value[tsym] >= target) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+      if (position) {
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeTarget(position);
+      }
     }
   }
 };
@@ -3048,6 +3052,10 @@ const checkStoplosses = () => {
   for (const [tsym, sl] of Object.entries(stoplosses.value)) {
     if (positionLTPs.value[tsym] <= sl) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+      if (position) {
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeStoploss(position);
+      }
     }
   }
   for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
