@@ -949,11 +949,10 @@
                 <th scope="col">Position</th>
                 <th scope="col">Avg</th>
                 <th scope="col">LTP</th>
-                <th scope="col">Buy Value</th>
-                <th scope="col">Sell Value</th>
+                <th scope="col">TSL / SL</th>
+                <th scope="col">Target</th>
                 <th scope="col">Realized</th>
                 <th scope="col">Unrealized</th>
-                <th scope="col">SL/Target</th>
                 <th scope="col">Select</th>
               </tr>
             </thead>
@@ -977,21 +976,14 @@
                       </span>
                       <span class="ms-2"> Type: {{ flattradePosition.prd }} </span>
                     </div>
+                    <div class="mt-1">
+                      <span>Buy Value: ₹{{ flattradePosition.daybuyamt }}</span>
+                      <br />
+                      <span>Sell Value: ₹{{ flattradePosition.daysellamt }}</span>
+                    </div>
                   </td>
                   <td>{{ flattradePosition.netavgprc }}</td>
                   <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
-                  <td>{{ flattradePosition.daybuyamt }}</td>
-                  <td>{{ flattradePosition.daysellamt }}</td>
-                  <td
-                    :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null"
-                  >
-                    {{ flattradePosition.rpnl }}
-                  </td>
-                  <td
-                    :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null"
-                  >
-                    {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
-                  </td>
                   <td>
                     <!-- SL & TSL -->
                     <div class="my-1">
@@ -1039,6 +1031,8 @@
                         Remove SL
                       </button>
                     </div>
+                  </td>
+                  <td>
                     <!-- TG -->
                     <div class="my-1">
                       <div v-if="targets[flattradePosition.tsym] !== null">
@@ -1076,6 +1070,16 @@
                         Remove TG
                       </button>
                     </div>
+                  </td>
+                  <td
+                    :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null"
+                  >
+                    {{ flattradePosition.rpnl }}
+                  </td>
+                  <td
+                    :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null"
+                  >
+                    {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                   </td>
                   <td class="position-relative">
                     <label
