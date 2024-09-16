@@ -986,45 +986,56 @@
                   <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                   <td>
                     <!-- SL & TSL -->
-                    <div class="my-1">
-                      <div v-if="trailingStoplosses[flattradePosition.tsym] !== null">
-                        Trailing SL: {{ trailingStoplosses[flattradePosition.tsym] }}
+                    <div class="row">
+                      <div
+                        class="col-12"
+                        v-if="trailingStoplosses[flattradePosition.tsym] !== null"
+                      >
+                        <div class="d-flex align-items-center">
+                          <span class="me-2">TSL:</span>
+                          <span class="bg-danger text-white px-2 py-1 rounded">
+                            {{ trailingStoplosses[flattradePosition.tsym] }}
+                          </span>
+                        </div>
                       </div>
-                      <div v-else-if="stoplosses[flattradePosition.tsym] !== null">
-                        Static SL: {{ stoplosses[flattradePosition.tsym] }}
-                        <div class="btn-group mt-1" role="group">
+                      <div class="col-12" v-else-if="stoplosses[flattradePosition.tsym] !== null">
+                        <div class="btn-group" role="group">
                           <button
-                            class="btn btn-sm btn-outline-secondary"
-                            @click="increaseStoploss(flattradePosition)"
-                          >
-                            + SL
-                          </button>
-                          <button
-                            class="btn btn-sm btn-outline-secondary"
+                            class="btn btn-sm btn-outline-danger"
                             @click="decreaseStoploss(flattradePosition)"
                           >
                             - SL
+                          </button>
+                          <span class="d-flex align-items-center bg-danger text-white px-2">
+                            {{ stoplosses[flattradePosition.tsym] }}
+                          </span>
+                          <button
+                            class="btn btn-sm btn-outline-success"
+                            @click="increaseStoploss(flattradePosition)"
+                          >
+                            + SL
                           </button>
                         </div>
                       </div>
                       <div v-else>No SL set</div>
                     </div>
-                    <div class="btn-group" role="group">
+                    <div class="btn-group mt-2" role="group">
                       <button
-                        class="btn btn-sm btn-outline-primary"
+                        v-if="trailingStoplosses[flattradePosition.tsym] === null && stoplosses[flattradePosition.tsym] === null"
+                        class="btn btn-sm btn-outline"
                         @click="setStoploss(flattradePosition, 'trailing')"
                       >
                         Set TSL
                       </button>
                       <button
-                        v-if="stoplosses[flattradePosition.tsym] === null"
-                        class="btn btn-sm btn-outline-primary"
+                        v-if="trailingStoplosses[flattradePosition.tsym] === null && stoplosses[flattradePosition.tsym] === null"
+                        class="btn btn-sm btn-outline"
                         @click="setStoploss(flattradePosition, 'static')"
                       >
                         Set SL
                       </button>
                       <button
-                        v-if="stoplosses[flattradePosition.tsym] !== null"
+                        v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
                         class="btn btn-sm btn-outline-danger"
                         @click="removeStoploss(flattradePosition)"
                       >
