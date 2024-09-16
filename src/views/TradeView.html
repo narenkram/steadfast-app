@@ -976,10 +976,9 @@
                       </span>
                       <span class="ms-2"> Type: {{ flattradePosition.prd }} </span>
                     </div>
-                    <div class="mt-1">
-                      <span>Buy Value: ₹{{ flattradePosition.daybuyamt }}</span>
-                      <br />
-                      <span>Sell Value: ₹{{ flattradePosition.daysellamt }}</span>
+                    <div class="mt-1 d-flex flex-row">
+                      <span class="text-success">₹{{ flattradePosition.daybuyamt }}</span>
+                      <span class="ms-2 text-danger">₹{{ flattradePosition.daysellamt }}</span>
                     </div>
                   </td>
                   <td>{{ flattradePosition.netavgprc }}</td>
