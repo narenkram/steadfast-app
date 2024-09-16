@@ -3332,6 +3332,7 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
       }
     }
   });
+  checkStoplosses();
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], () => {
   saveOffsets();
@@ -3476,8 +3477,4 @@ watch([totalBuyValue, totalSellValue, availableBalance], async () => {
 watch(experimentalFeatures, (newValue) => {
   localStorage.setItem('ExperimentalFeatures', JSON.stringify(newValue));
 });
-// Watchers
-watch(positionLTPs, () => {
-  checkStoplosses();
-}, { deep: true });
 </script>
