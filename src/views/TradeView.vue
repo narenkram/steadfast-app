@@ -3038,12 +3038,27 @@ const decreaseTarget = (position) => {
 };
 
 const checkTargets = () => {
-  for (const [tsym, target] of Object.entries(targets.value)) {
-    if (positionLTPs.value[tsym] >= target) {
+  console.log('Checking targets...');
+  const validTargets = Object.entries(targets.value).filter(([tsym, target]) => target !== null && target !== undefined);
+  
+  if (validTargets.length === 0) {
+    console.log('No valid targets set. Skipping check.');
+    return;
+  }
+
+  for (const [tsym, target] of validTargets) {
+    const currentLTP = positionLTPs.value[tsym];
+    console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
+    if (currentLTP >= target) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
       if (position) {
+        console.log(`Target reached for ${tsym}. Placing sell order.`);
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
         removeTarget(position);
+        toastMessage.value = 'Target hit for ' + tsym;
+        showToast.value = true;
+      } else {
+        console.log(`No position found for ${tsym}`);
       }
     }
   }
@@ -3055,6 +3070,8 @@ const checkStoplosses = () => {
       if (position) {
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
         removeStoploss(position);
+        toastMessage.value = 'Stoploss hit for ' + tsym;
+        showToast.value = true;
       }
     }
   }
@@ -3073,6 +3090,8 @@ const checkStoplosses = () => {
       if (newLTP <= tsl) {
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
         removeStoploss(position);
+        toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
+        showToast.value = true;
       }
     }
   }
