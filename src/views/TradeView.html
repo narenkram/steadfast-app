@@ -1615,52 +1615,29 @@
             <div class="col-12 border rounded p-3">
               <h6 class="mb-0">Risk Management Settings</h6>
               <div class="row">
-                <!-- Predefined Stoploss -->
+                <!-- Overtrade Protection (Auto-Kill Switch) -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
-                  <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
-                  <div class="input-group mb-3">
-                    <div class="input-group-text">
-                      <input
-                        class="form-check-input mt-0"
-                        type="checkbox"
-                        id="enableStoploss"
-                        aria-label="Enable Predefined Stoploss"
-                        :class="{ 'disabled-form': isFormDisabled }"
-                      />
-                    </div>
+                  <label for="overtradeProtection" class="form-label">
+                    Overtrade Protection (Auto-Kill Switch)
+                  </label>
+                  <div class="form-check form-switch">
                     <input
-                      type="number"
-                      class="form-control"
-                      id="stoplossValue"
-                      aria-label="Predefined Stoploss (points)"
-                      :class="{ 'disabled-form': isFormDisabled }"
+                      class="form-check-input"
+                      type="checkbox"
+                      id="overtradeProtection"
+                      :checked="overtradeProtection"
+                      @change="toggleOvertradeProtection"
                     />
-                    <span class="input-group-text">₹ Points</span>
+                    <label class="form-check-label" for="overtradeProtection">
+                      {{ overtradeProtection ? 'Enabled' : 'Disabled' }}
+                    </label>
                   </div>
+                  <small class="text-muted">
+                    Activates Kill Switch if your total Buy or Sell value exceeds your available
+                    funds, preventing overtrading.
+                  </small>
                 </div>
-                <!-- Predefined Target -->
-                <div class="col-12 col-md-6 col-lg-4 mt-3">
-                  <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
-                  <div class="input-group mb-3">
-                    <div class="input-group-text">
-                      <input
-                        class="form-check-input mt-0"
-                        type="checkbox"
-                        id="enableTarget"
-                        aria-label="Enable Predefined Target"
-                        :class="{ 'disabled-form': isFormDisabled }"
-                      />
-                    </div>
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="targetValue"
-                      aria-label="Predefined Target (points)"
-                      :class="{ 'disabled-form': isFormDisabled }"
-                    />
-                    <span class="input-group-text">₹ Points</span>
-                  </div>
-                </div>
+                <!-- Max Risk & Target Toggle -->
                 <div class="col-12 col-md-6 col-lg-4 mt-3">
                   <label for="" class="form-label mt-2">Max Risk & Target</label>
                   <div class="form-check form-switch">
@@ -1822,28 +1799,6 @@
                       >
                     </div>
                   </div>
-                </div>
-                <!-- Overtrade Protection (Auto-Kill Switch) -->
-                <div class="col-12 col-md-12 col-lg-12 mt-3">
-                  <label for="overtradeProtection" class="form-label">
-                    Overtrade Protection (Auto-Kill Switch)
-                  </label>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="overtradeProtection"
-                      :checked="overtradeProtection"
-                      @change="toggleOvertradeProtection"
-                    />
-                    <label class="form-check-label" for="overtradeProtection">
-                      {{ overtradeProtection ? 'Enabled' : 'Disabled' }}
-                    </label>
-                  </div>
-                  <small class="text-muted">
-                    Activates Kill Switch if your total Buy or Sell value exceeds your available
-                    funds, preventing overtrading.
-                  </small>
                 </div>
               </div>
             </div>
