@@ -177,7 +177,7 @@ const trailingStoplosses = useLocalStorage('trailingStoplosses', {});
 const enableStoploss = useLocalStorage('enableStoploss', false);
 const stoplossValue = useLocalStorage('stoplossValue', 10);
 const enableTarget = useLocalStorage('enableTarget', false);
-const targetValue = useLocalStorage('targetValue', 50); 
+const targetValue = useLocalStorage('targetValue', 50);
 
 
 
@@ -2987,13 +2987,19 @@ const getCurrentLTP = () => {
 };
 const setStoploss = (position, type) => {
   const ltp = positionLTPs.value[position.tsym];
+  const isLongPosition = position.netqty > 0;
   if (type === 'trailing') {
-    trailingStoplosses.value[position.tsym] = ltp - stoplossValue.value;
+    trailingStoplosses.value[position.tsym] = isLongPosition
+      ? ltp - stoplossValue.value
+      : ltp + stoplossValue.value;
     stoplosses.value[position.tsym] = null;
   } else {
-    stoplosses.value[position.tsym] = ltp - stoplossValue.value;
+    stoplosses.value[position.tsym] = isLongPosition
+      ? ltp - stoplossValue.value
+      : ltp + stoplossValue.value;
     trailingStoplosses.value[position.tsym] = null;
   }
+  console.log(`${type === 'trailing' ? 'TSL' : 'SL'} set for ${position.tsym}: ${isLongPosition ? trailingStoplosses.value[position.tsym] : stoplosses.value[position.tsym]}`);
 };
 const removeStoploss = (position) => {
   stoplosses.value[position.tsym] = null;
@@ -3012,10 +3018,10 @@ const decreaseStoploss = (position) => {
 const setTarget = (position) => {
   if (enableTarget.value && targetValue.value > 0) {
     const ltp = positionLTPs.value[position.tsym];
-    
+
     // Set target above the LTP for all positions
     targets.value[position.tsym] = parseFloat(ltp) + parseFloat(targetValue.value);
-    
+
     console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
   } else {
     // If target is not enabled or targetValue is not set, remove any existing target
@@ -3040,7 +3046,7 @@ const decreaseTarget = (position) => {
 const checkTargets = () => {
   console.log('Checking targets...');
   const validTargets = Object.entries(targets.value).filter(([tsym, target]) => target !== null && target !== undefined);
-  
+
   if (validTargets.length === 0) {
     console.log('No valid targets set. Skipping check.');
     return;
@@ -3081,17 +3087,30 @@ const checkStoplosses = () => {
       const isLongPosition = position.netqty > 0;
       const newLTP = positionLTPs.value[tsym];
 
-      if (isLongPosition && newLTP > tsl + stoplossValue.value) {
-        trailingStoplosses.value[tsym] = newLTP - stoplossValue.value;
-      } else if (!isLongPosition && newLTP < tsl - stoplossValue.value) {
-        trailingStoplosses.value[tsym] = newLTP + stoplossValue.value;
-      }
-
-      if (newLTP <= tsl) {
-        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-        removeStoploss(position);
-        toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
-        showToast.value = true;
+      if (isLongPosition) {
+        if (newLTP > tsl + stoplossValue.value) {
+          // Update TSL for long positions
+          trailingStoplosses.value[tsym] = newLTP - stoplossValue.value;
+          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
+        } else if (newLTP <= tsl) {
+          // Hit TSL for long positions
+          placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+          removeStoploss(position);
+          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
+          showToast.value = true;
+        }
+      } else {
+        if (newLTP < tsl - stoplossValue.value) {
+          // Update TSL for short positions
+          trailingStoplosses.value[tsym] = newLTP + stoplossValue.value;
+          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
+        } else if (newLTP >= tsl) {
+          // Hit TSL for short positions
+          placeOrderForPosition('B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+          removeStoploss(position);
+          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
+          showToast.value = true;
+        }
       }
     }
   }
