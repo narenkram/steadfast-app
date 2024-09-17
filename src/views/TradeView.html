@@ -1124,8 +1124,8 @@
                 <th scope="col">Position</th>
                 <th scope="col">Avg</th>
                 <th scope="col">LTP</th>
-                <th scope="col">Buy Value</th>
-                <th scope="col">Sell Value</th>
+                <th scope="col">TSL / SL</th>
+                <th scope="col">Target</th>
                 <th scope="col">Realized</th>
                 <th scope="col">Unrealized</th>
                 <th scope="col">Select</th>
@@ -1151,11 +1151,110 @@
                       </span>
                       <span class="ms-2"> Type: {{ shoonyaPosition.prd }} </span>
                     </div>
+                    <div class="mt-1 d-flex flex-row">
+                      <span class="text-success">₹{{ shoonyaPosition.daybuyamt }}</span>
+                      <span class="ms-2 text-danger">₹{{ shoonyaPosition.daysellamt }}</span>
+                    </div>
                   </td>
                   <td>{{ shoonyaPosition.netavgprc }}</td>
                   <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
-                  <td>{{ shoonyaPosition.daybuyamt }}</td>
-                  <td>{{ shoonyaPosition.daysellamt }}</td>
+                  <td>
+                    <!-- SL & TSL -->
+                    <div class="row">
+                      <div class="col-12" v-if="trailingStoplosses[shoonyaPosition.tsym] !== null">
+                        <div class="d-flex align-items-center">
+                          <span class="me-2">TSL:</span>
+                          <span class="bg-danger text-white px-2 py-1 rounded">
+                            {{ trailingStoplosses[shoonyaPosition.tsym] }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-12" v-else-if="stoplosses[shoonyaPosition.tsym] !== null">
+                        <div class="btn-group" role="group">
+                          <button
+                            class="btn btn-sm btn-outline-danger"
+                            @click="decreaseStoploss(shoonyaPosition)"
+                          >
+                            - SL
+                          </button>
+                          <span class="d-flex align-items-center bg-danger text-white px-2">
+                            {{ stoplosses[shoonyaPosition.tsym] }}
+                          </span>
+                          <button
+                            class="btn btn-sm btn-outline-success"
+                            @click="increaseStoploss(shoonyaPosition)"
+                          >
+                            + SL
+                          </button>
+                        </div>
+                      </div>
+                      <div v-else>No SL set</div>
+                    </div>
+                    <div class="btn-group mt-2" role="group">
+                      <button
+                        v-if="trailingStoplosses[shoonyaPosition.tsym] === null && stoplosses[shoonyaPosition.tsym] === null"
+                        class="btn btn-sm btn-outline"
+                        @click="setStoploss(shoonyaPosition, 'trailing')"
+                      >
+                        Set TSL
+                      </button>
+                      <button
+                        v-if="trailingStoplosses[shoonyaPosition.tsym] === null && stoplosses[shoonyaPosition.tsym] === null"
+                        class="btn btn-sm btn-outline"
+                        @click="setStoploss(shoonyaPosition, 'static')"
+                      >
+                        Set SL
+                      </button>
+                      <button
+                        v-if="trailingStoplosses[shoonyaPosition.tsym] !== null || stoplosses[shoonyaPosition.tsym] !== null"
+                        class="btn btn-sm btn-outline-danger"
+                        @click="removeStoploss(shoonyaPosition)"
+                      >
+                        Remove SL
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <!-- TG -->
+                    <div class="row">
+                      <div class="col-12" v-if="targets[shoonyaPosition.tsym] !== null">
+                        <div class="btn-group" role="group">
+                          <button
+                            class="btn btn-sm btn-outline-danger"
+                            @click="decreaseTarget(shoonyaPosition)"
+                          >
+                            - TG
+                          </button>
+                          <span class="d-flex align-items-center bg-success text-white px-2">
+                            {{ targets[shoonyaPosition.tsym] }}
+                          </span>
+                          <button
+                            class="btn btn-sm btn-outline-success"
+                            @click="increaseTarget(shoonyaPosition)"
+                          >
+                            + TG
+                          </button>
+                        </div>
+                      </div>
+                      <div v-else>No Target set</div>
+                    </div>
+                    <div class="btn-group mt-2" role="group">
+                      <button
+                        v-if="targets[shoonyaPosition.tsym] === null"
+                        class="btn btn-sm btn-outline-success"
+                        @click="setTarget(shoonyaPosition)"
+                      >
+                        Set TG
+                      </button>
+                      <button
+                        v-if="targets[shoonyaPosition.tsym] !== null"
+                        class="btn btn-sm btn-outline-danger"
+                        @click="removeTarget(shoonyaPosition)"
+                      >
+                        Remove TG
+                      </button>
+                    </div>
+                  </td>
                   <td
                     :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : null"
                   >
