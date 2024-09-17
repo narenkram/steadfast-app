@@ -3067,7 +3067,7 @@ const decreaseTarget = (position) => {
   }
 };
 
-const checkTargets = () => {
+const checkTargets = (newLTPs) => {
   if (!enableTarget.value) {
     console.log('Target is disabled.');
     return;
@@ -3081,7 +3081,7 @@ const checkTargets = () => {
   }
 
   for (const [tsym, target] of validTargets) {
-    const currentLTP = positionLTPs.value[tsym];
+    const currentLTP = newLTPs[tsym];
     console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
     if (currentLTP >= target) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
@@ -3097,13 +3097,13 @@ const checkTargets = () => {
     }
   }
 };
-const checkStoplosses = () => {
+const checkStoplosses = (newLTPs) => {
   if (!enableStoploss.value) {
     console.log('Stoploss is disabled.');
     return;
   }
   for (const [tsym, sl] of Object.entries(stoplosses.value)) {
-    if (positionLTPs.value[tsym] <= sl) {
+    if (newLTPs[tsym] <= sl) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
       if (position) {
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
@@ -3117,7 +3117,7 @@ const checkStoplosses = () => {
     const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
     if (position) {
       const isLongPosition = position.netqty > 0;
-      const newLTP = positionLTPs.value[tsym];
+      const newLTP = newLTPs[tsym];
 
       if (isLongPosition) {
         if (newLTP > tsl + stoplossValue.value) {
@@ -3149,9 +3149,9 @@ const checkStoplosses = () => {
     }
   }
 };
-const checkStoplossesAndTargets = () => {
-  checkStoplosses();
-  checkTargets();
+const checkStoplossesAndTargets = (newLTPs) => {
+  checkStoplosses(newLTPs);
+  checkTargets(newLTPs);
 };
 
 
@@ -3436,7 +3436,7 @@ watch(positionLTPs, (newLTPs, oldLTPs) => {
       }
     }
   });
-  checkStoplossesAndTargets();
+  checkStoplossesAndTargets(newLTPs);
 }, { deep: true });
 watch([callStrikeOffset, putStrikeOffset], () => {
   saveOffsets();
