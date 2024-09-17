@@ -2986,6 +2986,10 @@ const getCurrentLTP = () => {
   return modalOptionType.value === 'CALL' ? parseFloat(latestCallLTP.value) : parseFloat(latestPutLTP.value);
 };
 const setStoploss = (position, type) => {
+  if (!enableStoploss.value) {
+    console.log('Stoploss is disabled.');
+    return;
+  }
   const quantity = Math.abs(Number(position.netQty || position.netqty));
 
   if (quantity === 0) {
@@ -3025,6 +3029,10 @@ const decreaseStoploss = (position) => {
   }
 };
 const setTarget = (position) => {
+  if (!enableTarget.value) {
+    console.log('Target is disabled.');
+    return;
+  }
   const quantity = Math.abs(Number(position.netQty || position.netqty));
 
   if (quantity === 0) {
@@ -3060,6 +3068,10 @@ const decreaseTarget = (position) => {
 };
 
 const checkTargets = () => {
+  if (!enableTarget.value) {
+    console.log('Target is disabled.');
+    return;
+  }
   console.log('Checking targets...');
   const validTargets = Object.entries(targets.value).filter(([tsym, target]) => target !== null && target !== undefined);
 
@@ -3086,6 +3098,10 @@ const checkTargets = () => {
   }
 };
 const checkStoplosses = () => {
+  if (!enableStoploss.value) {
+    console.log('Stoploss is disabled.');
+    return;
+  }
   for (const [tsym, sl] of Object.entries(stoplosses.value)) {
     if (positionLTPs.value[tsym] <= sl) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
