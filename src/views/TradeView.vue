@@ -178,7 +178,7 @@ const enableStoploss = useLocalStorage('enableStoploss', false);
 const stoplossValue = useLocalStorage('stoplossValue', 10);
 const enableTarget = useLocalStorage('enableTarget', false);
 const targetValue = useLocalStorage('targetValue', 50);
-
+const tslHitPositions = new Set();
 
 
 
@@ -2999,11 +2999,13 @@ const setStoploss = (position, type) => {
       : ltp + stoplossValue.value;
     trailingStoplosses.value[position.tsym] = null;
   }
+  tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
   console.log(`${type === 'trailing' ? 'TSL' : 'SL'} set for ${position.tsym}: ${isLongPosition ? trailingStoplosses.value[position.tsym] : stoplosses.value[position.tsym]}`);
 };
 const removeStoploss = (position) => {
   stoplosses.value[position.tsym] = null;
   trailingStoplosses.value[position.tsym] = null;
+  tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
 };
 const increaseStoploss = (position) => {
   if (stoplosses.value[position.tsym] !== null) {
@@ -3092,24 +3094,26 @@ const checkStoplosses = () => {
           // Update TSL for long positions
           trailingStoplosses.value[tsym] = newLTP - stoplossValue.value;
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP <= tsl) {
+        } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for long positions
           placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
           removeStoploss(position);
           toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
           showToast.value = true;
+          tslHitPositions.add(tsym); // Mark TSL as hit
         }
       } else {
         if (newLTP < tsl - stoplossValue.value) {
           // Update TSL for short positions
           trailingStoplosses.value[tsym] = newLTP + stoplossValue.value;
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP >= tsl) {
+        } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for short positions
           placeOrderForPosition('B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
           removeStoploss(position);
           toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
           showToast.value = true;
+          tslHitPositions.add(tsym); // Mark TSL as hit
         }
       }
     }
