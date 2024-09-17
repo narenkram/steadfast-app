@@ -2986,6 +2986,13 @@ const getCurrentLTP = () => {
   return modalOptionType.value === 'CALL' ? parseFloat(latestCallLTP.value) : parseFloat(latestPutLTP.value);
 };
 const setStoploss = (position, type) => {
+  const quantity = Math.abs(Number(position.netQty || position.netqty));
+
+  if (quantity === 0) {
+    console.log(`Quantity is zero for ${position.tsym}, no stoploss will be set.`);
+    return;
+  }
+
   const ltp = positionLTPs.value[position.tsym];
   const isLongPosition = position.netqty > 0;
   if (type === 'trailing') {
@@ -3018,6 +3025,13 @@ const decreaseStoploss = (position) => {
   }
 };
 const setTarget = (position) => {
+  const quantity = Math.abs(Number(position.netQty || position.netqty));
+
+  if (quantity === 0) {
+    console.log(`Quantity is zero for ${position.tsym}, no target will be set.`);
+    return;
+  }
+
   if (enableTarget.value && targetValue.value > 0) {
     const ltp = positionLTPs.value[position.tsym];
 
