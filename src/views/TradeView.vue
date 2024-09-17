@@ -3000,14 +3000,14 @@ const setStoploss = (position, type) => {
   const ltp = positionLTPs.value[position.tsym];
   const isLongPosition = position.netqty > 0;
   if (type === 'trailing') {
-    trailingStoplosses.value[position.tsym] = isLongPosition
-      ? ltp - stoplossValue.value
-      : ltp + stoplossValue.value;
+    trailingStoplosses.value[position.tsym] = parseFloat(
+      (isLongPosition ? ltp - stoplossValue.value : ltp + stoplossValue.value).toFixed(2)
+    );
     stoplosses.value[position.tsym] = null;
   } else {
-    stoplosses.value[position.tsym] = isLongPosition
-      ? ltp - stoplossValue.value
-      : ltp + stoplossValue.value;
+    stoplosses.value[position.tsym] = parseFloat(
+      (isLongPosition ? ltp - stoplossValue.value : ltp + stoplossValue.value).toFixed(2)
+    );
     trailingStoplosses.value[position.tsym] = null;
   }
   tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
@@ -3044,7 +3044,7 @@ const setTarget = (position) => {
     const ltp = positionLTPs.value[position.tsym];
 
     // Set target above the LTP for all positions
-    targets.value[position.tsym] = parseFloat(ltp) + parseFloat(targetValue.value);
+    targets.value[position.tsym] = parseFloat((parseFloat(ltp) + parseFloat(targetValue.value)).toFixed(2));
 
     console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
   } else {
@@ -3122,7 +3122,7 @@ const checkStoplosses = () => {
       if (isLongPosition) {
         if (newLTP > tsl + stoplossValue.value) {
           // Update TSL for long positions
-          trailingStoplosses.value[tsym] = newLTP - stoplossValue.value;
+          trailingStoplosses.value[tsym] = parseFloat((newLTP - stoplossValue.value).toFixed(2));
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
         } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for long positions
@@ -3135,7 +3135,7 @@ const checkStoplosses = () => {
       } else {
         if (newLTP < tsl - stoplossValue.value) {
           // Update TSL for short positions
-          trailingStoplosses.value[tsym] = newLTP + stoplossValue.value;
+          trailingStoplosses.value[tsym] = parseFloat((newLTP + stoplossValue.value).toFixed(2));
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
         } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for short positions
