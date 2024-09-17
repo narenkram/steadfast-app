@@ -446,7 +446,10 @@
             </span>
           </div>
           <div class="mt-1">
-            <span v-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
+            <span v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
+              Margin Required: ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
+            </span>
+            <span v-else-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
             <span v-else>Margin: Not available</span>
           </div>
           <div v-if="showStrikeDetails">
@@ -588,7 +591,10 @@
             </select>
           </div>
           <div class="mt-1">
-            <span v-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
+            <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
+              Margin Required: ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
+            </span>
+            <span v-else-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
             <span v-else>Margin: Not available</span>
           </div>
           <div v-if="showStrikeDetails">
