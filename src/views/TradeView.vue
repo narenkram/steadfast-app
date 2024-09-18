@@ -2999,6 +2999,7 @@ const setStoploss = (position, type) => {
 
   const ltp = positionLTPs.value[position.tsym];
   const isLongPosition = position.netqty > 0;
+  
   if (type === 'trailing') {
     trailingStoplosses.value[position.tsym] = parseFloat(
       (isLongPosition ? ltp - stoplossValue.value : ltp + stoplossValue.value).toFixed(2)
@@ -3010,22 +3011,17 @@ const setStoploss = (position, type) => {
     );
     trailingStoplosses.value[position.tsym] = null;
   }
-  tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
-  console.log(`${type === 'trailing' ? 'TSL' : 'SL'} set for ${position.tsym}: ${isLongPosition ? trailingStoplosses.value[position.tsym] : stoplosses.value[position.tsym]}`);
+  console.log(`${type} SL set for ${position.tsym}: ${stoplosses.value[position.tsym] || trailingStoplosses.value[position.tsym]}`);
 };
+
 const removeStoploss = (position) => {
   stoplosses.value[position.tsym] = null;
   trailingStoplosses.value[position.tsym] = null;
-  tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
 };
-const increaseStoploss = (position) => {
+const adjustStoploss = (position, action) => {
   if (stoplosses.value[position.tsym] !== null) {
-    stoplosses.value[position.tsym] += 1; // Adjust increment value as needed
-  }
-};
-const decreaseStoploss = (position) => {
-  if (stoplosses.value[position.tsym] !== null) {
-    stoplosses.value[position.tsym] -= 1; // Adjust decrement value as needed
+    const adjustment = action === 'increase' ? 1 : -1;
+    stoplosses.value[position.tsym] = parseFloat((stoplosses.value[position.tsym] + adjustment).toFixed(2));
   }
 };
 const setTarget = (position) => {
@@ -3040,17 +3036,21 @@ const setTarget = (position) => {
     return;
   }
 
-  if (enableTarget.value && targetValue.value > 0) {
-    const ltp = positionLTPs.value[position.tsym];
+  const ltp = positionLTPs.value[position.tsym];
+  const isLongPosition = position.netqty > 0;
 
-    // Set target above the LTP for all positions
-    targets.value[position.tsym] = parseFloat((parseFloat(ltp) + parseFloat(targetValue.value)).toFixed(2));
+  if (enableTarget.value && targetValue.value > 0 && ltp !== undefined && !isNaN(ltp)) {
+    const ltpNumber = parseFloat(ltp);
+    const targetValueNumber = parseFloat(targetValue.value);
+    
+    targets.value[position.tsym] = isLongPosition 
+      ? (ltpNumber + targetValueNumber).toFixed(2) 
+      : (ltpNumber - targetValueNumber).toFixed(2);
 
     console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
   } else {
-    // If target is not enabled or targetValue is not set, remove any existing target
     targets.value[position.tsym] = null;
-    console.log(`Target removed for ${position.tsym}`);
+    console.log(`Target removed or invalid for ${position.tsym}. LTP: ${ltp}, TargetValue: ${targetValue.value}`);
   }
 };
 const removeTarget = (position) => {
@@ -3058,106 +3058,112 @@ const removeTarget = (position) => {
 };
 const increaseTarget = (position) => {
   if (targets.value[position.tsym] !== null) {
-    targets.value[position.tsym] += 1; // Adjust increment value as needed
+    const currentTarget = parseFloat(targets.value[position.tsym]);
+    targets.value[position.tsym] = (currentTarget + 1).toFixed(2);
   }
 };
+
 const decreaseTarget = (position) => {
   if (targets.value[position.tsym] !== null) {
-    targets.value[position.tsym] -= 1; // Adjust decrement value as needed
+    const currentTarget = parseFloat(targets.value[position.tsym]);
+    targets.value[position.tsym] = (currentTarget - 1).toFixed(2);
   }
 };
 
-const checkTargets = (newLTPs) => {
-  if (!enableTarget.value) {
-    console.log('Target is disabled.');
-    return;
-  }
-  console.log('Checking targets...');
-  const validTargets = Object.entries(targets.value).filter(([tsym, target]) => target !== null && target !== undefined);
+const checkStoploss = (currentLTPs) => {
+  if (!enableStoploss.value) return;
 
-  if (validTargets.length === 0) {
-    console.log('No valid targets set. Skipping check.');
-    return;
-  }
+  [...flatTradePositionBook.value, ...shoonyaPositionBook.value].forEach(position => {
+    const ltp = currentLTPs[position.tsym];
+    if (ltp === undefined) return;
 
-  for (const [tsym, target] of validTargets) {
-    const currentLTP = newLTPs[tsym];
-    console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
-    if (currentLTP >= target) {
-      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-      if (position) {
-        console.log(`Target reached for ${tsym}. Placing sell order.`);
-        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-        removeTarget(position);
-        toastMessage.value = 'Target hit for ' + tsym;
-        showToast.value = true;
+    const isLongPosition = position.netqty > 0;
+    const sl = stoplosses.value[position.tsym];
+    const tsl = trailingStoplosses.value[position.tsym];
+
+    if (sl !== null) {
+      if ((isLongPosition && ltp <= sl) || (!isLongPosition && ltp >= sl)) {
+        console.log(`SL hit for ${position.tsym}`);
+        executeStoplossOrder(position);
+        return; // Exit the loop after executing SL order
+      }
+    }
+
+    if (tsl !== null) {
+      if ((isLongPosition && ltp <= tsl) || (!isLongPosition && ltp >= tsl)) {
+        console.log(`TSL hit for ${position.tsym}`);
+        executeStoplossOrder(position);
       } else {
-        console.log(`No position found for ${tsym}`);
+        updateTrailingStoploss(position, ltp);
       }
+    }
+  });
+};
+
+const updateTrailingStoploss = (position, ltp) => {
+  const isLongPosition = position.netqty > 0;
+  const currentTSL = trailingStoplosses.value[position.tsym];
+
+  if (isLongPosition) {
+    if (ltp > currentTSL + stoplossValue.value) {
+      trailingStoplosses.value[position.tsym] = parseFloat((ltp - stoplossValue.value).toFixed(2));
+      console.log(`TSL updated for ${position.tsym}: ${trailingStoplosses.value[position.tsym]}`);
+    }
+  } else {
+    if (ltp < currentTSL - stoplossValue.value) {
+      trailingStoplosses.value[position.tsym] = parseFloat((ltp + stoplossValue.value).toFixed(2));
+      console.log(`TSL updated for ${position.tsym}: ${trailingStoplosses.value[position.tsym]}`);
     }
   }
 };
-const checkStoplosses = (newLTPs) => {
-  if (!enableStoploss.value) {
-    console.log('Stoploss is disabled.');
-    return;
-  }
-  for (const [tsym, sl] of Object.entries(stoplosses.value)) {
-    if (newLTPs[tsym] <= sl) {
-      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-      if (position) {
-        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-        removeStoploss(position);
-        toastMessage.value = 'Stoploss hit for ' + tsym;
-        showToast.value = true;
+
+
+const checkTargets = (currentLTPs) => {
+  if (!enableTarget.value) return;
+
+  [...flatTradePositionBook.value, ...shoonyaPositionBook.value].forEach(position => {
+    const ltp = currentLTPs[position.tsym];
+    if (ltp === undefined) return;
+
+    const isLongPosition = position.netqty > 0;
+    const target = targets.value[position.tsym];
+
+    if (target !== null) {
+      if ((isLongPosition && ltp >= target) || (!isLongPosition && ltp <= target)) {
+        console.log(`Target hit for ${position.tsym}`);
+        executeTargetOrder(position);
       }
     }
-  }
-  for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
-    const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-    if (position) {
-      const isLongPosition = position.netqty > 0;
-      const newLTP = newLTPs[tsym];
-
-      if (isLongPosition) {
-        if (newLTP > tsl + stoplossValue.value) {
-          // Update TSL for long positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP - stoplossValue.value).toFixed(2));
-          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
-          // Hit TSL for long positions
-          placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-          removeStoploss(position);
-          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
-          showToast.value = true;
-          tslHitPositions.add(tsym); // Mark TSL as hit
-        }
-      } else {
-        if (newLTP < tsl - stoplossValue.value) {
-          // Update TSL for short positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP + stoplossValue.value).toFixed(2));
-          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
-          // Hit TSL for short positions
-          placeOrderForPosition('B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-          removeStoploss(position);
-          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
-          showToast.value = true;
-          tslHitPositions.add(tsym); // Mark TSL as hit
-        }
-      }
-    }
-  }
-};
-const checkStoplossesAndTargets = (newLTPs) => {
-  checkStoplosses(newLTPs);
-  checkTargets(newLTPs);
+  });
 };
 
+const executeStoplossOrder = (position) => {
+  const orderType = position.netqty > 0 ? 'S' : 'B';
+  placeOrderForPosition(orderType, position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+  removeStoploss(position);
+  toastMessage.value = `Stoploss hit for ${position.tsym}`;
+  showToast.value = true;
+};
 
+const executeTargetOrder = (position) => {
+  const orderType = position.netqty > 0 ? 'S' : 'B';
+  placeOrderForPosition(orderType, position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+  removeTarget(position);
+  toastMessage.value = `Target hit for ${position.tsym}`;
+  showToast.value = true;
+};
 
+const checkStoplossesAndTargets = (currentLTPs) => {
+  checkStoploss(currentLTPs);
+  checkTargets(currentLTPs);
+};
 
+const continuousCheckStoplossesAndTargets = () => {
+  const currentLTPs = { ...positionLTPs.value };
+  checkStoplossesAndTargets(currentLTPs);
+};
 
+let continuousCheckInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
@@ -3224,6 +3230,7 @@ onMounted(async () => {
   if (storedBaskets) {
     savedBaskets.value = JSON.parse(storedBaskets);
   }
+  continuousCheckInterval = setInterval(continuousCheckStoplossesAndTargets, 100);
 });
 
 onBeforeUnmount(() => {
@@ -3234,6 +3241,9 @@ onBeforeUnmount(() => {
   clearInterval(timer);
   if (positionCheckInterval) {
     clearInterval(positionCheckInterval);
+  }
+  if (continuousCheckInterval) {
+    clearInterval(continuousCheckInterval);
   }
 });
 
@@ -3423,17 +3433,9 @@ watch(enableHotKeys, (newValue) => {
 });
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
-  // console.log('positionLTPs updated:', newLTPs);
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
       console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
-      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
-        .find(p => (p.tsym || p.tradingSymbol) === tsym);
-      if (position) {
-        console.log(`Found position for ${tsym}:`, position);
-      } else {
-        console.log(`No position found for ${tsym}`);
-      }
     }
   });
   checkStoplossesAndTargets(newLTPs);
