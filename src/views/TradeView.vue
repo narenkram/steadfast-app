@@ -2998,6 +2998,11 @@ const setStoploss = (position, type) => {
   }
 
   const ltp = positionLTPs.value[position.tsym];
+  if (!ltp) {
+    console.log(`No LTP available for ${position.tsym}, cannot set stoploss.`);
+    return;
+  }
+
   const isLongPosition = position.netqty > 0;
   if (type === 'trailing') {
     trailingStoplosses.value[position.tsym] = parseFloat(
@@ -3040,11 +3045,18 @@ const setTarget = (position) => {
     return;
   }
 
-  if (enableTarget.value && targetValue.value > 0) {
-    const ltp = positionLTPs.value[position.tsym];
+  const ltp = positionLTPs.value[position.tsym];
+  if (!ltp) {
+    console.log(`No LTP available for ${position.tsym}, cannot set target.`);
+    return;
+  }
 
-    // Set target above the LTP for all positions
-    targets.value[position.tsym] = parseFloat((parseFloat(ltp) + parseFloat(targetValue.value)).toFixed(2));
+  if (enableTarget.value && targetValue.value > 0) {
+    // Set target above the LTP for long positions, below for short positions
+    const isLongPosition = position.netqty > 0;
+    targets.value[position.tsym] = parseFloat(
+      (isLongPosition ? parseFloat(ltp) + parseFloat(targetValue.value) : parseFloat(ltp) - parseFloat(targetValue.value)).toFixed(2)
+    );
 
     console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
   } else {
@@ -3110,55 +3122,67 @@ const checkStoplosses = (newLTPs) => {
       continue;
     }
 
-    if (newLTP <= sl) {
-      const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-      if (position) {
-        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-        removeStoploss(position);
-        toastMessage.value = 'Stoploss hit for ' + tsym;
-        showToast.value = true;
-      }
+    const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
+    if (!position || Math.abs(Number(position.netQty || position.netqty)) === 0) {
+      console.log(`No active position for ${tsym}, removing stoploss.`);
+      removeStoploss({ tsym });
+      continue;
+    }
+
+    const isLongPosition = position.netqty > 0;
+    if ((isLongPosition && newLTP <= sl) || (!isLongPosition && newLTP >= sl)) {
+      console.log(`Stoploss hit for ${tsym}. Closing position.`);
+      placeOrderForPosition(isLongPosition ? 'S' : 'B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+      removeStoploss(position);
+      toastMessage.value = 'Stoploss hit for ' + tsym;
+      showToast.value = true;
     }
   }
 
   for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
     const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
-    if (position) {
-      const isLongPosition = position.netqty > 0;
-      const newLTP = parseFloat(newLTPs[tsym]);
-      const stopLossValue = parseFloat(stoplossValue.value);
+    if (!position || Math.abs(Number(position.netQty || position.netqty)) === 0) {
+      console.log(`No active position for ${tsym}, removing trailing stoploss.`);
+      removeStoploss({ tsym });
+      continue;
+    }
 
-      if (isNaN(newLTP) || isNaN(tsl) || isNaN(stopLossValue)) {
-        console.warn(`Invalid LTP, TSL, or stoploss value for ${tsym}. LTP: ${newLTPs[tsym]}, TSL: ${tsl}, SL Value: ${stoplossValue.value}`);
-        continue;
+    const isLongPosition = position.netqty > 0;
+    const newLTP = parseFloat(newLTPs[tsym]);
+    const stopLossValue = parseFloat(stoplossValue.value);
+
+    if (isNaN(newLTP) || isNaN(tsl) || isNaN(stopLossValue)) {
+      console.warn(`Invalid LTP, TSL, or stoploss value for ${tsym}. LTP: ${newLTPs[tsym]}, TSL: ${tsl}, SL Value: ${stoplossValue.value}`);
+      continue;
+    }
+
+    if (isLongPosition) {
+      if (newLTP > tsl + stopLossValue) {
+        // Update TSL for long positions
+        trailingStoplosses.value[tsym] = parseFloat((newLTP - stopLossValue).toFixed(2));
+        console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
+      } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
+        // Hit TSL for long positions
+        console.log(`Trailing Stoploss hit for ${tsym}. Closing position.`);
+        placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeStoploss(position);
+        toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
+        showToast.value = true;
+        tslHitPositions.add(tsym); // Mark TSL as hit
       }
-
-      if (isLongPosition) {
-        if (newLTP > tsl + stopLossValue) {
-          // Update TSL for long positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP - stopLossValue).toFixed(2));
-          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
-          // Hit TSL for long positions
-          placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-          removeStoploss(position);
-          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
-          showToast.value = true;
-          tslHitPositions.add(tsym); // Mark TSL as hit
-        }
-      } else {
-        if (newLTP < tsl - stopLossValue) {
-          // Update TSL for short positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP + stopLossValue).toFixed(2));
-          console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
-        } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
-          // Hit TSL for short positions
-          placeOrderForPosition('B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
-          removeStoploss(position);
-          toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
-          showToast.value = true;
-          tslHitPositions.add(tsym); // Mark TSL as hit
-        }
+    } else {
+      if (newLTP < tsl - stopLossValue) {
+        // Update TSL for short positions
+        trailingStoplosses.value[tsym] = parseFloat((newLTP + stopLossValue).toFixed(2));
+        console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
+      } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
+        // Hit TSL for short positions
+        console.log(`Trailing Stoploss hit for ${tsym}. Closing position.`);
+        placeOrderForPosition('B', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
+        removeStoploss(position);
+        toastMessage.value = 'Trailing Stoploss hit for ' + tsym;
+        showToast.value = true;
+        tslHitPositions.add(tsym); // Mark TSL as hit
       }
     }
   }
@@ -3437,7 +3461,6 @@ watch(enableHotKeys, (newValue) => {
 });
 // Modify the existing watcher for positionLTPs
 watch(positionLTPs, (newLTPs, oldLTPs) => {
-  // console.log('positionLTPs updated:', newLTPs);
   Object.entries(newLTPs).forEach(([tsym, ltp]) => {
     if (ltp !== oldLTPs[tsym]) {
       console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
