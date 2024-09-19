@@ -3102,15 +3102,8 @@ const checkStoplosses = (newLTPs) => {
     console.log('Stoploss is disabled.');
     return;
   }
-
   for (const [tsym, sl] of Object.entries(stoplosses.value)) {
-    const newLTP = parseFloat(newLTPs[tsym]);
-    if (isNaN(newLTP) || isNaN(sl)) {
-      console.warn(`Invalid LTP or stoploss for ${tsym}. LTP: ${newLTPs[tsym]}, SL: ${sl}`);
-      continue;
-    }
-
-    if (newLTP <= sl) {
+    if (newLTPs[tsym] <= sl) {
       const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
       if (position) {
         placeOrderForPosition('S', position.tsym.includes('C') ? 'CALL' : 'PUT', position);
@@ -3120,23 +3113,16 @@ const checkStoplosses = (newLTPs) => {
       }
     }
   }
-
   for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
     const position = flatTradePositionBook.value.find(p => p.tsym === tsym);
     if (position) {
       const isLongPosition = position.netqty > 0;
-      const newLTP = parseFloat(newLTPs[tsym]);
-      const stopLossValue = parseFloat(stoplossValue.value);
-
-      if (isNaN(newLTP) || isNaN(tsl) || isNaN(stopLossValue)) {
-        console.warn(`Invalid LTP, TSL, or stoploss value for ${tsym}. LTP: ${newLTPs[tsym]}, TSL: ${tsl}, SL Value: ${stoplossValue.value}`);
-        continue;
-      }
+      const newLTP = newLTPs[tsym];
 
       if (isLongPosition) {
-        if (newLTP > tsl + stopLossValue) {
+        if (newLTP > tsl + stoplossValue.value) {
           // Update TSL for long positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP - stopLossValue).toFixed(2));
+          trailingStoplosses.value[tsym] = parseFloat((newLTP - stoplossValue.value).toFixed(2));
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
         } else if (newLTP <= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for long positions
@@ -3147,9 +3133,9 @@ const checkStoplosses = (newLTPs) => {
           tslHitPositions.add(tsym); // Mark TSL as hit
         }
       } else {
-        if (newLTP < tsl - stopLossValue) {
+        if (newLTP < tsl - stoplossValue.value) {
           // Update TSL for short positions
-          trailingStoplosses.value[tsym] = parseFloat((newLTP + stopLossValue).toFixed(2));
+          trailingStoplosses.value[tsym] = parseFloat((newLTP + stoplossValue.value).toFixed(2));
           console.log(`TSL updated for ${tsym}: ${trailingStoplosses.value[tsym]}`);
         } else if (newLTP >= tsl && !tslHitPositions.has(tsym)) {
           // Hit TSL for short positions
