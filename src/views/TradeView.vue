@@ -3555,12 +3555,12 @@ watch([putOpenPrice, putHighPrice, putLowPrice, putClosePrice],
 );
 // Add this in your component's setup or mounted hook
 watch([selectedMasterSymbol, masterLowPrice, masterHighPrice, niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice], () => {
-  console.log('Master Symbol:', selectedMasterSymbol.value);
-  console.log('Low:', masterLowPrice.value);
-  console.log('High:', masterHighPrice.value);
-  console.log('LTP:', getMasterSymbolPrice());
-  console.log('Range Width:', ltpRangeWidth.value);
-  console.log('Marker Position:', ltpMarkerPosition.value);
+  // console.log('Master Symbol:', selectedMasterSymbol.value);
+  // console.log('Low:', masterLowPrice.value);
+  // console.log('High:', masterHighPrice.value);
+  // console.log('LTP:', getMasterSymbolPrice());
+  // console.log('Range Width:', ltpRangeWidth.value);
+  // console.log('Marker Position:', ltpMarkerPosition.value);
 });
 watch(additionalSymbols, (newValue) => {
   localStorage.setItem('additionalSymbols', JSON.stringify(newValue));
