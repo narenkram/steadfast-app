@@ -3112,6 +3112,11 @@ const checkTargets = (newLTPs) => {
     return;
   }
 
+  if (!flatTradePositionBook.value) {
+    console.log('Position book is not available. Skipping target check.');
+    return;
+  }
+
   for (const [tsym, target] of validTargets) {
     const currentLTP = newLTPs[tsym];
     console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
@@ -3132,6 +3137,11 @@ const checkTargets = (newLTPs) => {
 const checkStoplosses = (newLTPs) => {
   if (!enableStoploss.value) {
     console.log('Stoploss is disabled.');
+    return;
+  }
+
+  if (!flatTradePositionBook.value) {
+    console.log('Position book is not available. Skipping stoploss check.');
     return;
   }
 
@@ -3211,7 +3221,6 @@ const checkStoplossesAndTargets = (newLTPs) => {
   checkStoplosses(newLTPs);
   checkTargets(newLTPs);
 };
-
 
 
 
