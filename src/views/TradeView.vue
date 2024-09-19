@@ -1637,15 +1637,25 @@ const placeOrder = async (transactionType, drvOptionType) => {
         });
       }
 
-      console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`); // placed here to prevent delay and debugging if required
-      console.log("Order placed successfully:", response.data); // Log the response data for debugging if required
+      console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`);
+      console.log("Order placed successfully:", response.data);
       remainingLots -= lotsToPlace;
       placedLots += lotsToPlace;
     }
 
-    console.log(`All orders placed successfully. Total: ${placedLots} lots (${fullOrderQuantity} quantity)`); // Log the final result
+    console.log(`All orders placed successfully. Total: ${placedLots} lots (${fullOrderQuantity} quantity)`);
     toastMessage.value = `Order(s) placed successfully for ${placedLots} lots`;
     showToast.value = true;
+
+    // Set target automatically if enabled
+    if (enableTarget.value) {
+      const newPosition = {
+        tsym: selectedStrike.tradingSymbol,
+        netqty: transactionType === 'B' ? fullOrderQuantity : -fullOrderQuantity,
+        // Add any other necessary properties for the new position
+      };
+      await setTarget(newPosition);
+    }
 
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1654,10 +1664,10 @@ const placeOrder = async (transactionType, drvOptionType) => {
     await updateOrdersAndPositions();
 
     // Update fund limits
-    await updateFundLimits()
+    await updateFundLimits();
 
   } catch (error) {
-    console.error("Error placing order:", error); // Log the full error
+    console.error("Error placing order:", error);
     if (error.response && error.response.data && error.response.data.message) {
       const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ');
       toastMessage.value = firstThreeWords;
@@ -1753,6 +1763,10 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     toastMessage.value = `Order(s) placed successfully for ${getSymbol(position)}`;
     showToast.value = true;
 
+    // Remove stoploss and target when closing the position
+    removeStoploss(position);
+    removeTarget(position);
+
     // Add a delay before fetching updated data
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -1760,7 +1774,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     await updateOrdersAndPositions();
 
     // Update fund limits
-    await updateFundLimits()
+    await updateFundLimits();
 
   } catch (error) {
     console.error('Failed to place order for position:', error);
@@ -3021,7 +3035,7 @@ const setStoploss = (position, type) => {
 const removeStoploss = (position) => {
   stoplosses.value[position.tsym] = null;
   trailingStoplosses.value[position.tsym] = null;
-  tslHitPositions.delete(position.tsym); // Reset TSL hit tracking
+  tslHitPositions.delete(position.tsym);
 };
 const increaseStoploss = (position) => {
   if (stoplosses.value[position.tsym] !== null) {
@@ -3033,16 +3047,24 @@ const decreaseStoploss = (position) => {
     stoplosses.value[position.tsym] -= 1; // Adjust decrement value as needed
   }
 };
-const setTarget = (position) => {
+const setTarget = async (position) => {
   if (!enableTarget.value) {
     console.log('Target is disabled.');
     return;
   }
+
   const quantity = Math.abs(Number(position.netQty || position.netqty));
 
   if (quantity === 0) {
     console.log(`Quantity is zero for ${position.tsym}, no target will be set.`);
     return;
+  }
+
+  // Wait for the LTP to be available
+  let retries = 0;
+  while (!positionLTPs.value[position.tsym] && retries < 10) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    retries++;
   }
 
   const ltp = positionLTPs.value[position.tsym];
@@ -3052,7 +3074,6 @@ const setTarget = (position) => {
   }
 
   if (enableTarget.value && targetValue.value > 0) {
-    // Set target above the LTP for long positions, below for short positions
     const isLongPosition = position.netqty > 0;
     targets.value[position.tsym] = parseFloat(
       (isLongPosition ? parseFloat(ltp) + parseFloat(targetValue.value) : parseFloat(ltp) - parseFloat(targetValue.value)).toFixed(2)
@@ -3060,7 +3081,6 @@ const setTarget = (position) => {
 
     console.log(`Target set for ${position.tsym}: LTP = ${ltp}, TargetValue = ${targetValue.value}, Target = ${targets.value[position.tsym]}`);
   } else {
-    // If target is not enabled or targetValue is not set, remove any existing target
     targets.value[position.tsym] = null;
     console.log(`Target removed for ${position.tsym}`);
   }
