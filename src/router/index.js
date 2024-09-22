@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TradeView from '../views/TradeView.vue'
 import ManageBrokers from '../views/ManageBrokers.vue'
 import AddBroker from '../views/AddBroker.vue'
-import RedirectView from '../views/RedirectView.vue'
+import Flattrade_Redirect from '../views/BrokerRedirect/Flattrade_Redirect.vue'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -30,7 +30,11 @@ const router = createRouter({
     },
     {
       path: '/redirect',
-      component: RedirectView
+      component: Flattrade_Redirect
+    },
+    {
+      path: '/flattrade/redirect',
+      component: Flattrade_Redirect
     }
   ]
 })
