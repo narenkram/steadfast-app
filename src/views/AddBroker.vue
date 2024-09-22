@@ -31,6 +31,9 @@
             </button>
           </div>
 
+          <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
+          <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
+
           <!-- API Key (for Flattrade, Shoonya, and Paper Trading) -->
           <label for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
           <input v-model="apiKey" type="text" class="form-control" id="APIKey" required>
@@ -41,16 +44,11 @@
           <input v-if="selectedBroker === 'Flattrade'" v-model="apiSecret" type="text" class="form-control"
             id="APISecretKey" required>
 
-          <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
-          <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
-
           <!-- Redirect URL -->
-          <label for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
-          <input type="text" class="form-control" id="RedirectURL" disabled value="http://localhost:5173/redirect?"
-            required>
-          <p class="form-text text-danger">If your broker requires a redirect URL, register this URL in your broker's
-            portal to
-            get API details.
+          <label v-show="selectedBroker !== ''" for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
+          <input v-show="selectedBroker !== ''" type="text" class="form-control" id="RedirectURL" :value="redirectURL" disabled required>
+          <p v-show="selectedBroker !== ''" class="form-text text-info">If your broker requires a redirect URL, register this URL in your broker's
+            portal to get API details.
           </p>
 
           <!-- Add Broker -->
@@ -73,6 +71,7 @@ import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const redirectURL = computed(() => `http://127.0.0.1:5173/${selectedBroker.value.toLowerCase()}/redirect?`);
 
 const selectedBroker = ref('');
 const apiKey = ref('');
