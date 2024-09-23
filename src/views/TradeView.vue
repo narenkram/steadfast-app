@@ -106,6 +106,7 @@ const showStrikeDetails = ref(false);
 const reverseMode = ref('all');
 const showBasketOrderModal = ref(false);
 const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols') || 'false'));
+const marketDepth = ref(JSON.parse(localStorage.getItem('marketDepth') || 'false'));
 const additionalStrikeLTPs = ref({
   call: {},
   put: {}
@@ -2634,7 +2635,7 @@ const connectWebSocket = () => {
     }
 
     // Handle depth feed
-    if (quoteData.t === 'tf') {
+    if (quoteData.t === 'dk') {
       if (quoteData.tk === defaultCallSecurityId.value) {
         console.log('Updating call depth:', quoteData);
         callDepth.value = { ...callDepth.value, ...quoteData };
@@ -2900,6 +2901,10 @@ const getMasterSymbolPrice = () => {
 };
 const toggleAdditionalSymbols = () => {
   additionalSymbols.value = !additionalSymbols.value;
+};
+const toggleMarketDepth = () => {
+  marketDepth.value = !marketDepth.value;
+  localStorage.setItem('marketDepth', JSON.stringify(marketDepth.value));
 };
 const playNotificationSound = () => {
   localStorage.setItem('notificationSound', notificationSound.value.toString());
