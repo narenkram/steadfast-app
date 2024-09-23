@@ -481,7 +481,7 @@
             </div>
           </div>
           <!-- Call Market Depth -->
-          <div v-if="callDepth && Object.keys(callDepth).length > 0">
+          <div v-if="isCallDepthAvailable">
             <h6>Market Depth</h6>
             <table class="table table-sm">
               <thead>
@@ -493,31 +493,31 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="callDepth.bp1">
+                <tr>
                   <td>{{ callDepth.bp1 }}</td>
                   <td>{{ callDepth.bq1 }}</td>
                   <td>{{ callDepth.sp1 }}</td>
                   <td>{{ callDepth.sq1 }}</td>
                 </tr>
-                <tr v-if="callDepth.bp2">
+                <tr>
                   <td>{{ callDepth.bp2 }}</td>
                   <td>{{ callDepth.bq2 }}</td>
                   <td>{{ callDepth.sp2 }}</td>
                   <td>{{ callDepth.sq2 }}</td>
                 </tr>
-                <tr v-if="callDepth.bp3">
+                <tr>
                   <td>{{ callDepth.bp3 }}</td>
                   <td>{{ callDepth.bq3 }}</td>
                   <td>{{ callDepth.sp3 }}</td>
                   <td>{{ callDepth.sq3 }}</td>
                 </tr>
-                <tr v-if="callDepth.bp4">
+                <tr>
                   <td>{{ callDepth.bp4 }}</td>
                   <td>{{ callDepth.bq4 }}</td>
                   <td>{{ callDepth.sp4 }}</td>
                   <td>{{ callDepth.sq4 }}</td>
                 </tr>
-                <tr v-if="callDepth.bp5">
+                <tr>
                   <td>{{ callDepth.bp5 }}</td>
                   <td>{{ callDepth.bq5 }}</td>
                   <td>{{ callDepth.sp5 }}</td>
@@ -674,7 +674,7 @@
             </div>
           </div>
           <!-- Put Market Depth -->
-          <div v-if="putDepth && Object.keys(putDepth).length > 0">
+          <div v-if="isPutDepthAvailable">
             <h6>Market Depth</h6>
             <table class="table table-sm">
               <thead>
@@ -686,31 +686,31 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="putDepth.bp1">
+                <tr>
                   <td>{{ putDepth.bp1 }}</td>
                   <td>{{ putDepth.bq1 }}</td>
                   <td>{{ putDepth.sp1 }}</td>
                   <td>{{ putDepth.sq1 }}</td>
                 </tr>
-                <tr v-if="putDepth.bp2">
+                <tr>
                   <td>{{ putDepth.bp2 }}</td>
                   <td>{{ putDepth.bq2 }}</td>
                   <td>{{ putDepth.sp2 }}</td>
                   <td>{{ putDepth.sq2 }}</td>
                 </tr>
-                <tr v-if="putDepth.bp3">
+                <tr>
                   <td>{{ putDepth.bp3 }}</td>
                   <td>{{ putDepth.bq3 }}</td>
                   <td>{{ putDepth.sp3 }}</td>
                   <td>{{ putDepth.sq3 }}</td>
                 </tr>
-                <tr v-if="putDepth.bp4">
+                <tr>
                   <td>{{ putDepth.bp4 }}</td>
                   <td>{{ putDepth.bq4 }}</td>
                   <td>{{ putDepth.sp4 }}</td>
                   <td>{{ putDepth.sq4 }}</td>
                 </tr>
-                <tr v-if="putDepth.bp5">
+                <tr>
                   <td>{{ putDepth.bp5 }}</td>
                   <td>{{ putDepth.bq5 }}</td>
                   <td>{{ putDepth.sp5 }}</td>

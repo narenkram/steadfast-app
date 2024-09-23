@@ -179,8 +179,21 @@ const stoplossValue = useLocalStorage('stoplossValue', 10);
 const enableTarget = useLocalStorage('enableTarget', false);
 const targetValue = useLocalStorage('targetValue', 50);
 const tslHitPositions = new Set();
-const callDepth = ref(null);
-const putDepth = ref(null);
+const callDepth = ref({
+  bp1: null, bq1: null, sp1: null, sq1: null,
+  bp2: null, bq2: null, sp2: null, sq2: null,
+  bp3: null, bq3: null, sp3: null, sq3: null,
+  bp4: null, bq4: null, sp4: null, sq4: null,
+  bp5: null, bq5: null, sp5: null, sq5: null
+});
+
+const putDepth = ref({
+  bp1: null, bq1: null, sp1: null, sq1: null,
+  bp2: null, bq2: null, sp2: null, sq2: null,
+  bp3: null, bq3: null, sp3: null, sq3: null,
+  bp4: null, bq4: null, sp4: null, sq4: null,
+  bp5: null, bq5: null, sp5: null, sq5: null
+});
 
 
 
@@ -736,6 +749,17 @@ const isOffsetOrderType = computed(() => {
   console.log('Is Offset Order Type:', isOffset, 'Selected Order Type:', selectedOrderType.value);
   return isOffset;
 });
+const isCallDepthAvailable = computed(() => {
+  return callDepth.value.bp1 !== null && callDepth.value.bq1 !== null && callDepth.value.sp1 !== null && callDepth.value.sq1 !== null;
+});
+
+const isPutDepthAvailable = computed(() => {
+  return putDepth.value.bp1 !== null && putDepth.value.bq1 !== null && putDepth.value.sp1 !== null && putDepth.value.sq1 !== null;
+});
+
+
+
+
 
 
 
@@ -2612,9 +2636,11 @@ const connectWebSocket = () => {
     // Handle depth feed
     if (quoteData.t === 'tf') {
       if (quoteData.tk === defaultCallSecurityId.value) {
-        callDepth.value = quoteData;
+        console.log('Updating call depth:', quoteData);
+        callDepth.value = { ...callDepth.value, ...quoteData };
       } else if (quoteData.tk === defaultPutSecurityId.value) {
-        putDepth.value = quoteData;
+        console.log('Updating put depth:', quoteData);
+        putDepth.value = { ...putDepth.value, ...quoteData };
       }
     }
   };
@@ -2633,7 +2659,6 @@ const connectWebSocket = () => {
     setTimeout(connectWebSocket, 5000);
   };
 };
-
 // Helper function to update OHLC values if they are not empty
 const updateOHLCIfNotEmpty = (type, data) => {
   if (type === 'master') {
