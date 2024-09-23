@@ -179,7 +179,8 @@ const stoplossValue = useLocalStorage('stoplossValue', 10);
 const enableTarget = useLocalStorage('enableTarget', false);
 const targetValue = useLocalStorage('targetValue', 50);
 const tslHitPositions = new Set();
-
+const callDepth = ref(null);
+const putDepth = ref(null);
 
 
 
@@ -2607,6 +2608,15 @@ const connectWebSocket = () => {
         ltpCallbacks.value[quoteData.tk](quoteData);
       }
     }
+
+    // Handle depth feed
+    if (quoteData.t === 'tf') {
+      if (quoteData.tk === defaultCallSecurityId.value) {
+        callDepth.value = quoteData;
+      } else if (quoteData.tk === defaultPutSecurityId.value) {
+        putDepth.value = quoteData;
+      }
+    }
   };
 
   socket.value.onerror = (error) => {
@@ -2699,6 +2709,16 @@ const subscribeToOptions = () => {
         if (callStrike) subscribeToLTP(callStrike.securityId, updateAdditionalStrikeLTP);
         if (putStrike) subscribeToLTP(putStrike.securityId, updateAdditionalStrikeLTP);
       });
+    }
+
+    // Subscribe to depth data
+    const depthSymbolsToSubscribe = symbolsToSubscribe.map(symbol => `d|${symbol}`);
+    if (depthSymbolsToSubscribe.length > 0) {
+      const depthData = {
+        action: 'subscribe',
+        symbols: depthSymbolsToSubscribe
+      };
+      socket.value.send(JSON.stringify(depthData));
     }
   }
 
@@ -3102,7 +3122,7 @@ const checkTargets = (newLTPs) => {
   for (const [tsym, target] of validTargets) {
     const currentLTP = positionLTPs.value[tsym];
     const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(p => p.tsym === tsym);
-  
+
     // console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
     if (position && currentLTP) {
       const isLongPosition = position.netqty > 0;

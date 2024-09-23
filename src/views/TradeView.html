@@ -449,7 +449,9 @@
             <span v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
               Margin Required: ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
             </span>
-            <span v-else-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
+            <span v-else-if="orderMargin.call !== null"
+              >Margin Required: ₹{{ orderMargin.call }}</span
+            >
             <span v-else>Margin: Not available</span>
           </div>
           <div v-if="showStrikeDetails">
@@ -477,6 +479,52 @@
               <span class="ltp-range-low">L: {{ callLowPrice }}</span>
               <span class="ltp-range-high">H: {{ callHighPrice }}</span>
             </div>
+          </div>
+          <!-- Call Market Depth -->
+          <div v-if="callDepth && Object.keys(callDepth).length > 0">
+            <h6>Market Depth</h6>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Buy Price</th>
+                  <th>Buy Qty</th>
+                  <th>Sell Price</th>
+                  <th>Sell Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="callDepth.bp1">
+                  <td>{{ callDepth.bp1 }}</td>
+                  <td>{{ callDepth.bq1 }}</td>
+                  <td>{{ callDepth.sp1 }}</td>
+                  <td>{{ callDepth.sq1 }}</td>
+                </tr>
+                <tr v-if="callDepth.bp2">
+                  <td>{{ callDepth.bp2 }}</td>
+                  <td>{{ callDepth.bq2 }}</td>
+                  <td>{{ callDepth.sp2 }}</td>
+                  <td>{{ callDepth.sq2 }}</td>
+                </tr>
+                <tr v-if="callDepth.bp3">
+                  <td>{{ callDepth.bp3 }}</td>
+                  <td>{{ callDepth.bq3 }}</td>
+                  <td>{{ callDepth.sp3 }}</td>
+                  <td>{{ callDepth.sq3 }}</td>
+                </tr>
+                <tr v-if="callDepth.bp4">
+                  <td>{{ callDepth.bp4 }}</td>
+                  <td>{{ callDepth.bq4 }}</td>
+                  <td>{{ callDepth.sp4 }}</td>
+                  <td>{{ callDepth.sq4 }}</td>
+                </tr>
+                <tr v-if="callDepth.bp5">
+                  <td>{{ callDepth.bp5 }}</td>
+                  <td>{{ callDepth.bq5 }}</td>
+                  <td>{{ callDepth.sp5 }}</td>
+                  <td>{{ callDepth.sq5 }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -594,7 +642,9 @@
             <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
               Margin Required: ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
             </span>
-            <span v-else-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
+            <span v-else-if="orderMargin.put !== null"
+              >Margin Required: ₹{{ orderMargin.put }}</span
+            >
             <span v-else>Margin: Not available</span>
           </div>
           <div v-if="showStrikeDetails">
@@ -622,6 +672,52 @@
               <span class="ltp-range-low">L: {{ putLowPrice }}</span>
               <span class="ltp-range-high">H: {{ putHighPrice }}</span>
             </div>
+          </div>
+          <!-- Put Market Depth -->
+          <div v-if="putDepth && Object.keys(putDepth).length > 0">
+            <h6>Market Depth</h6>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Buy Price</th>
+                  <th>Buy Qty</th>
+                  <th>Sell Price</th>
+                  <th>Sell Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="putDepth.bp1">
+                  <td>{{ putDepth.bp1 }}</td>
+                  <td>{{ putDepth.bq1 }}</td>
+                  <td>{{ putDepth.sp1 }}</td>
+                  <td>{{ putDepth.sq1 }}</td>
+                </tr>
+                <tr v-if="putDepth.bp2">
+                  <td>{{ putDepth.bp2 }}</td>
+                  <td>{{ putDepth.bq2 }}</td>
+                  <td>{{ putDepth.sp2 }}</td>
+                  <td>{{ putDepth.sq2 }}</td>
+                </tr>
+                <tr v-if="putDepth.bp3">
+                  <td>{{ putDepth.bp3 }}</td>
+                  <td>{{ putDepth.bq3 }}</td>
+                  <td>{{ putDepth.sp3 }}</td>
+                  <td>{{ putDepth.sq3 }}</td>
+                </tr>
+                <tr v-if="putDepth.bp4">
+                  <td>{{ putDepth.bp4 }}</td>
+                  <td>{{ putDepth.bq4 }}</td>
+                  <td>{{ putDepth.sp4 }}</td>
+                  <td>{{ putDepth.sq4 }}</td>
+                </tr>
+                <tr v-if="putDepth.bp5">
+                  <td>{{ putDepth.bp5 }}</td>
+                  <td>{{ putDepth.bq5 }}</td>
+                  <td>{{ putDepth.sp5 }}</td>
+                  <td>{{ putDepth.sq5 }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <!-- Add this after the Put Strike Selection -->
@@ -1048,7 +1144,7 @@
                       </button>
                     </div>
                   </td>
-                  <td v-else style="text-align: center;"> - </td>
+                  <td v-else style="text-align: center">-</td>
                   <td v-if="flattradePosition.netqty != 0">
                     <!-- TG -->
                     <div class="row">
@@ -1090,7 +1186,7 @@
                       </button>
                     </div>
                   </td>
-                  <td v-else style="text-align: center;"> - </td>
+                  <td v-else style="text-align: center">-</td>
                   <td
                     :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null"
                   >
@@ -1222,7 +1318,7 @@
                       </button>
                     </div>
                   </td>
-                  <td v-else style="text-align: center;"> - </td>
+                  <td v-else style="text-align: center">-</td>
                   <td v-if="shoonyaPosition.netqty != 0">
                     <!-- TG -->
                     <div class="row">
@@ -1264,7 +1360,7 @@
                       </button>
                     </div>
                   </td>
-                  <td v-else style="text-align: center;"> - </td>
+                  <td v-else style="text-align: center">-</td>
                   <td
                     :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : null"
                   >
