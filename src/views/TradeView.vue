@@ -919,14 +919,14 @@ const getInitialPrice = (symbol) => {
 const fetchTradingData = async () => {
   let response;
   if (selectedBroker.value?.brokerName === 'Flattrade') {
-    // response = await fetch(`${BASE_URL}/flattradeSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
-    response = await fetch(`${BASE_URL}/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    // response = await fetch(`${BASE_URL}/flattrade/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     // console.log('Flattrade Symbols:', response);
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    response = await fetch(`${BASE_URL}/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     // console.log('Shoonya Symbols:', response);
   } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-    response = await fetch(`${BASE_URL}/shoonyaSymbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
     // console.log('Paper Trading Symbols:', response);
   }
   else {
@@ -1173,7 +1173,7 @@ const fetchFlattradeOrdersTradesBook = async () => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/flattradeGetOrdersAndTrades`, {
+    const response = await axios.get(`${BASE_URL}/flattrade/getOrdersAndTrades`, {
       params: {
         FLATTRADE_API_TOKEN: jKey,
         FLATTRADE_CLIENT_ID: clientId
@@ -1208,7 +1208,7 @@ const fetchShoonyaOrdersTradesBook = async () => {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/shoonyaGetOrdersAndTrades`, {
+    const response = await axios.get(`${BASE_URL}/shoonya/getOrdersAndTrades`, {
       params: {
         SHOONYA_API_TOKEN: jKey,
         SHOONYA_CLIENT_ID: clientId
@@ -1340,7 +1340,7 @@ const fetchFundLimit = async () => {
       if (!FLATTRADE_API_TOKEN) {
         throw new Error('Flattrade API Token is missing');
       }
-      response = await axios.post(`${BASE_URL}/flattradeFundLimit`, null, {
+      response = await axios.post(`${BASE_URL}/flattrade/fundLimit`, null, {
         params: {
           FLATTRADE_API_TOKEN,
           FLATTRADE_CLIENT_ID: selectedBroker.value.clientId
@@ -1356,7 +1356,7 @@ const fetchFundLimit = async () => {
       if (!SHOONYA_API_TOKEN) {
         throw new Error('Shoonya API Token is missing');
       }
-      response = await axios.post(`${BASE_URL}/shoonyaFundLimit`, null, {
+      response = await axios.post(`${BASE_URL}/shoonya/fundLimit`, null, {
         params: {
           SHOONYA_API_TOKEN,
           SHOONYA_CLIENT_ID: selectedBroker.value.clientId
@@ -1548,7 +1548,7 @@ const getOrderMargin = async () => {
           trantype: getTransactionType('BUY'),
           prctyp: selectedOrderType.value,
         };
-        endpoint = `${BASE_URL}/flattradeGetOrderMargin`;
+        endpoint = `${BASE_URL}/flattrade/getOrderMargin`;
       } else if (selectedBroker.value.brokerName === 'Shoonya') {
         orderData = {
           uid: clientId,
@@ -1562,7 +1562,7 @@ const getOrderMargin = async () => {
           prctyp: selectedOrderType.value,
           // Add any additional fields required by Shoonya
         };
-        endpoint = `${BASE_URL}/shoonyaGetOrderMargin`;
+        endpoint = `${BASE_URL}/shoonya/getOrderMargin`;
       }
 
       if (!orderData.exch || !orderData.qty || !orderData.tsym) {
@@ -1644,7 +1644,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
           uid: selectedBroker.value.clientId,
           actid: selectedBroker.value.clientId
         });
-        response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+        response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
           headers: {
             'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1658,7 +1658,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
           uid: selectedBroker.value.clientId,
           actid: selectedBroker.value.clientId
         });
-        response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+        response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
           headers: {
             'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1754,7 +1754,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       if (selectedBroker.value?.brokerName === 'Flattrade') {
         const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN');
         const payload = qs.stringify(orderData);
-        response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+        response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
           headers: {
             'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1764,7 +1764,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
       else if (selectedBroker.value?.brokerName === 'Shoonya') {
         const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN');
         const payload = qs.stringify(orderData);
-        response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+        response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
           headers: {
             'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -2036,7 +2036,7 @@ const placeBasketOrder = async (order) => {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId
       });
-      response = await axios.post(`${BASE_URL}/flattradePlaceOrder`, payload, {
+      response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
         headers: {
           'Authorization': `Bearer ${FLATTRADE_API_TOKEN}`,
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -2050,7 +2050,7 @@ const placeBasketOrder = async (order) => {
         uid: selectedBroker.value.clientId,
         actid: selectedBroker.value.clientId
       });
-      response = await axios.post(`${BASE_URL}/shoonyaPlaceOrder`, payload, {
+      response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
         headers: {
           'Authorization': `Bearer ${SHOONYA_API_TOKEN}`,
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -2309,7 +2309,7 @@ const cancelOrder = async (order) => {
       const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value;
       const clientId = selectedBroker.value.clientId;
       console.log(`Sending request to cancel Flattrade order ${orderId}`);
-      await axios.post(`${BASE_URL}/flattradeCancelOrder`, {
+      await axios.post(`${BASE_URL}/flattrade/cancelOrder`, {
         norenordno: orderId,
         uid: clientId
       }, {
@@ -2322,7 +2322,7 @@ const cancelOrder = async (order) => {
       const jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value;
       const clientId = selectedBroker.value.clientId;
       console.log(`Sending request to cancel Shoonya order ${orderId}`);
-      await axios.post(`${BASE_URL}/shoonyaCancelOrder`, {
+      await axios.post(`${BASE_URL}/shoonya/cancelOrder`, {
         norenordno: orderId,
         uid: clientId
       }, {
@@ -2457,7 +2457,7 @@ const setFlattradeCredentials = async () => {
       return;
     }
 
-    const response = await axios.post(`${BASE_URL}/api/set-flattrade-credentials`, {
+    const response = await axios.post(`${BASE_URL}/flattrade/setCredentials`, {
       usersession: apiToken,
       userid: clientId
     });
@@ -2496,7 +2496,7 @@ const setShoonyaCredentials = async () => {
       return;
     }
 
-    const response = await axios.post(`${BASE_URL}/api/set-shoonya-credentials`, {
+    const response = await axios.post(`${BASE_URL}/shoonya/setCredentials`, {
       usersession: apiToken,
       userid: clientId
     });
@@ -2636,10 +2636,10 @@ const connectWebSocket = () => {
 
     // Handle depth feed
     if (quoteData.tk === defaultCallSecurityId.value) {
-      console.log('Updating call depth:', quoteData);
+      // console.log('Updating call depth:', quoteData);
       callDepth.value = { ...callDepth.value, ...quoteData };
     } else if (quoteData.tk === defaultPutSecurityId.value) {
-      console.log('Updating put depth:', quoteData);
+      // console.log('Updating put depth:', quoteData);
       putDepth.value = { ...putDepth.value, ...quoteData };
     }
   };

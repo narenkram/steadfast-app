@@ -13,8 +13,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/flattradeSymbols': 'http://localhost:3000',
-      '/shoonyaSymbols': 'http://localhost:3000',
+      '/flattradeSymbols': 'http://localhost:3000/flattrade/',
+      '/shoonyaSymbols': 'http://localhost:3000/shoonya/',
       '/flattradeApi': {
         target: 'https://authapi.flattrade.in',
         changeOrigin: true,
