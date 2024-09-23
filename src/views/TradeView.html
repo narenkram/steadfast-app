@@ -989,7 +989,7 @@
                   </td>
                   <td>{{ flattradePosition.netavgprc }}</td>
                   <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
-                  <td>
+                  <td v-if="flattradePosition.netqty != 0">
                     <!-- SL & TSL -->
                     <div class="row">
                       <div
@@ -1048,7 +1048,8 @@
                       </button>
                     </div>
                   </td>
-                  <td>
+                  <td v-else style="text-align: center;"> - </td>
+                  <td v-if="flattradePosition.netqty != 0">
                     <!-- TG -->
                     <div class="row">
                       <div class="col-12" v-if="targets[flattradePosition.tsym] !== null">
@@ -1089,6 +1090,7 @@
                       </button>
                     </div>
                   </td>
+                  <td v-else style="text-align: center;"> - </td>
                   <td
                     :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null"
                   >
@@ -1164,7 +1166,7 @@
                   </td>
                   <td>{{ shoonyaPosition.netavgprc }}</td>
                   <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
-                  <td>
+                  <td v-if="shoonyaPosition.netqty != 0">
                     <!-- SL & TSL -->
                     <div class="row">
                       <div class="col-12" v-if="trailingStoplosses[shoonyaPosition.tsym] !== null">
@@ -1220,7 +1222,8 @@
                       </button>
                     </div>
                   </td>
-                  <td>
+                  <td v-else style="text-align: center;"> - </td>
+                  <td v-if="shoonyaPosition.netqty != 0">
                     <!-- TG -->
                     <div class="row">
                       <div class="col-12" v-if="targets[shoonyaPosition.tsym] !== null">
@@ -1261,6 +1264,7 @@
                       </button>
                     </div>
                   </td>
+                  <td v-else style="text-align: center;"> - </td>
                   <td
                     :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : null"
                   >
