@@ -2635,14 +2635,12 @@ const connectWebSocket = () => {
     }
 
     // Handle depth feed
-    if (quoteData.t === 'dk') {
-      if (quoteData.tk === defaultCallSecurityId.value) {
-        console.log('Updating call depth:', quoteData);
-        callDepth.value = { ...callDepth.value, ...quoteData };
-      } else if (quoteData.tk === defaultPutSecurityId.value) {
-        console.log('Updating put depth:', quoteData);
-        putDepth.value = { ...putDepth.value, ...quoteData };
-      }
+    if (quoteData.tk === defaultCallSecurityId.value) {
+      console.log('Updating call depth:', quoteData);
+      callDepth.value = { ...callDepth.value, ...quoteData };
+    } else if (quoteData.tk === defaultPutSecurityId.value) {
+      console.log('Updating put depth:', quoteData);
+      putDepth.value = { ...putDepth.value, ...quoteData };
     }
   };
 
@@ -2735,16 +2733,6 @@ const subscribeToOptions = () => {
         if (callStrike) subscribeToLTP(callStrike.securityId, updateAdditionalStrikeLTP);
         if (putStrike) subscribeToLTP(putStrike.securityId, updateAdditionalStrikeLTP);
       });
-    }
-
-    // Subscribe to depth data
-    const depthSymbolsToSubscribe = symbolsToSubscribe.map(symbol => `d|${symbol}`);
-    if (depthSymbolsToSubscribe.length > 0) {
-      const depthData = {
-        action: 'subscribe',
-        symbols: depthSymbolsToSubscribe
-      };
-      socket.value.send(JSON.stringify(depthData));
     }
   }
 
