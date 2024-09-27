@@ -1625,8 +1625,8 @@ const getOrderMargin = async () => {
 
   } catch (error) {
     console.error('Error getting order margin:', error);
-    toastMessage.value = 'Failed to get order margin';
-    showToast.value = true;
+    // toastMessage.value = 'Failed to get order margin';
+    // showToast.value = true;
     orderMargin.call = null;
     orderMargin.put = null;
   }
