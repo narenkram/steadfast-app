@@ -2529,8 +2529,8 @@ const setShoonyaCredentials = async () => {
       userid: clientId
     });
     // console.log('Credentials set successfully:', response.data);
-    toastMessage.value = 'Shoonya changes set successfully';
-    showToast.value = true;
+    // toastMessage.value = 'Shoonya changes set successfully';
+    // showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials: ', error);
     toastMessage.value = 'Failed to set Shoonya credentials';
