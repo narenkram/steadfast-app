@@ -170,6 +170,15 @@
 }
 
 // Styles that don't change based on color scheme
+.Navigation {
+  min-height: 50px;
+  display: block;
+  width: 100%;
+}
+.Navigation__logo {
+  height: 40px;
+  width: 40px;
+}
 .Card {
   border-radius: $border-radius;
   padding: $spacer;
