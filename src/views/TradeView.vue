@@ -1951,6 +1951,128 @@
 <script setup>
 import NavigationComponent from '../components/NavigationComponent.vue'
 import { ref, computed, onMounted, watch, onBeforeUnmount, reactive } from 'vue';
+import * as globalState from '@/composables/useGlobalState';
+
+const {
+  BASE_URL,
+  showLTPRangeBar,
+  showToast,
+  toastMessage,
+  activeTab,
+  killSwitchActive,
+  overtradeProtection,
+  experimentalFeatures,
+  activationTime,
+  currentTime,
+  enableHotKeys,
+  selectedBroker,
+  selectedBrokerName,
+  selectedExchange,
+  selectedMasterSymbol,
+  selectedQuantity,
+  selectedExpiry,
+  selectedCallStrike,
+  selectedPutStrike,
+  callStrikeOffset,
+  putStrikeOffset,
+  expiryOffset,
+  exchangeSymbols,
+  callStrikes,
+  putStrikes,
+  expiryDates,
+  synchronizeOnLoad,
+  niftyPrice,
+  bankNiftyPrice,
+  finniftyPrice,
+  midcpniftyPrice,
+  sensexPrice,
+  bankexPrice,
+  dataFetched,
+  lotsPerSymbol,
+  flatOrderBook,
+  flatTradeBook,
+  token,
+  shoonyaOrderBook,
+  shoonyaTradeBook,
+  flatTradePositionBook,
+  shoonyaPositionBook,
+  fundLimits,
+  showBrokerClientId,
+  quantities,
+  availableQuantities,
+  selectedStrike,
+  selectedProductType,
+  limitPrice,
+  modalTransactionType,
+  modalOptionType,
+  selectedShoonyaPositionsSet,
+  selectedFlattradePositionsSet,
+  positionsInExecution,
+  clockEmojis,
+  currentClockEmoji,
+  socket,
+  latestCallLTP,
+  latestPutLTP,
+  defaultCallSecurityId,
+  defaultPutSecurityId,
+  positionLTPs,
+  positionSecurityIds,
+  totalRiskType,
+  totalRiskTypeToggle,
+  activeFetchFunction,
+  masterOpenPrice,
+  masterHighPrice,
+  masterLowPrice,
+  masterClosePrice,
+  callOpenPrice,
+  callHighPrice,
+  callLowPrice,
+  callClosePrice,
+  putOpenPrice,
+  putHighPrice,
+  putLowPrice,
+  putClosePrice,
+  showOHLCValues,
+  showStrikeDetails,
+  reverseMode,
+  showBasketOrderModal,
+  additionalSymbols,
+  marketDepth,
+  additionalStrikeLTPs,
+  ltpCallbacks,
+  customStrikePrice,
+  notificationSound,
+  selectedSound,
+  riskClosingCountdown,
+  totalRiskTargetToggle,
+  totalRiskTargetType,
+  totalRiskAmount,
+  totalRiskPercentage,
+  totalTargetAmount,
+  totalTargetPercentage,
+  savedBaskets,
+  basketName,
+  editingBasketId,
+  basketOrders,
+  closePositionsRisk,
+  closePositionsTarget,
+  strategyType,
+  strategies,
+  riskAction,
+  targetAction,
+  orderMargin,
+  limitOffset,
+  stoplosses,
+  targets,
+  trailingStoplosses,
+  enableStoploss,
+  stoplossValue,
+  enableTarget,
+  targetValue,
+  tslHitPositions,
+  callDepth,
+  putDepth
+} = globalState;
 import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
 import axios from 'axios';
 import ToastAlert from '../components/ToastAlert.vue';
@@ -1960,191 +2082,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLocalStorage } from '@vueuse/core'; // Optional: for easier localStorage management
 
 
-
-// Reactive Variables
-const BASE_URL = 'http://localhost:3000';
-const showLTPRangeBar = ref(false);
-const showToast = ref(false);
-const toastMessage = ref('');
-const activeTab = ref('positions');
-const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true');
-const overtradeProtection = ref(localStorage.getItem('OvertradeProtection') === 'true');
-const experimentalFeatures = ref(JSON.parse(localStorage.getItem('ExperimentalFeatures') || 'false'));
-const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'));
-const currentTime = ref(Date.now());
-const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false');
-const selectedBroker = ref(null);
-const selectedBrokerName = ref('');
-const selectedExchange = ref({});
-const selectedMasterSymbol = ref('');
-const selectedQuantity = ref(0);
-const selectedExpiry = ref(null);
-const selectedCallStrike = ref({});
-const selectedPutStrike = ref({});
-const callStrikeOffset = ref(localStorage.getItem('callStrikeOffset') || '0');
-const putStrikeOffset = ref(localStorage.getItem('putStrikeOffset') || '0');
-const expiryOffset = ref(localStorage.getItem('expiryOffset') || '0');
-const exchangeSymbols = ref({});
-const callStrikes = ref([]);
-const putStrikes = ref([]);
-const expiryDates = ref([]);
-const synchronizeOnLoad = ref(true);
-const niftyPrice = ref('N/A');
-const bankNiftyPrice = ref('N/A');
-const finniftyPrice = ref('N/A');
-const midcpniftyPrice = ref('N/A');
-const sensexPrice = ref('N/A');
-const bankexPrice = ref('N/A');
-const dataFetched = ref(false);
-const lotsPerSymbol = ref({});
-const flatOrderBook = ref([]);
-const flatTradeBook = ref([]);
-const token = ref('');
-const shoonyaOrderBook = ref([]);
-const shoonyaTradeBook = ref([]);
-const flatTradePositionBook = ref([]);
-const shoonyaPositionBook = ref([]);
-const fundLimits = ref({});
-const showBrokerClientId = ref(false);
-const quantities = ref({
-  NIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
-  BANKNIFTY: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
-  FINNIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
-  MIDCPNIFTY: { lotSize: 50, maxLots: 280, freezeLimit: 56 },
-  SENSEX: { lotSize: 10, maxLots: 500, freezeLimit: 100 },
-  BANKEX: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
-});
-const availableQuantities = ref([]);
-
-const selectedStrike = ref({});
-const selectedProductType = ref('');
-const limitPrice = ref(null);
-const modalTransactionType = ref('');
-const modalOptionType = ref('');
-const selectedShoonyaPositionsSet = ref(new Set());
-const selectedFlattradePositionsSet = ref(new Set());
-const positionsInExecution = ref({});
-const clockEmojis = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚'];
-const currentClockEmoji = ref(clockEmojis[new Date().getHours() % clockEmojis.length]);
-const socket = ref(null);
-const latestCallLTP = ref('N/A');
-const latestPutLTP = ref('N/A');
-const defaultCallSecurityId = ref(null);
-const defaultPutSecurityId = ref(null);
-const positionLTPs = ref({});
-const positionSecurityIds = ref({});
 let timer;
 let positionCheckInterval;
-const totalRiskType = ref(null);
-const totalRiskTypeToggle = ref(false);
-const activeFetchFunction = ref(null);
-const masterOpenPrice = ref(localStorage.getItem('masterOpenPrice') || null);
-const masterHighPrice = ref(localStorage.getItem('masterHighPrice') || null);
-const masterLowPrice = ref(localStorage.getItem('masterLowPrice') || null);
-const masterClosePrice = ref(localStorage.getItem('masterClosePrice') || null);
-const callOpenPrice = ref(localStorage.getItem('callOpenPrice') || null);
-const callHighPrice = ref(localStorage.getItem('callHighPrice') || null);
-const callLowPrice = ref(localStorage.getItem('callLowPrice') || null);
-const callClosePrice = ref(localStorage.getItem('callClosePrice') || null);
-const putOpenPrice = ref(localStorage.getItem('putOpenPrice') || null);
-const putHighPrice = ref(localStorage.getItem('putHighPrice') || null);
-const putLowPrice = ref(localStorage.getItem('putLowPrice') || null);
-const putClosePrice = ref(localStorage.getItem('putClosePrice') || null);
-const showOHLCValues = ref(false);
-const showStrikeDetails = ref(false);
-const reverseMode = ref('all');
-const showBasketOrderModal = ref(false);
-const additionalSymbols = ref(JSON.parse(localStorage.getItem('additionalSymbols') || 'false'));
-const marketDepth = ref(JSON.parse(localStorage.getItem('marketDepth') || 'false'));
-const additionalStrikeLTPs = ref({
-  call: {},
-  put: {}
-});
-const ltpCallbacks = ref({});
-const customStrikePrice = ref('');
-const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false');
-const selectedSound = ref(localStorage.getItem('selectedSound'));
-const riskClosingCountdown = ref(30);
-const totalRiskTargetToggle = ref(JSON.parse(localStorage.getItem('totalRiskTargetToggle') || 'false'));
-const totalRiskTargetType = ref(localStorage.getItem('totalRiskTargetType') || 'percentage');
-const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount')) || 1500);
-const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 1.5);
-const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 3000);
-const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 3);
-const savedBaskets = ref([]);
-const basketName = ref('');
-const editingBasketId = ref(null);
-const basketOrders = ref([]);
-const closePositionsRisk = ref(JSON.parse(localStorage.getItem('closePositionsRisk') || 'false'));
-const closePositionsTarget = ref(JSON.parse(localStorage.getItem('closePositionsTarget') || 'false'));
-const strategyType = ref('Bullish');
-const strategies = ref([
-  { id: 1, name: 'Short Straddle', type: 'Neutral', image: '/strategies/short-straddle.svg' },
-  { id: 2, name: 'Iron Butterfly', type: 'Neutral', image: '/strategies/iron-butterfly.svg' },
-  { id: 3, name: 'Short Strangle', type: 'Neutral', image: '/strategies/short-strangle.svg' },
-  { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/strategies/short-iron-condor.svg' },
-  { id: 5, name: 'Batman', type: 'Neutral', image: '/strategies/batman.svg' },
-  { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/strategies/double-plateau.svg' },
-  { id: 7, name: 'Jade Lizard', type: 'Neutral', image: '/strategies/jade-lizard.svg' },
-  { id: 8, name: 'Reverse Jade Lizard', type: 'Neutral', image: '/strategies/jade-reverse-lizard.svg' },
-  { id: 9, name: 'Buy Put', type: 'Bearish', image: '/strategies/buy-put.svg' },
-  { id: 10, name: 'Sell Call', type: 'Bearish', image: '/strategies/sell-call.svg' },
-  { id: 11, name: 'Bear Call Spread', type: 'Bearish', image: '/strategies/bear-call-spread.svg' },
-  { id: 12, name: 'Bear Put Spread', type: 'Bearish', image: '/strategies/bear-put-spread.svg' },
-  { id: 13, name: 'Put Ratio Back Spread', type: 'Bearish', image: '/strategies/put-ratio-back-spread.svg' },
-  { id: 14, name: 'Long Calendar with Puts', type: 'Bearish', image: '/strategies/long-calendar-with-puts.svg' },
-  { id: 15, name: 'Bear Condor', type: 'Bearish', image: '/strategies/bear-condor.svg' },
-  { id: 16, name: 'Bear Butterfly', type: 'Bearish', image: '/strategies/bear-butterfly.svg' },
-  { id: 17, name: 'Buy Call', type: 'Bullish', image: '/strategies/buy-call.svg' },
-  { id: 18, name: 'Sell Put', type: 'Bullish', image: '/strategies/sell-put.svg' },
-  { id: 19, name: 'Bull Call Spread', type: 'Bullish', image: '/strategies/bull-call-spread.svg' },
-  { id: 20, name: 'Bull Put Spread', type: 'Bullish', image: '/strategies/bull-put-spread.svg' },
-  { id: 21, name: 'Call Ratio Back Spread', type: 'Bullish', image: '/strategies/call-ratio-back-spread.svg' },
-  { id: 22, name: 'Long Calendar with Calls', type: 'Bullish', image: '/strategies/long-calendar-with-calls.svg' },
-  { id: 23, name: 'Bull Condor', type: 'Bullish', image: '/strategies/bull-condor.svg' },
-  { id: 24, name: 'Bull Butterfly', type: 'Bullish', image: '/strategies/bull-butterfly.svg' },
-  { id: 25, name: 'Call Ratio Spread', type: 'Others', image: '/strategies/call-ratio-spread.svg' },
-  { id: 26, name: 'Put Ratio Spread', type: 'Others', image: '/strategies/put-ratio-spread.svg' },
-  { id: 27, name: 'Long Straddle', type: 'Others', image: '/strategies/long-straddle.svg' },
-  { id: 28, name: 'Long Iron Butterfly', type: 'Others', image: '/strategies/long-iron-butterfly.svg' },
-  { id: 29, name: 'Long Strangle', type: 'Others', image: '/strategies/long-strangle.svg' },
-  { id: 30, name: 'Long Iron Condor', type: 'Others', image: '/strategies/long-iron-condor.svg' },
-  { id: 31, name: 'Strip', type: 'Others', image: '/strategies/strip.svg' },
-  { id: 32, name: 'Strap', type: 'Others', image: '/strategies/strap.svg' },
-
-]);
-const riskAction = ref(localStorage.getItem('riskAction') || 'close');
-const targetAction = ref(localStorage.getItem('targetAction') || 'close');
-const orderMargin = reactive({
-  call: null,
-  put: null
-});
-const limitOffset = ref(0);
-const stoplosses = useLocalStorage('stoplosses', {});
-const targets = useLocalStorage('targets', {});
-const trailingStoplosses = useLocalStorage('trailingStoplosses', {});
-
-const enableStoploss = useLocalStorage('enableStoploss', false);
-const stoplossValue = useLocalStorage('stoplossValue', 10);
-const enableTarget = useLocalStorage('enableTarget', false);
-const targetValue = useLocalStorage('targetValue', 50);
-const tslHitPositions = new Set();
-const callDepth = ref({
-  bp1: null, bq1: null, sp1: null, sq1: null,
-  bp2: null, bq2: null, sp2: null, sq2: null,
-  bp3: null, bq3: null, sp3: null, sq3: null,
-  bp4: null, bq4: null, sp4: null, sq4: null,
-  bp5: null, bq5: null, sp5: null, sq5: null
-});
-
-const putDepth = ref({
-  bp1: null, bq1: null, sp1: null, sq1: null,
-  bp2: null, bq2: null, sp2: null, sq2: null,
-  bp3: null, bq3: null, sp3: null, sq3: null,
-  bp4: null, bq4: null, sp4: null, sq4: null,
-  bp5: null, bq5: null, sp5: null, sq5: null
-});
-
 
 
 
@@ -2978,12 +2917,12 @@ const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
 
     const uniqueStrikePrices = [...new Set([...filteredCallStrikes, ...filteredPutStrikes].map(strike => strike.strikePrice))].sort((a, b) => a - b);
 
-    filteredCallStrikes = uniqueStrikePrices.map(strikePrice => 
-      filteredCallStrikes.find(strike => strike.strikePrice === strikePrice) || 
+    filteredCallStrikes = uniqueStrikePrices.map(strikePrice =>
+      filteredCallStrikes.find(strike => strike.strikePrice === strikePrice) ||
       { strikePrice, expiryDate, securityId: null, tradingSymbol: null }
     );
-    filteredPutStrikes = uniqueStrikePrices.map(strikePrice => 
-      filteredPutStrikes.find(strike => strike.strikePrice === strikePrice) || 
+    filteredPutStrikes = uniqueStrikePrices.map(strikePrice =>
+      filteredPutStrikes.find(strike => strike.strikePrice === strikePrice) ||
       { strikePrice, expiryDate, securityId: null, tradingSymbol: null }
     );
 
