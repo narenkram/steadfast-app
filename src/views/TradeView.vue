@@ -1948,6 +1948,7 @@
 
 </template>
 
+
 <script setup>
 import NavigationComponent from '../components/NavigationComponent.vue'
 import { ref, computed, onMounted, watch, onBeforeUnmount, reactive } from 'vue';
@@ -2825,14 +2826,6 @@ const symbolData = reactive({
   SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1', expiryDay: 5 }, // Friday
   BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12', expiryDay: null }, // No specific expiry day
 });
-const allSymbolsData = reactive({
-  NIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  BANKNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  FINNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  MIDCPNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  SENSEX: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  BANKEX: { expiryDates: [], callStrikes: [], putStrikes: [] },
-});
 const updateExchangeSymbols = () => {
   if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
     exchangeSymbols.value = {
@@ -2845,30 +2838,23 @@ const updateExchangeSymbols = () => {
   exchangeSymbols.value.symbolData = symbolData;
 };
 const setDefaultExchangeAndMasterSymbol = () => {
-  const cachedData = JSON.parse(localStorage.getItem('cachedTradingData')) || {};
+  const exchanges = exchangeOptions.value;
+  if (exchanges.length > 0) {
+    // Set the exchange
+    const savedExchange = localStorage.getItem('selectedExchange');
+    selectedExchange.value = savedExchange && exchanges.includes(savedExchange)
+      ? savedExchange
+      : exchanges[0];
 
-  // Set the exchange
-  const savedExchange = cachedData.selectedExchange || localStorage.getItem('selectedExchange');
-  if (savedExchange && exchangeOptions.value.includes(savedExchange)) {
-    selectedExchange.value = savedExchange;
-  } else if (exchangeOptions.value.length > 0) {
-    selectedExchange.value = exchangeOptions.value[0];
-  }
-
-  // Set the master symbol
-  const savedMasterSymbol = cachedData.selectedMasterSymbol || localStorage.getItem('selectedMasterSymbol');
-  if (savedMasterSymbol && exchangeSymbols.value[selectedExchange.value]?.includes(savedMasterSymbol)) {
-    selectedMasterSymbol.value = savedMasterSymbol;
-  } else if (exchangeSymbols.value[selectedExchange.value]?.length > 0) {
-    selectedMasterSymbol.value = exchangeSymbols.value[selectedExchange.value][0];
-  }
-
-  // If we have cached data for the selected symbol, populate allSymbolsData
-  if (cachedData[selectedMasterSymbol.value]) {
-    allSymbolsData[selectedMasterSymbol.value] = cachedData[selectedMasterSymbol.value];
+    // Set the master symbol
+    if (exchangeSymbols.value[selectedExchange.value].length > 0) {
+      const savedMasterSymbol = localStorage.getItem('selectedMasterSymbol');
+      selectedMasterSymbol.value = savedMasterSymbol && exchangeSymbols.value[selectedExchange.value].includes(savedMasterSymbol)
+        ? savedMasterSymbol
+        : exchangeSymbols.value[selectedExchange.value][0];
+    }
   }
 };
-
 const saveUserChoice = () => {
   localStorage.setItem('selectedExchange', selectedExchange.value);
   localStorage.setItem('selectedMasterSymbol', selectedMasterSymbol.value);
@@ -2881,79 +2867,48 @@ const getInitialPrice = (symbol) => {
   return strike ? parseFloat(strike.strikePrice) : null;
 };
 const fetchTradingData = async () => {
-  const masterSymbols = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX'];
-
-  for (const symbol of masterSymbols) {
-    try {
-      let exchangeSymbol;
-
-      // Set the correct exchange symbol
-      if (['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].includes(symbol)) {
-        exchangeSymbol = 'NFO';
-      } else if (['SENSEX', 'BANKEX'].includes(symbol)) {
-        exchangeSymbol = 'BFO';
-      } else {
-        throw new Error(`Unknown symbol: ${symbol}`);
-      }
-
-      let response;
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`);
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`);
-      } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-        response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`);
-      } else {
-        throw new Error('Unsupported broker');
-      }
-
-      const data = await response.json();
-
-      allSymbolsData[symbol] = {
-        expiryDates: data.expiryDates || [],
-        callStrikes: Array.isArray(data.callStrikes)
-          ? data.callStrikes
-            .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-            .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }))
-          : [],
-        putStrikes: Array.isArray(data.putStrikes)
-          ? data.putStrikes
-            .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-            .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }))
-          : [],
-      };
-
-      // Set initial price for each symbol
-      const priceKey = `${symbol.toLowerCase()}Price`;
-      if (priceKey in window && window[priceKey].value === 'N/A') {
-        window[priceKey].value = getInitialPrice(symbol);
-      }
-
-    } catch (error) {
-      console.error(`Error fetching data for ${symbol}:`, error);
-      allSymbolsData[symbol] = { expiryDates: [], callStrikes: [], putStrikes: [] };
-    }
+  let response;
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    // response = await fetch(`${BASE_URL}/flattrade/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    // console.log('Flattrade Symbols:', response);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    // console.log('Shoonya Symbols:', response);
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    response = await fetch(`${BASE_URL}/shoonya/symbols?exchangeSymbol=${selectedExchange.value}&masterSymbol=${selectedMasterSymbol.value}`);
+    // console.log('Paper Trading Symbols:', response);
+  }
+  else {
+    throw new Error('Unsupported broker');
   }
 
-  // Update the reactive properties for the currently selected symbol
-  updateSymbolData(selectedMasterSymbol.value);
+  const data = await response.json();
+  // console.log('Data:', data);
+  expiryDates.value = data.expiryDates;
+
+  // Filter by selected expiry date before sorting and mapping
+  callStrikes.value = data.callStrikes
+    .filter(strike => strike.expiryDate === selectedExpiry.value)
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
+
+  putStrikes.value = data.putStrikes
+    .filter(strike => strike.expiryDate === selectedExpiry.value)
+    .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
+    .map(strike => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }));
+
+  // After fetching and setting callStrikes and putStrikes
+  if (niftyPrice.value === 'N/A') niftyPrice.value = getInitialPrice('NIFTY');
+  if (bankNiftyPrice.value === 'N/A') bankNiftyPrice.value = getInitialPrice('BANKNIFTY');
+  if (finniftyPrice.value === 'N/A') finniftyPrice.value = getInitialPrice('FINNIFTY');
+  if (midcpniftyPrice.value === 'N/A') midcpniftyPrice.value = getInitialPrice('MIDCPNIFTY');
+  if (sensexPrice.value === 'N/A') sensexPrice.value = getInitialPrice('SENSEX');
+  if (bankexPrice.value === 'N/A') bankexPrice.value = getInitialPrice('BANKEX');
 
   updateStrikesForExpiry(selectedExpiry.value);
   dataFetched.value = true;
-
-  // Cache the fetched data
-  localStorage.setItem('cachedTradingData', JSON.stringify(allSymbolsData));
 };
-const updateSymbolData = (symbol) => {
-  if (allSymbolsData[symbol]) {
-    expiryDates.value = allSymbolsData[symbol].expiryDates;
-    callStrikes.value = allSymbolsData[symbol].callStrikes;
-    putStrikes.value = allSymbolsData[symbol].putStrikes;
-  } else {
-    console.error(`No data found for ${symbol}`);
-  }
-};
-
 const formatDate = (dateString) => {
   if (!dataFetched.value || !dateString) {
     return ''; // Return empty string if data hasn't been fetched or dateString is null
@@ -2970,26 +2925,40 @@ const convertToComparableDate = (dateString) => {
   return date.toLocaleDateString('en-US', options).replace(/,/g, '');
 };
 const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
+  // console.log('Updating strikes for expiry:', expiryDate);
+
   let filteredCallStrikes, filteredPutStrikes;
 
-  if (allSymbolsData[selectedMasterSymbol.value]) {
-    filteredCallStrikes = allSymbolsData[selectedMasterSymbol.value].callStrikes.filter(strike => strike.expiryDate === expiryDate);
-    filteredPutStrikes = allSymbolsData[selectedMasterSymbol.value].putStrikes.filter(strike => strike.expiryDate === expiryDate);
-  } else {
-    console.error(`No data found for ${selectedMasterSymbol.value}`);
-    return;
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+  } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+    filteredCallStrikes = callStrikes.value.filter(strike => strike.expiryDate === expiryDate);
+    filteredPutStrikes = putStrikes.value.filter(strike => strike.expiryDate === expiryDate);
   }
 
+  // console.log('Filtered Call Strikes:', filteredCallStrikes);
+  // console.log('Filtered Put Strikes:', filteredPutStrikes);
+
+  // Change this condition to include forceUpdate
   if (forceUpdate || !selectedCallStrike.value.securityId || !selectedPutStrike.value.securityId || selectedCallStrike.value.expiryDate !== expiryDate) {
+    // Get the current underlying price based on the selected master symbol
     let currentPrice;
-    switch (selectedMasterSymbol.value) {
-      case 'NIFTY': currentPrice = parseFloat(niftyPrice.value); break;
-      case 'BANKNIFTY': currentPrice = parseFloat(bankNiftyPrice.value); break;
-      case 'FINNIFTY': currentPrice = parseFloat(finniftyPrice.value); break;
-      case 'MIDCPNIFTY': currentPrice = parseFloat(midcpniftyPrice.value); break;
-      case 'SENSEX': currentPrice = parseFloat(sensexPrice.value); break;
-      case 'BANKEX': currentPrice = parseFloat(bankexPrice.value); break;
-      default: console.error(`Unknown master symbol: ${selectedMasterSymbol.value}`); return;
+    if (selectedMasterSymbol.value === 'NIFTY') {
+      currentPrice = parseFloat(niftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'BANKNIFTY') {
+      currentPrice = parseFloat(bankNiftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'FINNIFTY') {
+      currentPrice = parseFloat(finniftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'MIDCPNIFTY') {
+      currentPrice = parseFloat(midcpniftyPrice.value);
+    } else if (selectedMasterSymbol.value === 'SENSEX') {
+      currentPrice = parseFloat(sensexPrice.value);
+    } else if (selectedMasterSymbol.value === 'BANKEX') {
+      currentPrice = parseFloat(bankexPrice.value);
     }
 
     if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
@@ -2997,12 +2966,16 @@ const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
         Math.abs(strike.strikePrice - currentPrice) === Math.min(...filteredCallStrikes.map(s => Math.abs(s.strikePrice - currentPrice)))
       );
 
+      // Reverse the logic for call and put offsets
       const callOffsetIndex = nearestStrikeIndex - parseInt(callStrikeOffset.value);
       const putOffsetIndex = nearestStrikeIndex + parseInt(putStrikeOffset.value);
 
       selectedCallStrike.value = filteredCallStrikes[callOffsetIndex] || {};
       selectedPutStrike.value = filteredPutStrikes[putOffsetIndex] || {};
     }
+
+    // console.log('Selected Call Strike:', selectedCallStrike.value);
+    // console.log('Selected Put Strike:', selectedPutStrike.value);
 
     if (synchronizeOnLoad.value) {
       synchronizeStrikes();
@@ -3574,8 +3547,8 @@ const getOrderMargin = async () => {
 
   } catch (error) {
     console.error('Error getting order margin:', error);
-    // toastMessage.value = 'Failed to get order margin';
-    // showToast.value = true;
+    toastMessage.value = 'Failed to get order margin';
+    showToast.value = true;
     orderMargin.call = null;
     orderMargin.put = null;
   }
@@ -4439,8 +4412,8 @@ const setFlattradeCredentials = async () => {
       userid: clientId
     });
     // console.log('Credentials set successfully:', response.data);
-    // toastMessage.value = 'Flattrade changes set successfully';
-    // showToast.value = true;
+    toastMessage.value = 'Flattrade changes set successfully';
+    showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials :', error);
     toastMessage.value = 'Failed to set Flattrade credentials';
@@ -4478,8 +4451,8 @@ const setShoonyaCredentials = async () => {
       userid: clientId
     });
     // console.log('Credentials set successfully:', response.data);
-    // toastMessage.value = 'Shoonya changes set successfully';
-    // showToast.value = true;
+    toastMessage.value = 'Shoonya changes set successfully';
+    showToast.value = true;
   } catch (error) {
     console.error('Error setting credentials: ', error);
     toastMessage.value = 'Failed to set Shoonya credentials';
@@ -5134,7 +5107,7 @@ const checkTargets = (newLTPs) => {
 };
 const checkStoplosses = () => {
   if (!enableStoploss.value) {
-    // console.log('Stoploss is disabled.');
+    console.log('Stoploss is disabled.');
     return;
   }
 
@@ -5224,33 +5197,19 @@ onMounted(async () => {
   checkAndShowAdaptabilityGuide();
   await checkAllTokens();
   initKillSwitch();
-
   const storedBroker = localStorage.getItem('selectedBroker');
   if (storedBroker) {
     const brokerDetails = JSON.parse(storedBroker);
     selectedBroker.value = brokerDetails;
     selectedBrokerName.value = brokerDetails.brokerName;
   }
-
-  // Load cached trading data
-  const cachedData = JSON.parse(localStorage.getItem('cachedTradingData'));
-  if (cachedData) {
-    Object.keys(cachedData).forEach(key => {
-      allSymbolsData[key] = cachedData[key];
-    });
-    updateExchangeSymbols();
-    setDefaultExchangeAndMasterSymbol();
-    updateSymbolData(selectedMasterSymbol.value);
-  } else {
-    updateExchangeSymbols();
-    setDefaultExchangeAndMasterSymbol();
-    await fetchTradingData();
-  }
-
-  updateAvailableQuantities();
+  updateExchangeSymbols()
+  setDefaultExchangeAndMasterSymbol()
+  fetchTradingData()
+  updateAvailableQuantities()
   loadLots();
   updateSelectedQuantity();
-  setDefaultExpiry();
+  setDefaultExpiry()
 
   window.addEventListener('keydown', handleHotKeys);
 
@@ -5275,7 +5234,6 @@ onMounted(async () => {
       activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
     }
   }
-
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
   timer = setInterval(() => {
@@ -5382,7 +5340,7 @@ watch(selectedBroker, async (newBroker) => {
 });
 // Watcher for selectedExpiry to repopulate strike prices
 watch(selectedExpiry, async (newExpiry) => {
-  // await fetchTradingData();
+  await fetchTradingData();
   updateStrikesForExpiry(newExpiry);
 });
 watch(selectedCallStrike, (newStrike, oldStrike) => {
@@ -5432,13 +5390,14 @@ watch(
   { deep: true }
 );
 // Modify the watcher for selectedMasterSymbol
-watch(selectedMasterSymbol, (newValue, oldValue) => {
+watch(selectedMasterSymbol, async (newValue, oldValue) => {
+  // console.log('selectedMasterSymbol changed:', newValue);
   saveUserChoice();
   updateAvailableQuantities();
   updateSelectedQuantity();
 
-  updateSymbolData(newValue);
-
+  // Fetch new trading data and update expiry
+  await fetchTradingData();
   setDefaultExpiry();
 
   // Force re-synchronization of strikes
@@ -5448,9 +5407,6 @@ watch(selectedMasterSymbol, (newValue, oldValue) => {
   // Update subscriptions
   debouncedUpdateSubscriptions();
 });
-
-
-
 // Watch productTypes to set the default selectedProductType
 watch(productTypes, (newProductTypes) => {
   if (newProductTypes.length > 0) {
