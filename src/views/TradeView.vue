@@ -1,5 +1,5 @@
 <template>
-  <NavigationComponent />
+  <NavigationComponent v-if="experimentalFeatures" />
 
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <section class="row pb-3">
