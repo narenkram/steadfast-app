@@ -2975,6 +2975,20 @@ const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
   if (allSymbolsData[selectedMasterSymbol.value]) {
     filteredCallStrikes = allSymbolsData[selectedMasterSymbol.value].callStrikes.filter(strike => strike.expiryDate === expiryDate);
     filteredPutStrikes = allSymbolsData[selectedMasterSymbol.value].putStrikes.filter(strike => strike.expiryDate === expiryDate);
+
+    const uniqueStrikePrices = [...new Set([...filteredCallStrikes, ...filteredPutStrikes].map(strike => strike.strikePrice))].sort((a, b) => a - b);
+
+    filteredCallStrikes = uniqueStrikePrices.map(strikePrice => 
+      filteredCallStrikes.find(strike => strike.strikePrice === strikePrice) || 
+      { strikePrice, expiryDate, securityId: null, tradingSymbol: null }
+    );
+    filteredPutStrikes = uniqueStrikePrices.map(strikePrice => 
+      filteredPutStrikes.find(strike => strike.strikePrice === strikePrice) || 
+      { strikePrice, expiryDate, securityId: null, tradingSymbol: null }
+    );
+
+    callStrikes.value = filteredCallStrikes;
+    putStrikes.value = filteredPutStrikes;
   } else {
     console.error(`No data found for ${selectedMasterSymbol.value}`);
     return;
