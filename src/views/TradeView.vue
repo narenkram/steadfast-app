@@ -88,7 +88,7 @@
 
   <!-- Total Profit & Net PNL -->
   <section class="row py-3">
-    <div class="col-6 col-md-4 col-lg-5">
+    <div class="col-12 col-md-5 col-lg-5">
       <div class="Card">
         <blockquote class="fs-3" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
           ₹ {{ totalProfit.toFixed(2) }}
@@ -101,7 +101,7 @@
         </small>
       </div>
     </div>
-    <div class="col-6 col-md-4 col-lg-4">
+    <div class="col-6 col-md-4 col-lg-4 mt-3 mt-md-0 mt-lg-0">
       <div class="Card">
         <blockquote class="fs-3 text-center m-0">
           <span
@@ -114,7 +114,7 @@
         <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
       </div>
     </div>
-    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
+    <div class="col-6 col-md-3 col-lg-3 d-flex justify-content-center align-items-center mt-3 mt-md-0 mt-lg-0">
       <div class="Card">
         <div class="card-title">
           <h5>Kill Switch</h5>
