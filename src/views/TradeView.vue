@@ -48,8 +48,6 @@
     <div class="col-6 col-md-4 col-lg-3 text-center">
       <p class="mb-1"><b>Total Funds</b></p>
       <p class="mt-2 mb-0">
-        <span id="showAdaptabilityGuideBtn" data-bs-toggle="modal"
-          data-bs-target="#adaptabilityEnforcingGuideModal">ℹ️</span>
         ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
           maximumFractionDigits: 0
         }) : 'N/A' }}
@@ -1843,104 +1841,6 @@
               src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timeselector&countries=14&calType=week&timeZone=23&lang=1"
               frameborder="0" allowtransparency="true"></iframe>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Adaptability Enforcing Guide Modal -->
-  <div class="modal fade" id="adaptabilityEnforcingGuideModal" tabindex="-1"
-    aria-labelledby="adaptabilityEnforcingGuideModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="adaptabilityEnforcingGuideModalLabel">
-            Adaptability: The Key to Successful Trading
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- <div class="alert alert-warning" role="alert">
-          <strong>Why am I not making money?</strong> The answer is simple: You're not adapting to
-          changing market conditions.
-        </div> -->
-
-          <div class="alert alert-info" role="alert">
-            <strong>Adaptability is the key to success!</strong> It means constantly adjusting your
-            strategy based on current market conditions to survive and thrive in changing markets.
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                  <h6 class="mb-0">1. Trending Markets</h6>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Adapt by using directional strategies</li>
-                    <li class="list-group-item">Follow the trend: "The trend is your friend"</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                  <h6 class="mb-0">2. Low Volatility (Ranging or Sideways Market)</h6>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Adapt by implementing neutral strategies</li>
-                    <li class="list-group-item">Consider Iron Condor or Iron Butterfly strategies</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-header bg-warning text-dark">
-                  <h6 class="mb-0">3. High Volatility</h6>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Adapt by focusing on scalping techniques</li>
-                    <li class="list-group-item">
-                      Exercise patience and aim for precise entry and exit points
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="card h-100">
-                <div class="card-header bg-danger text-white">
-                  <h6 class="mb-0">4. Event Days (High News Impact)</h6>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Adapt by avoiding trading if possible</li>
-                    <li class="list-group-item">Be aware that premiums may rise on both sides</li>
-                    <li class="list-group-item">Exercise extreme caution if you must trade</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-3 alert alert-success" role="alert">
-            <strong>Remember:</strong> Successful traders are always adapting. If your strategy isn't
-            working, don't stubbornly stick to it. Analyze the market conditions and adjust
-            accordingly.
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-            Start Trading with Adaptability
-          </button>
         </div>
       </div>
     </div>
@@ -4912,21 +4812,7 @@ const validateAndPlaceOrder = () => {
     // The modal will be dismissed automatically due to the data-bs-dismiss attribute
   }
 };
-const checkAndShowAdaptabilityGuide = () => {
-  const lastShownDate = localStorage.getItem('adaptabilityGuideLastShown');
-  const today = new Date().toDateString();
 
-  if (lastShownDate !== today) {
-    // Trigger the modal
-    const showButton = document.getElementById('showAdaptabilityGuideBtn');
-    if (showButton) {
-      showButton.click();
-    }
-
-    // Update the last shown date
-    localStorage.setItem('adaptabilityGuideLastShown', today);
-  }
-};
 const handleOrderTypeChange = () => {
   console.log('Order Type Changed:', selectedOrderType.value);
 
@@ -5174,7 +5060,6 @@ let checkInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
-  checkAndShowAdaptabilityGuide();
   await checkAllTokens();
   initKillSwitch();
 
