@@ -18,7 +18,7 @@
     </div>
 
     <!-- Broker Name and Status with Broker ID -->
-    <div class="col-6 col-md-4 col-lg-3 text-center">
+    <div class="col-6 col-md-5 col-lg-3 text-center">
       <p class="mb-1">
         <b>Status: </b>
         <span :class="{
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Total Funds -->
-    <div class="col-6 col-md-4 col-lg-3 text-center">
+    <div class="col-4 col-md-4 col-lg-3 text-center mt-3 mt-md-3 mt-lg-0">
       <p class="mb-1"><b>Total Funds</b></p>
       <p class="mt-2 mb-0">
         ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -55,13 +55,13 @@
     </div>
 
     <!-- Utilized Margin -->
-    <div class="col-6 col-md-6 col-lg-2 text-center">
+    <div class="col-4 col-md-4 col-lg-2 text-center mt-3 mt-md-3 mt-lg-0">
       <p class="mb-1"><b>Utilized Margin</b></p>
       <p class="mt-2 mb-0">₹ {{ usedAmount }}</p>
     </div>
 
     <!-- Today's Expiry -->
-    <div class="col-6 col-md-6 col-lg-2 text-end">
+    <div class="col-4 col-md-4 col-lg-2 text-end mt-3 mt-md-3 mt-lg-0">
       <p class="mb-1"><b>Today's Expiry</b></p>
       <p class="mb-0 d-flex align-items-center justify-content-center">
         <span class="fs-4 text-decoration-none me-2 text-danger" id="events-tab" type="button" data-bs-toggle="modal"
