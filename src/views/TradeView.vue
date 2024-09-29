@@ -1971,7 +1971,9 @@ const {
   targetValue,
   tslHitPositions,
   callDepth,
-  putDepth
+  putDepth,
+  symbolData,
+  allSymbolsData
 } = globalState;
 import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
 import axios from 'axios';
@@ -2656,22 +2658,7 @@ const updateSelectedBroker = () => {
     selectedBrokerName.value = '';
   }
 };
-const symbolData = reactive({
-  NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000', expiryDay: 4 }, // Thursday
-  BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009', expiryDay: 3 }, // Wednesday
-  FINNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26037', expiryDay: 2 }, // Tuesday
-  MIDCPNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26074', expiryDay: 1 }, // Monday
-  SENSEX: { exchangeCode: 'BSE', exchangeSecurityId: '1', expiryDay: 5 }, // Friday
-  BANKEX: { exchangeCode: 'BSE', exchangeSecurityId: '12', expiryDay: null }, // No specific expiry day
-});
-const allSymbolsData = reactive({
-  NIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  BANKNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  FINNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  MIDCPNIFTY: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  SENSEX: { expiryDates: [], callStrikes: [], putStrikes: [] },
-  BANKEX: { expiryDates: [], callStrikes: [], putStrikes: [] },
-});
+
 const updateExchangeSymbols = () => {
   if (selectedBroker.value?.brokerName === 'Flattrade' || selectedBroker.value?.brokerName === 'Shoonya' || selectedBroker.value?.brokerName === 'PaperTrading') {
     exchangeSymbols.value = {
