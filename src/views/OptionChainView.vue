@@ -12,48 +12,51 @@
           <label for="spotPrice" class="form-label">Spot Price:</label>
           <input type="number" id="spotPrice" v-model="spotPrice" class="form-control" @change="loadOptionGreek" />
         </div>
-        <div class="table-responsive" v-if="optionGreekData">
-          <table class="table table-striped table-hover">
-            <thead>
-              <tr>
-                <th>Greek</th>
-                <th>Call</th>
-                <th>Put</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Price</td>
-                <td>{{ optionGreekData.cal_price }}</td>
-                <td>{{ optionGreekData.put_price }}</td>
-              </tr>
-              <tr>
-                <td>Delta</td>
-                <td>{{ optionGreekData.cal_delta }}</td>
-                <td>{{ optionGreekData.put_delta }}</td>
-              </tr>
-              <tr>
-                <td>Gamma</td>
-                <td>{{ optionGreekData.cal_gamma }}</td>
-                <td>{{ optionGreekData.put_gamma }}</td>
-              </tr>
-              <tr>
-                <td>Theta</td>
-                <td>{{ optionGreekData.cal_theta }}</td>
-                <td>{{ optionGreekData.put_theta }}</td>
-              </tr>
-              <tr>
-                <td>Rho</td>
-                <td>{{ optionGreekData.cal_rho }}</td>
-                <td>{{ optionGreekData.put_rho }}</td>
-              </tr>
-              <tr>
-                <td>Vega</td>
-                <td>{{ optionGreekData.cal_vego }}</td>
-                <td>{{ optionGreekData.put_vego }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div v-if="optionGreekData">
+          <p>Request Time: {{ optionGreekData.request_time }}</p>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Greek</th>
+                  <th>Call</th>
+                  <th>Put</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Price</td>
+                  <td>{{ optionGreekData.cal_price }}</td>
+                  <td>{{ optionGreekData.put_price }}</td>
+                </tr>
+                <tr>
+                  <td>Delta</td>
+                  <td>{{ optionGreekData.cal_delta }}</td>
+                  <td>{{ optionGreekData.put_delta }}</td>
+                </tr>
+                <tr>
+                  <td>Gamma</td>
+                  <td>{{ optionGreekData.cal_gamma }}</td>
+                  <td>{{ optionGreekData.put_gamma }}</td>
+                </tr>
+                <tr>
+                  <td>Theta</td>
+                  <td>{{ optionGreekData.cal_theta }}</td>
+                  <td>{{ optionGreekData.put_theta }}</td>
+                </tr>
+                <tr>
+                  <td>Rho</td>
+                  <td>{{ optionGreekData.cal_rho }}</td>
+                  <td>{{ optionGreekData.put_rho }}</td>
+                </tr>
+                <tr>
+                  <td>Vega</td>
+                  <td>{{ optionGreekData.cal_vega }}</td>
+                  <td>{{ optionGreekData.put_vega }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
