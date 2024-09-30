@@ -49,7 +49,7 @@
       <p class="mb-1"><b>Total Funds</b></p>
       <p class="mt-2 mb-0">
         ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
-          maximumFractionDigits: 0
+          maximumFractionDigits: 2
         }) : 'N/A' }}
       </p>
     </div>
@@ -2182,9 +2182,9 @@ const availableBalance = computed(() => {
     const marginUsed = Number(fundLimits.value.marginused) || 0;
 
     // Use payin if cash is zero, otherwise use cash
-    const availableFunds = cash === 0 ? payin : cash;
+    const availableFunds = cash + payin;
 
-    const balance = Math.floor(availableFunds - marginUsed);
+    const balance = availableFunds - marginUsed;
     // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
     return balance;
   }
@@ -3165,6 +3165,7 @@ const fetchFundLimit = async () => {
       });
       fundLimits.value = {
         cash: response.data.cash,
+        payin: response.data.payin,
         marginused: response.data.marginused,
       };
     }
@@ -3182,6 +3183,7 @@ const fetchFundLimit = async () => {
       // Make sure the response data has the correct structure
       fundLimits.value = {
         cash: response.data.cash,
+        payin: response.data.payin,
         marginused: response.data.marginused
         // Add any other relevant fields from the Shoonya response
       };
