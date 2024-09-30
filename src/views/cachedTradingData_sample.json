@@ -1,0 +1,80 @@
+{
+  "NIFTY": {
+    "expiryDates": [
+      "03-OCT-2024",
+      "10-OCT-2024",
+      "17-OCT-2024",
+      "24-OCT-2024",
+      "31-OCT-2024",
+      "28-NOV-2024",
+      "26-DEC-2024"
+    ],
+    "callStrikes": [
+      {
+        "tradingSymbol": "NIFTY26SEP24C7000",
+        "securityId": "57289",
+        "expiryDate": "26-SEP-2024",
+        "strikePrice": 7000
+      },
+      {
+        "tradingSymbol": "NIFTY26SEP24C8000",
+        "securityId": "45667",
+        "expiryDate": "26-SEP-2024",
+        "strikePrice": 8000
+      }
+    ],
+    "putStrikes": [
+      {
+        "tradingSymbol": "NIFTY26SEP24P7000",
+        "securityId": "57290",
+        "expiryDate": "26-SEP-2024",
+        "strikePrice": 7000
+      },
+      {
+        "tradingSymbol": "NIFTY26SEP24P8000",
+        "securityId": "45668",
+        "expiryDate": "26-SEP-2024",
+        "strikePrice": 8000
+      }
+    ]
+  },
+  "BANKNIFTY": {
+    "expiryDates": [
+      "01-OCT-2024",
+      "09-OCT-2024",
+      "16-OCT-2024",
+      "23-OCT-2024",
+      "30-OCT-2024",
+      "27-NOV-2024",
+      "24-DEC-2024"
+    ],
+    "callStrikes": [
+      {
+        "tradingSymbol": "BANKNIFTY25SEP24C24000",
+        "securityId": "54701",
+        "expiryDate": "25-SEP-2024",
+        "strikePrice": 24000
+      },
+      {
+        "tradingSymbol": "BANKNIFTY25SEP24C25500",
+        "securityId": "54703",
+        "expiryDate": "25-SEP-2024",
+        "strikePrice": 25500
+      }
+    ],
+    "putStrikes": [
+      {
+        "tradingSymbol": "BANKNIFTY25SEP24P24000",
+        "securityId": "54702",
+        "expiryDate": "25-SEP-2024",
+        "strikePrice": 24000
+      },
+      {
+        "tradingSymbol": "BANKNIFTY25SEP24P25500",
+        "securityId": "54704",
+        "expiryDate": "25-SEP-2024",
+        "strikePrice": 25500
+      }
+    ]
+  }
+}

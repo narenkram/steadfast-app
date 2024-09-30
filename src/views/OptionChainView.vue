@@ -94,7 +94,7 @@ const loadOptionGreek = async () => {
       strprc: strikePrice.value.toString(),
       sptprc: spotPrice.value.toString(),
       int_rate: '7', // You might want to make this configurable
-      volatility: '20', // You might want to make this configurable
+      volatility: '12.8', // You might want to make this configurable
       optt: 'CE' // This will give Greeks for both CE and PE
     });
 
