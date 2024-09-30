@@ -3,42 +3,54 @@
   <section class="container-fluid py-5">
     <div class="row">
       <div class="col-12">
-        <h1 class="mb-4">Option Chain - NIFTY</h1>
-        <div class="table-responsive">
+        <h1 class="mb-4">Option Greeks - NIFTY</h1>
+        <div class="mb-3">
+          <label for="strikePrice" class="form-label">Strike Price:</label>
+          <input type="number" id="strikePrice" v-model="strikePrice" class="form-control" @change="loadOptionGreek" />
+        </div>
+        <div class="mb-3">
+          <label for="spotPrice" class="form-label">Spot Price:</label>
+          <input type="number" id="spotPrice" v-model="spotPrice" class="form-control" @change="loadOptionGreek" />
+        </div>
+        <div class="table-responsive" v-if="optionGreekData">
           <table class="table table-striped table-hover">
             <thead>
               <tr>
-                <th colspan="5" class="text-center bg-light">CALLS</th>
-                <th class="text-center bg-info">Strike Price</th>
-                <th colspan="5" class="text-center bg-light">PUTS</th>
-              </tr>
-              <tr>
-                <th>Symbol</th>
-                <th>Token</th>
-                <th>Price Precision</th>
-                <th>Tick Size</th>
-                <th>Lot Size</th>
-                <th class="text-center bg-info">Strike</th>
-                <th>Lot Size</th>
-                <th>Tick Size</th>
-                <th>Price Precision</th>
-                <th>Token</th>
-                <th>Symbol</th>
+                <th>Greek</th>
+                <th>Call</th>
+                <th>Put</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="row in optionChainData" :key="row.strikePrice">
-                <td>{{ row.callSymbol }}</td>
-                <td>{{ row.callToken }}</td>
-                <td>{{ row.callPP }}</td>
-                <td>{{ row.callTI }}</td>
-                <td>{{ row.callLS }}</td>
-                <td class="text-center bg-info">{{ row.strikePrice }}</td>
-                <td>{{ row.putLS }}</td>
-                <td>{{ row.putTI }}</td>
-                <td>{{ row.putPP }}</td>
-                <td>{{ row.putToken }}</td>
-                <td>{{ row.putSymbol }}</td>
+              <tr>
+                <td>Price</td>
+                <td>{{ optionGreekData.cal_price }}</td>
+                <td>{{ optionGreekData.put_price }}</td>
+              </tr>
+              <tr>
+                <td>Delta</td>
+                <td>{{ optionGreekData.cal_delta }}</td>
+                <td>{{ optionGreekData.put_delta }}</td>
+              </tr>
+              <tr>
+                <td>Gamma</td>
+                <td>{{ optionGreekData.cal_gamma }}</td>
+                <td>{{ optionGreekData.put_gamma }}</td>
+              </tr>
+              <tr>
+                <td>Theta</td>
+                <td>{{ optionGreekData.cal_theta }}</td>
+                <td>{{ optionGreekData.put_theta }}</td>
+              </tr>
+              <tr>
+                <td>Rho</td>
+                <td>{{ optionGreekData.cal_rho }}</td>
+                <td>{{ optionGreekData.put_rho }}</td>
+              </tr>
+              <tr>
+                <td>Vega</td>
+                <td>{{ optionGreekData.cal_vego }}</td>
+                <td>{{ optionGreekData.put_vego }}</td>
               </tr>
             </tbody>
           </table>
@@ -53,14 +65,16 @@ import NavigationComponent from '../components/NavigationComponent.vue'
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-const BASE_URL = 'https://piconnect.flattrade.in/PiConnectTP';
-const optionChainData = ref([]);
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const optionGreekData = ref(null);
+const strikePrice = ref(25900);
+const spotPrice = ref(25900);
 
 // Fetch Flattrade credentials from localStorage
 const flattradeCredentials = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
 const clientId = flattradeCredentials.clientId;
 
-const loadOptionChain = async () => {
+const loadOptionGreek = async () => {
   try {
     const jKey = localStorage.getItem('FLATTRADE_API_TOKEN');
     if (!jKey) {
@@ -73,61 +87,34 @@ const loadOptionChain = async () => {
 
     const jData = JSON.stringify({
       uid: clientId,
-      exch: 'NFO',
-      tsym: 'NIFTY03OCT24C25900',
-      strprc: '25900',
-      cnt: '5'
+      exd: '03-OCT-2024', // You might want to make this dynamic
+      strprc: strikePrice.value.toString(),
+      sptprc: spotPrice.value.toString(),
+      int_rate: '7', // You might want to make this configurable
+      volatility: '20', // You might want to make this configurable
+      optt: 'CE' // This will give Greeks for both CE and PE
     });
 
-    const response = await axios.post(`${BASE_URL}/GetOptionChain`, `jData=${jData}&jKey=${jKey}`, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    const response = await axios.post(`${BASE_URL}/flattrade/getOptionGreek`, { jData }, {
+      headers: {
+        'Authorization': `Bearer ${jKey}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    if (response.data.stat === 'Ok') {
-      processOptionChainData(response.data.values);
+    if (response.data.stat === 'OK') {
+      optionGreekData.value = response.data;
     } else {
-      throw new Error(response.data.emsg || 'Failed to fetch option chain data');
+      throw new Error(response.data.emsg || 'Failed to fetch option Greek data');
     }
   } catch (error) {
-    console.error('Error loading option chain:', error);
+    console.error('Error loading option Greek:', error);
     // You may want to show an error message to the user here
   }
 };
 
-const processOptionChainData = (data) => {
-  const processedData = {};
-
-  data.forEach(item => {
-    const strikePrice = parseFloat(item.strprc);
-    if (!processedData[strikePrice]) {
-      processedData[strikePrice] = {
-        strikePrice: strikePrice,
-        callSymbol: '-',
-        callToken: '-',
-        callPP: '-',
-        callTI: '-',
-        callLS: '-',
-        putSymbol: '-',
-        putToken: '-',
-        putPP: '-',
-        putTI: '-',
-        putLS: '-',
-      };
-    }
-
-    const side = item.optt === 'CE' ? 'call' : 'put';
-    processedData[strikePrice][`${side}Symbol`] = item.tsym;
-    processedData[strikePrice][`${side}Token`] = item.token;
-    processedData[strikePrice][`${side}PP`] = item.pp;
-    processedData[strikePrice][`${side}TI`] = item.ti;
-    processedData[strikePrice][`${side}LS`] = item.ls;
-  });
-
-  optionChainData.value = Object.values(processedData).sort((a, b) => a.strikePrice - b.strikePrice);
-};
-
 onMounted(() => {
-  loadOptionChain();
+  loadOptionGreek();
 });
 </script>
 
@@ -138,8 +125,8 @@ onMounted(() => {
   padding: 0.5rem;
 }
 
-.table th.text-center,
-.table td.text-center {
-  text-align: center;
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
 }
 </style>
