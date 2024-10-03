@@ -412,18 +412,14 @@ const deleteBroker = (broker) => {
 <template>
   <NavigationComponent />
   
-  <section class="row py-5">
+  <section class="row pt-5 pb-3">
     <div class="col-8 text-start">
       <RouterLink to="/add-broker">
         <button class="btn btn-primary">Add New Broker</button>
       </RouterLink>
     </div>
     <div class="col-4 text-end">
-      <RouterLink to="/steadfast">
-        <button class="btn btn-primary">
-          Open 1 Click Trade View
-        </button>
-      </RouterLink>
+     
     </div>
   </section>
 
