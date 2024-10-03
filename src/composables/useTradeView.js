@@ -3856,6 +3856,18 @@ export function useTradeView() {
     handleKillSwitchClick,
     closeSelectedPositions,
     updateTradingSymbol,
+    convertToComparableDate,
+    toggleBrokerClientIdVisibility,
+    resetOrderTypeIfNeeded,
+    findNewPosition,
+    setStrategyType,
+    updateBasketOrderQuantity,
+    removeFromBasket,
+    placeBasket,
+    placeAllBasketOrders,
+    setReverseMode,
+    reversePositions,
+    formatPrice,
 
     // Computed properties
     brokerStatus,
@@ -3905,6 +3917,7 @@ export function useTradeView() {
     putLtpMarkerPosition,
     putOpenMarkerPosition,
     additionalStrikes,
+    deployedCapitalPercentage,
 
     // Reactive variables (from globalState)
     showLTPRangeBar,

@@ -1944,6 +1944,18 @@ const {
   handleKillSwitchClick,
   closeSelectedPositions,
   updateTradingSymbol,
+  convertToComparableDate,
+  toggleBrokerClientIdVisibility,
+  resetOrderTypeIfNeeded,
+  findNewPosition,
+  setStrategyType,
+  updateBasketOrderQuantity,
+  removeFromBasket,
+  placeBasket,
+  placeAllBasketOrders,
+  setReverseMode,
+  reversePositions,
+  formatPrice,
 
   // Computed properties
   brokerStatus,
@@ -1993,6 +2005,7 @@ const {
   putLtpMarkerPosition,
   putOpenMarkerPosition,
   additionalStrikes,
+  deployedCapitalPercentage,
 
 
   // Reactive variables
