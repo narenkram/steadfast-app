@@ -11,7 +11,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav justify-content-between w-100 mb-2 mb-lg-0">
                     <li class="nav-item">
                         <RouterLink to="/steadfast" class="nav-link">⚡ Trade</RouterLink>
                     </li>
@@ -24,17 +24,8 @@
                     <li class="nav-item">
                         <RouterLink to="/manage-brokers" class="nav-link">🏦 Manage Brokers</RouterLink>
                     </li>
-                </ul>
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownProfile" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            More
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <RouterLink to="/parallel-copy-trade" class="nav-link">🔄 Parallel Copy Trade</RouterLink>
                     </li>
                 </ul>
             </div>

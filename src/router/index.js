@@ -6,7 +6,7 @@ import Flattrade_Redirect from '../views/BrokerRedirect/Flattrade_Redirect.vue'
 import HomeView from '../views/HomeView.vue'
 import OptionChainView from '../views/OptionChainView.vue'
 import AppSettingsView from '../views/AppSettingsView.vue'
-
+import ParallelCopyTradeView from '../views/ParallelCopyTradeView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -47,6 +47,11 @@ const router = createRouter({
       path: '/app-settings',
       name: 'AppSettingsView',
       component: AppSettingsView
+    },
+    {
+      path: '/parallel-copy-trade',
+      name: 'ParallelCopyTradeView',
+      component: ParallelCopyTradeView
     }
   ]
 })
