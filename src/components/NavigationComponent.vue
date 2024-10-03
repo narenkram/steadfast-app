@@ -16,13 +16,13 @@
                         <RouterLink to="/steadfast" class="nav-link">⚡ Trade</RouterLink>
                     </li>
                     <li class="nav-item">
-                        <RouterLink to="/manage-brokers" class="nav-link">🏦 Manage Brokers</RouterLink>
-                    </li>
-                    <li class="nav-item">
                         <RouterLink to="/option-chain" class="nav-link">⛓️ Option Chain</RouterLink>
                     </li>
                     <li class="nav-item">
                         <RouterLink to="/app-settings" class="nav-link">⚙️ Settings</RouterLink>
+                    </li>
+                    <li class="nav-item">
+                        <RouterLink to="/manage-brokers" class="nav-link">🏦 Manage Brokers</RouterLink>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
