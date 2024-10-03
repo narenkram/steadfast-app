@@ -1850,15 +1850,10 @@
 
 <script setup>
 import NavigationComponent from '../components/NavigationComponent.vue'
-import { ref, computed, onMounted, watch, onBeforeUnmount, reactive } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 import { useTradeView } from '@/composables/useTradeView';
-import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator';
-import axios from 'axios';
+import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import ToastAlert from '../components/ToastAlert.vue';
-import qs from 'qs';
-import { debounce } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
-import { useLocalStorage } from '@vueuse/core'; // Optional: for easier localStorage management
 
 
 const {

@@ -4,8 +4,7 @@ import axios from 'axios'
 import qs from 'qs'
 import { debounce } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { useLocalStorage } from '@vueuse/core' // Optional: for easier localStorage management
-import { checkAllTokens, getBrokerStatus, tokenStatus } from '@/utils/brokerTokenValidator'
+import { tokenStatus } from '@/utils/brokerTokenValidator'
 
 export function useTradeView() {
   // Reactive variables (from globalState)
