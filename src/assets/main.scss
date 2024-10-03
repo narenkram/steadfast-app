@@ -113,6 +113,9 @@
     color: var(--bs-body-color);
     background-color: var(--bs-light);
   }
+  .active-route {
+    background-color: var(--bs-light);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -167,6 +170,9 @@
   .text-muted {
     color: var(--bs-secondary) !important;
   }
+  .active-route {
+    background-color: var(--bs-light);
+  }
 }
 
 // Styles that don't change based on color scheme
@@ -175,6 +181,9 @@
 .Navigation__logo {
   height: 40px;
   width: 40px;
+}
+.active-route {
+  border-radius: 0.25rem;
 }
 .Card {
   border-radius: $border-radius;

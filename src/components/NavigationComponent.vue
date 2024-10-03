@@ -12,20 +12,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav justify-content-between w-100 mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <RouterLink to="/steadfast" class="nav-link">⚡ Trade</RouterLink>
-                    </li>
-                    <li class="nav-item">
-                        <RouterLink to="/option-chain" class="nav-link">⛓️ Option Chain</RouterLink>
-                    </li>
-                    <li class="nav-item">
-                        <RouterLink to="/app-settings" class="nav-link">⚙️ Settings</RouterLink>
-                    </li>
-                    <li class="nav-item">
-                        <RouterLink to="/manage-brokers" class="nav-link">🏦 Manage Brokers</RouterLink>
-                    </li>
-                    <li class="nav-item">
-                        <RouterLink to="/parallel-copy-trade" class="nav-link">🔄 Parallel Copy Trade</RouterLink>
+                    <li class="nav-item" v-for="route in routes" :key="route.path">
+                        <RouterLink :to="route.path" class="nav-link"
+                            :class="{ 'active-route': $route.path === route.path }">
+                            {{ route.icon }} {{ route.name }}
+                        </RouterLink>
                     </li>
                 </ul>
             </div>
@@ -36,9 +27,16 @@
 <script>
 export default {
     name: "NavigationComponent",
+    data() {
+        return {
+            routes: [
+                { path: '/steadfast', name: 'Trade', icon: '⚡' },
+                { path: '/option-chain', name: 'Option Chain', icon: '⛓️' },
+                { path: '/app-settings', name: 'Settings', icon: '⚙️' },
+                { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
+                { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
+            ],
+        };
+    },
 }
 </script>
-
-<style scoped>
-/* You can add styles for the component here */
-</style>
