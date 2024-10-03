@@ -16,6 +16,9 @@
                         <RouterLink to="/steadfast" class="nav-link">⚡ Trade</RouterLink>
                     </li>
                     <li class="nav-item">
+                        <RouterLink to="/manage-brokers" class="nav-link">🏦 Manage Brokers</RouterLink>
+                    </li>
+                    <li class="nav-item">
                         <RouterLink to="/option-chain" class="nav-link">⛓️ Option Chain</RouterLink>
                     </li>
                     <li class="nav-item">

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
+import NavigationComponent from '../components/NavigationComponent.vue';
 import { validateToken, checkAllTokens, getBrokerStatus, tokenStatus } from '../utils/brokerTokenValidator';
 
 const API_TOKEN = ref(''); // Not used right now
@@ -409,6 +410,8 @@ const deleteBroker = (broker) => {
 </script>
 
 <template>
+  <NavigationComponent />
+  
   <section class="row py-5">
     <div class="col-8 text-start">
       <RouterLink to="/add-broker">
