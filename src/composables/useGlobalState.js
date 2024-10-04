@@ -45,6 +45,7 @@ export const shoonyaOrderBook = ref([])
 export const shoonyaTradeBook = ref([])
 export const flatTradePositionBook = ref([])
 export const shoonyaPositionBook = ref([])
+export const paperTradingPositionBook = ref([])
 export const fundLimits = ref({})
 export const showBrokerClientId = ref(false)
 export const quantities = ref({

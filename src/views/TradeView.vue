@@ -1067,7 +1067,150 @@
               </tbody>
             </table>
           </div>
-
+          <!-- PaperTrading Positions -->
+          <div class="table-responsive" v-if="activeFetchFunction === 'fetchPaperTradingPositions'">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Position</th>
+                  <th scope="col">Avg</th>
+                  <th scope="col">LTP</th>
+                  <th scope="col">TSL / SL</th>
+                  <th scope="col">Target</th>
+                  <th scope="col">Realized</th>
+                  <th scope="col">Unrealized</th>
+                  <th scope="col">Select</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-if="activeFetchFunction === 'fetchPaperTradingPositions'">
+                  <tr v-for="paperPosition in paperTradingPositionBook" :key="paperPosition.tsym">
+                    <td>
+                      <div class="d-flex">{{ paperPosition.tsym }}</div>
+                      <div class="d-flex flex-row">
+                        <span
+                          :class="paperPosition.netqty > 0 ? 'text-success' : paperPosition.netqty < 0 ? 'text-danger' : null">
+                          Qty: {{ paperPosition.netqty }}
+                        </span>
+                        <span class="ms-2">
+                          Side:
+                          <b>{{ paperPosition.netqty > 0 ? 'B' : paperPosition.netqty < 0 ? 'S' : '-' }}</b>
+                        </span>
+                        <span class="ms-2"> Type: {{ paperPosition.prd }} </span>
+                      </div>
+                      <div class="mt-1 d-flex flex-row">
+                        <span class="text-success">₹{{ paperPosition.daybuyamt }}</span>
+                        <span class="ms-2 text-danger">₹{{ paperPosition.daysellamt }}</span>
+                      </div>
+                    </td>
+                    <td>{{ paperPosition.netavgprc }}</td>
+                    <td>{{ positionLTPs[paperPosition.tsym] || '-' }}</td>
+                    <td v-if="paperPosition.netqty != 0">
+                      <!-- SL & TSL -->
+                      <div class="row">
+                        <div class="col-12" v-if="trailingStoplosses[paperPosition.tsym] !== null">
+                          <div class="d-flex align-items-center">
+                            <span class="me-2">TSL:</span>
+                            <span class="bg-danger text-white px-2 py-1 rounded">
+                              {{ trailingStoplosses[paperPosition.tsym] }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="col-12" v-else-if="stoplosses[paperPosition.tsym] !== null">
+                          <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-danger" @click="decreaseStoploss(paperPosition)">
+                              - SL
+                            </button>
+                            <span class="d-flex align-items-center bg-danger text-white px-2">
+                              {{ stoplosses[paperPosition.tsym] }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-success" @click="increaseStoploss(paperPosition)">
+                              + SL
+                            </button>
+                          </div>
+                        </div>
+                        <div v-else>No SL set</div>
+                      </div>
+                      <div class="btn-group mt-2" role="group">
+                        <button
+                          v-if="trailingStoplosses[paperPosition.tsym] === null && stoplosses[paperPosition.tsym] === null"
+                          class="btn btn-sm btn-outline" @click="setStoploss(paperPosition, 'trailing')">
+                          Set TSL
+                        </button>
+                        <button
+                          v-if="trailingStoplosses[paperPosition.tsym] === null && stoplosses[paperPosition.tsym] === null"
+                          class="btn btn-sm btn-outline" @click="setStoploss(paperPosition, 'static')">
+                          Set SL
+                        </button>
+                        <button
+                          v-if="trailingStoplosses[paperPosition.tsym] !== null || stoplosses[paperPosition.tsym] !== null"
+                          class="btn btn-sm btn-outline-danger" @click="removeStoploss(paperPosition)">
+                          Remove SL
+                        </button>
+                      </div>
+                    </td>
+                    <td v-else style="text-align: center">-</td>
+                    <td v-if="paperPosition.netqty != 0">
+                      <!-- TG -->
+                      <div class="row">
+                        <div class="col-12" v-if="targets[paperPosition.tsym] !== null">
+                          <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-danger" @click="decreaseTarget(paperPosition)">
+                              - TG
+                            </button>
+                            <span class="d-flex align-items-center bg-success text-white px-2">
+                              {{ targets[paperPosition.tsym] }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-success" @click="increaseTarget(paperPosition)">
+                              + TG
+                            </button>
+                          </div>
+                        </div>
+                        <div v-else>No Target set</div>
+                      </div>
+                      <div class="btn-group mt-2" role="group">
+                        <button v-if="targets[paperPosition.tsym] === null" class="btn btn-sm btn-outline-success"
+                          @click="setTarget(paperPosition)">
+                          Set TG
+                        </button>
+                        <button v-if="targets[paperPosition.tsym] !== null" class="btn btn-sm btn-outline-danger"
+                          @click="removeTarget(paperPosition)">
+                          Remove TG
+                        </button>
+                      </div>
+                    </td>
+                    <td v-else style="text-align: center">-</td>
+                    <td
+                      :class="paperPosition.rpnl > 0 ? 'text-success' : paperPosition.rpnl < 0 ? 'text-danger' : null">
+                      {{ paperPosition.rpnl }}
+                    </td>
+                    <td
+                      :class="paperPosition.calculatedUrmtom > 0 ? 'text-success' : paperPosition.calculatedUrmtom < 0 ? 'text-danger' : null">
+                      {{ paperPosition.calculatedUrmtom.toFixed(2) }}
+                    </td>
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'paperPosition-' + paperPosition.tsym"
+                          v-model="selectedPaperPositionsSet" :value="paperPosition.tsym"
+                          :disabled="paperPosition.netqty == 0" />
+                      </label>
+                    </td>
+                  </tr>
+                  <tr v-if="paperTradingPositionBook.length === 0">
+                    <td colspan="10" class="text-center">
+                      No paper trading positions
+                    </td>
+                  </tr>
+                </template>
+                <tr v-else>
+                  <td colspan="10" class="text-center">
+                    No paper trading positions
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p class="text-secondary">
             Aim for a 1-3% daily target and set a 1-1.5% stoploss to manage trades effectively and
             minimize losses.
@@ -1568,6 +1711,8 @@ const {
   fetchShoonyaPositions,
   fetchFlattradeOrdersTradesBook,
   fetchShoonyaOrdersTradesBook,
+  fetchPaperTradingPositions,
+  fetchPaperTradingOrdersTradesBook,
   handleHotKeys,
   closeAllPositions,
   getProductTypeValue,
@@ -1682,6 +1827,7 @@ const {
   bankexPrice,
   flatTradePositionBook,
   shoonyaPositionBook,
+  paperTradingPositionBook,
   showBrokerClientId,
   selectedStrike,
   selectedProductType,
@@ -1777,20 +1923,24 @@ onMounted(async () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       fetchFlattradePositions();
       activeFetchFunction.value = 'fetchFlattradePositions';
-    }
-    if (selectedBroker.value?.brokerName === 'Shoonya') {
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       fetchShoonyaPositions();
       activeFetchFunction.value = 'fetchShoonyaPositions';
+    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+      fetchPaperTradingPositions();
+      activeFetchFunction.value = 'fetchPaperTradingPositions';
     }
   }
   if (activeTab.value === 'trades') {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       fetchFlattradeOrdersTradesBook();
       activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
-    }
-    if (selectedBroker.value?.brokerName === 'Shoonya') {
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       fetchShoonyaOrdersTradesBook();
       activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
+    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+      fetchPaperTradingOrdersTradesBook();
+      activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook';
     }
   }
 

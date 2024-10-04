@@ -51,6 +51,7 @@ export function useTradeView() {
     shoonyaTradeBook,
     flatTradePositionBook,
     shoonyaPositionBook,
+    paperTradingPositionBook,
     fundLimits,
     showBrokerClientId,
     quantities,
@@ -3398,6 +3399,19 @@ export function useTradeView() {
     checkStoplosses()
     checkTargets()
   }
+
+  const fetchPaperTradingPositions = async () => {
+    // Implement the logic to fetch paper trading positions
+    // This could be from a local storage, a mock API, or a real API endpoint
+    // Update paperTradingPositionBook.value with the fetched data
+  }
+
+  const fetchPaperTradingOrdersTradesBook = async () => {
+    // Implement the logic to fetch paper trading orders and trades
+    // This could be from a local storage, a mock API, or a real API endpoint
+    // Update the relevant reactive variables with the fetched data
+  }
+
   // ... (add all other methods here)
 
   // Watchers
@@ -3464,6 +3478,9 @@ export function useTradeView() {
         } else if (newBroker.brokerName === 'Shoonya') {
           activeFetchFunction.value = 'fetchShoonyaPositions'
           await fetchShoonyaPositions()
+        } else if (newBroker.brokerName === 'PaperTrading') {
+          activeFetchFunction.value = 'fetchPaperTradingPositions'
+          await fetchPaperTradingPositions()
         }
       } else if (activeTab.value === 'trades') {
         if (newBroker.brokerName === 'Flattrade') {
@@ -3472,6 +3489,9 @@ export function useTradeView() {
         } else if (newBroker.brokerName === 'Shoonya') {
           activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook'
           await fetchShoonyaOrdersTradesBook()
+        } else if (newBroker.brokerName === 'PaperTrading') {
+          activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook'
+          await fetchPaperTradingOrdersTradesBook()
         }
       }
     }
@@ -3800,6 +3820,8 @@ export function useTradeView() {
     fetchShoonyaPositions,
     fetchFlattradeOrdersTradesBook,
     fetchShoonyaOrdersTradesBook,
+    fetchPaperTradingPositions,
+    fetchPaperTradingOrdersTradesBook,
     handleHotKeys,
     placeOrder,
     placeOrderForPosition,
@@ -3960,6 +3982,7 @@ export function useTradeView() {
     shoonyaTradeBook,
     flatTradePositionBook,
     shoonyaPositionBook,
+    paperTradingPositionBook,
     fundLimits,
     showBrokerClientId,
     quantities,
