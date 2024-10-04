@@ -151,7 +151,9 @@ export function useTradeView() {
     shoonyaOneTimePassword,
     errorMessage,
     statusMessage,
-    userTriggeredTokenGeneration
+    userTriggeredTokenGeneration,
+    selectedBrokerToDelete,
+    selectedBrokerForPaper
   } = globalState
 
   // Computed Variables
@@ -3470,9 +3472,6 @@ export function useTradeView() {
     // This could be from a local storage, a mock API, or a real API endpoint
     // Update the relevant reactive variables with the fetched data
   }
-
-  const selectedBrokerToDelete = ref(null) // Store the broker to be deleted
-  const selectedBrokerForPaper = ref(null) // Add this line to store the selected broker for PaperTrading
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -4455,6 +4454,8 @@ export function useTradeView() {
     shoonyaOneTimePassword,
     errorMessage,
     statusMessage,
-    userTriggeredTokenGeneration
+    userTriggeredTokenGeneration,
+    saveSelectedBrokerForPaper,
+    selectedBrokerToDelete
   }
 }

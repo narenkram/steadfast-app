@@ -283,3 +283,5 @@ export const shoonyaOneTimePassword = ref('');
 export const errorMessage = ref('');
 export const statusMessage = ref('');
 export const userTriggeredTokenGeneration = ref(false); // Flag to track user-triggered token generation
+export const selectedBrokerToDelete = ref(null) // Store the broker to be deleted
+export const selectedBrokerForPaper = ref(null) // Add this line to store the selected broker for PaperTrading
