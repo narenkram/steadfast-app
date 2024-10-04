@@ -199,35 +199,43 @@ onMounted(() => {
   <div class="modal fade" id="ShoonyaLogin" tabindex="-1" aria-labelledby="ShoonyaLoginLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
-            Shoonya Login
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="col-12">
-            <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
-            <input type="text" id="ShoonyaBrokerUserId" class="form-control"
-              :value="ManageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
-
-            <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
-            <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
-              placeholder="Enter Broker Password">
-
-            <label for="ShoonyaOneTimePassword" class="form-label mb-0">One time password</label>
-            <input type="password" id="ShoonyaOneTimePassword" class="form-control" v-model="shoonyaOneTimePassword"
-              placeholder="Enter One time password">
+        <form @submit.prevent="handleShoonyaLogin" class="">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
+              Shoonya Login
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="handleShoonyaLogin">
-            Login
-          </button>
-        </div>
+          <div class="modal-body">
+            <div class="col-12">
+              <div class="mb-2">
+                <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
+                <input type="text" id="ShoonyaBrokerUserId" class="form-control"
+                  :value="ManageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
+              </div>
+
+              <div class="mb-2">
+                <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
+                <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
+                  placeholder="Enter Broker Password">
+              </div>
+
+              <div class="mb-2">
+                <label for="ShoonyaOneTimePassword" class="form-label mb-0">TOTP</label>
+                <input type="password" id="ShoonyaOneTimePassword" class="form-control" v-model="shoonyaOneTimePassword"
+                  placeholder="Enter Time Based OTP">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="handleShoonyaLogin">
+              Login
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
