@@ -265,3 +265,21 @@ export const allSymbolsData = reactive({
   SENSEX: { expiryDates: [], callStrikes: [], putStrikes: [] },
   BANKEX: { expiryDates: [], callStrikes: [], putStrikes: [] }
 })
+
+export const API_TOKEN = ref(''); // Not used right now
+export const FLATTRADE_API_KEY = ref('');
+export const FLATTRADE_API_SECRET = ref('');
+export const FLATTRADE_CLIENT_ID = ref('');
+export const FLATTRADE_API_TOKEN = ref('');
+export const SHOONYA_API_KEY = ref('');
+export const SHOONYA_CLIENT_ID = ref('');
+export const SHOONYA_API_TOKEN = ref('');
+export const PAPERTRADING_API_KEY = ref('logicGate'); // Default value for PaperTrading
+export const PAPERTRADING_CLIENT_ID = ref('Sp0ck'); // Default value for PaperTrading
+export const flattradeReqCode = ref('');
+export const shoonyaBrokerUserId = ref('');
+export const shoonyaBrokerPassword = ref('');
+export const shoonyaOneTimePassword = ref('');
+export const errorMessage = ref('');
+export const statusMessage = ref('');
+export const userTriggeredTokenGeneration = ref(false); // Flag to track user-triggered token generation

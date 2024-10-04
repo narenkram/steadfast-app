@@ -1,92 +1,49 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import axios from 'axios';
+import { onMounted } from 'vue';
 import NavigationComponent from '../components/NavigationComponent.vue';
-import { validateToken, checkAllTokens, getBrokerStatus, tokenStatus } from '../utils/brokerTokenValidator';
+import { checkAllTokens } from '../utils/brokerTokenValidator';
+import { useTradeView } from '@/composables/useTradeView';
 
-const API_TOKEN = ref(''); // Not used right now
-const FLATTRADE_API_KEY = ref('');
-const FLATTRADE_API_SECRET = ref('');
-const FLATTRADE_CLIENT_ID = ref('');
-const FLATTRADE_API_TOKEN = ref('');
-const SHOONYA_API_KEY = ref('');
-const SHOONYA_CLIENT_ID = ref('');
-const SHOONYA_API_TOKEN = ref('');
-const PAPERTRADING_API_KEY = ref('logicGate'); // Default value for PaperTrading
-const PAPERTRADING_CLIENT_ID = ref('Sp0ck'); // Default value for PaperTrading
+const {
+  // Methods
+  selectedBrokerToDelete,
+  copyToClipboard,
+  generateToken,
+  getStatus,
+  maskTokenSecret,
+  handleShoonyaLogin,
+  deleteBroker,
+  ManageBrokerMaskClientId,
 
-const flattradeReqCode = ref('');
-const shoonyaBrokerUserId = ref('');
-const shoonyaBrokerPassword = ref('');
-const shoonyaOneTimePassword = ref('');
 
-const token = ref('');
-const errorMessage = ref('');
-const statusMessage = ref('');
-const userTriggeredTokenGeneration = ref(false); // Flag to track user-triggered token generation
+  // Computed properties
 
-const brokers = computed(() => {
-  const brokersArray = [];
 
-  if (FLATTRADE_CLIENT_ID.value && FLATTRADE_API_KEY.value && FLATTRADE_API_SECRET.value) {
-    brokersArray.push({
-      id: 'Flattrade',
-      brokerName: 'Flattrade',
-      brokerClientId: FLATTRADE_CLIENT_ID.value,
-      apiKey: FLATTRADE_API_KEY.value,
-      apiSecret: FLATTRADE_API_SECRET.value,
-      apiToken: FLATTRADE_API_TOKEN.value
-    });
-  }
 
-  if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
-    brokersArray.push({
-      id: 'Shoonya',
-      brokerName: 'Shoonya',
-      brokerClientId: SHOONYA_CLIENT_ID.value,
-      apiKey: SHOONYA_API_KEY.value,
-      apiToken: SHOONYA_API_TOKEN.value
-    });
-  }
+  // Reactive variables
+  API_TOKEN, // Not used right now
+  FLATTRADE_API_KEY,
+  FLATTRADE_API_SECRET,
+  FLATTRADE_CLIENT_ID,
+  FLATTRADE_API_TOKEN,
+  SHOONYA_API_KEY,
+  SHOONYA_CLIENT_ID,
+  SHOONYA_API_TOKEN,
+  PAPERTRADING_API_KEY, // Default value for PaperTrading
+  PAPERTRADING_CLIENT_ID, // Default value for PaperTrading
+  flattradeReqCode,
+  shoonyaBrokerPassword,
+  shoonyaOneTimePassword,
+  errorMessage,
+  statusMessage,
+  brokers,
+  selectedBrokerForPaper,
 
-  // Add PaperTrading broker
-  if (PAPERTRADING_CLIENT_ID.value && PAPERTRADING_API_KEY.value) {
-    brokersArray.push({
-      id: 'PaperTrading',
-      brokerName: 'PaperTrading',
-      brokerClientId: PAPERTRADING_CLIENT_ID.value,
-      apiKey: PAPERTRADING_API_KEY.value,
-      apiToken: '' // PaperTrading does not have an API token
-    });
-  }
 
-  return brokersArray;
-});
+} = useTradeView();
 
-const selectedBrokerToDelete = ref(null); // Store the broker to be deleted
-const selectedBrokerForPaper = ref(null); // Add this line to store the selected broker for PaperTrading
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
-    statusMessage.value = 'Token copied to clipboard';
-    setTimeout(() => {
-      statusMessage.value = '';
-    }, 3000);
-  }, (err) => {
-    console.error('Could not copy text: ', err);
-    errorMessage.value = 'Failed to copy token';
-    clearErrorMessage();
-  });
-};
-const saveSelectedBrokerForPaper = () => {
-  if (selectedBrokerForPaper.value) {
-    localStorage.setItem('selectedBrokerForPaper', selectedBrokerForPaper.value);
-    toastMessage.value = 'Selected broker for paper trading saved';
-    showToast.value = true;
-  } else {
-    toastMessage.value = 'Please select a broker for paper trading';
-    showToast.value = true;
-  }
-};
+
+
 onMounted(() => {
   // Retrieve Flattrade details
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
@@ -133,285 +90,15 @@ onMounted(() => {
   });
   checkAllTokens();
 });
-// Watch for changes in selectedBrokerForPaper and update localStorage
-watch(selectedBrokerForPaper, (newBroker) => {
-  if (newBroker) {
-    localStorage.setItem('selectedBrokerForPaper', JSON.stringify(newBroker));
-    statusMessage.value = 'Selected broker for paper trading saved';
-    setTimeout(() => {
-      statusMessage.value = '';
-    }, 3000);
-  } else {
-    localStorage.removeItem('selectedBrokerForPaper');
-  }
-});
 
-// Watch for changes in FLATTRADE_API_TOKEN and update localStorage
-watch(FLATTRADE_API_TOKEN, (newToken) => {
-  if (newToken) {
-    localStorage.setItem('FLATTRADE_API_TOKEN', newToken);
-    validateToken('Flattrade');
-  } else {
-    localStorage.removeItem('FLATTRADE_API_TOKEN');
-  }
-});
-// Watch for changes in SHOONYA_API_TOKEN and update localStorage
-watch(SHOONYA_API_TOKEN, (newToken) => {
-  if (newToken) {
-    localStorage.setItem('SHOONYA_API_TOKEN', newToken);
-    validateToken('Shoonya');
-  } else {
-    localStorage.removeItem('SHOONYA_API_TOKEN');
-  }
-});
 
-const openFlattradeAuthUrl = () => {
-  statusMessage.value = 'Waiting for broker auth to complete...';
 
-  localStorage.setItem('statusMessage', statusMessage.value);
-
-  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
-  const storedFlattradeApiKey = flattradeDetails.apiKey;
-
-  if (!storedFlattradeApiKey) {
-    errorMessage.value = 'API key is missing';
-    clearErrorMessage();
-    return;
-  }
-
-  const authUrl = `https://auth.flattrade.in/?app_key=${storedFlattradeApiKey}`;
-  window.open(authUrl, '_blank');
-
-  // Clear status message after 2 minutes if token generation doesn't complete
-  setTimeout(() => {
-    if (statusMessage.value === 'Waiting for broker auth to complete...') {
-      statusMessage.value = '';
-      localStorage.removeItem('statusMessage');
-    }
-  }, 120000); // 2 minutes
-};
-
-const clearErrorMessage = () => {
-  setTimeout(() => {
-    errorMessage.value = '';
-  }, 5000); // Clear error message after 5 seconds
-};
-
-const generateToken = async (broker) => {
-  userTriggeredTokenGeneration.value = true; // Set the flag when user triggers token generation
-
-  if (!broker) {
-    errorMessage.value = 'Broker information is missing';
-    clearErrorMessage();
-    return;
-  }
-
-  if (broker.brokerName === 'Flattrade') {
-    openFlattradeAuthUrl();
-    statusMessage.value = 'Waiting for flattradeReqCode...';
-    return;
-  }
-
-  if (!flattradeReqCode.value) {
-    errorMessage.value = 'Request code is missing';
-    clearErrorMessage();
-    return;
-  }
-};
-
-watch(flattradeReqCode, async (newCode) => {
-  if (newCode && userTriggeredTokenGeneration.value) {
-    statusMessage.value = `Received flattradeReqCode: ${newCode}`;
-
-    const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
-    const storedApiKey = flattradeDetails.apiKey;
-    const storedApiSecret = flattradeDetails.apiSecret;
-
-    if (!storedApiKey || !storedApiSecret) {
-      errorMessage.value = 'API key or secret is missing';
-      clearErrorMessage();
-      return;
-    }
-
-    const api_secret = storedApiKey + newCode + storedApiSecret;
-    const hashedSecret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(api_secret));
-    const apiSecretHex = Array.from(new Uint8Array(hashedSecret)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const payload = {
-      api_key: storedApiKey,
-      request_code: newCode,
-      api_secret: apiSecretHex,
-    };
-
-    try {
-      const res = await axios.post('/flattradeApi/trade/apitoken', payload);
-      const token = res.data.token;
-      if (!token) {
-        errorMessage.value = "Token generation failed";
-        clearErrorMessage();
-      } else {
-        FLATTRADE_API_TOKEN.value = token;
-        errorMessage.value = '';
-        statusMessage.value = `Token generated successfully: ${token}`;
-        localStorage.removeItem('statusMessage'); // Clear the stored status message
-        console.log('Token generated successfully:', token);
-
-        // Clear success message after 5 seconds
-        setTimeout(() => {
-          statusMessage.value = '';
-        }, 5000);
-      }
-    } catch (error) {
-      errorMessage.value = 'Error generating token: ' + error.message;
-      clearErrorMessage();
-      console.error('Error generating token:', error);
-    }
-  }
-});
-
-function maskBrokerClientId(brokerClientId) {
-
-  if (!brokerClientId) return brokerClientId; // Ensure brokerClientId is defined and not a placeholder
-
-  const length = brokerClientId.length;
-  if (length <= 2) return brokerClientId; // If the length is 2 or less, return as is
-
-  const maskLength = Math.max(1, Math.floor(length / 2)); // Mask at least 1 character, up to half the length
-  const startUnmaskedLength = Math.ceil((length - maskLength) / 2);
-  const endUnmaskedLength = length - startUnmaskedLength - maskLength;
-
-  const firstPart = brokerClientId.slice(0, startUnmaskedLength);
-  const lastPart = brokerClientId.slice(-endUnmaskedLength);
-  const middleMask = '*'.repeat(maskLength); // Mask middle portion dynamically
-
-  return `${firstPart}${middleMask}${lastPart}`;
-}
-
-const getStatus = (broker) => {
-  if (!broker || !broker.brokerName) {
-    return { status: 'Unknown', statusClass: 'bg-secondary' };
-  }
-
-  const status = getBrokerStatus(broker.brokerName);
-  let statusText = 'Activated';
-  let statusClass = 'bg-success';
-
-  if (status === 'Token missing') {
-    statusText = `Token missing, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`;
-    statusClass = 'bg-warning text-dark';
-  } else if (status === 'expired') {
-    statusText = `Token Expired, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`;
-    statusClass = 'bg-warning text-dark';
-  }
-
-  return { status: statusText, statusClass };
-};
-
-function maskTokenSecret(apiSecret) {
-
-  if (!apiSecret || apiSecret.length < 10) return apiSecret; // Ensure there are enough characters to mask and not a placeholder
-
-  const start = apiSecret.slice(0, 3);
-  const end = apiSecret.slice(-3);
-  return `${start}******${end}`;
-}
-
-const handleShoonyaLogin = async () => {
-  try {
-    const encoder = new TextEncoder();
-
-    // Retrieve Shoonya details from localStorage
-    const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
-    const clientId = shoonyaDetails.clientId;
-    const apiKey = shoonyaDetails.apiKey;
-
-    if (!clientId || !apiKey) {
-      throw new Error('Shoonya client ID or API key is missing');
-    }
-
-    // Hash the password
-    const pwdBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(shoonyaBrokerPassword.value));
-    const pwd = Array.from(new Uint8Array(pwdBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-    // Create and hash the appkey
-    const appkeyRaw = `${SHOONYA_CLIENT_ID.value}|${apiKey}`;
-    const appkeyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(appkeyRaw));
-    const appkey = Array.from(new Uint8Array(appkeyBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const jData = {
-      apkversion: "1.0.0",
-      uid: SHOONYA_CLIENT_ID.value,
-      pwd: pwd,
-      factor2: shoonyaOneTimePassword.value,
-      vc: `${clientId}_U`,
-      appkey: appkey,
-      imei: "mac",
-      source: "API"
-    };
-
-    const jDataString = JSON.stringify(jData);
-    const payload = `jData=${jDataString}&jKey=${apiKey}`;
-
-    const response = await axios.post('/shoonyaApi/NorenWClientTP/QuickAuth', payload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-
-    if (response.data.stat === 'Ok') {
-      SHOONYA_API_TOKEN.value = response.data.susertoken;
-      localStorage.setItem('SHOONYA_API_TOKEN', SHOONYA_API_TOKEN.value);
-      statusMessage.value = 'Shoonya login successful';
-
-      // Clear the form fields
-      shoonyaBrokerUserId.value = '';
-      shoonyaBrokerPassword.value = '';
-      shoonyaOneTimePassword.value = '';
-      // Clear the status message after 5 seconds
-      setTimeout(() => {
-        statusMessage.value = '';
-      }, 5000);
-
-    } else {
-      throw new Error(response.data.emsg || 'Login failed');
-    }
-  } catch (error) {
-    errorMessage.value = `Shoonya login error: ${error.message}`;
-    clearErrorMessage();
-  }
-};
-
-const deleteBroker = (broker) => {
-  // Remove broker details from localStorage
-  localStorage.removeItem(`broker_${broker.brokerName}`);
-
-  // Remove API token from localStorage if it exists
-  if (broker.brokerName === 'Flattrade') {
-    localStorage.removeItem('FLATTRADE_API_TOKEN');
-    FLATTRADE_API_TOKEN.value = '';
-    FLATTRADE_API_KEY.value = '';
-    FLATTRADE_API_SECRET.value = '';
-    FLATTRADE_CLIENT_ID.value = '';
-  } else if (broker.brokerName === 'Shoonya') {
-    localStorage.removeItem('SHOONYA_API_TOKEN');
-    SHOONYA_API_TOKEN.value = '';
-    SHOONYA_API_KEY.value = '';
-    SHOONYA_CLIENT_ID.value = '';
-  } else if (broker.brokerName === 'PaperTrading') {
-    localStorage.removeItem('PAPERTRADING_API_TOKEN');
-    PAPERTRADING_API_KEY.value = '';
-    PAPERTRADING_CLIENT_ID.value = '';
-  }
-
-  // Update the brokers computed property
-  // This will automatically update the table
-};
 
 </script>
 
 <template>
   <NavigationComponent />
-  
+
   <section class="row pt-5 pb-3">
     <div class="col-8 text-start">
       <RouterLink to="/add-broker">
@@ -419,7 +106,7 @@ const deleteBroker = (broker) => {
       </RouterLink>
     </div>
     <div class="col-4 text-end">
-     
+
     </div>
   </section>
 
@@ -444,7 +131,7 @@ const deleteBroker = (broker) => {
           <tr v-else v-for="broker in brokers" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
             <td>
-              <span class="badge bg-primary">{{ maskBrokerClientId(broker.brokerClientId) }}</span>
+              <span class="badge bg-primary">{{ ManageBrokerMaskClientId(broker.brokerClientId) }}</span>
             </td>
             <td>
               <div class="d-flex align-items-center">
@@ -522,7 +209,7 @@ const deleteBroker = (broker) => {
           <div class="col-12">
             <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
             <input type="text" id="ShoonyaBrokerUserId" class="form-control"
-              :value="maskBrokerClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
+              :value="ManageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
 
             <label for="ShoonyaBrokerPassword" class="form-label mb-0">Broker Password</label>
             <input type="password" id="ShoonyaBrokerPassword" class="form-control" v-model="shoonyaBrokerPassword"
