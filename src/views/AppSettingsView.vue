@@ -295,7 +295,7 @@
 </template>
 
 <script setup>
-import NavigationComponent from '../components/NavigationComponent.vue'
+import NavigationComponent from '@/components/NavigationComponent.vue'
 import { useTradeView } from '@/composables/useTradingSystem';
 const {
   // Methods

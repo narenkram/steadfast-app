@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import NavigationComponent from '../components/NavigationComponent.vue'
+import NavigationComponent from '@/components/NavigationComponent.vue'
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import {

@@ -16,5 +16,5 @@
 </template>
 
 <script setup>
-import NavigationComponent from '../components/NavigationComponent.vue'
+import NavigationComponent from '@/components/NavigationComponent.vue'
 </script>
