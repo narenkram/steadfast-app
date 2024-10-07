@@ -85,7 +85,7 @@ import {
   bankexPrice,
   socket,
   ltpCallbacks
-} from '../composables/useGlobalState';
+} from '@/stores/globalStore';
 
 const optionChainData = ref([]);
 const spotPrice = ref(0);
