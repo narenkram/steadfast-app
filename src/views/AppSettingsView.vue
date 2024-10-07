@@ -296,7 +296,7 @@
 
 <script setup>
 import NavigationComponent from '../components/NavigationComponent.vue'
-import { useTradeView } from '@/composables/useTradeView';
+import { useTradeView } from '@/composables/useTradingSystem';
 const {
   // Methods
   toggleAdditionalSymbols,

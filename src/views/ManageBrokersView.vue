@@ -2,7 +2,7 @@
 import { onMounted } from 'vue';
 import NavigationComponent from '../components/NavigationComponent.vue';
 import { checkAllTokens } from '../utils/brokerTokenValidator';
-import { useTradeView } from '@/composables/useTradeView';
+import { useTradeView } from '@/composables/useTradingSystem';
 
 const {
   // Methods

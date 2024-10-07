@@ -1749,7 +1749,7 @@
 <script setup>
 import NavigationComponent from '../components/NavigationComponent.vue'
 import { onMounted, onBeforeUnmount } from 'vue';
-import { useTradeView } from '@/composables/useTradeView';
+import { useTradeView } from '@/composables/useTradingSystem';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import ToastAlert from '../components/ToastAlertComponent.vue';
 
