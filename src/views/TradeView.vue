@@ -1751,7 +1751,7 @@ import NavigationComponent from '../components/NavigationComponent.vue'
 import { onMounted, onBeforeUnmount } from 'vue';
 import { useTradeView } from '@/composables/useTradeView';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
-import ToastAlert from '../components/ToastAlert.vue';
+import ToastAlert from '../components/ToastAlertComponent.vue';
 
 
 const {
