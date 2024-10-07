@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TradeView from '../views/TradeView.vue'
-import ManageBrokers from '../views/ManageBrokersView.vue'
-import AddBroker from '../views/AddBrokerView.vue'
-import Flattrade_Redirect from '../views/BrokerRedirect/Flattrade_Redirect.vue'
-import HomeView from '../views/HomeView.vue'
-import OptionChainView from '../views/OptionChainView.vue'
-import AppSettingsView from '../views/AppSettingsView.vue'
-import ParallelCopyTradeView from '../views/ParallelCopyTradeView.vue'
+import TradeView from '@/views/TradeView.vue'
+import ManageBrokers from '@/views/ManageBrokersView.vue'
+import AddBroker from '@/views/AddBrokerView.vue'
+import Flattrade_Redirect from '@/views/BrokerRedirect/Flattrade_Redirect.vue'
+import HomeView from '@/views/HomeView.vue'
+import OptionChainView from '@/views/OptionChainView.vue'
+import AppSettingsView from '@/views/AppSettingsView.vue'
+import ParallelCopyTradeView from '@/views/ParallelCopyTradeView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
