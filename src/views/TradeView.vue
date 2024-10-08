@@ -795,6 +795,7 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
@@ -848,6 +849,7 @@
                           </span>
                       </div>
                     </td>
+                    <td>{{ flattradePosition.netavgprc }}</td>
                     <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- SL & TSL -->
@@ -956,6 +958,7 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
@@ -1008,6 +1011,7 @@
                           </span>
                       </div>
                     </td>
+                    <td>{{ shoonyaPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
                     <td v-if="shoonyaPosition.netqty != 0">
                       <!-- SL & TSL -->
@@ -1116,6 +1120,7 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
+                  <th scope="col">Net Avg</th>
                   <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
@@ -1166,6 +1171,7 @@
                           </span>
                       </div>
                     </td>
+                    <td>{{ paperPosition.netavgprc }}</td>
                     <td>{{ positionLTPs[paperPosition.tsym] || '-' }}</td>
                     <td v-if="paperPosition.netqty != 0">
                       <!-- SL & TSL -->
