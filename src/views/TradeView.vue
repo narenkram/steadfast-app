@@ -1728,17 +1728,13 @@
         </div>
         <div class="modal-body">
           <div class="bg-danger text-white p-3">
-            <h4>On Event days, option premiums can be very volatile.</h4>
-            <p class="blockquote">
-              It's highly recommended to avoid trading on event days as market volatility can lead to
-              significant losses.
-            </p>
+            <h4>Watch out for events!</h4>
           </div>
-          <!-- <div class="iframe-container">
+          <div class="iframe-container">
             <iframe id="events-iframe"
               src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timeselector&countries=14&calType=week&timeZone=23&lang=1"
               frameborder="0" allowtransparency="true"></iframe>
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
