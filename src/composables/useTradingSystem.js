@@ -3657,6 +3657,37 @@ export function useTradeView() {
     // Update the brokers computed property
     // This will automatically update the table
   }
+
+  const debouncedFetchData = debounce(async () => {
+    try {
+      if (activeTab.value === 'positions') {
+        if (selectedBroker.value?.brokerName === 'Flattrade') {
+          activeFetchFunction.value = 'fetchFlattradePositions'
+          await fetchFlattradePositions()
+        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+          activeFetchFunction.value = 'fetchShoonyaPositions'
+          await fetchShoonyaPositions()
+        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+          activeFetchFunction.value = 'fetchPaperTradingPositions'
+          await fetchPaperTradingPositions()
+        }
+      } else if (activeTab.value === 'trades') {
+        if (selectedBroker.value?.brokerName === 'Flattrade') {
+          activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook'
+          await fetchFlattradeOrdersTradesBook()
+        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+          activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook'
+          await fetchShoonyaOrdersTradesBook()
+        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+          activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook'
+          await fetchPaperTradingOrdersTradesBook()
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      // Handle the error appropriately (e.g., show an error message to the user)
+    }
+  })
   // ... (add all other methods here)
 
   // Watchers
@@ -3706,40 +3737,26 @@ export function useTradeView() {
   })
   watch(selectedBroker, async (newBroker) => {
     if (newBroker) {
-      selectedOrderType.value = orderTypes.value[0]
-      previousOrderType.value = orderTypes.value[0]
-      selectedProductType.value = getProductTypeValue(productTypes.value[1]) // Default to 'Margin' or 'M'
-      await fetchFundLimit()
-      updateExchangeSymbols()
-      setDefaultExchangeAndMasterSymbol()
-      await fetchTradingData()
-      setDefaultExpiry()
+      try {
+        selectedOrderType.value = orderTypes.value[0]
+        previousOrderType.value = orderTypes.value[0]
+        selectedProductType.value = getProductTypeValue(productTypes.value[1]) // Default to 'Margin' or 'M'
+        await fetchFundLimit()
+        updateExchangeSymbols()
+        setDefaultExchangeAndMasterSymbol()
+        await fetchTradingData()
+        setDefaultExpiry()
 
-      // Update the table based on the active tab
-      if (activeTab.value === 'positions') {
-        if (newBroker.brokerName === 'Flattrade') {
-          activeFetchFunction.value = 'fetchFlattradePositions'
-          await fetchFlattradePositions()
-        } else if (newBroker.brokerName === 'Shoonya') {
-          activeFetchFunction.value = 'fetchShoonyaPositions'
-          await fetchShoonyaPositions()
-        } else if (newBroker.brokerName === 'PaperTrading') {
-          activeFetchFunction.value = 'fetchPaperTradingPositions'
-          await fetchPaperTradingPositions()
-        }
-      } else if (activeTab.value === 'trades') {
-        if (newBroker.brokerName === 'Flattrade') {
-          activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook'
-          await fetchFlattradeOrdersTradesBook()
-        } else if (newBroker.brokerName === 'Shoonya') {
-          activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook'
-          await fetchShoonyaOrdersTradesBook()
-        } else if (newBroker.brokerName === 'PaperTrading') {
-          activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook'
-          await fetchPaperTradingOrdersTradesBook()
-        }
+        // Update the table based on the active tab
+        debouncedFetchData()
+      } catch (error) {
+        console.error('Error updating broker data:', error)
+        // Handle the error appropriately
       }
     }
+  })
+  watch(activeTab, () => {
+    debouncedFetchData()
   })
   // Watcher for selectedExpiry to repopulate strike prices
   watch(selectedExpiry, async (newExpiry) => {
@@ -3833,26 +3850,6 @@ export function useTradeView() {
   })
   watch(selectedOrderType, (newValue, oldValue) => {
     previousOrderType.value = oldValue
-  })
-  watch(activeTab, async (newTab) => {
-    // Update activeFetchFunction based on the new broker
-    if (newTab === 'positions') {
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        activeFetchFunction.value = 'fetchFlattradePositions'
-        await fetchFlattradePositions()
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        activeFetchFunction.value = 'fetchShoonyaPositions'
-        await fetchShoonyaPositions()
-      }
-    } else if (newTab === 'trades') {
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook'
-        await fetchFlattradeOrdersTradesBook()
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook'
-        await fetchShoonyaOrdersTradesBook()
-      }
-    }
   })
   // Watcher to update localStorage when enableHotKeys changes
   watch(enableHotKeys, (newValue) => {
