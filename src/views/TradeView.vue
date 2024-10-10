@@ -346,7 +346,7 @@
               <div class="text-muted">Security ID: {{ selectedCallStrike.securityId }}</div>
             </div>
             <!-- Call OHLC Values -->
-            <div class="d-flex" v-if="showOHLCValues">
+            <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ callOpenPrice }}</span>
               <span class="text-success">H: {{ callHighPrice }}</span>
               <span class="text-danger">L: {{ callLowPrice }}</span>
@@ -457,7 +457,7 @@
               }">{{ bankexPrice }}</b>
             </p>
             <!-- Master OHLC Values -->
-            <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
+            <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ masterOpenPrice }}</span>
               <span class="text-success">H: {{ masterHighPrice }}</span>
               <span class="text-danger">L: {{ masterLowPrice }}</span>
@@ -508,7 +508,7 @@
               <div class="text-muted">Security ID: {{ selectedPutStrike.securityId }}</div>
             </div>
             <!-- Put OHLC Values -->
-            <div class="d-flex w-100 justify-content-around" v-if="showOHLCValues">
+            <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ putOpenPrice }}</span>
               <span class="text-success">H: {{ putHighPrice }}</span>
               <span class="text-danger">L: {{ putLowPrice }}</span>
