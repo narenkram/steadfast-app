@@ -3213,19 +3213,46 @@ export function useTradeView() {
     let stoplossPrice
 
     try {
-      if (type === 'trailing') {
-        stoplossPrice = isLongPosition ? ltp - stoplossValueNum : ltp + stoplossValueNum
-        trailingStoplosses.value[position.tsym] = parseFloat(stoplossPrice.toFixed(2))
-        stoplosses.value[position.tsym] = null
-      } else {
-        stoplossPrice = isLongPosition ? ltp - stoplossValueNum : ltp + stoplossValueNum
-        stoplosses.value[position.tsym] = parseFloat(stoplossPrice.toFixed(2))
-        trailingStoplosses.value[position.tsym] = null
+      switch (type) {
+        case 'trailing':
+          stoplossPrice = isLongPosition ? ltp - stoplossValueNum : ltp + stoplossValueNum
+          trailingStoplosses.value[position.tsym] = parseFloat(stoplossPrice.toFixed(2))
+          stoplosses.value[position.tsym] = null
+          console.log(`TSL set for ${position.tsym}: ${stoplossPrice.toFixed(2)}`)
+          break
+        case 'static':
+          stoplossPrice = isLongPosition ? ltp - stoplossValueNum : ltp + stoplossValueNum
+          stoplosses.value[position.tsym] = parseFloat(stoplossPrice.toFixed(2))
+          trailingStoplosses.value[position.tsym] = null
+          console.log(`SL set for ${position.tsym}: ${stoplossPrice.toFixed(2)}`)
+          break
+        case 'convert_to_tsl':
+          const existingSL = stoplosses.value[position.tsym]
+          if (existingSL !== null) {
+            trailingStoplosses.value[position.tsym] = existingSL
+            stoplosses.value[position.tsym] = null
+            console.log(`Converted SL to TSL for ${position.tsym}: ${existingSL.toFixed(2)}`)
+          } else {
+            console.error(`No existing SL to convert for ${position.tsym}`)
+            return
+          }
+          break
+        case 'convert_to_sl':
+          const existingTSL = trailingStoplosses.value[position.tsym]
+          if (existingTSL !== null) {
+            stoplosses.value[position.tsym] = existingTSL
+            trailingStoplosses.value[position.tsym] = null
+            console.log(`Converted TSL to SL for ${position.tsym}: ${existingTSL.toFixed(2)}`)
+          } else {
+            console.error(`No existing TSL to convert for ${position.tsym}`)
+            return
+          }
+          break
+        default:
+          console.error(`Unknown stoploss type: ${type}`)
+          return
       }
       tslHitPositions.delete(position.tsym)
-      console.log(
-        `${type === 'trailing' ? 'TSL' : 'SL'} set for ${position.tsym}: ${stoplossPrice.toFixed(2)}`
-      )
     } catch (error) {
       console.error(`Error setting ${type} stoploss for ${position.tsym}:`, error)
     }
