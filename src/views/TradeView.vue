@@ -833,7 +833,7 @@
                       {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }} </td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- SL & TSL -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="trailingStoplosses[flattradePosition.tsym] !== null">
                           <div class="d-flex align-items-center">
                             <span class="me-2">TSL:</span>
@@ -857,7 +857,7 @@
                         </div>
                         <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group" style="width: 160px;">
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
                         <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
                           @click="setStoploss(flattradePosition, trailingStoplosses[flattradePosition.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
@@ -875,11 +875,11 @@
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
                     <td class="fw-bold">{{ positionLTPs[flattradePosition.tsym] }}</td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- TG -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="targets[flattradePosition.tsym] !== null">
                           <div class="btn-group" role="group">
                             <button class="btn btn-sm btn-outline-danger" @click="decreaseTarget(flattradePosition)">
@@ -895,7 +895,7 @@
                         </div>
                         <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group" style="width: 160px;">
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
                         <button class="btn btn-sm btn-outline" v-if="targets[flattradePosition.tsym] === null"
                           @click="setTarget(flattradePosition)">
                           ➕
@@ -906,7 +906,7 @@
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
                     <td>{{ flattradePosition.prd }}</td>
                     <td class="text-success">{{ flattradePosition.totbuyavgprc }}</td>
                     <td class="text-primary">{{ flattradePosition.netavgprc }}</td>
