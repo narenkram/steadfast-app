@@ -794,17 +794,23 @@
             <table class="table table-hover">
               <thead>
                 <tr>
+                  <th scope="col">Select</th>
                   <th scope="col">Position</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
-                  <th scope="col">Realized</th>
-                  <th scope="col">Unrealized</th>
-                  <th scope="col">Select</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
+                          v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
+                          :disabled="flattradePosition.netqty == 0" />
+                      </label>
+                    </td>
                     <td>
                       <div class="Position__instrument">
                         {{ flattradePosition.tsym }}
@@ -823,13 +829,9 @@
                         </div>
 
                         <div class="Position__item">
-
                           <small class="Position__item-label">Side</small>
-                          <div class="Position__item-value" :class="{
-                            'text-success': flattradePosition.netqty > 0,
-                            'text-danger': flattradePosition.netqty < 0,
-                            'text-secondary': flattradePosition.netqty === 0
-                          }">
+                          <div class="Position__item-value"
+                            :class="{ 'text-success': flattradePosition.netqty > 0, 'text-danger': flattradePosition.netqty < 0 }">
                             {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }}
                               </div>
                           </div>
@@ -855,8 +857,21 @@
                           <div class="Position__item">
                             <small class="Position__item-label">LTP</small>
                             <div class="Position__item-value text-primary">
-                              {{ positionLTPs[flattradePosition.tsym] ||
-                                '-' }}
+                              {{ positionLTPs[flattradePosition.tsym] }}
+                            </div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Realized</small>
+                            <div class="Position__item-value text-primary"
+                              :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
+                              {{ flattradePosition.rpnl }}
+                            </div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Unrealized</small>
+                            <div class="Position__item-value text-primary"
+                              :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
+                              {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                             </div>
                           </div>
                         </div>
@@ -936,22 +951,7 @@
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
-                    <td
-                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
-                      {{ flattradePosition.rpnl }}
-                    </td>
-                    <td
-                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
-                      {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
-                    </td>
-                    <td class="position-relative">
-                      <label
-                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-                        <input type="checkbox" :id="'flattradePosition-' + flattradePosition.tsym"
-                          v-model="selectedFlattradePositionsSet" :value="flattradePosition.tsym"
-                          :disabled="flattradePosition.netqty == 0" />
-                      </label>
-                    </td>
+
                   </tr>
                 </template>
                 <tr v-else>

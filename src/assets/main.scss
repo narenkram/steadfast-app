@@ -365,14 +365,15 @@ input:focus {
   text-align: center;
   border-radius: 0.25rem;
   overflow: hidden;
+  background-color: var(--bs-light);
 }
 .Position__item-container {
   display: flex;
+  justify-content: space-between;
 }
 
 .Position__item-label {
   font-size: 0.8rem;
-  background-color: var(--bs-light);
   border-bottom: 1px solid var(--bs-border-color);
   padding: 0.1rem 0.5rem;
   width: inherit;
@@ -384,6 +385,7 @@ input:focus {
   background-color: var(--bs-light);
   text-align: center;
   width: 100%;
+  padding: 0.1rem 0.5rem;
 }
 
 .Position__instrument {
