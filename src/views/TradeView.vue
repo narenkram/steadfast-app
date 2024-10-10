@@ -879,7 +879,12 @@
                         <small
                           v-if="trailingStoplosses[flattradePosition.tsym] === null && stoplosses[flattradePosition.tsym] === null"
                           @click="setStoploss(flattradePosition, 'static')">
-                          Set SL
+                          ➕
+                        </small>
+                        <small
+                          v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
+                          @click="removeStoploss(flattradePosition)">
+                          ❌
                         </small>
                       </div>
                     </td>
