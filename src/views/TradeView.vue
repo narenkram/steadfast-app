@@ -871,21 +871,21 @@
                         <div v-else>-</div>
                       </div>
                       <div class="btn-group mt-2" role="group" style="width: 160px;">
-                        <small
+                        <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
                           @click="setStoploss(flattradePosition, trailingStoplosses[flattradePosition.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
                           {{ trailingStoplosses[flattradePosition.tsym] !== null ? 'S' : 'T' }}
-                        </small>
-                        <small
+                        </button>
+                        <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[flattradePosition.tsym] === null && stoplosses[flattradePosition.tsym] === null"
                           @click="setStoploss(flattradePosition, 'static')">
                           ➕
-                        </small>
-                        <small
+                        </button>
+                        <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
                           @click="removeStoploss(flattradePosition)">
                           ❌
-                        </small>
+                        </button>
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
@@ -908,12 +908,14 @@
                         <div v-else>-</div>
                       </div>
                       <div class="btn-group mt-2" role="group" style="width: 160px;">
-                        <small v-if="targets[flattradePosition.tsym] === null" @click="setTarget(flattradePosition)">
+                        <button class="btn btn-sm btn-outline" v-if="targets[flattradePosition.tsym] === null"
+                          @click="setTarget(flattradePosition)">
                           ➕
-                        </small>
-                        <small v-if="targets[flattradePosition.tsym] !== null" @click="removeTarget(flattradePosition)">
+                        </button>
+                        <button class="btn btn-sm btn-outline" v-if="targets[flattradePosition.tsym] !== null"
+                          @click="removeTarget(flattradePosition)">
                           ❌
-                        </small>
+                        </button>
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
