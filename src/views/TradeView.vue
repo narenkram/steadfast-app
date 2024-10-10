@@ -795,8 +795,6 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
-                  <th scope="col">Net Avg</th>
-                  <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
                   <th scope="col">Realized</th>
@@ -808,49 +806,61 @@
                 <template v-if="flatTradePositionBook.length">
                   <tr v-for="flattradePosition in sortedPositions" :key="flattradePosition.tsym">
                     <td>
-                      <div class="d-flex">
+                      <div class="Position__instrument">
                         {{ flattradePosition.tsym }}
                       </div>
-                      <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Quantity</small>
-                          <span :class="[
-                            'fs-6',
+                      <div class="Position__item-container mt-2">
+                        <div class="Position__item">
+                          <small class="Position__item-label">Quantity</small>
+                          <div :class="[
+                            'Position__item-value',
                             flattradePosition.netqty > 0 ? 'text-success' :
                               flattradePosition.netqty < 0 ? 'text-danger' :
                                 'text-secondary'
                           ]">
                             {{ flattradePosition.netqty }}
-                          </span>
-                        </span>
+                          </div>
+                        </div>
 
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Side</small>
-                          <span class="fs-6" :class="{
+                        <div class="Position__item">
+
+                          <small class="Position__item-label">Side</small>
+                          <div class="Position__item-value" :class="{
                             'text-success': flattradePosition.netqty > 0,
                             'text-danger': flattradePosition.netqty < 0,
                             'text-secondary': flattradePosition.netqty === 0
                           }">
                             {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }}
-                              </span>
-                          </span>
+                              </div>
+                          </div>
 
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Type</small>
-                            <span class="fs-6">{{ flattradePosition.prd }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Buy Avg</small>
-                            <span class="fs-6 text-success">₹{{ flattradePosition.totbuyavgprc }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Sell Avg</small>
-                            <span class="fs-6 text-danger">₹{{ flattradePosition.totsellavgprc }}</span>
-                          </span>
-                      </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Type</small>
+                            <div class="Position__item-value">{{ flattradePosition.prd }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Buy Avg</small>
+                            <div class="Position__item-value text-success">{{ flattradePosition.totbuyavgprc }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Net Avg</small>
+                            <div class="Position__item-value text-primary">{{ flattradePosition.netavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Sell Avg</small>
+                            <div class="Position__item-value text-danger">{{ flattradePosition.totsellavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">LTP</small>
+                            <div class="Position__item-value text-primary">
+                              {{ positionLTPs[flattradePosition.tsym] ||
+                                '-' }}
+                            </div>
+                          </div>
+                        </div>
                     </td>
-                    <td>{{ flattradePosition.netavgprc }}</td>
-                    <td>{{ positionLTPs[flattradePosition.tsym] || '-' }}</td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- SL & TSL -->
                       <div class="row">
@@ -958,8 +968,6 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
-                  <th scope="col">Net Avg</th>
-                  <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
                   <th scope="col">Realized</th>
@@ -971,48 +979,58 @@
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
                     <td>
-                      <div class="d-flex">
+                      <div class="Position__instrument">
                         {{ shoonyaPosition.tsym }}
                       </div>
-                      <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Quantity</small>
-                          <span :class="[
-                            'fs-6',
+                      <div class="Position__item-container mt-2">
+                        <div class="Position__item">
+                          <small class="Position__item-label">Quantity</small>
+                          <div :class="[
+                            'Position__item-value',
                             shoonyaPosition.netqty > 0 ? 'text-success' :
                               shoonyaPosition.netqty < 0 ? 'text-danger' :
                                 'text-secondary'
                           ]">
                             {{ shoonyaPosition.netqty }}
-                          </span>
-                        </span>
+                          </div>
+                        </div>
 
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Side</small>
-                          <span class="fs-6" :class="{
+                        <div class="Position__item">
+                          <small class="Position__item-label">Side</small>
+                          <div class="Position__item-value" :class="{
                             'text-success': shoonyaPosition.netqty > 0,
                             'text-danger': shoonyaPosition.netqty < 0,
                             'text-secondary': shoonyaPosition.netqty === 0
                           }">
-                            {{ shoonyaPosition.netqty > 0 ? 'BUY' : shoonyaPosition.netqty < 0 ? 'SELL' : '-' }} </span>
-                          </span>
+                            {{ shoonyaPosition.netqty > 0 ? 'BUY' : shoonyaPosition.netqty < 0 ? 'SELL' : '-' }} </div>
+                          </div>
 
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Type</small>
-                            <span class="fs-6">{{ shoonyaPosition.prd }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Buy Avg</small>
-                            <span class="fs-6 text-success">₹{{ shoonyaPosition.totbuyavgprc }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Sell Avg</small>
-                            <span class="fs-6 text-danger">₹{{ shoonyaPosition.totsellavgprc }}</span>
-                          </span>
-                      </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Type</small>
+                            <div class="Position__item-value">{{ shoonyaPosition.prd }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Buy Avg</small>
+                            <div class="Position__item-value text-success">{{ shoonyaPosition.totbuyavgprc }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Net Avg</small>
+                            <div class="Position__item-value text-primary">{{ shoonyaPosition.netavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Sell Avg</small>
+                            <div class="Position__item-value text-danger">{{ shoonyaPosition.totsellavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">LTP</small>
+                            <div class="Position__item-value text-primary">
+                              {{ positionLTPs[shoonyaPosition.tsym] || '-' }}
+                            </div>
+                          </div>
+                        </div>
                     </td>
-                    <td>{{ shoonyaPosition.netavgprc }}</td>
-                    <td>{{ positionLTPs[shoonyaPosition.tsym] || '-' }}</td>
                     <td v-if="shoonyaPosition.netqty != 0">
                       <!-- SL & TSL -->
                       <div class="row">
@@ -1120,8 +1138,6 @@
               <thead>
                 <tr>
                   <th scope="col">Position</th>
-                  <th scope="col">Net Avg</th>
-                  <th scope="col">LTP</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
                   <th scope="col">Realized</th>
@@ -1133,46 +1149,58 @@
                 <template v-if="activeFetchFunction === 'fetchPaperTradingPositions'">
                   <tr v-for="paperPosition in paperTradingPositionBook" :key="paperPosition.tsym">
                     <td>
-                      <div class="d-flex">{{ paperPosition.tsym }}</div>
-                      <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Quantity</small>
-                          <span :class="[
-                            'fs-6',
+                      <div class="Position__instrument">
+                        {{ paperPosition.tsym }}
+                      </div>
+                      <div class="Position__item-container mt-2">
+                        <div class="Position__item">
+                          <small class="Position__item-label">Quantity</small>
+                          <div :class="[
+                            'Position__item-value',
                             paperPosition.netqty > 0 ? 'text-success' :
                               paperPosition.netqty < 0 ? 'text-danger' :
                                 'text-secondary'
                           ]">
                             {{ paperPosition.netqty }}
-                          </span>
-                        </span>
+                          </div>
+                        </div>
 
-                        <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                          <small class="text-muted">Side</small>
-                          <span class="fs-6" :class="{
+                        <div class="Position__item">
+                          <small class="Position__item-label">Side</small>
+                          <div class="Position__item-value" :class="{
                             'text-success': paperPosition.netqty > 0,
                             'text-danger': paperPosition.netqty < 0,
                             'text-secondary': paperPosition.netqty === 0
                           }">
-                            {{ paperPosition.netqty > 0 ? 'BUY' : paperPosition.netqty < 0 ? 'SELL' : '-' }} </span>
-                          </span>
+                            {{ paperPosition.netqty > 0 ? 'BUY' : paperPosition.netqty < 0 ? 'SELL' : '-' }} </div>
+                          </div>
 
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Type</small>
-                            <span class="fs-6">{{ paperPosition.prd }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Buy Avg</small>
-                            <span class="fs-6 text-success">₹{{ paperPosition.totbuyavgprc }}</span>
-                          </span>
-                          <span class="badge bg-light text-dark p-2 d-flex flex-column align-items-center">
-                            <small class="text-muted">Sell Avg</small>
-                            <span class="fs-6 text-danger">₹{{ paperPosition.totsellavgprc }}</span>
-                          </span>
-                      </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Type</small>
+                            <div class="Position__item-value">{{ paperPosition.prd }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Buy Avg</small>
+                            <div class="Position__item-value text-success">{{ paperPosition.totbuyavgprc }}</div>
+                          </div>
+
+                          <div class="Position__item">
+                            <small class="Position__item-label">Net Avg</small>
+                            <div class="Position__item-value text-primary">{{ paperPosition.netavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">Sell Avg</small>
+                            <div class="Position__item-value text-danger">{{ paperPosition.totsellavgprc }}</div>
+                          </div>
+                          <div class="Position__item">
+                            <small class="Position__item-label">LTP</small>
+                            <div class="Position__item-value text-primary">
+                              {{ positionLTPs[paperPosition.tsym] || '-' }}
+                            </div>
+                          </div>
+                        </div>
                     </td>
-                    <td>{{ paperPosition.netavgprc }}</td>
-                    <td>{{ positionLTPs[paperPosition.tsym] || '-' }}</td>
                     <td v-if="paperPosition.netqty != 0">
                       <!-- SL & TSL -->
                       <div class="row">
