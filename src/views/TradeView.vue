@@ -870,7 +870,7 @@
                         </div>
                         <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
+                      <div class="btn-group mt-2" role="group" style="width: 160px;">
                         <small
                           v-if="trailingStoplosses[flattradePosition.tsym] !== null || stoplosses[flattradePosition.tsym] !== null"
                           @click="setStoploss(flattradePosition, trailingStoplosses[flattradePosition.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
@@ -907,7 +907,7 @@
                         </div>
                         <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
+                      <div class="btn-group mt-2" role="group" style="width: 160px;">
                         <small v-if="targets[flattradePosition.tsym] === null" @click="setTarget(flattradePosition)">
                           ➕
                         </small>
