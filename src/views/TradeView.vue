@@ -934,73 +934,46 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Position</th>
+                  <th scope="col">Select</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Side</th>
                   <th scope="col">TSL / SL</th>
+                  <th scope="col">LTP</th>
                   <th scope="col">Target</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">B.Avg</th>
+                  <th scope="col">N.Avg</th>
+                  <th scope="col">S.Avg</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
-                  <th scope="col">Select</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="shoonyaPositionBook.length">
                   <tr v-for="shoonyaPosition in sortedPositions" :key="shoonyaPosition.tsym">
-                    <td>
-                      <div class="Position__instrument">
-                        {{ shoonyaPosition.tsym }}
-                      </div>
-                      <div class="Position__item-container mt-2">
-                        <div class="Position__item">
-                          <small class="Position__item-label">Quantity</small>
-                          <div :class="[
-                            'Position__item-value',
-                            shoonyaPosition.netqty > 0 ? 'text-success' :
-                              shoonyaPosition.netqty < 0 ? 'text-danger' :
-                                'text-secondary'
-                          ]">
-                            {{ shoonyaPosition.netqty }}
-                          </div>
-                        </div>
-
-                        <div class="Position__item">
-                          <small class="Position__item-label">Side</small>
-                          <div class="Position__item-value" :class="{
-                            'text-success': shoonyaPosition.netqty > 0,
-                            'text-danger': shoonyaPosition.netqty < 0,
-                            'text-secondary': shoonyaPosition.netqty === 0
-                          }">
-                            {{ shoonyaPosition.netqty > 0 ? 'BUY' : shoonyaPosition.netqty < 0 ? 'SELL' : '-' }} </div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Type</small>
-                            <div class="Position__item-value">{{ shoonyaPosition.prd }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Buy Avg</small>
-                            <div class="Position__item-value text-success">{{ shoonyaPosition.totbuyavgprc }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Net Avg</small>
-                            <div class="Position__item-value text-primary">{{ shoonyaPosition.netavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">Sell Avg</small>
-                            <div class="Position__item-value text-danger">{{ shoonyaPosition.totsellavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">LTP</small>
-                            <div class="Position__item-value text-primary">
-                              {{ positionLTPs[shoonyaPosition.tsym] || '-' }}
-                            </div>
-                          </div>
-                        </div>
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
+                          v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
+                          :disabled="shoonyaPosition.netqty == 0" />
+                      </label>
                     </td>
+                    <td>{{ shoonyaPosition.tsym }}</td>
+                    <td :class="[
+                      shoonyaPosition.netqty > 0 ? 'text-success' :
+                        shoonyaPosition.netqty < 0 ? 'text-danger' :
+                          'text-secondary'
+                    ]">
+                      {{ shoonyaPosition.netqty }}
+                    </td>
+                    <td
+                      :class="{ 'text-success': shoonyaPosition.netqty > 0, 'text-danger': shoonyaPosition.netqty < 0 }">
+                      {{ shoonyaPosition.netqty > 0 ? 'BUY' : shoonyaPosition.netqty < 0 ? 'SELL' : '-' }} </td>
                     <td v-if="shoonyaPosition.netqty != 0">
                       <!-- SL & TSL -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="trailingStoplosses[shoonyaPosition.tsym] !== null">
                           <div class="d-flex align-items-center">
                             <span class="me-2">TSL:</span>
@@ -1022,30 +995,31 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No SL set</div>
+                        <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
-                        <button
-                          v-if="trailingStoplosses[shoonyaPosition.tsym] === null && stoplosses[shoonyaPosition.tsym] === null"
-                          class="btn btn-sm btn-outline" @click="setStoploss(shoonyaPosition, 'trailing')">
-                          Set TSL
-                        </button>
-                        <button
-                          v-if="trailingStoplosses[shoonyaPosition.tsym] === null && stoplosses[shoonyaPosition.tsym] === null"
-                          class="btn btn-sm btn-outline" @click="setStoploss(shoonyaPosition, 'static')">
-                          Set SL
-                        </button>
-                        <button
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
+                        <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[shoonyaPosition.tsym] !== null || stoplosses[shoonyaPosition.tsym] !== null"
-                          class="btn btn-sm btn-outline-danger" @click="removeStoploss(shoonyaPosition)">
-                          Remove SL
+                          @click="setStoploss(shoonyaPosition, trailingStoplosses[shoonyaPosition.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
+                          {{ trailingStoplosses[shoonyaPosition.tsym] !== null ? 'S' : 'T' }}
+                        </button>
+                        <button class="btn btn-sm btn-outline"
+                          v-if="trailingStoplosses[shoonyaPosition.tsym] === null && stoplosses[shoonyaPosition.tsym] === null"
+                          @click="setStoploss(shoonyaPosition, 'static')">
+                          ➕
+                        </button>
+                        <button class="btn btn-sm btn-outline"
+                          v-if="trailingStoplosses[shoonyaPosition.tsym] !== null || stoplosses[shoonyaPosition.tsym] !== null"
+                          @click="removeStoploss(shoonyaPosition)">
+                          ❌
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
+                    <td class="fw-bold">{{ positionLTPs[shoonyaPosition.tsym] }}</td>
                     <td v-if="shoonyaPosition.netqty != 0">
                       <!-- TG -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="targets[shoonyaPosition.tsym] !== null">
                           <div class="btn-group" role="group">
                             <button class="btn btn-sm btn-outline-danger" @click="decreaseTarget(shoonyaPosition)">
@@ -1059,20 +1033,24 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No Target set</div>
+                        <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
-                        <button v-if="targets[shoonyaPosition.tsym] === null" class="btn btn-sm btn-outline-success"
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
+                        <button class="btn btn-sm btn-outline" v-if="targets[shoonyaPosition.tsym] === null"
                           @click="setTarget(shoonyaPosition)">
-                          Set TG
+                          ➕
                         </button>
-                        <button v-if="targets[shoonyaPosition.tsym] !== null" class="btn btn-sm btn-outline-danger"
+                        <button class="btn btn-sm btn-outline" v-if="targets[shoonyaPosition.tsym] !== null"
                           @click="removeTarget(shoonyaPosition)">
-                          Remove TG
+                          ❌
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
+                    <td>{{ shoonyaPosition.prd }}</td>
+                    <td class="text-success">{{ shoonyaPosition.totbuyavgprc }}</td>
+                    <td class="text-primary">{{ shoonyaPosition.netavgprc }}</td>
+                    <td class="text-danger">{{ shoonyaPosition.totsellavgprc }}</td>
                     <td
                       :class="shoonyaPosition.rpnl > 0 ? 'text-success' : shoonyaPosition.rpnl < 0 ? 'text-danger' : null">
                       {{ shoonyaPosition.rpnl }}
@@ -1081,18 +1059,10 @@
                       :class="shoonyaPosition.calculatedUrmtom > 0 ? 'text-success' : shoonyaPosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ shoonyaPosition.calculatedUrmtom.toFixed(2) }}
                     </td>
-                    <td class="position-relative">
-                      <label
-                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-                        <input type="checkbox" :id="'shoonyaPosition-' + shoonyaPosition.tsym"
-                          v-model="selectedShoonyaPositionsSet" :value="shoonyaPosition.tsym"
-                          :disabled="shoonyaPosition.netqty == 0" />
-                      </label>
-                    </td>
                   </tr>
                 </template>
                 <tr v-else>
-                  <td colspan="10" class="text-center">
+                  <td colspan="13" class="text-center">
                     No positions on selected broker {{ selectedBroker.brokerName }}
                   </td>
                 </tr>
@@ -1104,73 +1074,45 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Position</th>
+                  <th scope="col">Select</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Side</th>
                   <th scope="col">TSL / SL</th>
+                  <th scope="col">LTP</th>
                   <th scope="col">Target</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">B.Avg</th>
+                  <th scope="col">N.Avg</th>
+                  <th scope="col">S.Avg</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
-                  <th scope="col">Select</th>
                 </tr>
               </thead>
               <tbody>
-                <template v-if="activeFetchFunction === 'fetchPaperTradingPositions'">
-                  <tr v-for="paperPosition in paperTradingPositionBook" :key="paperPosition.tsym">
-                    <td>
-                      <div class="Position__instrument">
-                        {{ paperPosition.tsym }}
-                      </div>
-                      <div class="Position__item-container mt-2">
-                        <div class="Position__item">
-                          <small class="Position__item-label">Quantity</small>
-                          <div :class="[
-                            'Position__item-value',
-                            paperPosition.netqty > 0 ? 'text-success' :
-                              paperPosition.netqty < 0 ? 'text-danger' :
-                                'text-secondary'
-                          ]">
-                            {{ paperPosition.netqty }}
-                          </div>
-                        </div>
-
-                        <div class="Position__item">
-                          <small class="Position__item-label">Side</small>
-                          <div class="Position__item-value" :class="{
-                            'text-success': paperPosition.netqty > 0,
-                            'text-danger': paperPosition.netqty < 0,
-                            'text-secondary': paperPosition.netqty === 0
-                          }">
-                            {{ paperPosition.netqty > 0 ? 'BUY' : paperPosition.netqty < 0 ? 'SELL' : '-' }} </div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Type</small>
-                            <div class="Position__item-value">{{ paperPosition.prd }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Buy Avg</small>
-                            <div class="Position__item-value text-success">{{ paperPosition.totbuyavgprc }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Net Avg</small>
-                            <div class="Position__item-value text-primary">{{ paperPosition.netavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">Sell Avg</small>
-                            <div class="Position__item-value text-danger">{{ paperPosition.totsellavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">LTP</small>
-                            <div class="Position__item-value text-primary">
-                              {{ positionLTPs[paperPosition.tsym] || '-' }}
-                            </div>
-                          </div>
-                        </div>
+                <template v-if="paperTradingPositionBook.length">
+                  <tr v-for="paperPosition in sortedPositions" :key="paperPosition.tsym">
+                    <td class="position-relative">
+                      <label
+                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                        <input type="checkbox" :id="'paperPosition-' + paperPosition.tsym"
+                          v-model="selectedPaperPositionsSet" :value="paperPosition.tsym"
+                          :disabled="paperPosition.netqty == 0" />
+                      </label>
                     </td>
+                    <td>{{ paperPosition.tsym }}</td>
+                    <td :class="[
+                      paperPosition.netqty > 0 ? 'text-success' :
+                        paperPosition.netqty < 0 ? 'text-danger' :
+                          'text-secondary'
+                    ]">
+                      {{ paperPosition.netqty }}
+                    </td>
+                    <td :class="{ 'text-success': paperPosition.netqty > 0, 'text-danger': paperPosition.netqty < 0 }">
+                      {{ paperPosition.netqty > 0 ? 'BUY' : paperPosition.netqty < 0 ? 'SELL' : '-' }} </td>
                     <td v-if="paperPosition.netqty != 0">
                       <!-- SL & TSL -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="trailingStoplosses[paperPosition.tsym] !== null">
                           <div class="d-flex align-items-center">
                             <span class="me-2">TSL:</span>
@@ -1192,30 +1134,31 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No SL set</div>
+                        <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
-                        <button
-                          v-if="trailingStoplosses[paperPosition.tsym] === null && stoplosses[paperPosition.tsym] === null"
-                          class="btn btn-sm btn-outline" @click="setStoploss(paperPosition, 'trailing')">
-                          Set TSL
-                        </button>
-                        <button
-                          v-if="trailingStoplosses[paperPosition.tsym] === null && stoplosses[paperPosition.tsym] === null"
-                          class="btn btn-sm btn-outline" @click="setStoploss(paperPosition, 'static')">
-                          Set SL
-                        </button>
-                        <button
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
+                        <button class="btn btn-sm btn-outline"
                           v-if="trailingStoplosses[paperPosition.tsym] !== null || stoplosses[paperPosition.tsym] !== null"
-                          class="btn btn-sm btn-outline-danger" @click="removeStoploss(paperPosition)">
-                          Remove SL
+                          @click="setStoploss(paperPosition, trailingStoplosses[paperPosition.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
+                          {{ trailingStoplosses[paperPosition.tsym] !== null ? 'S' : 'T' }}
+                        </button>
+                        <button class="btn btn-sm btn-outline"
+                          v-if="trailingStoplosses[paperPosition.tsym] === null && stoplosses[paperPosition.tsym] === null"
+                          @click="setStoploss(paperPosition, 'static')">
+                          ➕
+                        </button>
+                        <button class="btn btn-sm btn-outline"
+                          v-if="trailingStoplosses[paperPosition.tsym] !== null || stoplosses[paperPosition.tsym] !== null"
+                          @click="removeStoploss(paperPosition)">
+                          ❌
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
+                    <td class="fw-bold">{{ positionLTPs[paperPosition.tsym] }}</td>
                     <td v-if="paperPosition.netqty != 0">
                       <!-- TG -->
-                      <div class="row">
+                      <div class="row" style="height: 30px;">
                         <div class="col-12" v-if="targets[paperPosition.tsym] !== null">
                           <div class="btn-group" role="group">
                             <button class="btn btn-sm btn-outline-danger" @click="decreaseTarget(paperPosition)">
@@ -1229,20 +1172,24 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No Target set</div>
+                        <div v-else>-</div>
                       </div>
-                      <div class="btn-group mt-2" role="group">
-                        <button v-if="targets[paperPosition.tsym] === null" class="btn btn-sm btn-outline-success"
+                      <div class="btn-group mt-2" role="group" style="width: 165px;">
+                        <button class="btn btn-sm btn-outline" v-if="targets[paperPosition.tsym] === null"
                           @click="setTarget(paperPosition)">
-                          Set TG
+                          ➕
                         </button>
-                        <button v-if="targets[paperPosition.tsym] !== null" class="btn btn-sm btn-outline-danger"
+                        <button class="btn btn-sm btn-outline" v-if="targets[paperPosition.tsym] !== null"
                           @click="removeTarget(paperPosition)">
-                          Remove TG
+                          ❌
                         </button>
                       </div>
                     </td>
-                    <td v-else style="text-align: center">-</td>
+                    <td v-else>-</td>
+                    <td>{{ paperPosition.prd }}</td>
+                    <td class="text-success">{{ paperPosition.totbuyavgprc }}</td>
+                    <td class="text-primary">{{ paperPosition.netavgprc }}</td>
+                    <td class="text-danger">{{ paperPosition.totsellavgprc }}</td>
                     <td
                       :class="paperPosition.rpnl > 0 ? 'text-success' : paperPosition.rpnl < 0 ? 'text-danger' : null">
                       {{ paperPosition.rpnl }}
@@ -1251,23 +1198,10 @@
                       :class="paperPosition.calculatedUrmtom > 0 ? 'text-success' : paperPosition.calculatedUrmtom < 0 ? 'text-danger' : null">
                       {{ paperPosition.calculatedUrmtom.toFixed(2) }}
                     </td>
-                    <td class="position-relative">
-                      <label
-                        class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-                        <input type="checkbox" :id="'paperPosition-' + paperPosition.tsym"
-                          v-model="selectedPaperPositionsSet" :value="paperPosition.tsym"
-                          :disabled="paperPosition.netqty == 0" />
-                      </label>
-                    </td>
-                  </tr>
-                  <tr v-if="paperTradingPositionBook.length === 0">
-                    <td colspan="10" class="text-center">
-                      No paper trading positions
-                    </td>
                   </tr>
                 </template>
                 <tr v-else>
-                  <td colspan="10" class="text-center">
+                  <td colspan="13" class="text-center">
                     No paper trading positions
                   </td>
                 </tr>
