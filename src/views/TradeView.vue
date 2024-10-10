@@ -798,15 +798,15 @@
                   <th scope="col">Symbol</th>
                   <th scope="col">Qty</th>
                   <th scope="col">Side</th>
+                  <th scope="col">TSL / SL</th>
+                  <th scope="col">LTP</th>
+                  <th scope="col">Target</th>
                   <th scope="col">Type</th>
                   <th scope="col">B.Avg</th>
                   <th scope="col">N.Avg</th>
                   <th scope="col">S.Avg</th>
-                  <th scope="col">LTP</th>
                   <th scope="col">Realized</th>
                   <th scope="col">Unrealized</th>
-                  <th scope="col">TSL / SL</th>
-                  <th scope="col">Target</th>
                 </tr>
               </thead>
               <tbody>
@@ -831,19 +831,6 @@
                     <td
                       :class="{ 'text-success': flattradePosition.netqty > 0, 'text-danger': flattradePosition.netqty < 0 }">
                       {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }} </td>
-                    <td>{{ flattradePosition.prd }}</td>
-                    <td class="text-success">{{ flattradePosition.totbuyavgprc }}</td>
-                    <td class="text-primary">{{ flattradePosition.netavgprc }}</td>
-                    <td class="text-danger">{{ flattradePosition.totsellavgprc }}</td>
-                    <td class="text-primary">{{ positionLTPs[flattradePosition.tsym] }}</td>
-                    <td
-                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
-                      {{ flattradePosition.rpnl }}
-                    </td>
-                    <td
-                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
-                      {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
-                    </td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- SL & TSL -->
                       <div class="row">
@@ -889,6 +876,7 @@
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
+                    <td class="fw-bold">{{ positionLTPs[flattradePosition.tsym] }}</td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- TG -->
                       <div class="row">
@@ -919,6 +907,18 @@
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
+                    <td>{{ flattradePosition.prd }}</td>
+                    <td class="text-success">{{ flattradePosition.totbuyavgprc }}</td>
+                    <td class="text-primary">{{ flattradePosition.netavgprc }}</td>
+                    <td class="text-danger">{{ flattradePosition.totsellavgprc }}</td>
+                    <td
+                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
+                      {{ flattradePosition.rpnl }}
+                    </td>
+                    <td
+                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
+                      {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
+                    </td>
                   </tr>
                 </template>
                 <tr v-else>
