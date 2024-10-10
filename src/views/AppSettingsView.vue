@@ -84,7 +84,7 @@
           </div>
           <!-- Max Risk & Target Toggle -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="" class="form-label mt-2">Max Risk & Target</label>
+            <label for="" class="form-label mt-2">Max Risk & Target Warning</label>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="totalRiskTargetToggle"
                 v-model="totalRiskTargetToggle" />
