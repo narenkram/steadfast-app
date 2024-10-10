@@ -795,7 +795,16 @@
               <thead>
                 <tr>
                   <th scope="col">Select</th>
-                  <th scope="col">Position</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Side</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">B.Avg</th>
+                  <th scope="col">N.Avg</th>
+                  <th scope="col">S.Avg</th>
+                  <th scope="col">LTP</th>
+                  <th scope="col">Realized</th>
+                  <th scope="col">Unrealized</th>
                   <th scope="col">TSL / SL</th>
                   <th scope="col">Target</th>
                 </tr>
@@ -811,70 +820,29 @@
                           :disabled="flattradePosition.netqty == 0" />
                       </label>
                     </td>
-                    <td>
-                      <div class="Position__instrument">
-                        {{ flattradePosition.tsym }}
-                      </div>
-                      <div class="Position__item-container mt-2">
-                        <div class="Position__item">
-                          <small class="Position__item-label">Quantity</small>
-                          <div :class="[
-                            'Position__item-value',
-                            flattradePosition.netqty > 0 ? 'text-success' :
-                              flattradePosition.netqty < 0 ? 'text-danger' :
-                                'text-secondary'
-                          ]">
-                            {{ flattradePosition.netqty }}
-                          </div>
-                        </div>
-
-                        <div class="Position__item">
-                          <small class="Position__item-label">Side</small>
-                          <div class="Position__item-value"
-                            :class="{ 'text-success': flattradePosition.netqty > 0, 'text-danger': flattradePosition.netqty < 0 }">
-                            {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }}
-                              </div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Type</small>
-                            <div class="Position__item-value">{{ flattradePosition.prd }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Buy Avg</small>
-                            <div class="Position__item-value text-success">{{ flattradePosition.totbuyavgprc }}</div>
-                          </div>
-
-                          <div class="Position__item">
-                            <small class="Position__item-label">Net Avg</small>
-                            <div class="Position__item-value text-primary">{{ flattradePosition.netavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">Sell Avg</small>
-                            <div class="Position__item-value text-danger">{{ flattradePosition.totsellavgprc }}</div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">LTP</small>
-                            <div class="Position__item-value text-primary">
-                              {{ positionLTPs[flattradePosition.tsym] }}
-                            </div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">Realized</small>
-                            <div class="Position__item-value text-primary"
-                              :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
-                              {{ flattradePosition.rpnl }}
-                            </div>
-                          </div>
-                          <div class="Position__item">
-                            <small class="Position__item-label">Unrealized</small>
-                            <div class="Position__item-value text-primary"
-                              :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
-                              {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
-                            </div>
-                          </div>
-                        </div>
+                    <td>{{ flattradePosition.tsym }}</td>
+                    <td :class="[
+                      flattradePosition.netqty > 0 ? 'text-success' :
+                        flattradePosition.netqty < 0 ? 'text-danger' :
+                          'text-secondary'
+                    ]">
+                      {{ flattradePosition.netqty }}
+                    </td>
+                    <td
+                      :class="{ 'text-success': flattradePosition.netqty > 0, 'text-danger': flattradePosition.netqty < 0 }">
+                      {{ flattradePosition.netqty > 0 ? 'BUY' : flattradePosition.netqty < 0 ? 'SELL' : '-' }} </td>
+                    <td>{{ flattradePosition.prd }}</td>
+                    <td class="text-success">{{ flattradePosition.totbuyavgprc }}</td>
+                    <td class="text-primary">{{ flattradePosition.netavgprc }}</td>
+                    <td class="text-danger">{{ flattradePosition.totsellavgprc }}</td>
+                    <td class="text-primary">{{ positionLTPs[flattradePosition.tsym] }}</td>
+                    <td
+                      :class="flattradePosition.rpnl > 0 ? 'text-success' : flattradePosition.rpnl < 0 ? 'text-danger' : null">
+                      {{ flattradePosition.rpnl }}
+                    </td>
+                    <td
+                      :class="flattradePosition.calculatedUrmtom > 0 ? 'text-success' : flattradePosition.calculatedUrmtom < 0 ? 'text-danger' : null">
+                      {{ flattradePosition.calculatedUrmtom.toFixed(2) }}
                     </td>
                     <td v-if="flattradePosition.netqty != 0">
                       <!-- SL & TSL -->
@@ -900,7 +868,7 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No SL set</div>
+                        <div v-else>-</div>
                       </div>
                       <div class="btn-group mt-2" role="group">
                         <button
@@ -937,7 +905,7 @@
                             </button>
                           </div>
                         </div>
-                        <div v-else>No Target set</div>
+                        <div v-else>-</div>
                       </div>
                       <div class="btn-group mt-2" role="group">
                         <button v-if="targets[flattradePosition.tsym] === null" class="btn btn-sm btn-outline-success"
@@ -951,11 +919,10 @@
                       </div>
                     </td>
                     <td v-else style="text-align: center">-</td>
-
                   </tr>
                 </template>
                 <tr v-else>
-                  <td colspan="10" class="text-center">
+                  <td colspan="13" class="text-center">
                     No positions on selected broker {{ selectedBroker.brokerName }}
                   </td>
                 </tr>
