@@ -357,39 +357,27 @@ input:focus {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-// New Styles
-.Position__item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  background-color: var(--bs-light);
-}
-.Position__item-container {
-  display: flex;
-  justify-content: space-between;
+// Slim scrollbar styles
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.Position__item-label {
-  font-size: 0.8rem;
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 0.1rem 0.5rem;
-  width: inherit;
+::-webkit-scrollbar-track {
+  background: var(--bs-body-bg);
 }
 
-.Position__item-value {
-  font-size: 1rem;
-  font-weight: bold;
-  background-color: var(--bs-light);
-  text-align: center;
-  width: 100%;
-  padding: 0.1rem 0.5rem;
+::-webkit-scrollbar-thumb {
+  background: var(--bs-secondary);
+  border-radius: 4px;
 }
 
-.Position__instrument {
-  font-size: 1rem;
-  font-weight: 600;
-  width: 100%;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bs-gray-600);
+}
+
+// For Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-secondary) var(--bs-body-bg);
 }
