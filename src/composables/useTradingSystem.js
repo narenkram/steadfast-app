@@ -153,7 +153,9 @@ export function useTradeView() {
     statusMessage,
     userTriggeredTokenGeneration,
     selectedBrokerToDelete,
-    selectedBrokerForPaper
+    selectedBrokerForPaper,
+    stickyMTM,
+    savedStickyMTM
   } = globalState
 
   // Computed Variables
@@ -4144,6 +4146,9 @@ export function useTradeView() {
       }
     }
   })
+  watch(stickyMTM, (newValue) => {
+    localStorage.setItem('stickyMTM', JSON.stringify(newValue))
+  })
   // ... (add all other watchers here)
 
   return {
@@ -4446,6 +4451,8 @@ export function useTradeView() {
     statusMessage,
     userTriggeredTokenGeneration,
     saveSelectedBrokerForPaper,
-    selectedBrokerToDelete
+    selectedBrokerToDelete,
+    stickyMTM,
+    savedStickyMTM
   }
 }

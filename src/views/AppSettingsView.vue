@@ -284,6 +284,16 @@
               </label>
             </div>
           </div>
+          <!-- Enable / Disable Sticky MTM -->
+          <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <label for="stickyMTM" class="form-label">Sticky MTM Section</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="stickyMTM" v-model="stickyMTM" />
+              <label class="form-check-label" for="stickyMTM">
+                {{ stickyMTM ? 'Enabled' : 'Disabled' }}
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -311,6 +321,8 @@ const {
   showLTPRangeBar,
   overtradeProtection,
   experimentalFeatures,
+  stickyMTM,
+  savedStickyMTM,
 
   enableHotKeys,
   callStrikeOffset,

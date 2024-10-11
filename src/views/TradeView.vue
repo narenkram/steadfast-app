@@ -84,7 +84,7 @@
   </section> -->
 
   <!-- Total Profit & Net PNL -->
-  <section class="row py-3">
+  <section class="row py-3" :class="{ 'MTM': stickyMTM }">
     <div class="col-12 col-md-5 col-lg-5">
       <div class="Card">
         <blockquote class="fs-3" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
@@ -1932,6 +1932,7 @@ const {
   putDepth,
   allSymbolsData,
   selectedOrderType,
+  stickyMTM,
 } = useTradeView();
 
 let timer;
