@@ -386,6 +386,7 @@ input:focus {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--bs-body) var(--bs-body-bg);
+  outline: none;
 }
 
 .MTM {
@@ -395,7 +396,9 @@ input:focus {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
-
+.tab-content {
+  height: 500px;
+}
 .table-responsive {
   height: 400px;
   overflow: scroll;
