@@ -817,7 +817,7 @@
             @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
             @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
-          <p class="text-secondary">
+          <p class="text-secondary my-2">
             Aim for a 1-3% daily target and set a 1-1.5% stoploss to manage trades effectively and
             minimize losses.
           </p>
@@ -1005,7 +1005,7 @@
             </table>
           </div>
 
-          <p class="text-secondary">
+          <p class="text-secondary my-2">
             This trades tab fetches orders and trades from selected broker and combines them. Only
             failed orders are shown. If the order is successfully placed, you'll only see the
             respective trade.

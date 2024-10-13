@@ -374,18 +374,18 @@ input:focus {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bs-secondary);
+  background: var(--bs-body);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--bs-gray-600);
+  background: var(--bs-body);
 }
 
 // For Firefox
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--bs-secondary) var(--bs-body-bg);
+  scrollbar-color: var(--bs-body) var(--bs-body-bg);
 }
 
 .MTM {
@@ -394,4 +394,9 @@ input:focus {
   z-index: 1000;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+}
+
+.table-responsive {
+  height: 400px;
+  overflow: scroll;
 }
