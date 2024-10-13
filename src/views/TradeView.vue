@@ -137,7 +137,7 @@
             </p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
               {{ killSwitchRemainingTime }}
             </span>
           </div>
@@ -156,7 +156,7 @@
             <p class="mb-0">Risk Threshold Reached!</p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
               Make Adjustments Or Close Positions
             </span>
           </div>
@@ -175,7 +175,7 @@
             <p class="mb-0">Target Reached!</p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-4 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
               Close Positions to Lock in Profits
             </span>
           </div>
