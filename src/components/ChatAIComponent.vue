@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="Steadfast-AI-Assistant">
         <h2 class="mb-3">Steadfast AI Assistant</h2>
         <div v-if="!apiKey" class="mb-3">
             <div class="input-group">

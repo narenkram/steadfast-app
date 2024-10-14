@@ -311,6 +311,8 @@
               <span class="input-group-text">₹ Points</span>
             </div>
           </div>
+          <!-- Steadfast AI Assistant -->
+          <ChatAIComponent />
         </div>
 
         <!-- Trading Symbols & Strikes -->
@@ -1346,12 +1348,6 @@
     </div>
   </div>
 
-  <!-- AI Automation Section -->
-  <section class="row mt-3 py-4 border border-primary rounded">
-    <div class="col-12">
-      <ChatAIComponent />
-    </div>
-  </section>
 
 
 
