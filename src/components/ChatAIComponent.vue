@@ -1,6 +1,11 @@
 <template>
     <div class="Steadfast-AI-Assistant">
-        <h2 class="mb-3">Steadfast AI Assistant</h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-3">Steadfast AI Assistant</h2>
+            <div class="d-flex justify-content-end p-2">
+                <button @click="startNewChat" class="btn btn-outline btn-sm">New Chat</button>
+            </div>
+        </div>
         <div v-if="!apiKey" class="mb-3">
             <div class="input-group">
                 <input v-model="apiKeyInput" type="text" class="form-control" placeholder="Enter your API key">
@@ -26,20 +31,20 @@
             </div>
             <div class="p-3 bg-light">
                 <div class="row d-flex flex-row align-items-center justify-content-between">
-                    <div class="col-2">
+                    <div class="col-1">
                         <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"
                             id="imageUpload">
                         <label class="input-group-text" for="imageUpload">🖼️</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
                             placeholder="Type your message..." :disabled="isWaitingForResponse">
 
                     </div>
                     <div class="col-2">
-                        <button @click="sendMessage" class="btn btn-primary"
+                        <button @click="sendMessage" class="btn btn-primary w-100"
                             :disabled="isWaitingForResponse">Send</button>
-                        <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning"
+                        <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning w-100"
                             :disabled="isWaitingForResponse">Retry</button>
                     </div>
                 </div>
@@ -179,10 +184,15 @@ const retryLastMessage = async () => {
     }
 };
 
+const startNewChat = () => {
+    messages.value = [];
+    initChat();
+    messages.value.push({ role: 'ai', content: 'Hello! How can I assist you with Steadfast today?' });
+};
+
 onMounted(() => {
     if (apiKey.value) {
-        initChat();
-        messages.value.push({ role: 'ai', content: 'Hello! How can I assist you with Steadfast today?' });
+        startNewChat();
     }
 });
 </script>
