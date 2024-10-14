@@ -13,6 +13,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@popperjs/core": "^2.11.8",
     "@vueuse/core": "^11.0.3",
     "axios": "^1.7.3",

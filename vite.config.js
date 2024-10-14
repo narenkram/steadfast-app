@@ -26,5 +26,8 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
       }
     }
+  },
+  optimizeDeps: {
+    include: ['@google/generative-ai']
   }
 })

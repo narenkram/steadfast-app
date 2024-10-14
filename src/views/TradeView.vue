@@ -1346,6 +1346,18 @@
     </div>
   </div>
 
+  <!-- AI Automation Section -->
+  <section class="row mt-3 py-4 border border-primary rounded">
+    <div class="col-12">
+      <ChatAIComponent />
+    </div>
+  </section>
+
+
+
+
+
+
 </template>
 
 <script setup>
@@ -1355,7 +1367,7 @@ import { useTradeView } from '@/composables/useTradingSystem';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import ToastAlert from '@/components/ToastAlertComponent.vue';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
-
+import ChatAIComponent from '@/components/ChatAIComponent.vue';
 
 const {
   // Methods
