@@ -313,10 +313,10 @@
           </div>
           <!-- Steadfast AI Assistant -->
           <div class="col-6 col-md-3 col-lg-3">
-            <label for="SteadfastAIAssistant" class="form-label mb-0">Steadfast AI Assistant</label>
+            <label for="SteadfastAIAssistant" class="form-label mb-1">Steadfast AI Assistant</label>
             <div class="input-group mb-3">
               <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
-                class="btn btn-outline-danger w-100">✨ Open Chat</button>
+                class="btn btn-sm btn-outline-danger w-100">✨ Open Chat</button>
             </div>
           </div>
         </div>
