@@ -25,17 +25,23 @@
                 </div>
             </div>
             <div class="p-3 bg-light">
-                <div class="input-group mb-2">
-                    <input type="file" @change="handleImageUpload" accept="image/*" class="form-control"
-                        id="imageUpload">
-                    <label class="input-group-text" for="imageUpload">Upload Image</label>
-                </div>
-                <div class="input-group">
-                    <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
-                        placeholder="Type your message..." :disabled="isWaitingForResponse">
-                    <button @click="sendMessage" class="btn btn-primary" :disabled="isWaitingForResponse">Send</button>
-                    <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning"
-                        :disabled="isWaitingForResponse">Retry</button>
+                <div class="row d-flex flex-row align-items-center justify-content-between">
+                    <div class="col-2">
+                        <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"
+                            id="imageUpload">
+                        <label class="input-group-text" for="imageUpload">🖼️</label>
+                    </div>
+                    <div class="col-8">
+                        <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
+                            placeholder="Type your message..." :disabled="isWaitingForResponse">
+
+                    </div>
+                    <div class="col-2">
+                        <button @click="sendMessage" class="btn btn-primary"
+                            :disabled="isWaitingForResponse">Send</button>
+                        <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning"
+                            :disabled="isWaitingForResponse">Retry</button>
+                    </div>
                 </div>
             </div>
         </div>
