@@ -12,6 +12,8 @@ export default defineConfig({
     }
   },
   server: {
+    host: true,
+    port: 5173,
     proxy: {
       '/flattradeSymbols': 'http://localhost:3000/flattrade/',
       '/shoonyaSymbols': 'http://localhost:3000/shoonya/',
