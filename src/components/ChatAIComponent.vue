@@ -16,14 +16,15 @@
                         <span></span>
                         <span></span>
                     </div>
+                    <div v-else-if="message.role === 'ai'" v-html="renderMarkdown(message.content)"></div>
                     <div v-else>{{ message.content }}</div>
                 </div>
             </div>
             <div class="p-3 bg-light">
                 <div class="input-group">
                     <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
-                        placeholder="Type your message...">
-                    <button @click="sendMessage" class="btn btn-primary">Send</button>
+                        placeholder="Type your message..." :disabled="isWaitingForResponse">
+                    <button @click="sendMessage" class="btn btn-primary" :disabled="isWaitingForResponse">Send</button>
                 </div>
             </div>
         </div>
@@ -33,12 +34,14 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { marked } from 'marked';
 
 const apiKey = ref(localStorage.getItem('GEMINI_API_KEY') || '');
 const apiKeyInput = ref('');
 const userInput = ref('');
 const messages = ref([]);
 const chatMessages = ref(null);
+const isWaitingForResponse = ref(false);
 
 const saveApiKey = () => {
     if (apiKeyInput.value.trim()) {
@@ -50,10 +53,22 @@ const saveApiKey = () => {
 
 const systemPrompt = "You are an AI assistant for the Steadfast trading app. Provide helpful information about options trading, risk management, and using the Steadfast app features.";
 
+const renderMarkdown = (content) => {
+    return marked(content);
+};
+
+const scrollToBottom = () => {
+    if (chatMessages.value) {
+        chatMessages.value.scrollTop = chatMessages.value.scrollHeight;
+    }
+};
+
 const sendMessage = async () => {
-    if (userInput.value.trim() === '') return;
+    if (userInput.value.trim() === '' || isWaitingForResponse.value) return;
 
     messages.value.push({ role: 'user', content: userInput.value });
+    messages.value.push({ role: 'ai', content: '' }); // Add empty AI message for typing indicator
+    isWaitingForResponse.value = true;
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey.value);
@@ -79,15 +94,17 @@ const sendMessage = async () => {
         const response = await result.response;
         const text = response.text();
 
-        messages.value.push({ role: 'ai', content: text });
+        messages.value[messages.value.length - 1].content = text; // Update the last AI message with the response
 
         userInput.value = '';
 
         await nextTick();
-        chatMessages.value.scrollTop = chatMessages.value.scrollHeight;
+        scrollToBottom(); // Scroll to bottom after adding AI response
     } catch (error) {
         console.error('Error sending message to AI:', error);
-        messages.value.push({ role: 'error', content: 'An error occurred while processing your request.' });
+        messages.value[messages.value.length - 1].content = 'An error occurred while processing your request.';
+    } finally {
+        isWaitingForResponse.value = false;
     }
 };
 
@@ -99,80 +116,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.ai-automation {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.api-key-input {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.api-key-input input {
-    flex-grow: 1;
-    margin-right: 10px;
-}
-
-.chat-container {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.chat-messages {
-    height: 400px;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-.message {
-    margin-bottom: 10px;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
-
-.user {
-    background-color: #e6f2ff;
-    text-align: right;
-}
-
-.ai {
-    background-color: #f0f0f0;
-}
-
-.error {
-    background-color: #ffebee;
-    color: #d32f2f;
-}
-
-.chat-input {
-    display: flex;
-    padding: 10px;
-    background-color: #f9f9f9;
-}
-
-input {
-    flex-grow: 1;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
-
-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
 .typing-indicator {
     display: inline-block;
     width: 50px;
@@ -183,27 +126,32 @@ button:hover {
     width: 10px;
     float: left;
     margin: 0 1px;
-    background-color: #9E9EA1;
+    background-color: #6c757d;
     display: block;
     border-radius: 50%;
     opacity: 0.4;
-}
-
-.typing-indicator span:nth-of-type(1) {
-    animation: 1s blink infinite 0.3333s;
+    animation: blink 1s infinite;
 }
 
 .typing-indicator span:nth-of-type(2) {
-    animation: 1s blink infinite 0.6666s;
+    animation-delay: 0.2s;
 }
 
 .typing-indicator span:nth-of-type(3) {
-    animation: 1s blink infinite 0.9999s;
+    animation-delay: 0.4s;
 }
 
 @keyframes blink {
-    50% {
+    0% {
+        opacity: 0.4;
+    }
+
+    20% {
         opacity: 1;
+    }
+
+    100% {
+        opacity: 0.4;
     }
 }
 </style>
