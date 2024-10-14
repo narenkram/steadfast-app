@@ -55,6 +55,7 @@ const chatMessages = ref(null);
 const isWaitingForResponse = ref(false);
 const lastMessageIsError = ref(false);
 const selectedImage = ref(null);
+const chat = ref(null);
 
 const saveApiKey = () => {
     if (apiKeyInput.value.trim()) {
@@ -86,38 +87,59 @@ const handleImageUpload = (event) => {
     }
 };
 
+const initChat = () => {
+    const genAI = new GoogleGenerativeAI(apiKey.value);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    chat.value = model.startChat({
+        history: [
+            {
+                role: "user",
+                parts: [{ text: systemPrompt }],
+            },
+            {
+                role: "model",
+                parts: [{ text: "Understood. I'm here to assist users with the Steadfast trading app, providing information about options trading, risk management, and the app's features. How can I help you today?" }],
+            },
+        ],
+        generationConfig: {
+            maxOutputTokens: 1000,
+        },
+    });
+};
+
 const sendMessage = async () => {
     if ((userInput.value.trim() === '' && !selectedImage.value) || isWaitingForResponse.value) return;
+
+    if (!chat.value) {
+        initChat();
+    }
 
     const newMessage = { role: 'user', content: userInput.value };
     if (selectedImage.value) {
         newMessage.image = URL.createObjectURL(selectedImage.value);
     }
     messages.value.push(newMessage);
-    messages.value.push({ role: 'ai', content: '' }); // Add empty AI message for typing indicator
+    messages.value.push({ role: 'ai', content: '' });
     isWaitingForResponse.value = true;
 
     try {
-        const genAI = new GoogleGenerativeAI(apiKey.value);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
         const prompt = userInput.value.trim() || "What's in this image?";
         const imageParts = selectedImage.value ? [
             { inlineData: { data: await fileToGenerativePart(selectedImage.value), mimeType: selectedImage.value.type } },
         ] : [];
 
-        const result = await model.generateContent([prompt, ...imageParts]);
+        const result = await chat.value.sendMessage([prompt, ...imageParts]);
         const response = await result.response;
         const text = response.text();
 
-        messages.value[messages.value.length - 1].content = text; // Update the last AI message with the response
+        messages.value[messages.value.length - 1].content = text;
 
         userInput.value = '';
         selectedImage.value = null;
-        document.getElementById('imageUpload').value = ''; // Clear the file input
+        document.getElementById('imageUpload').value = '';
 
         await nextTick();
-        scrollToBottom(); // Scroll to bottom after adding AI response
+        scrollToBottom();
     } catch (error) {
         console.error('Error sending message to AI:', error);
         messages.value[messages.value.length - 1] = { role: 'error', content: 'An error occurred while processing your request.' };
@@ -153,6 +175,7 @@ const retryLastMessage = async () => {
 
 onMounted(() => {
     if (apiKey.value) {
+        initChat();
         messages.value.push({ role: 'ai', content: 'Hello! How can I assist you with Steadfast today?' });
     }
 });
