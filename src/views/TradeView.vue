@@ -312,7 +312,13 @@
             </div>
           </div>
           <!-- Steadfast AI Assistant -->
-          <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal">Open Chat</button>
+          <div class="col-6 col-md-3 col-lg-3">
+            <label for="SteadfastAIAssistant" class="form-label mb-0">Steadfast AI Assistant</label>
+            <div class="input-group mb-3">
+              <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
+                class="btn btn-outline-danger w-100">✨ Open Chat</button>
+            </div>
+          </div>
         </div>
 
         <!-- Trading Symbols & Strikes -->
