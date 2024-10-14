@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h2 class="mb-3">AI Automation</h2>
+        <h2 class="mb-3">Steadfast AI Assistant</h2>
         <div v-if="!apiKey" class="mb-3">
             <div class="input-group">
                 <input v-model="apiKeyInput" type="text" class="form-control" placeholder="Enter your API key">
@@ -10,7 +10,7 @@
         <div v-else class="border rounded">
             <div class="overflow-auto p-3" style="height: 400px;" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
-                    :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end bg-light' : 'bg-secondary text-white']">
+                    :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end bg-light text-dark' : 'bg-light text-dark']">
                     <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                         <span></span>
                         <span></span>
@@ -25,6 +25,8 @@
                     <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
                         placeholder="Type your message..." :disabled="isWaitingForResponse">
                     <button @click="sendMessage" class="btn btn-primary" :disabled="isWaitingForResponse">Send</button>
+                    <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning"
+                        :disabled="isWaitingForResponse">Retry</button>
                 </div>
             </div>
         </div>
@@ -42,6 +44,7 @@ const userInput = ref('');
 const messages = ref([]);
 const chatMessages = ref(null);
 const isWaitingForResponse = ref(false);
+const lastMessageIsError = ref(false);
 
 const saveApiKey = () => {
     if (apiKeyInput.value.trim()) {
@@ -102,9 +105,25 @@ const sendMessage = async () => {
         scrollToBottom(); // Scroll to bottom after adding AI response
     } catch (error) {
         console.error('Error sending message to AI:', error);
-        messages.value[messages.value.length - 1].content = 'An error occurred while processing your request.';
+        messages.value[messages.value.length - 1] = { role: 'error', content: 'An error occurred while processing your request.' };
+        lastMessageIsError.value = true;
     } finally {
         isWaitingForResponse.value = false;
+    }
+};
+
+const retryLastMessage = async () => {
+    if (messages.value.length < 2) return;
+
+    const lastUserMessage = messages.value
+        .slice()
+        .reverse()
+        .find(message => message.role === 'user');
+
+    if (lastUserMessage) {
+        messages.value.pop(); // Remove the error message
+        userInput.value = lastUserMessage.content;
+        await sendMessage();
     }
 };
 
