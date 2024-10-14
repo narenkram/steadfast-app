@@ -13,6 +13,7 @@
                     :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
                     <div
                         :class="['d-inline-block', 'p-2', 'rounded', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark', 'mw-75']">
+                        <img v-if="message.image" :src="message.image" class="user-image" />
                         <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                             <span></span>
                             <span></span>
@@ -24,6 +25,11 @@
                 </div>
             </div>
             <div class="p-3 bg-light">
+                <div class="input-group mb-2">
+                    <input type="file" @change="handleImageUpload" accept="image/*" class="form-control"
+                        id="imageUpload">
+                    <label class="input-group-text" for="imageUpload">Upload Image</label>
+                </div>
                 <div class="input-group">
                     <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
                         placeholder="Type your message..." :disabled="isWaitingForResponse">
@@ -48,6 +54,7 @@ const messages = ref([]);
 const chatMessages = ref(null);
 const isWaitingForResponse = ref(false);
 const lastMessageIsError = ref(false);
+const selectedImage = ref(null);
 
 const saveApiKey = () => {
     if (apiKeyInput.value.trim()) {
@@ -69,40 +76,45 @@ const scrollToBottom = () => {
     }
 };
 
-const sendMessage = async () => {
-    if (userInput.value.trim() === '' || isWaitingForResponse.value) return;
+const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        selectedImage.value = file;
+    } else {
+        alert('Please select a valid image file.');
+        event.target.value = ''; // Clear the file input
+    }
+};
 
-    messages.value.push({ role: 'user', content: userInput.value });
+const sendMessage = async () => {
+    if ((userInput.value.trim() === '' && !selectedImage.value) || isWaitingForResponse.value) return;
+
+    const newMessage = { role: 'user', content: userInput.value };
+    if (selectedImage.value) {
+        newMessage.image = URL.createObjectURL(selectedImage.value);
+    }
+    messages.value.push(newMessage);
     messages.value.push({ role: 'ai', content: '' }); // Add empty AI message for typing indicator
     isWaitingForResponse.value = true;
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey.value);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const chat = model.startChat({
-            history: [
-                {
-                    role: "user",
-                    parts: [{ text: systemPrompt }],
-                },
-                {
-                    role: "model",
-                    parts: [{ text: "Understood. I'm here to assist users with the Steadfast trading app, providing information about options trading, risk management, and the app's features. How can I help you today?" }],
-                },
-            ],
-            generationConfig: {
-                maxOutputTokens: 1000,
-            },
-        });
+        const prompt = userInput.value.trim() || "What's in this image?";
+        const imageParts = selectedImage.value ? [
+            { inlineData: { data: await fileToGenerativePart(selectedImage.value), mimeType: selectedImage.value.type } },
+        ] : [];
 
-        const result = await chat.sendMessage([{ text: userInput.value }]);
+        const result = await model.generateContent([prompt, ...imageParts]);
         const response = await result.response;
         const text = response.text();
 
         messages.value[messages.value.length - 1].content = text; // Update the last AI message with the response
 
         userInput.value = '';
+        selectedImage.value = null;
+        document.getElementById('imageUpload').value = ''; // Clear the file input
 
         await nextTick();
         scrollToBottom(); // Scroll to bottom after adding AI response
@@ -113,6 +125,15 @@ const sendMessage = async () => {
     } finally {
         isWaitingForResponse.value = false;
     }
+};
+
+const fileToGenerativePart = async (file) => {
+    const base64EncodedDataPromise = new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(file);
+    });
+    return base64EncodedDataPromise;
 };
 
 const retryLastMessage = async () => {
@@ -175,5 +196,12 @@ onMounted(() => {
     100% {
         opacity: 0.4;
     }
+}
+
+.user-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    margin-bottom: 10px;
 }
 </style>
