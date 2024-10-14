@@ -8,7 +8,7 @@
             </div>
         </div>
         <div v-else class="border rounded">
-            <div class="overflow-auto p-3" style="height: 400px;" ref="chatMessages">
+            <div class="overflow-auto p-3" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
                     :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
                     <div

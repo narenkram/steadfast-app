@@ -312,7 +312,7 @@
             </div>
           </div>
           <!-- Steadfast AI Assistant -->
-          <ChatAIComponent />
+          <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal">Open Chat</button>
         </div>
 
         <!-- Trading Symbols & Strikes -->
@@ -1349,7 +1349,17 @@
   </div>
 
 
-
+  <!-- Steadfast AI Assistant Modal -->
+  <div class="modal fade" id="SteadfastAIAssistantModal" tabindex="-1" aria-labelledby="SteadfastAIAssistantModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <ChatAIComponent />
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
