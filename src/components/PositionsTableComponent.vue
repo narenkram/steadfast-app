@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <template v-if="positions.length">
+                <template v-if="sortedPositions.length">
                     <tr v-for="position in sortedPositions" :key="position.tsym">
                         <td class="position-relative">
                             <label
@@ -127,7 +127,7 @@
                         </td>
                         <td
                             :class="position.calculatedUrmtom > 0 ? 'text-success' : position.calculatedUrmtom < 0 ? 'text-danger' : null">
-                            {{ position.calculatedUrmtom }}
+                            {{ position.calculatedUrmtom.toFixed(2) }}
                         </td>
                     </tr>
                 </template>
@@ -142,14 +142,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 
 const props = defineProps({
-    positions: {
-        type: Array,
-        required: true,
-    },
     selectedBroker: {
         type: Object,
         required: true,
@@ -177,11 +172,8 @@ const {
     stoplosses,
     targets,
     trailingStoplosses,
+    sortedPositions,
 } = useTradeView();
-
-const sortedPositions = computed(() => {
-    return [...props.positions].sort((a, b) => a.tsym.localeCompare(b.tsym));
-});
 
 function setStoploss(position, type) {
     emit('set-stoploss', position, type);
