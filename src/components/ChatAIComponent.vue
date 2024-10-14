@@ -10,14 +10,17 @@
         <div v-else class="border rounded">
             <div class="overflow-auto p-3" style="height: 400px;" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
-                    :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end bg-light text-dark' : 'bg-light text-dark']">
-                    <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                    :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
+                    <div
+                        :class="['d-inline-block', 'p-2', 'rounded', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark', 'mw-75']">
+                        <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div v-else-if="message.role === 'ai'" v-html="renderMarkdown(message.content)"></div>
+                        <div v-else>{{ message.content }}</div>
                     </div>
-                    <div v-else-if="message.role === 'ai'" v-html="renderMarkdown(message.content)"></div>
-                    <div v-else>{{ message.content }}</div>
                 </div>
             </div>
             <div class="p-3 bg-light">
