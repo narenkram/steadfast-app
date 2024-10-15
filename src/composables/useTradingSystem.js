@@ -1561,12 +1561,24 @@ export function useTradeView() {
     selectedStrike.value =
       optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
   }
-  const handleOrderClick = (transactionType, optionType) => {
-    if (selectedOrderType.value !== orderTypes.value[1]) {
-      // If not LMT order
-      placeOrder(getTransactionType(transactionType), optionType)
+  const handleOrderClick = async (transactionType, optionType) => {
+    modalTransactionType.value = transactionType
+    modalOptionType.value = optionType
+
+    // Set the correct strike based on the option type
+    if (optionType === 'CALL') {
+      selectedStrike.value = selectedCallStrike.value
+    } else if (optionType === 'PUT') {
+      selectedStrike.value = selectedPutStrike.value
+    }
+
+    // If it's a limit order type, the modal will be shown automatically due to data-bs-toggle and data-bs-target
+    if (['LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'].includes(selectedOrderType.value)) {
+      // Set initial limit price based on the order type
+      handleOrderTypeChange()
     } else {
-      setOrderDetails(transactionType, optionType)
+      // For market orders, place the order directly
+      await placeOrder(transactionType, optionType)
     }
   }
   const resetOrderTypeIfNeeded = () => {
@@ -1631,16 +1643,38 @@ export function useTradeView() {
     }
   }
   const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
+    let price = '0'
+    let priceType = 'MKT'
+
+    switch (selectedOrderType.value) {
+      case 'LMT':
+        price = limitPrice.value.toString()
+        priceType = 'LMT'
+        break
+      case 'LMT_LTP':
+        price = getCurrentLTP().toString()
+        priceType = 'LMT'
+        break
+      case 'LMT_OFFSET':
+        price = (getCurrentLTP() + limitOffset.value).toString()
+        priceType = 'LMT'
+        break
+      case 'MKT_PROTECTION':
+        price = (getCurrentLTP() * 1.01).toString()
+        priceType = 'LMT'
+        break
+    }
+
     const commonPayload = {
       uid: selectedBroker.value.clientId,
       actid: selectedBroker.value.clientId,
       exch: exchangeSegment,
       tsym: selectedStrike.tradingSymbol,
       qty: selectedQuantity.value.toString(),
-      prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : '0',
+      prc: price,
       prd: getProductTypeValue(selectedProductType.value),
       trantype: getTransactionType(transactionType),
-      prctyp: selectedOrderType.value,
+      prctyp: priceType,
       ret: 'DAY',
       ordersource: 'API'
     }
@@ -1661,7 +1695,8 @@ export function useTradeView() {
           ...commonPayload,
           paperTrade: true,
           drvOptionType,
-          strikePrice: selectedStrike.strikePrice
+          strikePrice: selectedStrike.strikePrice,
+          originalOrderType: selectedOrderType.value // Store the original order type for paper trading
           // Add any additional fields specific to PaperTrading here
         }
       default:
@@ -1719,21 +1754,11 @@ export function useTradeView() {
   }
   const placeOrder = async (transactionType, drvOptionType) => {
     try {
-      let selectedStrike
-      if (drvOptionType === 'CALL') {
-        selectedStrike = selectedCallStrike.value
-      } else if (drvOptionType === 'PUT') {
-        selectedStrike = selectedPutStrike.value
-      }
+      let selectedStrike =
+        drvOptionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
 
-      if (!selectedStrike) {
-        throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not defined`)
-      }
-
-      if (!selectedStrike.tradingSymbol || !selectedStrike.securityId) {
-        throw new Error(
-          `Selected ${drvOptionType.toLowerCase()} strike properties are not properly defined`
-        )
+      if (!selectedStrike || !selectedStrike.tradingSymbol || !selectedStrike.securityId) {
+        throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not properly defined`)
       }
 
       const exchangeSegment = getExchangeSegment()
@@ -1757,14 +1782,26 @@ export function useTradeView() {
         )
         orderData.qty = quantityToPlace.toString()
 
+        // Handle dynamic price updates for LMT_LTP and LMT_OFFSET
+        if (['LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'].includes(selectedOrderType.value)) {
+          const currentLTP = getCurrentLTP()
+          switch (selectedOrderType.value) {
+            case 'LMT_LTP':
+              orderData.prc = currentLTP.toString()
+              break
+            case 'LMT_OFFSET':
+              orderData.prc = (currentLTP + limitOffset.value).toString()
+              break
+            case 'MKT_PROTECTION':
+              orderData.prc = (currentLTP * 1.01).toString()
+              break
+          }
+        }
+
         let response
         if (selectedBroker.value?.brokerName === 'Flattrade') {
           const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN')
-          const payload = qs.stringify({
-            ...orderData,
-            uid: selectedBroker.value.clientId,
-            actid: selectedBroker.value.clientId
-          })
+          const payload = qs.stringify(orderData)
           response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
             headers: {
               Authorization: `Bearer ${FLATTRADE_API_TOKEN}`,
@@ -1773,11 +1810,7 @@ export function useTradeView() {
           })
         } else if (selectedBroker.value?.brokerName === 'Shoonya') {
           const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN')
-          const payload = qs.stringify({
-            ...orderData,
-            uid: selectedBroker.value.clientId,
-            actid: selectedBroker.value.clientId
-          })
+          const payload = qs.stringify(orderData)
           response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
             headers: {
               Authorization: `Bearer ${SHOONYA_API_TOKEN}`,
@@ -1788,15 +1821,20 @@ export function useTradeView() {
           response = simulatePaperTradingOrder(orderData)
         }
 
-        console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`) // placed here to prevent delay and debugging if required
-        console.log('Order placed successfully:', response.data) // Log the response data for debugging if required
+        console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`)
+        console.log('Order placed successfully:', response.data)
         remainingLots -= lotsToPlace
         placedLots += lotsToPlace
+
+        // Add a small delay between orders for LMT_LTP and LMT_OFFSET to get updated LTP
+        if (['LMT_LTP', 'LMT_OFFSET'].includes(selectedOrderType.value)) {
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
       }
 
       console.log(
         `All orders placed successfully. Total: ${placedLots} lots (${fullOrderQuantity} quantity)`
-      ) // Log the final result
+      )
       toastMessage.value = `Order(s) placed successfully for ${placedLots} lots`
       showToast.value = true
 
@@ -1809,8 +1847,8 @@ export function useTradeView() {
       // Update fund limits
       await updateFundLimits()
     } catch (error) {
-      console.error('Error placing order:', error) // Log the full error
-      if (error.response && error.response.data && error.response.data.message) {
+      console.error('Error placing order:', error)
+      if (error.response?.data?.message) {
         const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ')
         toastMessage.value = firstThreeWords
       } else {
@@ -3228,10 +3266,13 @@ export function useTradeView() {
       editingBasketId.value = null
     }
   }
-  const validateAndPlaceOrder = () => {
+  const validateAndPlaceOrder = async () => {
     if (isValidLimitPrice.value) {
-      placeOrder(modalTransactionType.value, modalOptionType.value)
-      // The modal will be dismissed automatically due to the data-bs-dismiss attribute
+      await placeOrder(modalTransactionType.value, modalOptionType.value)
+    } else {
+      console.error('Invalid limit price')
+      toastMessage.value = 'Invalid limit price'
+      showToast.value = true
     }
   }
 
@@ -3243,10 +3284,6 @@ export function useTradeView() {
         limitPrice.value = null
         break
       case 'LMT':
-        if (!limitPrice.value) {
-          limitPrice.value = getCurrentLTP()
-        }
-        break
       case 'LMT_LTP':
         limitPrice.value = getCurrentLTP()
         break
@@ -3412,9 +3449,11 @@ export function useTradeView() {
 
     for (const [tsym, target] of validTargets) {
       const currentLTP = positionLTPs.value[tsym]
-      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
-        (p) => p.tsym === tsym
-      )
+      const position = [
+        ...flatTradePositionBook.value,
+        ...shoonyaPositionBook.value,
+        ...paperTradingPositionBook.value
+      ].find((p) => p.tsym === tsym)
 
       // console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
       if (position && currentLTP) {
@@ -3449,9 +3488,11 @@ export function useTradeView() {
     // Check static stoplosses
     for (const [tsym, sl] of Object.entries(stoplosses.value)) {
       if (sl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
-          (p) => p.tsym === tsym
-        )
+        const position = [
+          ...flatTradePositionBook.value,
+          ...shoonyaPositionBook.value,
+          ...paperTradingPositionBook.value
+        ].find((p) => p.tsym === tsym)
         if (position) {
           const isLongPosition = position.netqty > 0
           const currentLTP = parseFloat(positionLTPs.value[tsym])
@@ -3477,9 +3518,11 @@ export function useTradeView() {
     // Check trailing stoplosses
     for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
       if (tsl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
-          (p) => p.tsym === tsym
-        )
+        const position = [
+          ...flatTradePositionBook.value,
+          ...shoonyaPositionBook.value,
+          ...paperTradingPositionBook.value
+        ].find((p) => p.tsym === tsym)
         if (position) {
           const isLongPosition = position.netqty > 0
           const currentLTP = parseFloat(positionLTPs.value[tsym])
