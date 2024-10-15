@@ -2789,7 +2789,6 @@ export function useTradeView() {
       selectedBroker.value?.brokerName === 'PaperTrading' &&
       brokerStatus.value === 'Connected'
     ) {
-      // Get the selected broker for paper trading
       const selectedPaperBroker = JSON.parse(localStorage.getItem('selectedBrokerForPaper') || '{}')
       if (selectedPaperBroker.brokerName === 'Flattrade') {
         websocketUrl = 'ws://localhost:8765'
@@ -2804,82 +2803,87 @@ export function useTradeView() {
     console.log(`Connecting to WebSocket at ${websocketUrl}`)
     socket.value = new WebSocket(websocketUrl)
 
-    socket.value.onmessage = (event) => {
-      const quoteData = JSON.parse(event.data)
-      if (quoteData.lp) {
-        const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
-        if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
-          // Update the price for the selected master symbol
-          switch (selectedMasterSymbol.value) {
-            case 'NIFTY':
-              niftyPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-            case 'BANKNIFTY':
-              bankNiftyPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-            case 'FINNIFTY':
-              finniftyPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-            case 'MIDCPNIFTY':
-              midcpniftyPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-            case 'SENSEX':
-              sensexPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-            case 'BANKEX':
-              bankexPrice.value = quoteData.lp
-              updateOHLCIfNotEmpty('master', quoteData)
-              break
-          }
-        } else if (quoteData.tk === defaultCallSecurityId.value) {
-          latestCallLTP.value = quoteData.lp
-          updateOHLCIfNotEmpty('call', quoteData)
-        } else if (quoteData.tk === defaultPutSecurityId.value) {
-          latestPutLTP.value = quoteData.lp
-          updateOHLCIfNotEmpty('put', quoteData)
-        }
+    socket.value.onmessage = handleWebSocketMessage
+    socket.value.onerror = handleWebSocketError
+    socket.value.onopen = handleWebSocketOpen
+    socket.value.onclose = handleWebSocketClose
+  }
 
-        // Update position LTPs
-        const positionTsym = Object.keys(positionSecurityIds.value).find(
-          (tsym) => positionSecurityIds.value[tsym] === quoteData.tk
-        )
-        if (positionTsym) {
-          positionLTPs.value[positionTsym] = quoteData.lp
-        }
-        // Handle additional strike LTPs
-        if (ltpCallbacks.value[quoteData.tk]) {
-          ltpCallbacks.value[quoteData.tk](quoteData)
-        }
+  const handleWebSocketMessage = (event) => {
+    const quoteData = JSON.parse(event.data)
+    if (quoteData.lp) {
+      updateMasterSymbolPrice(quoteData)
+      updateOptionPrices(quoteData)
+      updatePositionLTPs(quoteData)
+      handleAdditionalStrikeLTPs(quoteData)
+    }
+    handleDepthFeed(quoteData)
+  }
+
+  const updateMasterSymbolPrice = (quoteData) => {
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
+    if (symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId) {
+      const priceMap = {
+        NIFTY: niftyPrice,
+        BANKNIFTY: bankNiftyPrice,
+        FINNIFTY: finniftyPrice,
+        MIDCPNIFTY: midcpniftyPrice,
+        SENSEX: sensexPrice,
+        BANKEX: bankexPrice
       }
-
-      // Handle depth feed
-      if (quoteData.tk === defaultCallSecurityId.value) {
-        // console.log('Updating call depth:', quoteData);
-        callDepth.value = { ...callDepth.value, ...quoteData }
-      } else if (quoteData.tk === defaultPutSecurityId.value) {
-        // console.log('Updating put depth:', quoteData);
-        putDepth.value = { ...putDepth.value, ...quoteData }
+      if (priceMap[selectedMasterSymbol.value]) {
+        priceMap[selectedMasterSymbol.value].value = quoteData.lp
+        updateOHLCIfNotEmpty('master', quoteData)
       }
     }
+  }
 
-    socket.value.onerror = (error) => {
-      console.error('WebSocket Error:', error)
+  const updateOptionPrices = (quoteData) => {
+    if (quoteData.tk === defaultCallSecurityId.value) {
+      latestCallLTP.value = quoteData.lp
+      updateOHLCIfNotEmpty('call', quoteData)
+    } else if (quoteData.tk === defaultPutSecurityId.value) {
+      latestPutLTP.value = quoteData.lp
+      updateOHLCIfNotEmpty('put', quoteData)
     }
+  }
 
-    socket.value.onopen = () => {
-      console.log('WebSocket connected')
-      initializeSubscriptions()
+  const updatePositionLTPs = (quoteData) => {
+    const positionTsym = Object.keys(positionSecurityIds.value).find(
+      (tsym) => positionSecurityIds.value[tsym] === quoteData.tk
+    )
+    if (positionTsym) {
+      positionLTPs.value[positionTsym] = quoteData.lp
+      console.log(`Updated LTP for position ${positionTsym}: ${quoteData.lp}`)
     }
+  }
 
-    socket.value.onclose = () => {
-      console.log('WebSocket disconnected. Attempting to reconnect...')
-      setTimeout(connectWebSocket, 5000)
+  const handleAdditionalStrikeLTPs = (quoteData) => {
+    if (ltpCallbacks.value[quoteData.tk]) {
+      ltpCallbacks.value[quoteData.tk](quoteData)
     }
+  }
+
+  const handleDepthFeed = (quoteData) => {
+    if (quoteData.tk === defaultCallSecurityId.value) {
+      callDepth.value = { ...callDepth.value, ...quoteData }
+    } else if (quoteData.tk === defaultPutSecurityId.value) {
+      putDepth.value = { ...putDepth.value, ...quoteData }
+    }
+  }
+
+  const handleWebSocketError = (error) => {
+    console.error('WebSocket Error:', error)
+  }
+
+  const handleWebSocketOpen = () => {
+    console.log('WebSocket connected')
+    initializeSubscriptions()
+  }
+
+  const handleWebSocketClose = () => {
+    console.log('WebSocket disconnected. Attempting to reconnect...')
+    setTimeout(connectWebSocket, 5000)
   }
   // Helper function to update OHLC values if they are not empty
   const updateOHLCIfNotEmpty = (type, data) => {
