@@ -19,13 +19,14 @@
                 </tr>
             </thead>
             <tbody>
-                <template v-if="sortedPositions.length">
+                <template v-if="sortedPositions.length > 0">
                     <tr v-for="position in sortedPositions" :key="position.tsym">
                         <td class="position-relative">
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
                                 <input type="checkbox" :id="'position-' + position.tsym" :value="position.tsym"
-                                    :checked="selectedPositionsSet.has(position.tsym)" :disabled="position.netqty == 0"
+                                    :checked="safeSelectedPositionsSet.has(position.tsym)"
+                                    :disabled="position.netqty == 0"
                                     @change="$emit('update:selectedPositionsSet', handleCheckboxChange($event, position.tsym))" />
                             </label>
                         </td>
@@ -127,7 +128,7 @@
                         </td>
                         <td
                             :class="position.calculatedUrmtom > 0 ? 'text-success' : position.calculatedUrmtom < 0 ? 'text-danger' : null">
-                            {{ position.calculatedUrmtom.toFixed(2) }}
+                            {{ position.calculatedUrmtom != null ? position.calculatedUrmtom.toFixed(2) : '-' }}
                         </td>
                     </tr>
                 </template>
@@ -143,6 +144,7 @@
 
 <script setup>
 import { useTradeView } from '@/composables/useTradingSystem';
+import { computed, watch } from 'vue';
 
 const props = defineProps({
     selectedBroker: {
@@ -151,6 +153,10 @@ const props = defineProps({
     },
     selectedPositionsSet: {
         type: Set,
+        default: () => new Set(),
+    },
+    positions: {
+        type: Array,
         required: true,
     },
 });
@@ -172,8 +178,29 @@ const {
     stoplosses,
     targets,
     trailingStoplosses,
-    sortedPositions,
 } = useTradeView();
+
+// Local computed property for sorted positions
+const sortedPositions = computed(() => {
+    if (!props.positions) return [];
+    console.log('Computing sortedPositions, positions:', props.positions);
+    return [...props.positions].sort((a, b) => {
+        // First, sort by open/closed status
+        if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1;
+        if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1;
+
+        // Then, for open positions, sort by absolute quantity in descending order
+        if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
+            return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty));
+        }
+
+        // For closed positions, maintain their original order
+        return 0;
+    });
+});
+
+// Compute a safe version of selectedPositionsSet
+const safeSelectedPositionsSet = computed(() => props.selectedPositionsSet || new Set());
 
 function setStoploss(position, type) {
     emit('set-stoploss', position, type);
@@ -208,7 +235,7 @@ function decreaseTarget(position) {
 }
 
 function handleCheckboxChange(event, tsym) {
-    const updatedSet = new Set(props.selectedPositionsSet);
+    const updatedSet = new Set(safeSelectedPositionsSet.value);
     if (event.target.checked) {
         updatedSet.add(tsym);
     } else {
@@ -216,4 +243,12 @@ function handleCheckboxChange(event, tsym) {
     }
     return updatedSet;
 }
+
+watch(() => props.positions, (newPositions) => {
+    console.log('Positions prop changed:', newPositions);
+}, { deep: true });
+
+watch(sortedPositions, (newSortedPositions) => {
+    console.log('Sorted positions changed:', newSortedPositions);
+}, { deep: true });
 </script>

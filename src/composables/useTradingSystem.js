@@ -57,6 +57,8 @@ export function useTradeView() {
     flatTradePositionBook,
     shoonyaPositionBook,
     paperTradingPositionBook,
+    paperTradingOrderBook,
+    paperTradingTradeBook,
     fundLimits,
     showBrokerClientId,
     quantities,
@@ -1629,35 +1631,41 @@ export function useTradeView() {
     }
   }
   const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      return {
-        uid: selectedBroker.value.brokerClientId,
-        actid: selectedBroker.value.brokerClientId,
-        exch: exchangeSegment,
-        tsym: selectedStrike.tradingSymbol,
-        qty: selectedQuantity.value,
-        prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
-        prd: selectedProductType.value,
-        trantype: transactionType,
-        prctyp: selectedOrderType.value,
-        ret: 'DAY'
-        // Add any additional fields specific to Flattrade here
-      }
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      return {
-        uid: selectedBroker.value.brokerClientId,
-        actid: selectedBroker.value.brokerClientId,
-        exch: exchangeSegment,
-        tsym: selectedStrike.tradingSymbol,
-        qty: selectedQuantity.value,
-        prc: selectedOrderType.value === 'LMT' ? limitPrice.value : 0,
-        prd: selectedProductType.value,
-        trantype: transactionType,
-        prctyp: selectedOrderType.value,
-        ret: 'DAY'
-      }
-    } else {
-      throw new Error('Unsupported broker')
+    const commonPayload = {
+      uid: selectedBroker.value.clientId,
+      actid: selectedBroker.value.clientId,
+      exch: exchangeSegment,
+      tsym: selectedStrike.tradingSymbol,
+      qty: selectedQuantity.value.toString(),
+      prc: selectedOrderType.value === 'LMT' ? limitPrice.value.toString() : '0',
+      prd: getProductTypeValue(selectedProductType.value),
+      trantype: getTransactionType(transactionType),
+      prctyp: selectedOrderType.value,
+      ret: 'DAY',
+      ordersource: 'API'
+    }
+
+    switch (selectedBroker.value?.brokerName) {
+      case 'Flattrade':
+        return {
+          ...commonPayload
+          // Add any additional fields specific to Flattrade here
+        }
+      case 'Shoonya':
+        return {
+          ...commonPayload
+          // Add any additional fields specific to Shoonya here
+        }
+      case 'PaperTrading':
+        return {
+          ...commonPayload,
+          paperTrade: true,
+          drvOptionType,
+          strikePrice: selectedStrike.strikePrice
+          // Add any additional fields specific to PaperTrading here
+        }
+      default:
+        throw new Error('Unsupported broker')
     }
   }
   const getOrderMargin = async () => {
@@ -1776,6 +1784,8 @@ export function useTradeView() {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           })
+        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+          response = simulatePaperTradingOrder(orderData)
         }
 
         console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`) // placed here to prevent delay and debugging if required
@@ -1814,6 +1824,8 @@ export function useTradeView() {
       await Promise.all([fetchFlattradeOrdersTradesBook(), fetchFlattradePositions()])
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       await Promise.all([fetchShoonyaOrdersTradesBook(), fetchShoonyaPositions()])
+    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
+      await Promise.all([fetchPaperTradingOrdersTradesBook(), fetchPaperTradingPositions()])
     }
   }
   const findNewPosition = (tradingSymbol) => {
@@ -1903,6 +1915,69 @@ export function useTradeView() {
       console.error('Failed to place order for position:', error)
       toastMessage.value = 'Failed to place order for SL/Target'
       showToast.value = true
+    }
+  }
+  const simulatePaperTradingOrder = (orderData) => {
+    const orderId = uuidv4()
+    const order = {
+      ...orderData,
+      orderId,
+      status: 'COMPLETE',
+      orderTimestamp: new Date().toISOString(),
+      lastUpdateTimestamp: new Date().toISOString(),
+      averagePrice: parseFloat(orderData.prc) || getMasterSymbolPrice()
+    }
+
+    paperTradingOrderBook.value.push(order)
+
+    const trade = {
+      tradeId: uuidv4(),
+      orderId,
+      exchangeOrderId: `PaperTrade-${orderId}`,
+      tradingSymbol: order.tsym,
+      tradeTimestamp: new Date().toISOString(),
+      quantity: parseInt(order.qty),
+      tradePrice: order.averagePrice,
+      product: order.prd,
+      ctcl: '',
+      remarks: 'Paper Trading Simulated Trade'
+    }
+
+    paperTradingTradeBook.value.push(trade)
+
+    updatePaperTradingPosition(order)
+    savePaperTradingData()
+
+    return { data: { stat: 'Ok', norenordno: orderId } }
+  }
+  const updatePaperTradingPosition = (order) => {
+    const existingPosition = paperTradingPositionBook.value.find(
+      (pos) => pos.tsym === order.tsym && pos.prd === order.prd
+    )
+
+    if (existingPosition) {
+      const quantity = parseInt(order.qty) * (order.trantype === 'B' ? 1 : -1)
+      existingPosition.netqty = (parseInt(existingPosition.netqty) + quantity).toString()
+      existingPosition.daybuyqty = (
+        parseInt(existingPosition.daybuyqty) + (order.trantype === 'B' ? parseInt(order.qty) : 0)
+      ).toString()
+      existingPosition.daysellqty = (
+        parseInt(existingPosition.daysellqty) + (order.trantype === 'S' ? parseInt(order.qty) : 0)
+      ).toString()
+      existingPosition.ltp = order.averagePrice.toString()
+      // Update other fields as needed
+    } else {
+      const newPosition = {
+        tsym: order.tsym,
+        exch: order.exch,
+        prd: order.prd,
+        netqty: order.trantype === 'B' ? order.qty : (-parseInt(order.qty)).toString(),
+        daybuyqty: order.trantype === 'B' ? order.qty : '0',
+        daysellqty: order.trantype === 'S' ? order.qty : '0',
+        ltp: order.averagePrice.toString()
+        // Add other necessary fields
+      }
+      paperTradingPositionBook.value.push(newPosition)
     }
   }
   const setStrategyType = (type) => {
@@ -3450,16 +3525,28 @@ export function useTradeView() {
   }
 
   const fetchPaperTradingPositions = async () => {
-    // Implement the logic to fetch paper trading positions
-    // This could be from a local storage, a mock API, or a real API endpoint
-    // Update paperTradingPositionBook.value with the fetched data
+    console.log('Fetching paper trading positions...')
+    const positions = JSON.parse(localStorage.getItem('paperTradingPositions') || '[]')
+    console.log('Fetched paper trading positions:', positions)
+    paperTradingPositionBook.value = positions || [] // Ensure it's always an array
+    console.log('Updated paperTradingPositionBook:', paperTradingPositionBook.value)
+    updatePositionSecurityIds()
+    subscribeToPositionLTPs()
+    subscribeToOptions()
   }
 
   const fetchPaperTradingOrdersTradesBook = async () => {
-    // Implement the logic to fetch paper trading orders and trades
-    // This could be from a local storage, a mock API, or a real API endpoint
-    // Update the relevant reactive variables with the fetched data
+    const orders = JSON.parse(localStorage.getItem('paperTradingOrders') || '[]')
+    const trades = JSON.parse(localStorage.getItem('paperTradingTrades') || '[]')
+    paperTradingOrderBook.value = orders
+    paperTradingTradeBook.value = trades
   }
+  const savePaperTradingData = () => {
+    localStorage.setItem('paperTradingPositions', JSON.stringify(paperTradingPositionBook.value))
+    localStorage.setItem('paperTradingOrders', JSON.stringify(paperTradingOrderBook.value))
+    localStorage.setItem('paperTradingTrades', JSON.stringify(paperTradingTradeBook.value))
+  }
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -4149,6 +4236,9 @@ export function useTradeView() {
   watch(stickyMTM, (newValue) => {
     localStorage.setItem('stickyMTM', JSON.stringify(newValue))
   })
+  watch(paperTradingPositionBook, (newValue) => {
+    console.log('paperTradingPositionBook changed:', newValue)
+  })
   // ... (add all other watchers here)
 
   return {
@@ -4272,7 +4362,6 @@ export function useTradeView() {
     selectedLots,
     maxLots,
     combinedOrdersAndTrades,
-    sortedPositions,
     orderTypes,
     displayOrderTypes,
     productTypes,

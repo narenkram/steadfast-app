@@ -1524,6 +1524,7 @@ const {
   modalOptionType,
   selectedShoonyaPositionsSet,
   selectedFlattradePositionsSet,
+  selectedPaperPositionsSet,
   currentClockEmoji,
   socket,
   latestCallLTP,
