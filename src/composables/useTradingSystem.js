@@ -3412,7 +3412,7 @@ export function useTradeView() {
 
     for (const [tsym, target] of validTargets) {
       const currentLTP = positionLTPs.value[tsym]
-      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
         (p) => p.tsym === tsym
       )
 
@@ -3449,7 +3449,7 @@ export function useTradeView() {
     // Check static stoplosses
     for (const [tsym, sl] of Object.entries(stoplosses.value)) {
       if (sl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
           (p) => p.tsym === tsym
         )
         if (position) {
@@ -3477,7 +3477,7 @@ export function useTradeView() {
     // Check trailing stoplosses
     for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
       if (tsl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value, ...paperTradingPositionBook.value].find(
           (p) => p.tsym === tsym
         )
         if (position) {
@@ -3982,9 +3982,11 @@ export function useTradeView() {
       Object.entries(newLTPs).forEach(([tsym, ltp]) => {
         if (ltp !== oldLTPs[tsym]) {
           // console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
-          const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
-            (p) => (p.tsym || p.tradingSymbol) === tsym
-          )
+          const position = [
+            ...flatTradePositionBook.value,
+            ...shoonyaPositionBook.value,
+            ...paperTradingPositionBook.value
+          ].find((p) => (p.tsym || p.tradingSymbol) === tsym)
           if (position) {
             // console.log(`Found position for ${tsym}:`, position);
             // Check stoplosses and targets immediately when LTP changes
