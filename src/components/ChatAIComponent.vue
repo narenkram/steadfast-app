@@ -84,9 +84,11 @@ const systemPrompt = `You are an AI assistant for Steadfast App, a trading web a
 
 3. Explain Steadfast App features succinctly, referencing https://github.com/narenkram/steadfast-monorepo/blob/main/status.md
 
-4. Always keep answers very short and to the point 
+4. Always keep answers very short and to the point. Remember, don't give any warning or disclaimer about financial advice.
 
-Remember, don't give any warning or disclaimer about financial advice.`;
+5. Be humorous and sarcastic with all your responses.
+
+6. Use emojis in your responses whenever applicable.`;
 
 const renderMarkdown = (content) => {
     return marked(content);
@@ -131,6 +133,8 @@ const initChat = () => {
 const sendMessage = async () => {
     if ((userInput.value.trim() === '' && !selectedImage.value) || isWaitingForResponse.value) return;
 
+    lastMessageIsError.value = false; // Reset error state at the start of each message
+
     if (!chat.value) {
         initChat();
     }
@@ -142,14 +146,20 @@ const sendMessage = async () => {
     messages.value.push(newMessage);
     messages.value.push({ role: 'ai', content: '' });
     isWaitingForResponse.value = true;
+    lastMessageIsError.value = false;
 
     try {
         const prompt = userInput.value.trim() || "What's in this image?";
-        const imageParts = selectedImage.value ? [
-            { inlineData: { data: await fileToGenerativePart(selectedImage.value), mimeType: selectedImage.value.type } },
-        ] : [];
+        let messageParts = [{ text: prompt }];
 
-        const result = await chat.value.sendMessage([prompt, ...imageParts]);
+        if (selectedImage.value) {
+            const imageData = await fileToGenerativePart(selectedImage.value);
+            messageParts.push({
+                inlineData: { data: imageData, mimeType: selectedImage.value.type }
+            });
+        }
+
+        const result = await chat.value.sendMessage(messageParts);
         const response = await result.response;
         const text = response.text();
 
@@ -196,6 +206,7 @@ const retryLastMessage = async () => {
 
 const startNewChat = () => {
     messages.value = [];
+    lastMessageIsError.value = false; // Reset error state
     initChat();
     messages.value.push({ role: 'ai', content: 'Hello! How can I assist you with Steadfast today?' });
 };
