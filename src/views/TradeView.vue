@@ -119,7 +119,7 @@
       <div class="bg-danger text-white p-3 rounded-3 shadow">
         <div class="d-flex align-items-center justify-content-between">
           <div>
-            <h5 class="mb-2">Kill Switch Activated</h5>
+            <h5 class="mb-2">Kill switch activated</h5>
             <p class="mb-0">
               Trading has been blocked for the next 6 hours. Take a break to put your mind at ease.
             </p>
@@ -145,7 +145,7 @@
           </div>
           <div class="text-center">
             <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
-              Make Adjustments Or Close Positions
+              Make adjustments or close positions
             </span>
           </div>
         </div>
@@ -164,7 +164,7 @@
           </div>
           <div class="text-center">
             <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
-              Close Positions to Lock in Profits
+              Close positions to lock in profits
             </span>
           </div>
         </div>
