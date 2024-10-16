@@ -54,14 +54,14 @@
                                 <div class="col-12" v-else-if="stoplosses[position.tsym] !== null">
                                     <div class="btn-group" role="group">
                                         <button class="btn btn-sm btn-outline-danger"
-                                            @click="decreaseStoploss(position)">
+                                            @click="$emit('decrease-stoploss', position)">
                                             - SL
                                         </button>
                                         <span class="d-flex align-items-center bg-danger text-white px-2">
                                             {{ stoplosses[position.tsym] }}
                                         </span>
                                         <button class="btn btn-sm btn-outline-success"
-                                            @click="increaseStoploss(position)">
+                                            @click="$emit('increase-stoploss', position)">
                                             + SL
                                         </button>
                                     </div>
@@ -93,14 +93,14 @@
                             <div class="row" style="height: 30px;">
                                 <div class="col-12" v-if="targets[position.tsym] !== null">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-sm btn-outline-danger" @click="decreaseTarget(position)">
+                                        <button class="btn btn-sm btn-outline-danger" @click="$emit('decrease-target', position)">
                                             - TG
                                         </button>
                                         <span class="d-flex align-items-center bg-success text-white px-2">
                                             {{ targets[position.tsym] }}
                                         </span>
                                         <button class="btn btn-sm btn-outline-success"
-                                            @click="increaseTarget(position)">
+                                            @click="$emit('increase-target', position)">
                                             + TG
                                         </button>
                                     </div>
@@ -200,38 +200,6 @@ const sortedPositions = computed(() => {
 
 // Compute a safe version of selectedPositionsSet
 const safeSelectedPositionsSet = computed(() => props.selectedPositionsSet || new Set());
-
-function setStoploss(position, type) {
-    emit('set-stoploss', position, type);
-}
-
-function removeStoploss(position) {
-    emit('remove-stoploss', position);
-}
-
-function increaseStoploss(position) {
-    emit('increase-stoploss', position);
-}
-
-function decreaseStoploss(position) {
-    emit('decrease-stoploss', position);
-}
-
-function setTarget(position) {
-    emit('set-target', position);
-}
-
-function removeTarget(position) {
-    emit('remove-target', position);
-}
-
-function increaseTarget(position) {
-    emit('increase-target', position);
-}
-
-function decreaseTarget(position) {
-    emit('decrease-target', position);
-}
 
 function handleCheckboxChange(event, tsym) {
     const updatedSet = new Set(safeSelectedPositionsSet.value);
