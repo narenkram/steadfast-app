@@ -287,21 +287,6 @@ export function useTradeView() {
       return new Date(bTime) - new Date(aTime) // Sort in descending order (most recent first)
     })
   })
-  const sortedPositions = computed(() => {
-    return [...positionsWithCalculatedProfit.value].sort((a, b) => {
-      // First, sort by open/closed status
-      if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1
-      if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1
-
-      // Then, for open positions, sort by absolute quantity in descending order
-      if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
-        return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty))
-      }
-
-      // For closed positions, maintain their original order
-      return 0
-    })
-  })
   const orderTypes = computed(() => {
     if (
       selectedBroker.value?.brokerName === 'Flattrade' ||
