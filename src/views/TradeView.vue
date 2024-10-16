@@ -71,18 +71,6 @@
     </div>
   </section>
 
-  <!-- <section class="row py-3">
-    <div class="col-12">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="toggleLineChart" v-model="showLineChart">
-        <label class="form-check-label" for="toggleLineChart">
-          Show MTM Chart
-        </label>
-      </div>
-      <LineChart v-if="showLineChart" :profitData="profitData" />
-    </div>
-  </section> -->
-
   <!-- Total Profit & Net PNL -->
   <section class="row py-3" :class="{ 'MTM': stickyMTM }">
     <div class="col-12 col-md-5 col-lg-5">
