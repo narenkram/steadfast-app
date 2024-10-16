@@ -785,32 +785,35 @@
           </div> -->
           </div>
 
-          <!-- Flattrade Positions -->
-          <PositionsTableComponent v-if="activeFetchFunction === 'fetchFlattradePositions'"
-            :positions="flatTradePositionBook" :selected-broker="selectedBroker"
-            :selected-positions-set="selectedFlattradePositionsSet"
-            @update:selected-positions-set="selectedFlattradePositionsSet = $event"
-            @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-            @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-            @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+          <div class="TabContent">
+            <!-- Flattrade Positions -->
+            <PositionsTableComponent v-if="activeFetchFunction === 'fetchFlattradePositions'"
+              :positions="flatTradePositionBook" :selected-broker="selectedBroker"
+              :selected-positions-set="selectedFlattradePositionsSet"
+              @update:selected-positions-set="selectedFlattradePositionsSet = $event"
+              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
+              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
+              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
-          <!-- Shoonya Positions -->
-          <PositionsTableComponent v-if="activeFetchFunction === 'fetchShoonyaPositions'"
-            :positions="shoonyaPositionBook" :selected-broker="selectedBroker"
-            :selected-positions-set="selectedShoonyaPositionsSet"
-            @update:selected-positions-set="selectedShoonyaPositionsSet = $event"
-            @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-            @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-            @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+            <!-- Shoonya Positions -->
+            <PositionsTableComponent v-if="activeFetchFunction === 'fetchShoonyaPositions'"
+              :positions="shoonyaPositionBook" :selected-broker="selectedBroker"
+              :selected-positions-set="selectedShoonyaPositionsSet"
+              @update:selected-positions-set="selectedShoonyaPositionsSet = $event"
+              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
+              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
+              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
-          <!-- PaperTrading Positions -->
-          <PositionsTableComponent v-if="activeFetchFunction === 'fetchPaperTradingPositions'"
-            :positions="paperTradingPositionBook" :selected-broker="selectedBroker"
-            :selected-positions-set="selectedPaperPositionsSet"
-            @update:selected-positions-set="selectedPaperPositionsSet = $event"
-            @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-            @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-            @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+            <!-- PaperTrading Positions -->
+            <PositionsTableComponent v-if="activeFetchFunction === 'fetchPaperTradingPositions'"
+              :positions="paperTradingPositionBook" :selected-broker="selectedBroker"
+              :selected-positions-set="selectedPaperPositionsSet"
+              @update:selected-positions-set="selectedPaperPositionsSet = $event"
+              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
+              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
+              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+          </div>
+
 
           <p class="text-secondary my-2">
             The targets & stoplosses are stored locally in the browser, they are not sent to the exchange, so if you
@@ -818,186 +821,189 @@
           </p>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
-          <!-- Flattrade Trades -->
-          <div class="table-responsive" v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Type</th>
-                  <th scope="col">Side</th>
-                  <th scope="col">Details</th>
-                  <th scope="col">Qty</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Status & Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template v-if="combinedOrdersAndTrades.length">
-                  <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
-                    <tr v-if="item.order.status !== 'COMPLETE'">
-                      <td>Order</td>
-                      <td>{{ item.order.trantype }}</td>
-                      <td>
-                        {{ item.order.norenordno }}
-                        <br />
-                        {{ item.order.tsym }}
-                      </td>
-                      <td>{{ item.order.qty }}</td>
-                      <td>{{ item.order.prc }}</td>
-                      <td>{{ formatTime(item.order.norentm) }}</td>
-                      <td :class="{
-                        'text-danger': item.order.status === 'REJECTED',
-                        'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
-                      }">
-                        {{ item.order.status }} {{ item.order.rejreason }}
-                      </td>
-                    </tr>
-                    <tr v-if="item.trade" class="nested-trade-row">
-                      <td>Trade</td>
-                      <td>{{ item.trade.trantype }}</td>
-                      <td>
-                        {{ item.trade.norenordno }}
-                        <br />
-                        {{ item.trade.tsym }}
-                      </td>
-                      <td>{{ item.trade.qty }}</td>
-                      <td>{{ item.trade.flprc }}</td>
-                      <td>{{ formatTime(item.trade.norentm) }}</td>
-                      <td class="text-success">
-                        {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
-                      </td>
-                    </tr>
-                  </template>
-                </template>
-                <tr v-else>
-                  <td colspan="9" class="text-center">
-                    No orders or trades on selected broker {{ selectedBroker.brokerName }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- Shoonya Trades -->
-          <div class="table-responsive" v-if="activeFetchFunction === 'fetchShoonyaOrdersTradesBook'">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Type</th>
-                  <th scope="col">Side</th>
-                  <th scope="col">Details</th>
-                  <th scope="col">Qty</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Status & Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template v-if="combinedOrdersAndTrades.length">
-                  <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
-                    <tr v-if="item.order.status !== 'COMPLETE'">
-                      <td>Order</td>
-                      <td>{{ item.order.trantype }}</td>
-                      <td>
-                        {{ item.order.norenordno }}
-                        <br />
-                        {{ item.order.tsym }}
-                      </td>
-                      <td>{{ item.order.qty }}</td>
-                      <td>{{ item.order.prc }}</td>
-                      <td>{{ formatTime(item.order.norentm) }}</td>
-                      <td :class="{
-                        'text-danger': item.order.status === 'REJECTED',
-                        'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
-                      }">
-                        {{ item.order.status }} {{ item.order.rejreason }}
-                      </td>
-                    </tr>
-                    <tr v-if="item.trade" class="nested-trade-row">
-                      <td>Trade</td>
-                      <td>{{ item.order.trantype }}</td>
-                      <td>
-                        {{ item.trade.norenordno }}
-                        <br />
-                        {{ item.trade.tsym }}
-                      </td>
-                      <td>{{ item.trade.qty }}</td>
-                      <td>{{ item.trade.flprc }}</td>
-                      <td>{{ formatTime(item.trade.norentm) }}</td>
-                      <td class="text-success">
-                        {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
-                      </td>
-                    </tr>
-                  </template>
-                </template>
-                <tr v-else>
-                  <td colspan="9" class="text-center">
-                    No orders or trades on selected broker {{ selectedBroker.brokerName }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
 
-          <!-- PaperTrading Trades -->
-          <div class="table-responsive" v-if="activeFetchFunction === 'fetchPaperTradingOrdersTradesBook'">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Type</th>
-                  <th scope="col">Side</th>
-                  <th scope="col">Details</th>
-                  <th scope="col">Qty</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Status & Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template v-if="combinedOrdersAndTrades.length">
-                  <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
-                    <tr v-if="item.order.status !== 'COMPLETE'">
-                      <td>Order</td>
-                      <td>{{ item.order.trantype }}</td>
-                      <td>
-                        {{ item.order.norenordno }}
-                        <br />
-                        {{ item.order.tsym }}
-                      </td>
-                      <td>{{ item.order.qty }}</td>
-                      <td>{{ item.order.prc }}</td>
-                      <td>{{ formatTime(item.order.norentm) }}</td>
-                      <td :class="{
-                        'text-danger': item.order.status === 'REJECTED',
-                        'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
-                      }">
-                        {{ item.order.status }} {{ item.order.rejreason }}
-                      </td>
-                    </tr>
-                    <tr v-if="item.trade" class="nested-trade-row">
-                      <td>Trade</td>
-                      <td>{{ item.trade.trantype }}</td>
-                      <td>
-                        {{ item.trade.norenordno }}
-                        <br />
-                        {{ item.trade.tsym }}
-                      </td>
-                      <td>{{ item.trade.qty }}</td>
-                      <td>{{ item.trade.flprc }}</td>
-                      <td>{{ formatTime(item.trade.norentm) }}</td>
-                      <td class="text-success">
-                        {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
-                      </td>
-                    </tr>
+          <div class="TabContent">
+            <!-- Flattrade Trades -->
+            <div class="table-responsive" v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook'">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Side</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Status & Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-if="combinedOrdersAndTrades.length">
+                    <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
+                      <tr v-if="item.order.status !== 'COMPLETE'">
+                        <td>Order</td>
+                        <td>{{ item.order.trantype }}</td>
+                        <td>
+                          {{ item.order.norenordno }}
+                          <br />
+                          {{ item.order.tsym }}
+                        </td>
+                        <td>{{ item.order.qty }}</td>
+                        <td>{{ item.order.prc }}</td>
+                        <td>{{ formatTime(item.order.norentm) }}</td>
+                        <td :class="{
+                          'text-danger': item.order.status === 'REJECTED',
+                          'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
+                        }">
+                          {{ item.order.status }} {{ item.order.rejreason }}
+                        </td>
+                      </tr>
+                      <tr v-if="item.trade" class="nested-trade-row">
+                        <td>Trade</td>
+                        <td>{{ item.trade.trantype }}</td>
+                        <td>
+                          {{ item.trade.norenordno }}
+                          <br />
+                          {{ item.trade.tsym }}
+                        </td>
+                        <td>{{ item.trade.qty }}</td>
+                        <td>{{ item.trade.flprc }}</td>
+                        <td>{{ formatTime(item.trade.norentm) }}</td>
+                        <td class="text-success">
+                          {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
+                        </td>
+                      </tr>
+                    </template>
                   </template>
-                </template>
-                <tr v-else>
-                  <td colspan="9" class="text-center">
-                    No orders or trades on selected broker {{ selectedBroker.brokerName }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  <tr v-else>
+                    <td colspan="9" class="text-center">
+                      No orders or trades on selected broker {{ selectedBroker.brokerName }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Shoonya Trades -->
+            <div class="table-responsive" v-if="activeFetchFunction === 'fetchShoonyaOrdersTradesBook'">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Side</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Status & Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-if="combinedOrdersAndTrades.length">
+                    <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
+                      <tr v-if="item.order.status !== 'COMPLETE'">
+                        <td>Order</td>
+                        <td>{{ item.order.trantype }}</td>
+                        <td>
+                          {{ item.order.norenordno }}
+                          <br />
+                          {{ item.order.tsym }}
+                        </td>
+                        <td>{{ item.order.qty }}</td>
+                        <td>{{ item.order.prc }}</td>
+                        <td>{{ formatTime(item.order.norentm) }}</td>
+                        <td :class="{
+                          'text-danger': item.order.status === 'REJECTED',
+                          'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
+                        }">
+                          {{ item.order.status }} {{ item.order.rejreason }}
+                        </td>
+                      </tr>
+                      <tr v-if="item.trade" class="nested-trade-row">
+                        <td>Trade</td>
+                        <td>{{ item.order.trantype }}</td>
+                        <td>
+                          {{ item.trade.norenordno }}
+                          <br />
+                          {{ item.trade.tsym }}
+                        </td>
+                        <td>{{ item.trade.qty }}</td>
+                        <td>{{ item.trade.flprc }}</td>
+                        <td>{{ formatTime(item.trade.norentm) }}</td>
+                        <td class="text-success">
+                          {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
+                        </td>
+                      </tr>
+                    </template>
+                  </template>
+                  <tr v-else>
+                    <td colspan="9" class="text-center">
+                      No orders or trades on selected broker {{ selectedBroker.brokerName }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- PaperTrading Trades -->
+            <div class="table-responsive" v-if="activeFetchFunction === 'fetchPaperTradingOrdersTradesBook'">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Side</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Status & Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-if="combinedOrdersAndTrades.length">
+                    <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
+                      <tr v-if="item.order.status !== 'COMPLETE'">
+                        <td>Order</td>
+                        <td>{{ item.order.trantype }}</td>
+                        <td>
+                          {{ item.order.norenordno }}
+                          <br />
+                          {{ item.order.tsym }}
+                        </td>
+                        <td>{{ item.order.qty }}</td>
+                        <td>{{ item.order.prc }}</td>
+                        <td>{{ formatTime(item.order.norentm) }}</td>
+                        <td :class="{
+                          'text-danger': item.order.status === 'REJECTED',
+                          'text-warning': item.order.status === 'PENDING' || item.order.status === 'OPEN'
+                        }">
+                          {{ item.order.status }} {{ item.order.rejreason }}
+                        </td>
+                      </tr>
+                      <tr v-if="item.trade" class="nested-trade-row">
+                        <td>Trade</td>
+                        <td>{{ item.trade.trantype }}</td>
+                        <td>
+                          {{ item.trade.norenordno }}
+                          <br />
+                          {{ item.trade.tsym }}
+                        </td>
+                        <td>{{ item.trade.qty }}</td>
+                        <td>{{ item.trade.flprc }}</td>
+                        <td>{{ formatTime(item.trade.norentm) }}</td>
+                        <td class="text-success">
+                          {{ item.trade.stat === 'Ok' ? 'EXECUTED' : item.trade.stat }}
+                        </td>
+                      </tr>
+                    </template>
+                  </template>
+                  <tr v-else>
+                    <td colspan="9" class="text-center">
+                      No orders or trades on selected broker {{ selectedBroker.brokerName }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <p class="text-secondary my-2">
