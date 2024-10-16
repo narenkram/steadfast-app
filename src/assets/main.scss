@@ -125,7 +125,7 @@
     // Invert some of the theme colors for dark mode
     --bs-primary: #6ea8fe; // Light blue
     --bs-secondary: #6c757d; // Gray
-    --bs-light: #343a40; // Dark gray
+    --bs-light: #191c1f; // Dark gray
     --bs-dark: #212529; // Dark background color (changed)
     --bs-body-color: #f8f9fa; // Light text color (should be darker)
     --bs-body-bg: #212529; // Dark background
@@ -133,6 +133,11 @@
     --bs-card-border-color: #dee2e6; // Light gray
   }
   @include color-scheme-styles;
+
+  // Add this new rule
+  .bg-light {
+    background-color: var(--bs-light) !important;
+  }
 
   // Dark theme styles
   .btn-outline {
@@ -396,7 +401,7 @@ input:focus {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
-.tab-content {
+.tab-content > .tab-pane {
   height: 500px;
 }
 .table-responsive {
@@ -405,5 +410,4 @@ input:focus {
 }
 
 .Steadfast-AI-Assistant {
-
 }

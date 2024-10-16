@@ -87,13 +87,17 @@
                             </div>
                         </td>
                         <td v-else>-</td>
-                        <td class="fw-bold">{{ positionLTPs[position.tsym] }}</td>
+                        <td
+                            :class="{ 'text-success': parseFloat(positionLTPs[position.tsym]) > parseFloat(position.totbuyavgprc), 'text-danger': parseFloat(positionLTPs[position.tsym]) < parseFloat(position.totbuyavgprc) }">
+                            {{ positionLTPs[position.tsym] }}
+                        </td>
                         <td v-if="position.netqty != 0">
                             <!-- TG -->
                             <div class="row" style="height: 30px;">
                                 <div class="col-12" v-if="targets[position.tsym] !== null">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-sm btn-outline-danger" @click="$emit('decrease-target', position)">
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            @click="$emit('decrease-target', position)">
                                             - TG
                                         </button>
                                         <span class="d-flex align-items-center bg-success text-white px-2">
@@ -120,9 +124,9 @@
                         </td>
                         <td v-else>-</td>
                         <td>{{ position.prd }}</td>
-                        <td class="text-success">{{ position.totbuyavgprc }}</td>
-                        <td class="text-primary">{{ position.netavgprc }}</td>
-                        <td class="text-danger">{{ position.totsellavgprc }}</td>
+                        <td>{{ position.totbuyavgprc }}</td>
+                        <td>{{ position.netavgprc }}</td>
+                        <td>{{ position.totsellavgprc }}</td>
                         <td :class="position.rpnl > 0 ? 'text-success' : position.rpnl < 0 ? 'text-danger' : null">
                             {{ position.rpnl }}
                         </td>

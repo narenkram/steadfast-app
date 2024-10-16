@@ -744,10 +744,10 @@
           </button>
         </li>
       </ul>
-      <div class="tab-content" id="myTabContent">
+      <div class="tab-content bg-light p-2 rounded border" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
-          <div class="row align-items-center">
+          <div class="row align-items-center justify-content-between mb-2">
             <div class="col-md-4 col-lg-4 text-center py-2">
               <p class="mb-0">
                 <b>Net Qty:
@@ -760,9 +760,8 @@
             <div class="col-md-4 col-lg-6 text-center py-2">
               <p class="mb-0">
                 <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
-                <span class="ms-3">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
+                <span class="ms-4">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
               </p>
-              <p class="mb-0"></p>
             </div>
             <!-- 1 Click Reverse Positions for Reverse All & Selected positions -->
             <!-- <div class="col-md-4 col-lg-2 text-center">
@@ -814,8 +813,8 @@
             @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
           <p class="text-secondary my-2">
-            Aim for a 1-3% daily target and set a 1-1.5% stoploss to manage trades effectively and
-            minimize losses.
+            The targets & stoplosses are stored locally in the browser, they are not sent to the exchange, so if you
+            internet goes down or you close this window, you positons will not close when they hit sl, tsl or target.
           </p>
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
