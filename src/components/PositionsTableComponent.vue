@@ -178,26 +178,25 @@ const {
     stoplosses,
     targets,
     trailingStoplosses,
+    positionsWithCalculatedProfit,
 } = useTradeView();
 
-// Local computed property for sorted positions
 const sortedPositions = computed(() => {
-    if (!props.positions) return [];
-    console.log('Computing sortedPositions, positions:', props.positions);
-    return [...props.positions].sort((a, b) => {
+    return [...positionsWithCalculatedProfit.value].sort((a, b) => {
         // First, sort by open/closed status
-        if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1;
-        if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1;
+        if (Number(a.netqty) !== 0 && Number(b.netqty) === 0) return -1
+        if (Number(a.netqty) === 0 && Number(b.netqty) !== 0) return 1
 
         // Then, for open positions, sort by absolute quantity in descending order
         if (Number(a.netqty) !== 0 && Number(b.netqty) !== 0) {
-            return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty));
+            return Math.abs(Number(b.netqty)) - Math.abs(Number(a.netqty))
         }
 
         // For closed positions, maintain their original order
-        return 0;
-    });
-});
+        return 0
+    })
+})
+
 
 // Compute a safe version of selectedPositionsSet
 const safeSelectedPositionsSet = computed(() => props.selectedPositionsSet || new Set());
