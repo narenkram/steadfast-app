@@ -750,7 +750,8 @@
           <div class="row align-items-center justify-content-between mb-2">
             <div class="col-md-4 col-lg-4 text-center py-2">
               <p class="mb-0">
-                <b>Net Qty:
+                <b>
+                  Net Qty:
                   <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
                     {{ totalNetQty }}
                   </span>
@@ -759,8 +760,14 @@
             </div>
             <div class="col-md-4 col-lg-6 text-center py-2">
               <p class="mb-0">
-                <span>Total Buy Value: <b>₹ {{ totalBuyValue.toFixed(2) }}</b></span>
-                <span class="ms-4">Total Sell Value: <b>₹ {{ totalSellValue.toFixed(2) }}</b></span>
+                <b>
+                  <span>
+                    Total Buy Value: <span class="text-success">₹ {{ totalBuyValue.toFixed(2) }}</span>
+                  </span>
+                  <span class="ms-4">
+                    Total Sell Value: <span class="text-danger">₹ {{ totalSellValue.toFixed(2) }}</span>
+                  </span>
+                </b>
               </p>
             </div>
             <!-- 1 Click Reverse Positions for Reverse All & Selected positions -->
