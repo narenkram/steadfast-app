@@ -19,7 +19,7 @@
         <div
             class="col-7 col-md-5 col-lg-5 d-flex align-items-center justify-content-md-around justify-content-between">
             <span class="me-3">
-                <small class="text-muted">Total</small>
+                <small class="text-muted">Funds</small>
                 <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
                     maximumFractionDigits: 2
                 }) : 'N/A' }}</span>
