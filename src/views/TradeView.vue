@@ -154,8 +154,8 @@
         <div class="row">
           <!-- Exchange Selection -->
           <div class="col-6 col-md-4 col-lg-2">
-            <label for="Exchange" class="form-label mb-0">Exchange</label>
-            <select id="Exchange" class="form-select" aria-label="Exchange" v-model="selectedExchange"
+            <label for="Exchange" class="form-label mb-0 small">Exchange</label>
+            <select id="Exchange" class="form-select form-select-sm" aria-label="Exchange" v-model="selectedExchange"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="exchange in exchangeOptions" :key="exchange" :value="exchange">
                 {{ exchange }}
@@ -163,26 +163,11 @@
             </select>
           </div>
 
-          <!-- Segment Selection -->
-          <!-- <div class="col-6 col-md-4 col-lg-2">
-          <label for="Segment" class="form-label mb-0">Segment</label>
-          <select
-            id="Segment"
-            class="form-select"
-            aria-label="Segment"
-            :class="{ 'disabled-form': isFormDisabled }"
-            disabled
-          >
-            <option value="Options" selected>Options</option>
-            <option value="Futures">Futures</option>
-          </select>
-        </div> -->
-
           <!-- Master Symbol Selection -->
           <div class="col-6 col-md-4 col-lg-3">
-            <label for="MasterSymbol" class="form-label mb-0">Master Symbol</label>
-            <select id="MasterSymbol" class="form-select" aria-label="Master Symbol" v-model="selectedMasterSymbol"
-              :class="{ 'disabled-form': isFormDisabled }">
+            <label for="MasterSymbol" class="form-label mb-0 small">Master Symbol</label>
+            <select id="MasterSymbol" class="form-select form-select-sm" aria-label="Master Symbol"
+              v-model="selectedMasterSymbol" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">
                 {{ symbol }}
               </option>
@@ -191,8 +176,8 @@
 
           <!-- Expiry Date Selection -->
           <div class="col-6 col-md-4 col-lg-3">
-            <label for="Expiry" class="form-label mb-0">Expiry Date</label>
-            <select id="Expiry" class="form-select" aria-label="Expiry" v-model="selectedExpiry"
+            <label for="Expiry" class="form-label mb-0 small">Expiry Date</label>
+            <select id="Expiry" class="form-select form-select-sm" aria-label="Expiry" v-model="selectedExpiry"
               :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="date in expiryDates" :key="date" :value="date">
                 {{ formatDate(date) }}
@@ -202,9 +187,9 @@
 
           <!-- Product Type Selection -->
           <div class="col-6 col-md-4 col-lg-2">
-            <label for="ProductType" class="form-label mb-0">Product Type</label>
-            <select id="ProductType" class="form-select" v-model="selectedProductType" aria-label="ProductType"
-              :class="{ 'disabled-form': isFormDisabled }">
+            <label for="ProductType" class="form-label mb-0 small">Product Type</label>
+            <select id="ProductType" class="form-select form-select-sm" v-model="selectedProductType"
+              aria-label="ProductType" :class="{ 'disabled-form': isFormDisabled }">
               <option v-for="productType in productTypes" :key="productType" :value="getProductTypeValue(productType)">
                 {{ productType }}
               </option>
@@ -213,12 +198,12 @@
 
           <!-- Quantity Selection -->
           <div class="col-6 col-md-4 col-lg-2">
-            <label for="Quantity" class="form-label mb-0">
+            <label for="Quantity" class="form-label mb-0 small">
               {{ selectedLots }} Lot{{ selectedLots !== 1 ? 's' : '' }} / Quantity
             </label>
-            <div class="input-group">
-              <input type="number" id="Quantity" class="form-control" v-model.number="selectedLots" :min="1"
-                :max="maxLots" @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }" />
+            <div class="input-group input-group-sm">
+              <input type="number" id="Quantity" class="form-control form-control-sm" v-model.number="selectedLots"
+                :min="1" :max="maxLots" @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">{{ selectedQuantity }}</span>
             </div>
           </div>
@@ -227,18 +212,18 @@
         <div class="row mt-3">
           <!-- Order Type -->
           <div class="col-6 col-md-3 col-lg-3">
-            <label for="OrderType" class="form-label mb-0">Order Type</label>
-            <div class="input-group">
-              <select id="OrderType" class="form-select w-75" aria-label="OrderType" v-model="selectedOrderType"
-                :class="{ 'disabled-form': isFormDisabled }" @change="handleOrderTypeChange">
+            <label for="OrderType" class="form-label mb-0 small">Order Type</label>
+            <div class="input-group input-group-sm">
+              <select id="OrderType" class="form-select form-select-sm w-75" aria-label="OrderType"
+                v-model="selectedOrderType" :class="{ 'disabled-form': isFormDisabled }"
+                @change="handleOrderTypeChange">
                 <option v-for="(displayType, index) in displayOrderTypes" :key="orderTypes[index]"
                   :value="orderTypes[index]">
                   {{ displayType }}
                 </option>
               </select>
-              <!-- Offset input (only visible for 'Limit at Offset' order type) -->
               <span class="input-group-text flex-shrink w-25 p-0 ps-2" v-if="isOffsetOrderType">
-                <input type="number" id="LimitOffset" class="form-control border-0 p-1" min="-9" max="9"
+                <input type="number" id="LimitOffset" class="form-control form-control-sm border-0 p-1" min="-9" max="9"
                   v-model="limitOffset" @input="handleOrderTypeChange" :class="{ 'disabled-form': isFormDisabled }" />
               </span>
             </div>
@@ -246,36 +231,40 @@
 
           <!-- Predefined Stoploss -->
           <div class="col-6 col-md-3 col-lg-3">
-            <label for="enableStoploss" class="form-label mb-0">Predefined Stoploss</label>
-            <div class="input-group mb-3">
+            <label for="enableStoploss" class="form-label mb-0 small">Predefined Stoploss</label>
+            <div class="input-group input-group-sm mb-3">
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableStoploss"
                   aria-label="Enable Predefined Stoploss" v-model="enableStoploss"
                   :class="{ 'disabled-form': isFormDisabled }" />
               </div>
-              <input type="number" class="form-control" id="stoplossValue" aria-label="Predefined Stoploss (points)"
-                v-model="stoplossValue" :class="{ 'disabled-form': isFormDisabled }" />
+              <input type="number" class="form-control form-control-sm" id="stoplossValue"
+                aria-label="Predefined Stoploss (points)" v-model="stoplossValue"
+                :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">₹ Points</span>
             </div>
           </div>
+
           <!-- Predefined Target -->
           <div class="col-6 col-md-3 col-lg-3">
-            <label for="enableTarget" class="form-label mb-0">Predefined Target</label>
-            <div class="input-group mb-3">
+            <label for="enableTarget" class="form-label mb-0 small">Predefined Target</label>
+            <div class="input-group input-group-sm mb-3">
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableTarget"
                   aria-label="Enable Predefined Target" v-model="enableTarget"
                   :class="{ 'disabled-form': isFormDisabled }" />
               </div>
-              <input type="number" class="form-control" id="targetValue" aria-label="Predefined Target (points)"
-                v-model="targetValue" :class="{ 'disabled-form': isFormDisabled }" />
+              <input type="number" class="form-control form-control-sm" id="targetValue"
+                aria-label="Predefined Target (points)" v-model="targetValue"
+                :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">₹ Points</span>
             </div>
           </div>
+
           <!-- Steadfast AI Assistant -->
           <div class="col-6 col-md-3 col-lg-3">
-            <label for="SteadfastAIAssistant" class="form-label mb-1">Steadfast AI Assistant</label>
-            <div class="input-group mb-3">
+            <label for="SteadfastAIAssistant" class="form-label mb-0 small">Steadfast AI Assistant</label>
+            <div class="input-group input-group-sm mb-3">
               <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
                 class="btn btn-sm btn-outline-danger w-100">✨ Open Chat</button>
             </div>
