@@ -35,16 +35,17 @@
     </div>
 
     <!-- Today's Expiry -->
-    <div class="col-4 col-md-4 col-lg-2 text-end mt-3 mt-md-3 mt-lg-0">
-      <p class="mb-1"><b>Today's Expiry</b></p>
-      <p class="mb-0 d-flex align-items-center justify-content-center">
-        <span class="fs-4 text-decoration-none me-2 text-danger" id="events-tab" type="button" data-bs-toggle="modal"
-          data-bs-target="#eventsModal">
-          📅
+    <div class="col-12 col-md-6 col-lg-3 d-flex align-items-center">
+      <span class="me-2">
+        <small class="text-muted">Today's Expiry</small>
+        <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
+          {{ todayExpirySymbol || '-' }}
         </span>
-        <b v-if="todayExpirySymbol" class="text-danger">{{ todayExpirySymbol }}</b>
-        <b v-else class="text-secondary">-</b>
-      </p>
+      </span>
+      <span class="fs-5 text-danger" id="events-tab" data-bs-toggle="modal" data-bs-target="#eventsModal"
+        style="cursor: pointer;">
+        📅
+      </span>
     </div>
   </section>
 
