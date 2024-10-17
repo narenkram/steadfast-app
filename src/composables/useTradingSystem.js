@@ -2287,24 +2287,14 @@ export function useTradeView() {
     showToast.value = true
     showBasketOrderModal.value = false
   }
-  const updateTradingSymbol = (order) => {
-    const strikes = order.optionType === 'CALL' ? callStrikes.value : putStrikes.value
-    const newStrike = strikes.find((strike) => strike.strikePrice === order.strikePrice)
-
-    if (newStrike) {
-      // If we found an exact match, use its properties
-      if (order.optionType === 'CALL') {
-        selectedCallStrike.value = newStrike
-      } else {
-        selectedPutStrike.value = newStrike
-      }
-    } else {
-      console.error(`No matching strike found for ${order.strikePrice}`)
-      return // Exit the function if no matching strike is found
+  const updateTradingSymbol = (strike) => {
+    if (strike.optionType === 'CALL') {
+      selectedCallStrike.value = strike
+      defaultCallSecurityId.value = strike.securityId || 'N/A'
+    } else if (strike.optionType === 'PUT') {
+      selectedPutStrike.value = strike
+      defaultPutSecurityId.value = strike.securityId || 'N/A'
     }
-
-    // Update security IDs
-    updateSecurityIds()
 
     // Trigger a re-subscription to the new security
     subscribeToOptions()
@@ -2937,20 +2927,14 @@ export function useTradeView() {
       const symbolsToSubscribe = []
       const exchangeSegment = getExchangeSegment()
 
-      // Add subscriptions for Call and Put options
-      if (
-        defaultCallSecurityId.value &&
-        defaultCallSecurityId.value !== 'N/A' &&
-        defaultCallSecurityId.value !== currentSubscriptions.value.callOption
-      ) {
+      // Add subscriptions for both Call and Put options
+      if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A') {
         symbolsToSubscribe.push(`${exchangeSegment}|${defaultCallSecurityId.value}`)
+        currentSubscriptions.value.callOption = defaultCallSecurityId.value
       }
-      if (
-        defaultPutSecurityId.value &&
-        defaultPutSecurityId.value !== 'N/A' &&
-        defaultPutSecurityId.value !== currentSubscriptions.value.putOption
-      ) {
+      if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A') {
         symbolsToSubscribe.push(`${exchangeSegment}|${defaultPutSecurityId.value}`)
+        currentSubscriptions.value.putOption = defaultPutSecurityId.value
       }
 
       if (symbolsToSubscribe.length > 0) {
@@ -2959,8 +2943,6 @@ export function useTradeView() {
           symbols: symbolsToSubscribe
         }
         socket.value.send(JSON.stringify(data))
-        currentSubscriptions.value.callOption = defaultCallSecurityId.value
-        currentSubscriptions.value.putOption = defaultPutSecurityId.value
         getOrderMargin()
       }
 
