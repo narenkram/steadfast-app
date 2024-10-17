@@ -123,7 +123,7 @@
                             </div>
                         </td>
                         <td v-else>-</td>
-                        <td>{{ position.prd }}</td>
+                        <td>{{ formatProductType(position.prd) }}</td>
                         <td>{{ position.totbuyavgprc }}</td>
                         <td>{{ position.netavgprc }}</td>
                         <td>{{ position.totsellavgprc }}</td>
@@ -202,6 +202,17 @@ const sortedPositions = computed(() => {
     })
 })
 
+// New function to format product type
+const formatProductType = (prd) => {
+    switch (prd) {
+        case 'M':
+            return 'Overnight';
+        case 'I':
+            return 'Intraday';
+        default:
+            return prd;
+    }
+}
 
 // Compute a safe version of selectedPositionsSet
 const safeSelectedPositionsSet = computed(() => props.selectedPositionsSet || new Set());
