@@ -275,13 +275,13 @@
         <div class="row align-items-center justify-content-between mt-3">
           <!-- Call Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
-            <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between small">
+            <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span>Call Strike</span>
               <span class="me-4">LTP</span>
             </label>
-            <div class="input-group input-group-sm">
-              <select id="CallStrike" class="form-select form-select-sm" aria-label="Call Strike"
-                v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }">
+            <div class="input-group">
+              <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
+                :class="{ 'disabled-form': isFormDisabled }">
                 <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
                   {{ strike.strikePrice }}
                 </option>
@@ -292,19 +292,19 @@
               }">{{ latestCallLTP }}
               </span>
             </div>
-            <div class="mt-1 small">
+            <div class="mt-1">
               <span v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
                 Margin Required: ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
               </span>
               <span v-else-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
               <span v-else>Margin: Not available</span>
             </div>
-            <div v-if="showStrikeDetails" class="small">
+            <div v-if="showStrikeDetails">
               <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
               <div class="text-muted">Security ID: {{ selectedCallStrike.securityId }}</div>
             </div>
             <!-- Call OHLC Values -->
-            <div class="d-flex w-100 justify-content-around flex-wrap small" v-if="showOHLCValues">
+            <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ callOpenPrice }}</span>
               <span class="text-success">H: {{ callHighPrice }}</span>
               <span class="text-danger">L: {{ callLowPrice }}</span>
@@ -317,7 +317,7 @@
                 <div class="ltp-range-marker" :style="{ left: callLtpRangeWidth + '%' }"></div>
                 <div class="ltp-range-open-marker" :style="{ left: callOpenMarkerPosition + '%' }"></div>
               </div>
-              <div class="d-flex justify-content-between small">
+              <div class="d-flex justify-content-between">
                 <span class="ltp-range-low">L: {{ callLowPrice }}</span>
                 <span class="ltp-range-high">H: {{ callHighPrice }}</span>
               </div>
@@ -437,36 +437,36 @@
 
           <!-- Put Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
-            <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between small">
+            <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span class="ms-4">LTP</span>
               <span>Put Strike</span>
             </label>
-            <div class="input-group input-group-sm">
+            <div class="input-group">
               <span class="input-group-text" :class="{
                 'text-success': parseFloat(latestPutLTP) > parseFloat(putOpenPrice),
                 'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
               }">{{ latestPutLTP }}
               </span>
-              <select id="PutStrike" class="form-select form-select-sm" aria-label="Put Strike"
-                v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }">
+              <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
+                :class="{ 'disabled-form': isFormDisabled }">
                 <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                   {{ strike.strikePrice }}
                 </option>
               </select>
             </div>
-            <div class="mt-1 small">
+            <div class="mt-1">
               <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
                 Margin Required: ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
               </span>
               <span v-else-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
               <span v-else>Margin: Not available</span>
             </div>
-            <div v-if="showStrikeDetails" class="small">
+            <div v-if="showStrikeDetails">
               <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
               <div class="text-muted">Security ID: {{ selectedPutStrike.securityId }}</div>
             </div>
             <!-- Put OHLC Values -->
-            <div class="d-flex w-100 justify-content-around flex-wrap small" v-if="showOHLCValues">
+            <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ putOpenPrice }}</span>
               <span class="text-success">H: {{ putHighPrice }}</span>
               <span class="text-danger">L: {{ putLowPrice }}</span>
@@ -479,7 +479,7 @@
                 <div class="ltp-range-marker" :style="{ left: putLtpRangeWidth + '%' }"></div>
                 <div class="ltp-range-open-marker" :style="{ left: putOpenMarkerPosition + '%' }"></div>
               </div>
-              <div class="d-flex justify-content-between small">
+              <div class="d-flex justify-content-between">
                 <span class="ltp-range-low">L: {{ putLowPrice }}</span>
                 <span class="ltp-range-high">H: {{ putHighPrice }}</span>
               </div>
