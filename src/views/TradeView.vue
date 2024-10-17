@@ -304,7 +304,8 @@
           <!-- Multi Strike Mode -->
           <MultiStrikeComponent :additionalSymbols="additionalSymbols" :additionalStrikes="additionalStrikes"
             :additionalStrikeLTPs="additionalStrikeLTPs" :selectedCallStrike="selectedCallStrike"
-            :selectedPutStrike="selectedPutStrike" :handleOrderClick="handleOrderClick" />
+            :selectedPutStrike="selectedPutStrike" :handleOrderClick="handleOrderClick" :callStrikes="callStrikes"
+            :putStrikes="putStrikes" />
         </div>
 
         <div class="row align-items-center justify-content-between mt-3">
