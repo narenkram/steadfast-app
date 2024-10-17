@@ -31,6 +31,8 @@ export default {
         return {
             routes: [
                 { path: '/', name: 'Home', icon: '⚡' },
+                { path: '/pricing', name: 'Pricing', icon: '💰' },
+                { path: '/login', name: 'Login', icon: '🔑' },
             ],
         };
     },

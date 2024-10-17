@@ -6,6 +6,9 @@ import Flattrade_Redirect from '@/views/BrokerRedirect/Flattrade_Redirect.vue'
 import HomeView from '@/views/HomeView.vue'
 import AppSettingsView from '@/views/AppSettingsView.vue'
 import ParallelCopyTradeView from '@/views/ParallelCopyTradeView.vue'
+import PricingView from '@/views/PricingView.vue'
+import LoginView from '@/views/LoginView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -13,6 +16,16 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/pricing',
+      name: 'pricing',
+      component: PricingView
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView
     },
     {
       path: '/manage-brokers',
