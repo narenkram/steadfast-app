@@ -158,8 +158,9 @@
             <div class="text-start mt-2">
               <div>
                 {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
-                <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
-                  :class="{ 'disabled-form': isFormDisabled }" @change="updateTradingSymbol(selectedCallStrike)">
+                <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
+                  aria-label="Call Strike" v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }"
+                  @change="updateTradingSymbol(selectedCallStrike)">
                   <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
@@ -260,8 +261,9 @@
             <div class="text-end mt-2">
               <div>
                 {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
-                <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
-                  :class="{ 'disabled-form': isFormDisabled }" @change="updateTradingSymbol(selectedPutStrike)">
+                <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
+                  aria-label="Put Strike" v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }"
+                  @change="updateTradingSymbol(selectedPutStrike)">
                   <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
