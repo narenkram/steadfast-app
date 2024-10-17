@@ -30,7 +30,7 @@
                                     @change="$emit('update:selectedPositionsSet', handleCheckboxChange($event, position.tsym))" />
                             </label>
                         </td>
-                        <td>{{ position.tsym }}</td>
+                        <td>{{ formatTradingSymbol(position.tsym) }}</td>
                         <td :class="[
                             position.netqty > 0 ? 'text-success' :
                                 position.netqty < 0 ? 'text-danger' :
@@ -183,6 +183,7 @@ const {
     targets,
     trailingStoplosses,
     positionsWithCalculatedProfit,
+    formatTradingSymbol,
 } = useTradeView();
 
 const sortedPositions = computed(() => {
