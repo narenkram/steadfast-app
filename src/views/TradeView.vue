@@ -743,7 +743,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="PlaceLimitOrderWindowLabel">
+          <h1 class="modal-title fs-6" id="PlaceLimitOrderWindowLabel">
             {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{
               selectedStrike.strikePrice }} {{ selectedStrike.expiryDate }}
           </h1>
@@ -761,10 +761,10 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-sm fs-5 btn-secondary" data-bs-dismiss="modal">
+            <button type="button" class="btn btn-sm fs-6 btn-secondary" data-bs-dismiss="modal">
               Cancel
             </button>
-            <button type="button" class="btn btn-sm fs-5 btn-primary" :disabled="!isValidLimitPrice"
+            <button type="button" class="btn btn-sm fs-6 btn-primary" :disabled="!isValidLimitPrice"
               data-bs-dismiss="modal" @click="validateAndPlaceOrder">
               Place Order
             </button>
@@ -780,7 +780,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="PlaceLimitOrderWithResetOrderTypeWindowLabel">
+          <h1 class="modal-title fs-6" id="PlaceLimitOrderWithResetOrderTypeWindowLabel">
             {{ modalTransactionType }} {{ modalOptionType }}: {{ selectedMasterSymbol }} {{
               selectedStrike.strikePrice }} {{ selectedStrike.expiryDate }}
           </h1>
@@ -799,11 +799,11 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-sm fs-5 btn-secondary" data-bs-dismiss="modal"
+            <button type="button" class="btn btn-sm fs-6 btn-secondary" data-bs-dismiss="modal"
               @click="resetOrderTypeIfNeeded">
               Cancel
             </button>
-            <button type="button" class="btn btn-sm fs-5 btn-primary" :disabled="!isValidLimitPrice"
+            <button type="button" class="btn btn-sm fs-6 btn-primary" :disabled="!isValidLimitPrice"
               data-bs-dismiss="modal" @click="validateAndPlaceOrder">
               Place Order
             </button>
@@ -832,10 +832,10 @@
         </div>
         <div class="modal-footer">
           <div class="d-flex flex-row justify-content-between w-100">
-            <button type="button" class="btn btn-sm fs-5 btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
+            <button type="button" class="btn btn-sm fs-6 btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
               No
             </button>
-            <button type="button" class="btn btn-sm fs-5 btn-danger w-50 ms-1" data-bs-dismiss="modal"
+            <button type="button" class="btn btn-sm fs-6 btn-danger w-50 ms-1" data-bs-dismiss="modal"
               @click="toggleKillSwitch">
               Yes
             </button>

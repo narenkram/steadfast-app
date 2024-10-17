@@ -211,7 +211,7 @@ onMounted(() => {
       <div class="modal-content">
         <form @submit.prevent="handleShoonyaLogin" class="">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="ShoonyaLoginLabel">
+            <h1 class="modal-title fs-6" id="ShoonyaLoginLabel">
               Shoonya Login
             </h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -255,7 +255,7 @@ onMounted(() => {
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="UpdateTokenLabel">
+          <h1 class="modal-title fs-6" id="UpdateTokenLabel">
             Update Token
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

@@ -38,7 +38,7 @@
                     {{ todayExpirySymbol || '-' }}
                 </span>
             </span>
-            <span class="fs-5 text-danger" id="events-tab" data-bs-toggle="modal" data-bs-target="#eventsModal"
+            <span class="fs-6 text-danger" id="events-tab" data-bs-toggle="modal" data-bs-target="#eventsModal"
                 style="cursor: pointer;">
                 📅
             </span>
