@@ -215,12 +215,4 @@ function handleCheckboxChange(event, tsym) {
     }
     return updatedSet;
 }
-
-watch(() => props.positions, (newPositions) => {
-    console.log('Positions prop changed:', newPositions);
-}, { deep: true });
-
-watch(sortedPositions, (newSortedPositions) => {
-    console.log('Sorted positions changed:', newSortedPositions);
-}, { deep: true });
 </script>

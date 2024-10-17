@@ -2891,7 +2891,7 @@ export function useTradeView() {
     )
     if (positionTsym) {
       positionLTPs.value[positionTsym] = quoteData.lp
-      console.log(`Updated LTP for position ${positionTsym}: ${quoteData.lp}`)
+      // console.log(`Updated LTP for position ${positionTsym}: ${quoteData.lp}`)
     }
   }
 
