@@ -1033,7 +1033,6 @@ const {
   handleKillSwitchClick,
   closeSelectedPositions,
   updateTradingSymbol,
-  toggleBrokerClientIdVisibility,
   resetOrderTypeIfNeeded,
   setStrategyType,
   updateBasketOrderQuantity,
