@@ -31,15 +31,6 @@
     background-color: var(--bs-gray-200);
   }
 
-  .nested-trade-row {
-    background-color: var(--bs-gray-100);
-  }
-
-  tr:hover + .nested-trade-row,
-  .nested-trade-row:hover {
-    background-color: var(--bs-gray-200);
-  }
-
   #enableStoploss:checked {
     background-color: var(--bs-danger);
     border-color: var(--bs-danger);
@@ -281,14 +272,6 @@ input:focus {
 
 .nav-link {
   color: inherit !important;
-}
-
-.nested-trade-row {
-  transition: background-color 0.3s ease;
-}
-
-.nested-trade-row td {
-  padding-left: calc(2rem - 3px);
 }
 
 .broker-logo {

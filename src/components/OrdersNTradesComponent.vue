@@ -17,7 +17,7 @@
                     <template v-for="item in combinedOrdersAndTrades" :key="item.norenordno">
                         <tr v-if="item.order.status !== 'COMPLETE'">
                             <td>Order</td>
-                            <td>{{ item.order.trantype }}</td>
+                            <td>{{ formatTranType(item.order.trantype) }}</td>
                             <td>
                                 {{ item.order.norenordno }}
                                 <br />
@@ -33,9 +33,9 @@
                                 {{ item.order.status }} {{ item.order.rejreason }}
                             </td>
                         </tr>
-                        <tr v-if="item.trade" class="nested-trade-row">
+                        <tr v-if="item.trade">
                             <td>Trade</td>
-                            <td>{{ item.trade.trantype }}</td>
+                            <td>{{ formatTranType(item.trade.trantype) }}</td>
                             <td>
                                 {{ item.trade.norenordno }}
                                 <br />
@@ -82,4 +82,16 @@ const props = defineProps({
         required: true,
     },
 });
+
+// Format trantype
+const formatTranType = (trantype) => {
+    switch (trantype) {
+        case 'S':
+            return 'SELL';
+        case 'B':
+            return 'BUY';
+        default:
+            return trantype;
+    }
+};
 </script>
