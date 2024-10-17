@@ -30,7 +30,7 @@ export default {
     data() {
         return {
             routes: [
-                { path: '/steadfast', name: 'Trade', icon: '⚡' },
+                { path: '/', name: 'Home', icon: '⚡' },
                 { path: '/app-settings', name: 'Settings', icon: '⚙️' },
                 { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
                 { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },

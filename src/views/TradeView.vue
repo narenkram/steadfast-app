@@ -1,6 +1,4 @@
 <template>
-  <NavigationComponent />
-
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <section class="row justify-content-between my-3">
     <!-- Broker Information -->
@@ -1354,7 +1352,6 @@
 </template>
 
 <script setup>
-import NavigationComponent from '@/components/NavigationComponent.vue'
 import { onMounted, onBeforeUnmount } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';

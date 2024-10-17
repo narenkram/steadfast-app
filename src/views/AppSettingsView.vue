@@ -299,7 +299,7 @@
     </div>
 
     <div class="col-12 pt-5 text-center">
-      <p class="text-secondary">These settings are automatically saved.</p>
+      <p class="text-secondary">These settings are automatically saved, just reload the app to see the changes.</p>
     </div>
   </section>
 </template>

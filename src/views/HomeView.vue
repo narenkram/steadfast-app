@@ -1,4 +1,5 @@
 <template>
+    <NavigationComponent />
     <div class="container-fluid">
         <!-- Hero Section -->
         <section class="row py-5 border border-success rounded">
@@ -148,7 +149,7 @@
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
-
+import NavigationComponent from '@/components/NavigationComponent.vue';
 
 const tradeViewWindow = ref(null)
 const openTradeView = () => {
