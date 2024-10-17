@@ -8,7 +8,7 @@
         </div>
         <div v-if="!apiKey" class="mb-3">
             <div class="input-group">
-                <input v-model="apiKeyInput" type="text" class="form-control" placeholder="Enter your API key">
+                <input v-model="apiKeyInput" type="text" class="form-control" placeholder="Enter your Gemini API key">
                 <button @click="saveApiKey" class="btn btn-primary">Save API Key</button>
             </div>
         </div>
