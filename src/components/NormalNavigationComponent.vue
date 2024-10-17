@@ -31,7 +31,10 @@ export default {
         return {
             routes: [
                 { path: '/', name: 'Home', icon: '⚡' },
+                { path: '/about', name: 'About', icon: '💡' },
                 { path: '/pricing', name: 'Pricing', icon: '💰' },
+                { path: '/contact', name: 'Contact', icon: '💬' },
+                { path: '/faq', name: 'FAQ', icon: '❓' },
                 { path: '/login', name: 'Login', icon: '🔑' },
             ],
         };
