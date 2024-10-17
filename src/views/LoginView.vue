@@ -30,8 +30,7 @@ import NormalNavigationComponent from '@/components/NormalNavigationComponent.vu
 const tradeViewWindow = ref(null)
 const openTradeView = () => {
     const url = `${window.location.origin}/steadfast`
-    const windowFeatures = 'width=1024,height=936,resizable=yes,scrollbars=yes,status=1'
-    tradeViewWindow.value = window.open(url, 'TradeView', windowFeatures)
+    window.location.href = url
 }
 
 onMounted(() => {
