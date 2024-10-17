@@ -234,9 +234,9 @@
             </div>
             <small class="text-muted">For development purposes only</small>
           </div>
-          <!-- Subscibe LTP for 3 more additional symbols -->
+          <!-- Multi Strike Mode Subscibe LTP for 3 more additional symbols -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="additionalSymbols" class="form-label">Additional Symbols</label>
+            <label for="additionalSymbols" class="form-label">Multi Strike Mode</label>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="additionalSymbols" :checked="additionalSymbols"
                 @change="toggleAdditionalSymbols" />

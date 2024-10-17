@@ -340,28 +340,9 @@
             <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth"
               :depth="putDepth" />
           </div>
-          <!-- Additional Strike LTPs -->
-          <div v-if="additionalSymbols" class="col-12 mt-3">
-            <h5>Additional Strike LTPs</h5>
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered">
-                <thead>
-                  <tr>
-                    <th>Call LTP</th>
-                    <th>Strike</th>
-                    <th>Put LTP</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="strike in additionalStrikes" :key="strike">
-                    <td>{{ additionalStrikeLTPs.call[strike] || 'N/A' }}</td>
-                    <td><strong>{{ strike }}</strong></td>
-                    <td>{{ additionalStrikeLTPs.put[strike] || 'N/A' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <!-- Multi Strike Mode -->
+          <MultiStrikeComponent :additionalSymbols="additionalSymbols" :additionalStrikes="additionalStrikes"
+            :additionalStrikeLTPs="additionalStrikeLTPs" />
         </div>
 
         <div class="row align-items-center justify-content-between mt-3">
@@ -1072,7 +1053,7 @@ import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import ChatAIComponent from '@/components/ChatAIComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
 import MarketDepthComponent from '@/components/MarketDepthComponent.vue';
-
+import MultiStrikeComponent from '@/components/MultiStrikeComponent.vue';
 
 const {
   // Methods
