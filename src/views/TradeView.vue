@@ -1024,7 +1024,6 @@ const {
   putLtpRangeWidth,
   putOpenMarkerPosition,
   additionalStrikes,
-  deployedCapitalPercentage,
   getBrokerClientId,
 
 

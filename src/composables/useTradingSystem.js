@@ -419,10 +419,6 @@ export function useTradeView() {
     const totalMoney = Number(availableBalance.value) + Number(usedAmount.value)
     return totalMoney ? (Number(totalProfit.value) / totalMoney) * 100 : 0
   })
-  const deployedCapitalPercentage = computed(() => {
-    const totalUsedAmount = usedAmount.value || 0
-    return totalUsedAmount ? (totalProfit.value / totalUsedAmount) * 100 : 0
-  })
   const totalBrokerage = computed(() => {
     let total = 0
 
@@ -4447,7 +4443,6 @@ export function useTradeView() {
     putLtpMarkerPosition,
     putOpenMarkerPosition,
     additionalStrikes,
-    deployedCapitalPercentage,
 
     // Reactive variables (from globalState)
     showLTPRangeBar,
