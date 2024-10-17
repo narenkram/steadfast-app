@@ -1,49 +1,8 @@
 <template>
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
-  <section class="row justify-content-between my-3">
-    <!-- Broker Information -->
-    <div class="col-12 col-md-6 col-lg-4 d-flex align-items-center justify-content-start">
-      <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
-        <option value="" disabled selected>Select broker</option>
-        <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-          {{ brokerName }} {{ maskBrokerClientId(getBrokerClientId(brokerName)) }}
-        </option>
-      </select>
-      <span class="badge me-2" :class="{
-        'bg-success': brokerStatus === 'Connected',
-        'bg-danger': brokerStatus === 'Not Connected',
-        'bg-warning text-dark': brokerStatus === 'Token Expired'
-      }">{{ brokerStatus }}</span>
-    </div>
-
-    <!-- Funds -->
-    <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-around">
-      <span class="me-3">
-        <small class="text-muted">Total</small>
-        <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
-          maximumFractionDigits: 2
-        }) : 'N/A' }}</span>
-      </span>
-      <span>
-        <small class="text-muted">Used</small>
-        <span class="ms-1 fw-bold">₹{{ usedAmount }}</span>
-      </span>
-    </div>
-
-    <!-- Today's Expiry -->
-    <div class="col-12 col-md-6 col-lg-3 d-flex align-items-center justify-content-end">
-      <span class="me-2">
-        <small class="text-muted">Today's Expiry</small>
-        <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
-          {{ todayExpirySymbol || '-' }}
-        </span>
-      </span>
-      <span class="fs-5 text-danger" id="events-tab" data-bs-toggle="modal" data-bs-target="#eventsModal"
-        style="cursor: pointer;">
-        📅
-      </span>
-    </div>
-  </section>
+  <BrokerComponent :selectedBrokerName="selectedBrokerName" @update:selectedBrokerName="selectedBrokerName = $event"
+    :availableBrokers="availableBrokers" :brokerStatus="brokerStatus" :availableBalance="availableBalance"
+    :usedAmount="usedAmount" :todayExpirySymbol="todayExpirySymbol" @updateSelectedBroker="updateSelectedBroker" />
 
   <!-- Place Order Form -->
   <section class="row mt-2">
@@ -1013,6 +972,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
+import BrokerComponent from '@/components/BrokerComponent.vue';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import ToastAlert from '@/components/ToastAlertComponent.vue';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
@@ -1061,7 +1021,6 @@ const {
   increaseTarget,
   decreaseTarget,
   checkStoplossesAndTargets,
-  maskBrokerClientId,
   initKillSwitch,
   formatDate,
   loadLots,

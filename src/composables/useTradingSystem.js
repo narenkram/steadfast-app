@@ -210,10 +210,6 @@ export function useTradeView() {
       ? 'btn btn-sm btn-danger shadow fs-6'
       : 'btn btn-sm btn-success shadow fs-6'
   )
-  const getBrokerClientId = (brokerName) => {
-    const brokerDetails = JSON.parse(localStorage.getItem(`broker_${brokerName}`) || '{}')
-    return brokerDetails.clientId ? `(${brokerDetails.clientId})` : ''
-  }
   const availableBrokers = computed(() => {
     return Object.keys(localStorage)
       .filter((key) => key.startsWith('broker_'))
@@ -1525,18 +1521,6 @@ export function useTradeView() {
     // console.log('Updated Fund Limits:', fundLimits.value);
   }
 
-  const maskBrokerClientId = (clientId) => {
-    if (!clientId) return 'N/A'
-    const length = clientId.length
-    if (length <= 2) return clientId
-    const maskLength = Math.max(1, Math.floor(length / 2))
-    const startUnmaskedLength = Math.ceil((length - maskLength) / 2)
-    const endUnmaskedLength = length - startUnmaskedLength - maskLength
-    const firstPart = clientId.slice(0, startUnmaskedLength)
-    const lastPart = clientId.slice(-endUnmaskedLength)
-    const middleMask = '*'.repeat(maskLength)
-    return `${firstPart}${middleMask}${lastPart}`
-  }
   const setOrderDetails = (transactionType, optionType) => {
     modalTransactionType.value = getTransactionType(transactionType) // Use getTransactionType to set modalTransactionType
     modalOptionType.value = optionType
@@ -4368,7 +4352,6 @@ export function useTradeView() {
     checkTargets,
     checkStoplosses,
     checkStoplossesAndTargets,
-    maskBrokerClientId,
     initKillSwitch,
     formatDate,
     loadLots,
@@ -4454,7 +4437,6 @@ export function useTradeView() {
     putOpenMarkerPosition,
     additionalStrikes,
     deployedCapitalPercentage,
-    getBrokerClientId,
 
     // Reactive variables (from globalState)
     showLTPRangeBar,
