@@ -232,7 +232,7 @@
               <span class="text-warning">C: {{ callClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Call Strike -->
-            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
+            <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
               :openMarkerPosition="callOpenMarkerPosition" :lowPrice="callLowPrice" :highPrice="callHighPrice" />
             <!-- Call Market Depth -->
             <MarketDepthComponent :isDepthAvailable="isCallDepthAvailable" :marketDepth="marketDepth"
@@ -291,7 +291,7 @@
               <span class="text-warning">C: {{ masterClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Live Underlying Price -->
-            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="ltpRangeWidth"
+            <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="ltpRangeWidth"
               :openMarkerPosition="openMarkerPosition" :lowPrice="masterLowPrice" :highPrice="masterHighPrice" />
           </div>
 
@@ -334,7 +334,7 @@
               <span class="text-warning">C: {{ putClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Put Strike -->
-            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
+            <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
               :openMarkerPosition="putOpenMarkerPosition" :lowPrice="putLowPrice" :highPrice="putHighPrice" />
             <!-- Put Market Depth -->
             <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth"

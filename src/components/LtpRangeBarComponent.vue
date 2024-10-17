@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
+    <div class="ltp-range-bar mt-3 mb-2">
         <div class="ltp-range">
             <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
             <div class="ltp-range-marker" :style="{ left: ltpRangeWidth + '%' }"></div>
@@ -16,10 +16,6 @@
 import { defineProps } from 'vue';
 
 const props = defineProps({
-    showLTPRangeBar: {
-        type: Boolean,
-        required: true
-    },
     ltpRangeWidth: {
         type: Number,
         required: true
