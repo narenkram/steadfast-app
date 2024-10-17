@@ -1146,18 +1146,9 @@ export function useTradeView() {
     synchronizePutStrikes()
   }
   const synchronizeCallStrikes = () => {
-    if (selectedPutStrike.value && selectedPutStrike.value.tradingSymbol) {
-      let baseSymbol
-      if (
-        selectedBroker.value?.brokerName === 'Flattrade' ||
-        selectedBroker.value?.brokerName === 'Shoonya' ||
-        selectedBroker.value?.brokerName === 'PaperTrading'
-      ) {
-        baseSymbol = selectedPutStrike.value.tradingSymbol.replace(/P\d+$/, '')
-      }
+    if (selectedPutStrike.value && selectedPutStrike.value.strikePrice) {
       const matchingCallStrike = callStrikes.value.find(
-        (strike) =>
-          strike.tradingSymbol.startsWith(baseSymbol) && /C\d+$/.test(strike.tradingSymbol)
+        (strike) => strike.strikePrice === selectedPutStrike.value.strikePrice
       )
       if (matchingCallStrike) {
         selectedCallStrike.value = matchingCallStrike
@@ -1167,19 +1158,11 @@ export function useTradeView() {
     }
     updateSecurityIds()
   }
+
   const synchronizePutStrikes = () => {
-    if (selectedCallStrike.value && selectedCallStrike.value.tradingSymbol) {
-      let baseSymbol
-      if (
-        selectedBroker.value?.brokerName === 'Flattrade' ||
-        selectedBroker.value?.brokerName === 'Shoonya' ||
-        selectedBroker.value?.brokerName === 'PaperTrading'
-      ) {
-        baseSymbol = selectedCallStrike.value.tradingSymbol.replace(/C\d+$/, '')
-      }
+    if (selectedCallStrike.value && selectedCallStrike.value.strikePrice) {
       const matchingPutStrike = putStrikes.value.find(
-        (strike) =>
-          strike.tradingSymbol.startsWith(baseSymbol) && /P\d+$/.test(strike.tradingSymbol)
+        (strike) => strike.strikePrice === selectedCallStrike.value.strikePrice
       )
       if (matchingPutStrike) {
         selectedPutStrike.value = matchingPutStrike
@@ -2305,21 +2288,49 @@ export function useTradeView() {
   const updateTradingSymbol = (order) => {
     const strikes = order.optionType === 'CALL' ? callStrikes.value : putStrikes.value
     const newStrike = strikes.find((strike) => strike.strikePrice === order.strikePrice)
+
     if (newStrike) {
-      order.tradingSymbol = newStrike.tradingSymbol
+      // If we found an exact match, use all its properties
+      Object.assign(order, newStrike)
     } else {
-      // If no matching strike is found, construct the new trading symbol
+      // If no matching strike is found, find the closest one
+      const closestStrike = strikes.reduce((prev, curr) =>
+        Math.abs(curr.strikePrice - order.strikePrice) <
+        Math.abs(prev.strikePrice - order.strikePrice)
+          ? curr
+          : prev
+      )
+
+      // Use the properties of the closest strike, but keep the selected strikePrice
+      Object.assign(order, closestStrike, { strikePrice: order.strikePrice })
+
+      // Update the trading symbol with the new strike price
       const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
       const match = order.tradingSymbol.match(regex)
-
       if (match) {
         const [, index, year, month, date, optionType] = match
-        order.tradingSymbol = `${index}${year}${month}${date}${optionType}${order.strikePrice}`
+        const newStrikePrice = order.strikePrice.toString().padStart(5, '0')
+        order.tradingSymbol = `${index}${year}${month}${date}${optionType}${newStrikePrice}`
       }
     }
 
     // Update the formatted display of the trading symbol
     order.formattedTradingSymbol = formatTradingSymbol(order.tradingSymbol)
+
+    // Synchronize the other strike
+    if (order.optionType === 'CALL') {
+      selectedCallStrike.value = order
+      synchronizePutStrikes()
+    } else {
+      selectedPutStrike.value = order
+      synchronizeCallStrikes()
+    }
+
+    // Update security IDs
+    updateSecurityIds()
+
+    // Trigger a re-subscription to the new security
+    subscribeToOptions()
   }
   const closeAllPositions = async () => {
     try {
