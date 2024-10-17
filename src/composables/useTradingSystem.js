@@ -2331,7 +2331,19 @@ export function useTradeView() {
     const newStrike = strikes.find((strike) => strike.strikePrice === order.strikePrice)
     if (newStrike) {
       order.tradingSymbol = newStrike.tradingSymbol
+    } else {
+      // If no matching strike is found, construct the new trading symbol
+      const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
+      const match = order.tradingSymbol.match(regex)
+
+      if (match) {
+        const [, index, year, month, date, optionType] = match
+        order.tradingSymbol = `${index}${year}${month}${date}${optionType}${order.strikePrice}`
+      }
     }
+
+    // Update the formatted display of the trading symbol
+    order.formattedTradingSymbol = formatTradingSymbol(order.tradingSymbol)
   }
   const closeAllPositions = async () => {
     try {
@@ -3838,19 +3850,18 @@ export function useTradeView() {
       // Handle the error appropriately (e.g., show an error message to the user)
     }
   })
-  const formatTradingSymbol = (symbol) => {
+  const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
     if (!symbol) return ''
 
-    // Regular expression to match the parts of the trading symbol
     const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
     const match = symbol.match(regex)
 
     if (match) {
       const [, index, year, month, date, optionType, strikePrice] = match
-      return `${index} ${date}${month}${year} ${optionType} ${strikePrice}`
+      return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
     }
 
-    return symbol // Return original if it doesn't match the expected format
+    return symbol
   }
   // ... (add all other methods here)
 

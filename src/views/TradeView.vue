@@ -258,7 +258,15 @@
           <div class="col-12 col-md-4 col-lg-4">
             <!-- Call Strike Details -->
             <div class="text-start mt-2">
-              <div>{{ formatTradingSymbol(selectedCallStrike.tradingSymbol) }}</div>
+              <div>
+                {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
+                <select v-model="selectedCallStrike.strikePrice" @change="updateTradingSymbol(selectedCallStrike)"
+                  class="form-select form-select-sm d-inline-block w-auto ms-2">
+                  <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike.strikePrice">
+                    {{ strike.strikePrice }}
+                  </option>
+                </select>
+              </div>
               <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedCallStrike.securityId }}</div>
             </div>
             <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
@@ -266,12 +274,6 @@
               <span class="me-4">LTP</span>
             </label>
             <div class="input-group">
-              <select id="CallStrike" class="form-select" aria-label="Call Strike" v-model="selectedCallStrike"
-                :class="{ 'disabled-form': isFormDisabled }">
-                <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
-                  {{ strike.strikePrice }}
-                </option>
-              </select>
               <span class="input-group-text" :class="{
                 'text-success': parseFloat(latestCallLTP) > parseFloat(callOpenPrice),
                 'text-danger': parseFloat(latestCallLTP) < parseFloat(callOpenPrice)
@@ -422,7 +424,15 @@
           <div class="col-12 col-md-4 col-lg-4">
             <!-- Put Strike Details -->
             <div class="text-end mt-2">
-              <div>{{ formatTradingSymbol(selectedPutStrike.tradingSymbol) }}</div>
+              <div>
+                {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
+                <select v-model="selectedPutStrike.strikePrice" @change="updateTradingSymbol(selectedPutStrike)"
+                  class="form-select form-select-sm d-inline-block w-auto ms-2">
+                  <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike.strikePrice">
+                    {{ strike.strikePrice }}
+                  </option>
+                </select>
+              </div>
               <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
             </div>
             <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
@@ -435,12 +445,6 @@
                 'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
               }">{{ latestPutLTP }}
               </span>
-              <select id="PutStrike" class="form-select" aria-label="Put Strike" v-model="selectedPutStrike"
-                :class="{ 'disabled-form': isFormDisabled }">
-                <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
-                  {{ strike.strikePrice }}
-                </option>
-              </select>
             </div>
             <div class="mt-1">
               <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
