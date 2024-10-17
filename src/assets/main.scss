@@ -71,16 +71,6 @@
     background-color: var(--bs-input-bg);
     border-color: var(--bs-border-color);
   }
-  .form-control:disabled {
-    color: var(--bs-body-color);
-    background-color: var(--bs-input-bg);
-    border-color: var(--bs-border-color);
-  }
-  .form-select:disabled {
-    color: var(--bs-body-color);
-    background-color: var(--bs-input-bg);
-    border-color: var(--bs-border-color);
-  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -183,6 +173,17 @@
   .MTM {
     background: rgba(0, 0, 0, 0.2);
   }
+
+  .form-control:disabled {
+    color: var(--bs-body-color);
+    background-color: var(--bs-light);
+    border-color: var(--bs-border-color);
+  }
+  .form-select:disabled {
+    color: var(--bs-body-color);
+    background-color: var(--bs-light);
+    border-color: var(--bs-border-color);
+  }
 }
 
 // Styles that don't change based on color scheme
@@ -275,11 +276,6 @@ input:focus {
 
 .dropdown-menu {
   width: 100%;
-}
-
-.disabled-form {
-  cursor: not-allowed;
-  pointer-events: all;
 }
 
 .nav-link {

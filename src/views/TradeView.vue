@@ -2,7 +2,7 @@
   <NavigationComponent />
 
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
-  <section class="row justify-content-between">
+  <section class="row justify-content-between my-3">
     <!-- Broker Information -->
     <div class="col-12 col-md-6 col-lg-4 d-flex align-items-center justify-content-start">
       <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
@@ -19,7 +19,7 @@
     </div>
 
     <!-- Funds -->
-    <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center">
+    <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-around">
       <span class="me-3">
         <small class="text-muted">Total</small>
         <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -43,45 +43,6 @@
       <span class="fs-5 text-danger" id="events-tab" data-bs-toggle="modal" data-bs-target="#eventsModal"
         style="cursor: pointer;">
         📅
-      </span>
-    </div>
-  </section>
-
-  <!-- Total Profit & Net PNL -->
-  <section class="row pt-3" :class="{ 'MTM': stickyMTM }">
-    <div class="col-12 d-flex align-items-center justify-content-between">
-      <span class="me-3">
-        <small class="text-muted">Total Profit</small>
-        <span class="ms-1 fw-bold" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
-          ₹{{ totalProfit.toFixed(2) }}
-        </span>
-      </span>
-      <span>
-        <small class="text-muted">Net PNL (est.)</small>
-        <span class="ms-1 fw-bold" :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
-          ₹{{ netPnl.toFixed(2) }}
-        </span>
-      </span>
-      <span>
-        <small class="text-muted">Net Qty</small>
-        <span class="ms-1 fw-bold" :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
-          {{ totalNetQty }}
-        </span>
-      </span>
-      <span>
-        <small class="text-muted">Total Capital</small>
-        <span class="ms-1 fw-bold"
-          :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
-          {{ totalCapitalPercentage.toFixed(2) }}%
-        </span>
-      </span>
-      <span>
-        <small class="text-muted">Kill Switch</small>
-        <a :class="['ms-2', 'btn', 'btn-sm', killSwitchButtonClass]" @click="handleKillSwitchClick"
-          :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
-          :data-bs-toggle="killSwitchActive ? '' : 'modal'">
-          {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
-        </a>
       </span>
     </div>
   </section>
@@ -145,10 +106,8 @@
     </div>
   </section>
 
-  <hr />
-
   <!-- Place Order Form -->
-  <section class="row py-2">
+  <section class="row mt-2">
     <form @submit.prevent>
       <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
         <div class="row">
@@ -163,8 +122,18 @@
             </select>
           </div>
 
+          <!-- Segment Selection -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <label for="Segment" class="form-label mb-0 small">Segment</label>
+            <select id="Segment" class="form-select form-select-sm" aria-label="Segment"
+              :class="{ 'disabled-form': isFormDisabled }" disabled>
+              <option value="Options" selected>Options</option>
+              <option value="Futures">Futures</option>
+            </select>
+          </div>
+
           <!-- Master Symbol Selection -->
-          <div class="col-6 col-md-4 col-lg-3">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="MasterSymbol" class="form-label mb-0 small">Master Symbol</label>
             <select id="MasterSymbol" class="form-select form-select-sm" aria-label="Master Symbol"
               v-model="selectedMasterSymbol" :class="{ 'disabled-form': isFormDisabled }">
@@ -175,7 +144,7 @@
           </div>
 
           <!-- Expiry Date Selection -->
-          <div class="col-6 col-md-4 col-lg-3">
+          <div class="col-6 col-md-4 col-lg-2">
             <label for="Expiry" class="form-label mb-0 small">Expiry Date</label>
             <select id="Expiry" class="form-select form-select-sm" aria-label="Expiry" v-model="selectedExpiry"
               :class="{ 'disabled-form': isFormDisabled }">
@@ -207,11 +176,9 @@
               <span class="input-group-text">{{ selectedQuantity }}</span>
             </div>
           </div>
-        </div>
 
-        <div class="row mt-3">
           <!-- Order Type -->
-          <div class="col-6 col-md-3 col-lg-3">
+          <div class="col-6 col-md-4 col-lg-2 mt-md-1 mt-lg-2">
             <label for="OrderType" class="form-label mb-0 small">Order Type</label>
             <div class="input-group input-group-sm">
               <select id="OrderType" class="form-select form-select-sm w-75" aria-label="OrderType"
@@ -229,8 +196,22 @@
             </div>
           </div>
 
+          <!-- Market Protection -->
+          <div class="col-6 col-md-4 col-lg-2 mt-md-1 mt-lg-2">
+            <label for="MarketProtection" class="form-label mb-0 small">Market Protection</label>
+            <select id="Segment" class="form-select form-select-sm" aria-label="Segment"
+              :class="{ 'disabled-form': isFormDisabled }" disabled>
+              <option value="0" selected>0%</option>
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+              <option value="3">3%</option>
+              <option value="4">4%</option>
+              <option value="5">5%</option>
+            </select>
+          </div>
+
           <!-- Predefined Stoploss -->
-          <div class="col-6 col-md-3 col-lg-3">
+          <div class="col-6 col-md-4 col-lg-3 mt-md-1 mt-lg-2">
             <label for="enableStoploss" class="form-label mb-0 small">Predefined Stoploss</label>
             <div class="input-group input-group-sm mb-3">
               <div class="input-group-text">
@@ -246,7 +227,7 @@
           </div>
 
           <!-- Predefined Target -->
-          <div class="col-6 col-md-3 col-lg-3">
+          <div class="col-6 col-md-4 col-lg-3 mt-md-1 mt-lg-2">
             <label for="enableTarget" class="form-label mb-0 small">Predefined Target</label>
             <div class="input-group input-group-sm mb-3">
               <div class="input-group-text">
@@ -262,11 +243,11 @@
           </div>
 
           <!-- Steadfast AI Assistant -->
-          <div class="col-6 col-md-3 col-lg-3">
-            <label for="SteadfastAIAssistant" class="form-label mb-0 small">Steadfast AI Assistant</label>
+          <div class="col-6 col-md-4 col-lg-1 mt-md-1 mt-lg-2">
+            <label for="SteadfastAIAssistant" class="form-label mb-0 small"></label>
             <div class="input-group input-group-sm mb-3">
               <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
-                class="btn btn-sm btn-outline-danger w-100">✨ Open Chat</button>
+                class="btn btn-sm btn-outline-danger w-100">✨</button>
             </div>
           </div>
         </div>
@@ -680,6 +661,45 @@
         </div>
       </fieldset>
     </form>
+  </section>
+
+  <!-- Total Profit & Net PNL -->
+  <section class="row mt-3 mx-0 bg-light rounded" :class="{ 'MTM': stickyMTM }">
+    <div class="col-12 d-flex align-items-center justify-content-between p-0">
+      <span class="ms-3">
+        <small class="text-muted">Total Capital</small>
+        <span class="ms-1 fw-bold"
+          :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
+          {{ totalCapitalPercentage.toFixed(2) }}%
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Total Profit</small>
+        <span class="ms-1 fw-bold" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
+          ₹{{ totalProfit.toFixed(2) }}
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Net Qty</small>
+        <span class="ms-1 fw-bold" :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
+          {{ totalNetQty }}
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Net PNL (est.)</small>
+        <span class="ms-1 fw-bold" :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
+          ₹{{ netPnl.toFixed(2) }}
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Kill Switch</small>
+        <a :class="['ms-2', 'btn', 'btn-sm', killSwitchButtonClass]" @click="handleKillSwitchClick"
+          :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
+          :data-bs-toggle="killSwitchActive ? '' : 'modal'">
+          {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
+        </a>
+      </span>
+    </div>
   </section>
 
   <!-- Positions & Trades -->
