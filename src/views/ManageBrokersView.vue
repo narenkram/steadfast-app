@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import NavigationComponent from '@/components/NavigationComponent.vue';
+import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import { useTradeView } from '@/composables/useTradingSystem';
 
@@ -101,7 +101,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <NavigationComponent />
+  <AppNavigationComponent />
 
   <section class="row pt-5 pb-3">
     <div class="col-8 text-start">

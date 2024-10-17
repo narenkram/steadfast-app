@@ -1,5 +1,5 @@
 <template>
-  <NavigationComponent />
+  <AppNavigationComponent />
   <section class="container-fluid py-5">
     <div class="row">
       <div class="col-12">
@@ -16,5 +16,5 @@
 </template>
 
 <script setup>
-import NavigationComponent from '@/components/NavigationComponent.vue'
+import AppNavigationComponent from '@/components/AppNavigationComponent.vue'
 </script>

@@ -1,4 +1,5 @@
 <template>
+  <AppNavigationComponent />
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <BrokerComponent :selectedBrokerName="selectedBrokerName" @update:selectedBrokerName="selectedBrokerName = $event"
     :availableBrokers="availableBrokers" :brokerStatus="brokerStatus" :availableBalance="availableBalance"
@@ -920,6 +921,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
+import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import BrokerComponent from '@/components/BrokerComponent.vue';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';

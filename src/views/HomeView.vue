@@ -1,5 +1,5 @@
 <template>
-    <NavigationComponent />
+    <NormalNavigationComponent />
     <div class="container-fluid">
         <!-- Hero Section -->
         <section class="row py-5 border border-success rounded">
@@ -51,7 +51,7 @@
         </section>
 
         <!-- Key Features Section -->
-        <!-- <section class="row py-5">
+        <section class="row py-5">
             <div class="col-lg-10 mx-auto">
                 <h2 class="text-center mb-5">Key Features</h2>
                 <div class="row">
@@ -67,15 +67,15 @@
                         <p>Automatically block overtrading to protect your profits or prevent excessive losses.</p>
                     </div>
                     <div class="col-md-4 mb-4 text-center">
-                        <h3>Discipline Automation</h3>
+                        <h3>Enforces Discipline</h3>
                         <p>Set predefined deployment values and risk limits to protect your capital.</p>
                     </div>
                 </div>
             </div>
-        </section> -->
+        </section>
 
         <!-- Multi-Broker Support Section -->
-        <!-- <section class="row py-5 bg-light">
+        <section class="row py-5 bg-light">
             <div class="col-lg-10 mx-auto text-center">
                 <h2 class="mb-5">Multi-Broker Support</h2>
                 <div class="d-flex justify-content-center align-items-center mb-4">
@@ -85,10 +85,10 @@
                 <p>Seamlessly integrate with Flattrade, and Shoonya. Manage all your accounts from one platform.
                 </p>
             </div>
-        </section> -->
+        </section>
 
         <!-- Why Steadfast Section -->
-        <!-- <section class="row py-5">
+        <section class="row py-5">
             <div class="col-lg-10 mx-auto">
                 <h2 class="text-center mb-5">Why Choose Steadfast?</h2>
                 <p class="lead text-center mb-5">Designed to help small retail traders survive and thrive in the options
@@ -98,7 +98,7 @@
                         <h4>Advanced Features</h4>
                         <ul class="list-unstyled">
                             <li>✓ Kill Switch (Client-side, psychologically effective)</li>
-                            <li>✓ Discipline Automation</li>
+                            <li>✓ Enforces discipline</li>
                             <li>✓ 1-Click Trading buttons</li>
                             <li>✓ Automatic Trailing Stop-loss</li>
                             <li>✓ Automatic MTM Trailing</li>
@@ -125,31 +125,31 @@
                     </div>
                 </div>
             </div>
-        </section> -->
+        </section>
 
         <!-- Pricing Section -->
-        <!-- <section class="row py-5 bg-light">
+        <section class="row py-5 bg-light">
             <div class="col-lg-8 mx-auto text-center">
                 <h2 class="mb-4">Pricing</h2>
                 <p class="display-4 text-success mb-4">FREE FOREVER</p>
                 <p>Enjoy all features at no cost. Steadfast is committed to remaining free for all users.</p>
             </div>
-        </section> -->
+        </section>
 
         <!-- Community Section -->
-        <!-- <section class="row py-5">
+        <section class="row py-5">
             <div class="col-lg-8 mx-auto text-center">
                 <h2 class="mb-4">Join Our Community</h2>
                 <p class="mb-4">Stay updated with the latest features and trading insights.</p>
                 <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline-primary btn-lg">Join
                     Telegram Channel</a>
             </div>
-        </section> -->
+        </section>
     </div>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
-import NavigationComponent from '@/components/NavigationComponent.vue';
+import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
 
 const tradeViewWindow = ref(null)
 const openTradeView = () => {

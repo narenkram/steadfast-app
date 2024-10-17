@@ -1,5 +1,5 @@
 <template>
-  <NavigationComponent />
+  <AppNavigationComponent />
   <section class="row py-3">
     <div class="row m-0">
       <div class="col-12 border rounded p-3">
@@ -299,13 +299,13 @@
     </div>
 
     <div class="col-12 pt-5 text-center">
-      <p class="text-secondary">These settings are automatically saved, just reload the app to see the changes.</p>
+      <p class="text-secondary">These settings are automatically saved.</p>
     </div>
   </section>
 </template>
 
 <script setup>
-import NavigationComponent from '@/components/NavigationComponent.vue'
+import AppNavigationComponent from '@/components/AppNavigationComponent.vue'
 import { useTradeView } from '@/composables/useTradingSystem';
 const {
   // Methods
