@@ -1,7 +1,7 @@
 import { ref, reactive } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 
-export const BASE_URL = 'http://localhost:3000'
+export const BASE_URL = import.meta.env.VITE_BASE_URL
 export const showLTPRangeBar = ref(false)
 export const showToast = ref(false)
 export const toastMessage = ref('')
