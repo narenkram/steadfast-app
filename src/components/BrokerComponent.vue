@@ -1,7 +1,7 @@
 <template>
     <section class="row justify-content-between my-3">
         <!-- Broker Information -->
-        <div class="col-12 col-md-6 col-lg-4 d-flex align-items-center justify-content-start">
+        <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center justify-content-start">
             <select class="form-select form-select-sm me-2" v-model="selectedBroker" @change="updateSelectedBroker">
                 <option value="" disabled selected>Select broker</option>
                 <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
@@ -16,7 +16,8 @@
         </div>
 
         <!-- Funds -->
-        <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-around">
+        <div
+            class="col-7 col-md-5 col-lg-5 d-flex align-items-center justify-content-md-around justify-content-between">
             <span class="me-3">
                 <small class="text-muted">Total</small>
                 <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -30,9 +31,9 @@
         </div>
 
         <!-- Today's Expiry -->
-        <div class="col-12 col-md-6 col-lg-3 d-flex align-items-center justify-content-end">
+        <div class="col-5 col-md-3 col-lg-3 d-flex align-items-center justify-content-lg-end justify-content-end">
             <span class="me-2">
-                <small class="text-muted">Today's Expiry</small>
+                <small class="text-muted">Expiry</small>
                 <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
                     {{ todayExpirySymbol || '-' }}
                 </span>
