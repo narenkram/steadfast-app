@@ -3800,35 +3800,45 @@ export function useTradeView() {
     // This will automatically update the table
   }
 
-  const debouncedFetchData = debounce(async () => {
-    try {
-      if (activeTab.value === 'positions') {
-        if (selectedBroker.value?.brokerName === 'Flattrade') {
-          activeFetchFunction.value = 'fetchFlattradePositions'
-          await fetchFlattradePositions()
-        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-          activeFetchFunction.value = 'fetchShoonyaPositions'
-          await fetchShoonyaPositions()
-        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-          activeFetchFunction.value = 'fetchPaperTradingPositions'
-          await fetchPaperTradingPositions()
-        }
-      } else if (activeTab.value === 'trades') {
-        if (selectedBroker.value?.brokerName === 'Flattrade') {
-          activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook'
-          await fetchFlattradeOrdersTradesBook()
-        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-          activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook'
-          await fetchShoonyaOrdersTradesBook()
-        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-          activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook'
-          await fetchPaperTradingOrdersTradesBook()
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      // Handle the error appropriately (e.g., show an error message to the user)
+  // Active Tab Functions
+  const activeTabFunction = {
+    Flattrade: {
+      positions: 'fetchFlattradePositions',
+      trades: 'fetchFlattradeOrdersTradesBook'
+    },
+    Shoonya: {
+      positions: 'fetchShoonyaPositions',
+      trades: 'fetchShoonyaOrdersTradesBook'
+    },
+    PaperTrading: {
+      positions: 'fetchPaperTradingPositions',
+      trades: 'fetchPaperTradingOrdersTradesBook'
     }
+  }
+
+  // SetActive Tab Function
+  const setActiveFetchFunctionAndFetch = async () => {
+    const brokerName = selectedBroker.value?.brokerName
+    const tabType = activeTab.value === 'positions' ? 'positions' : 'trades'
+
+    if (brokerName && activeTabFunction[brokerName]) {
+      const functionName = activeTabFunction[brokerName][tabType]
+      activeFetchFunction.value = functionName
+
+      try {
+        await eval(functionName)()
+      } catch (error) {
+        console.error(`Error fetching data for ${brokerName} ${tabType}:`, error)
+        // Handle the error appropriately (e.g., show an error message to the user)
+      }
+    } else {
+      console.error('Invalid broker or tab type')
+    }
+  }
+
+  // Update your debouncedFetchData function
+  const debouncedFetchData = debounce(async () => {
+    await setActiveFetchFunctionAndFetch()
   })
   const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
     if (!symbol) return ''
@@ -4387,6 +4397,7 @@ export function useTradeView() {
     deleteBroker,
     ManageBrokerMaskClientId,
     formatTradingSymbol,
+    setActiveFetchFunctionAndFetch,
 
     // Computed properties
     brokers,

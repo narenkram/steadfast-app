@@ -943,12 +943,7 @@ const {
   updateAvailableQuantities,
   updateSelectedQuantity,
   updateSymbolData,
-  fetchFlattradePositions,
-  fetchShoonyaPositions,
-  fetchFlattradeOrdersTradesBook,
-  fetchShoonyaOrdersTradesBook,
-  fetchPaperTradingPositions,
-  fetchPaperTradingOrdersTradesBook,
+  setActiveFetchFunctionAndFetch,
   handleHotKeys,
   closeAllPositions,
   getProductTypeValue,
@@ -1151,30 +1146,7 @@ onMounted(async () => {
   window.addEventListener('keydown', handleHotKeys);
 
   // Initialize with the default active tab
-  if (activeTab.value === 'positions') {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      fetchFlattradePositions();
-      activeFetchFunction.value = 'fetchFlattradePositions';
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      fetchShoonyaPositions();
-      activeFetchFunction.value = 'fetchShoonyaPositions';
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      fetchPaperTradingPositions();
-      activeFetchFunction.value = 'fetchPaperTradingPositions';
-    }
-  }
-  if (activeTab.value === 'trades') {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      fetchFlattradeOrdersTradesBook();
-      activeFetchFunction.value = 'fetchFlattradeOrdersTradesBook';
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      fetchShoonyaOrdersTradesBook();
-      activeFetchFunction.value = 'fetchShoonyaOrdersTradesBook';
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      fetchPaperTradingOrdersTradesBook();
-      activeFetchFunction.value = 'fetchPaperTradingOrdersTradesBook';
-    }
-  }
+  await setActiveFetchFunctionAndFetch();
 
   enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
