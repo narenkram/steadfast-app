@@ -481,7 +481,7 @@
           <!-- Call Strike Buy/Sell Buttons -->
           <div class="order-1 order-md-1 order-lg-1 col-6 col-md-4 col-lg-4">
             <div class="btn-group col-12 col-md-10 col-lg-10">
-              <button type="button" class="btn btn-sm btn-success fs-5 my-2 w-75"
+              <button type="button" class="btn btn-sm btn-success fs-6 my-2 w-75"
                 @click="handleOrderClick('BUY', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
@@ -489,7 +489,7 @@
                 Buy CE
               </button>
               <button type="button"
-                class="btn btn-sm btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                class="btn btn-sm btn-outline-success fs-6 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -504,14 +504,14 @@
               </ul>
             </div>
             <div class="btn-group col-12 col-md-10 col-lg-10">
-              <button type="button" class="btn btn-sm btn-danger fs-5 w-75" @click="handleOrderClick('SELL', 'CALL')"
+              <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
                 <span v-if="enableHotKeys">⬅️</span>
                 Sell CE
               </button>
               <button type="button"
-                class="btn btn-sm btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                class="btn btn-sm btn-outline-danger fs-6 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -532,18 +532,18 @@
             <div class="row mt-2">
               <div class="col-6 col-md-12 col-lg-12">
                 <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
-                  class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10" @click="closeAllPositions">
+                  class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10" @click="closeAllPositions">
                   <span v-if="enableHotKeys">F6 / </span>
                   Close All
                 </button>
                 <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
-                  class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10" @click="closeSelectedPositions">
+                  class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10" @click="closeSelectedPositions">
                   <span v-if="enableHotKeys">F6 / </span>
                   Close Selected
                 </button>
               </div>
               <div class="col-6 col-md-12 col-lg-12">
-                <button class="btn btn-sm btn-outline fs-5 col-12 col-md-11 col-lg-10 mt-md-2 mt-lg-2"
+                <button class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10 mt-md-2 mt-lg-2"
                   @click="cancelPendingOrders">
                   <span v-if="enableHotKeys">F7 / </span>
                   Cancel Orders
@@ -554,7 +554,7 @@
           <!-- Put Strike Buy/Sell Buttons -->
           <div class="order-2 order-md-3 order-lg-3 col-6 col-md-4 col-lg-4 text-end">
             <div class="btn-group col-12 col-md-10 col-lg-10">
-              <button type="button" class="btn btn-sm btn-success fs-5 my-2 w-75"
+              <button type="button" class="btn btn-sm btn-success fs-6 my-2 w-75"
                 @click="handleOrderClick('BUY', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
@@ -562,7 +562,7 @@
                 Buy PE
               </button>
               <button type="button"
-                class="btn btn-sm btn-outline-success fs-5 my-2 dropdown-toggle dropdown-toggle-split w-25"
+                class="btn btn-sm btn-outline-success fs-6 my-2 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" data-bs-offset="0,-7">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
@@ -577,14 +577,14 @@
               </ul>
             </div>
             <div class="btn-group col-12 col-md-10 col-lg-10">
-              <button type="button" class="btn btn-sm btn-danger fs-5 w-75" @click="handleOrderClick('SELL', 'PUT')"
+              <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
                 <span v-if="enableHotKeys">➡️</span>
                 Sell PE
               </button>
               <button type="button"
-                class="btn btn-sm btn-outline-danger fs-5 dropdown-toggle dropdown-toggle-split w-25"
+                class="btn btn-sm btn-outline-danger fs-6 dropdown-toggle dropdown-toggle-split w-25"
                 data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>

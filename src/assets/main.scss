@@ -276,6 +276,7 @@ input:focus {
 
 .dropdown-menu {
   width: 100%;
+  z-index: 99999;
 }
 
 .nav-link {
