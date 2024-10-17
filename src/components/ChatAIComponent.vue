@@ -17,7 +17,7 @@
                 <div v-for="(message, index) in messages" :key="index"
                     :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
                     <div
-                        :class="['d-inline-block', 'p-2', 'rounded', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark', 'mw-75']">
+                        :class="['d-inline-block', 'p-2', 'rounded', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-danger', 'mw-75']">
                         <img v-if="message.image" :src="message.image" class="user-image" />
                         <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                             <span></span>
