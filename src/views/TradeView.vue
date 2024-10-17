@@ -260,14 +260,14 @@
             <!-- Put Strike Details -->
             <div class="text-end mt-2">
               <div>
-                {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
-                <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
+                <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto me-2"
                   aria-label="Put Strike" v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }"
                   @change="updateTradingSymbol(selectedPutStrike)">
                   <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
                 </select>
+                {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
               </div>
               <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
             </div>
