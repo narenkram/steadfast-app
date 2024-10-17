@@ -3,58 +3,39 @@
 
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
   <section class="row pb-3">
-    <!-- Change Broker -->
-    <div class="col-6 col-md-4 col-lg-2">
-      <label for="ChangeBroker" class="form-label mb-1"><b>Change Broker</b></label>
-      <div class="d-flex align-items-center">
-        <select class="form-select" id="ChangeBroker" aria-label="Change Broker" v-model="selectedBrokerName"
-          @change="updateSelectedBroker">
-          <option value="" disabled selected>Select a broker</option>
+    <!-- Broker Information -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="broker-info d-flex align-items-center">
+        <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
+          <option value="" disabled selected>Select broker</option>
           <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
             {{ brokerName }}
           </option>
         </select>
+        <span class="badge me-2" :class="{
+          'bg-success': brokerStatus === 'Connected',
+          'bg-danger': brokerStatus === 'Not Connected',
+          'bg-warning text-dark': brokerStatus === 'Token Expired'
+        }">{{ brokerStatus }}</span>
+        <span class="broker-id" @click="toggleBrokerClientIdVisibility">
+          {{ showBrokerClientId ? (selectedBroker?.clientId || 'N/A') : maskBrokerClientId(selectedBroker?.clientId) }}
+          <span class="ms-1">{{ showBrokerClientId ? '👁️' : '👁️‍🗨️' }}</span>
+        </span>
       </div>
     </div>
 
-    <!-- Broker Name and Status with Broker ID -->
-    <div class="col-6 col-md-5 col-lg-3 text-center">
-      <p class="mb-1">
-        <b>Status: </b>
-        <span :class="{
-          'badge bg-success': brokerStatus === 'Connected',
-          'badge bg-danger': brokerStatus === 'Not Connected',
-          'badge bg-warning text-dark': brokerStatus === 'Token Expired'
-        }">
-          {{ brokerStatus }}
-        </span>
-      </p>
-      <p class="mb-0 d-flex align-items-center justify-content-center">
-        <span v-if="showBrokerClientId" @click="toggleBrokerClientIdVisibility">
-          {{ selectedBroker?.clientId || 'N/A' }}
-          <span>👀</span>
-        </span>
-        <span v-else @click="toggleBrokerClientIdVisibility">
-          {{ maskBrokerClientId(selectedBroker?.clientId) }}
-          <span>👁️</span>
-        </span>
-      </p>
-    </div>
-
-    <!-- Total Funds -->
-    <div class="col-4 col-md-4 col-lg-3 text-center mt-3 mt-md-3 mt-lg-0">
-      <p class="mb-1"><b>Total Funds</b></p>
-      <p class="mt-2 mb-0">
-        ₹ {{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
+    <!-- Funds -->
+    <div class="col-8 col-md-8 col-lg-5 d-flex">
+      <span class="me-3">
+        <small class="text-muted">Total</small>
+        <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
           maximumFractionDigits: 2
-        }) : 'N/A' }}
-      </p>
-    </div>
-
-    <!-- Utilized Margin -->
-    <div class="col-4 col-md-4 col-lg-2 text-center mt-3 mt-md-3 mt-lg-0">
-      <p class="mb-1"><b>Utilized Margin</b></p>
-      <p class="mt-2 mb-0">₹ {{ usedAmount }}</p>
+        }) : 'N/A' }}</span>
+      </span>
+      <span>
+        <small class="text-muted">Utilized</small>
+        <span class="ms-1 fw-bold">₹{{ usedAmount }}</span>
+      </span>
     </div>
 
     <!-- Today's Expiry -->
