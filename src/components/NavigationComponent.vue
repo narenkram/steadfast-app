@@ -31,7 +31,6 @@ export default {
         return {
             routes: [
                 { path: '/steadfast', name: 'Trade', icon: '⚡' },
-                { path: '/option-chain', name: 'Option Chain', icon: '⛓️' },
                 { path: '/app-settings', name: 'Settings', icon: '⚙️' },
                 { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
                 { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
