@@ -235,51 +235,8 @@
             <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
               :openMarkerPosition="callOpenMarkerPosition" :lowPrice="callLowPrice" :highPrice="callHighPrice" />
             <!-- Call Market Depth -->
-            <div v-if="isCallDepthAvailable & marketDepth">
-              <h6>Market Depth</h6>
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Buy Price</th>
-                    <th>Buy Qty</th>
-                    <th>Sell Price</th>
-                    <th>Sell Qty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ callDepth.bp1 }}</td>
-                    <td>{{ callDepth.bq1 }}</td>
-                    <td>{{ callDepth.sp1 }}</td>
-                    <td>{{ callDepth.sq1 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ callDepth.bp2 }}</td>
-                    <td>{{ callDepth.bq2 }}</td>
-                    <td>{{ callDepth.sp2 }}</td>
-                    <td>{{ callDepth.sq2 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ callDepth.bp3 }}</td>
-                    <td>{{ callDepth.bq3 }}</td>
-                    <td>{{ callDepth.sp3 }}</td>
-                    <td>{{ callDepth.sq3 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ callDepth.bp4 }}</td>
-                    <td>{{ callDepth.bq4 }}</td>
-                    <td>{{ callDepth.sp4 }}</td>
-                    <td>{{ callDepth.sq4 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ callDepth.bp5 }}</td>
-                    <td>{{ callDepth.bq5 }}</td>
-                    <td>{{ callDepth.sp5 }}</td>
-                    <td>{{ callDepth.sq5 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <MarketDepthComponent :isDepthAvailable="isCallDepthAvailable" :marketDepth="marketDepth"
+              :depth="callDepth" />
           </div>
 
           <!-- Live Underlying Price -->
@@ -380,51 +337,8 @@
             <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
               :openMarkerPosition="putOpenMarkerPosition" :lowPrice="putLowPrice" :highPrice="putHighPrice" />
             <!-- Put Market Depth -->
-            <div v-if="isPutDepthAvailable & marketDepth">
-              <h6>Market Depth</h6>
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Buy Price</th>
-                    <th>Buy Qty</th>
-                    <th>Sell Price</th>
-                    <th>Sell Qty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ putDepth.bp1 }}</td>
-                    <td>{{ putDepth.bq1 }}</td>
-                    <td>{{ putDepth.sp1 }}</td>
-                    <td>{{ putDepth.sq1 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ putDepth.bp2 }}</td>
-                    <td>{{ putDepth.bq2 }}</td>
-                    <td>{{ putDepth.sp2 }}</td>
-                    <td>{{ putDepth.sq2 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ putDepth.bp3 }}</td>
-                    <td>{{ putDepth.bq3 }}</td>
-                    <td>{{ putDepth.sp3 }}</td>
-                    <td>{{ putDepth.sq3 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ putDepth.bp4 }}</td>
-                    <td>{{ putDepth.bq4 }}</td>
-                    <td>{{ putDepth.sp4 }}</td>
-                    <td>{{ putDepth.sq4 }}</td>
-                  </tr>
-                  <tr>
-                    <td>{{ putDepth.bp5 }}</td>
-                    <td>{{ putDepth.bq5 }}</td>
-                    <td>{{ putDepth.sp5 }}</td>
-                    <td>{{ putDepth.sq5 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth"
+              :depth="putDepth" />
           </div>
           <!-- Additional Strike LTPs -->
           <div v-if="additionalSymbols" class="col-12 mt-3">
@@ -1157,6 +1071,8 @@ import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import ChatAIComponent from '@/components/ChatAIComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
+import MarketDepthComponent from '@/components/MarketDepthComponent.vue';
+
 
 const {
   // Methods
