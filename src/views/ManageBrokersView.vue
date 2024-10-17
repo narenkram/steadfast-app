@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import NavigationComponent from '@/components/NavigationComponent.vue';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import { useTradeView } from '@/composables/useTradingSystem';
@@ -17,7 +17,6 @@ const {
 
 
   // Computed properties
-
 
 
   // Reactive variables
@@ -39,10 +38,15 @@ const {
   brokers,
   selectedBrokerForPaper,
 
-
 } = useTradeView();
 
+// Add this new ref to track visibility for each broker
+const visibleClientIds = ref({});
 
+// Modify the toggle function to work per broker
+const toggleBrokerClientIdVisibility = (brokerId) => {
+  visibleClientIds.value[brokerId] = !visibleClientIds.value[brokerId];
+};
 
 onMounted(() => {
   // Retrieve Flattrade details
@@ -131,7 +135,13 @@ onMounted(() => {
           <tr v-else v-for="broker in brokers" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
             <td>
-              <span class="badge bg-primary">{{ ManageBrokerMaskClientId(broker.brokerClientId) }}</span>
+              <span class="badge bg-primary">
+                {{ visibleClientIds[broker.id] ? broker.brokerClientId : ManageBrokerMaskClientId(broker.brokerClientId)
+                }}
+              </span>
+              <button class="btn btn-sm btn-outline-secondary ms-2" @click="toggleBrokerClientIdVisibility(broker.id)">
+                {{ visibleClientIds[broker.id] ? '👁️' : '👀' }}
+              </button>
             </td>
             <td>
               <div class="d-flex align-items-center">

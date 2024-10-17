@@ -60,7 +60,6 @@ export function useTradeView() {
     paperTradingOrderBook,
     paperTradingTradeBook,
     fundLimits,
-    showBrokerClientId,
     quantities,
     availableQuantities,
     selectedStrike,
@@ -1524,9 +1523,6 @@ export function useTradeView() {
   const updateFundLimits = async () => {
     await fetchFundLimit()
     // console.log('Updated Fund Limits:', fundLimits.value);
-  }
-  const toggleBrokerClientIdVisibility = () => {
-    showBrokerClientId.value = !showBrokerClientId.value
   }
 
   const maskBrokerClientId = (clientId) => {
@@ -4388,7 +4384,6 @@ export function useTradeView() {
     closeSelectedPositions,
     updateTradingSymbol,
     convertToComparableDate,
-    toggleBrokerClientIdVisibility,
     resetOrderTypeIfNeeded,
     findNewPosition,
     setStrategyType,
@@ -4505,7 +4500,6 @@ export function useTradeView() {
     shoonyaPositionBook,
     paperTradingPositionBook,
     fundLimits,
-    showBrokerClientId,
     quantities,
     availableQuantities,
     selectedStrike,

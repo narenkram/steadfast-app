@@ -1320,7 +1320,6 @@ const {
   flatTradePositionBook,
   shoonyaPositionBook,
   paperTradingPositionBook,
-  showBrokerClientId,
   selectedStrike,
   selectedProductType,
   limitPrice,

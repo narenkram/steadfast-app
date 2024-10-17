@@ -49,7 +49,6 @@ export const paperTradingPositionBook = ref([])
 export const paperTradingOrderBook = ref([])
 export const paperTradingTradeBook = ref([])
 export const fundLimits = ref({})
-export const showBrokerClientId = ref(false)
 export const quantities = ref({
   NIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
   BANKNIFTY: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
