@@ -2,26 +2,24 @@
   <NavigationComponent />
 
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
-  <section class="row pb-3">
+  <section class="row justify-content-between">
     <!-- Broker Information -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="broker-info d-flex align-items-center">
-        <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
-          <option value="" disabled selected>Select broker</option>
-          <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-            {{ brokerName }} {{ getBrokerClientId(brokerName) }}
-          </option>
-        </select>
-        <span class="badge me-2" :class="{
-          'bg-success': brokerStatus === 'Connected',
-          'bg-danger': brokerStatus === 'Not Connected',
-          'bg-warning text-dark': brokerStatus === 'Token Expired'
-        }">{{ brokerStatus }}</span>
-      </div>
+    <div class="col-12 col-md-6 col-lg-4 d-flex align-items-center justify-content-start">
+      <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
+        <option value="" disabled selected>Select broker</option>
+        <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
+          {{ brokerName }} {{ getBrokerClientId(brokerName) }}
+        </option>
+      </select>
+      <span class="badge me-2" :class="{
+        'bg-success': brokerStatus === 'Connected',
+        'bg-danger': brokerStatus === 'Not Connected',
+        'bg-warning text-dark': brokerStatus === 'Token Expired'
+      }">{{ brokerStatus }}</span>
     </div>
 
     <!-- Funds -->
-    <div class="col-12 col-md-6 col-lg-4 d-flex">
+    <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center">
       <span class="me-3">
         <small class="text-muted">Total</small>
         <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -35,7 +33,7 @@
     </div>
 
     <!-- Today's Expiry -->
-    <div class="col-12 col-md-6 col-lg-3 d-flex align-items-center">
+    <div class="col-12 col-md-6 col-lg-3 d-flex align-items-center justify-content-end">
       <span class="me-2">
         <small class="text-muted">Today's Expiry</small>
         <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
@@ -50,44 +48,35 @@
   </section>
 
   <!-- Total Profit & Net PNL -->
-  <section class="row py-3" :class="{ 'MTM': stickyMTM }">
-    <div class="col-12 col-md-5 col-lg-5">
-      <div class="Card">
-        <blockquote class="fs-3" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
-          ₹ {{ totalProfit.toFixed(2) }}
-        </blockquote>
-        <small>
-          <span :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
-            ₹ {{ netPnl.toFixed(2) }}
-          </span>
-          Estimated (after all charges)
-        </small>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-4 mt-3 mt-md-0 mt-lg-0">
-      <div class="Card">
-        <blockquote class="fs-3 text-center m-0">
-          <span
-            :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
-            {{ totalCapitalPercentage.toFixed(2) }}%
-          </span>
-          <br />
-          <small> on Total Capital</small>
-        </blockquote>
-        <small v-if="totalNetQty !== 0">{{ deployedCapitalPercentage.toFixed(2) }}% on Deployed Capital</small>
-      </div>
-    </div>
-    <div class="col-6 col-md-3 col-lg-3 d-flex justify-content-center align-items-center mt-3 mt-md-0 mt-lg-0">
-      <div class="Card">
-        <div class="card-title">
-          <h5>Kill Switch</h5>
-        </div>
-        <button :class="killSwitchButtonClass" @click="handleKillSwitchClick"
+  <section class="row pt-3" :class="{ 'MTM': stickyMTM }">
+    <div class="col-12 d-flex align-items-center justify-content-between">
+      <span class="me-3">
+        <small class="text-muted">Total Profit</small>
+        <span class="ms-1 fw-bold" :class="totalProfit > 0 ? 'text-success' : totalProfit < 0 ? 'text-danger' : null">
+          ₹{{ totalProfit.toFixed(2) }}
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Net PNL (est.)</small>
+        <span class="ms-1 fw-bold" :class="netPnl > 0 ? 'text-success' : netPnl < 0 ? 'text-danger' : null">
+          ₹{{ netPnl.toFixed(2) }}
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Total Capital</small>
+        <span class="ms-1 fw-bold"
+          :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
+          {{ totalCapitalPercentage.toFixed(2) }}%
+        </span>
+      </span>
+      <span>
+        <small class="text-muted">Kill Switch</small>
+        <a :class="['ms-2', 'btn', 'btn-sm', killSwitchButtonClass]" @click="handleKillSwitchClick"
           :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
           :data-bs-toggle="killSwitchActive ? '' : 'modal'">
           {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
-        </button>
-      </div>
+        </a>
+      </span>
     </div>
   </section>
 
