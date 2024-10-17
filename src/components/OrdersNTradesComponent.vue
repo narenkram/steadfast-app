@@ -39,7 +39,7 @@
                             <td>
                                 {{ item.trade.norenordno }}
                                 <br />
-                                {{ item.trade.tsym }}
+                                {{ formatTradingSymbol(item.trade.tsym) }}
                             </td>
                             <td>{{ item.trade.qty }}</td>
                             <td>{{ item.trade.flprc }}</td>
@@ -62,6 +62,11 @@
 
 <script setup>
 import { defineProps } from 'vue';
+import { useTradeView } from '@/composables/useTradingSystem';
+
+const {
+    formatTradingSymbol,
+} = useTradeView();
 
 const props = defineProps({
     combinedOrdersAndTrades: {
