@@ -211,6 +211,10 @@ export function useTradeView() {
       ? 'btn btn-sm btn-danger shadow fs-5'
       : 'btn btn-sm btn-success shadow fs-5'
   )
+  const getBrokerClientId = (brokerName) => {
+    const brokerDetails = JSON.parse(localStorage.getItem(`broker_${brokerName}`) || '{}')
+    return brokerDetails.clientId ? `(${brokerDetails.clientId})` : ''
+  }
   const availableBrokers = computed(() => {
     return Object.keys(localStorage)
       .filter((key) => key.startsWith('broker_'))
@@ -874,7 +878,6 @@ export function useTradeView() {
     const availableBrokerNames = availableBrokers.value
 
     if (availableBrokerNames.length === 0) {
-      // No brokers available, remove selectedBroker from localStorage
       selectedBroker.value = null
       localStorage.removeItem('selectedBroker')
       selectedBrokerName.value = ''
@@ -888,7 +891,6 @@ export function useTradeView() {
       selectedBroker.value = brokerDetails
       localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails))
     } else {
-      // If the selected broker is not available, clear the selection
       selectedBroker.value = null
       localStorage.removeItem('selectedBroker')
       selectedBrokerName.value = ''
@@ -4431,6 +4433,7 @@ export function useTradeView() {
     putOpenMarkerPosition,
     additionalStrikes,
     deployedCapitalPercentage,
+    getBrokerClientId,
 
     // Reactive variables (from globalState)
     showLTPRangeBar,

@@ -9,7 +9,7 @@
         <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
           <option value="" disabled selected>Select broker</option>
           <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-            {{ brokerName }}
+            {{ brokerName }} {{ getBrokerClientId(brokerName) }}
           </option>
         </select>
         <span class="badge me-2" :class="{
@@ -17,15 +17,11 @@
           'bg-danger': brokerStatus === 'Not Connected',
           'bg-warning text-dark': brokerStatus === 'Token Expired'
         }">{{ brokerStatus }}</span>
-        <span class="broker-id" @click="toggleBrokerClientIdVisibility">
-          {{ showBrokerClientId ? (selectedBroker?.clientId || 'N/A') : maskBrokerClientId(selectedBroker?.clientId) }}
-          <span class="ms-1">{{ showBrokerClientId ? '👁️' : '👁️‍🗨️' }}</span>
-        </span>
       </div>
     </div>
 
     <!-- Funds -->
-    <div class="col-8 col-md-8 col-lg-5 d-flex">
+    <div class="col-12 col-md-6 col-lg-4 d-flex">
       <span class="me-3">
         <small class="text-muted">Total</small>
         <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -33,7 +29,7 @@
         }) : 'N/A' }}</span>
       </span>
       <span>
-        <small class="text-muted">Utilized</small>
+        <small class="text-muted">Used</small>
         <span class="ms-1 fw-bold">₹{{ usedAmount }}</span>
       </span>
     </div>
@@ -1464,6 +1460,7 @@ const {
   putOpenMarkerPosition,
   additionalStrikes,
   deployedCapitalPercentage,
+  getBrokerClientId,
 
 
   // Reactive variables
