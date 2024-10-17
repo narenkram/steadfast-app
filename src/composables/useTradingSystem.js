@@ -3838,6 +3838,20 @@ export function useTradeView() {
       // Handle the error appropriately (e.g., show an error message to the user)
     }
   })
+  const formatTradingSymbol = (symbol) => {
+    if (!symbol) return ''
+
+    // Regular expression to match the parts of the trading symbol
+    const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
+    const match = symbol.match(regex)
+
+    if (match) {
+      const [, index, year, month, date, optionType, strikePrice] = match
+      return `${index} ${date}${month}${year} ${optionType} ${strikePrice}`
+    }
+
+    return symbol // Return original if it doesn't match the expected format
+  }
   // ... (add all other methods here)
 
   // Watchers
@@ -4383,6 +4397,7 @@ export function useTradeView() {
     handleShoonyaLogin,
     deleteBroker,
     ManageBrokerMaskClientId,
+    formatTradingSymbol,
 
     // Computed properties
     brokers,

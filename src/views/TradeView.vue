@@ -253,9 +253,14 @@
         </div>
 
         <!-- Trading Symbols & Strikes -->
-        <div class="row align-items-center justify-content-between mt-3">
+        <div class="row align-items-center justify-content-between">
           <!-- Call Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
+            <!-- Call Strike Details -->
+            <div class="text-start mt-2">
+              <div>{{ formatTradingSymbol(selectedCallStrike.tradingSymbol) }}</div>
+              <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedCallStrike.securityId }}</div>
+            </div>
             <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span>Call Strike</span>
               <span class="me-4">LTP</span>
@@ -280,10 +285,7 @@
               <span v-else-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
               <span v-else>Margin: Not available</span>
             </div>
-            <div v-if="showStrikeDetails">
-              <div class="mt-2">{{ selectedCallStrike.tradingSymbol }}</div>
-              <div class="text-muted">Security ID: {{ selectedCallStrike.securityId }}</div>
-            </div>
+
             <!-- Call OHLC Values -->
             <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ callOpenPrice }}</span>
@@ -418,6 +420,11 @@
 
           <!-- Put Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
+            <!-- Put Strike Details -->
+            <div class="text-end mt-2">
+              <div>{{ formatTradingSymbol(selectedPutStrike.tradingSymbol) }}</div>
+              <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
+            </div>
             <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
               <span class="ms-4">LTP</span>
               <span>Put Strike</span>
@@ -442,10 +449,7 @@
               <span v-else-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
               <span v-else>Margin: Not available</span>
             </div>
-            <div v-if="showStrikeDetails">
-              <div class="mt-2">{{ selectedPutStrike.tradingSymbol }}</div>
-              <div class="text-muted">Security ID: {{ selectedPutStrike.securityId }}</div>
-            </div>
+
             <!-- Put OHLC Values -->
             <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
               <span class="text-primary">O: {{ putOpenPrice }}</span>
@@ -512,7 +516,7 @@
               </table>
             </div>
           </div>
-          <!-- Add this after the Put Strike Selection -->
+          <!-- Additional Strike LTPs -->
           <div v-if="additionalSymbols" class="col-12 mt-3">
             <h5>Additional Strike LTPs</h5>
             <div class="table-responsive">
@@ -1349,9 +1353,6 @@
     </div>
   </div>
 
-
-
-
 </template>
 
 <script setup>
@@ -1421,6 +1422,7 @@ const {
   removeFromBasket,
   placeBasket,
   reversePositions,
+  formatTradingSymbol,
 
   // Computed properties
   brokerStatus,
