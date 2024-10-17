@@ -208,8 +208,8 @@ export function useTradeView() {
   const killSwitchButtonText = computed(() => (killSwitchActive.value ? 'Deactivate' : 'Activate'))
   const killSwitchButtonClass = computed(() =>
     killSwitchActive.value
-      ? 'btn btn-sm btn-danger shadow fs-5'
-      : 'btn btn-sm btn-success shadow fs-5'
+      ? 'btn btn-sm btn-danger shadow fs-6'
+      : 'btn btn-sm btn-success shadow fs-6'
   )
   const getBrokerClientId = (brokerName) => {
     const brokerDetails = JSON.parse(localStorage.getItem(`broker_${brokerName}`) || '{}')
