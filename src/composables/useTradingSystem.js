@@ -1144,6 +1144,8 @@ export function useTradeView() {
   const synchronizeStrikes = () => {
     synchronizeCallStrikes()
     synchronizePutStrikes()
+    updateSecurityIds()
+    subscribeToOptions()
   }
   const synchronizeCallStrikes = () => {
     if (selectedPutStrike.value && selectedPutStrike.value.strikePrice) {
@@ -2290,40 +2292,15 @@ export function useTradeView() {
     const newStrike = strikes.find((strike) => strike.strikePrice === order.strikePrice)
 
     if (newStrike) {
-      // If we found an exact match, use all its properties
-      Object.assign(order, newStrike)
-    } else {
-      // If no matching strike is found, find the closest one
-      const closestStrike = strikes.reduce((prev, curr) =>
-        Math.abs(curr.strikePrice - order.strikePrice) <
-        Math.abs(prev.strikePrice - order.strikePrice)
-          ? curr
-          : prev
-      )
-
-      // Use the properties of the closest strike, but keep the selected strikePrice
-      Object.assign(order, closestStrike, { strikePrice: order.strikePrice })
-
-      // Update the trading symbol with the new strike price
-      const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
-      const match = order.tradingSymbol.match(regex)
-      if (match) {
-        const [, index, year, month, date, optionType] = match
-        const newStrikePrice = order.strikePrice.toString().padStart(5, '0')
-        order.tradingSymbol = `${index}${year}${month}${date}${optionType}${newStrikePrice}`
+      // If we found an exact match, use its properties
+      if (order.optionType === 'CALL') {
+        selectedCallStrike.value = newStrike
+      } else {
+        selectedPutStrike.value = newStrike
       }
-    }
-
-    // Update the formatted display of the trading symbol
-    order.formattedTradingSymbol = formatTradingSymbol(order.tradingSymbol)
-
-    // Synchronize the other strike
-    if (order.optionType === 'CALL') {
-      selectedCallStrike.value = order
-      synchronizePutStrikes()
     } else {
-      selectedPutStrike.value = order
-      synchronizeCallStrikes()
+      console.error(`No matching strike found for ${order.strikePrice}`)
+      return // Exit the function if no matching strike is found
     }
 
     // Update security IDs
