@@ -232,17 +232,8 @@
               <span class="text-warning">C: {{ callClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Call Strike -->
-            <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
-              <div class="ltp-range">
-                <div class="ltp-range-fill" :style="{ width: callLtpRangeWidth + '%' }"></div>
-                <div class="ltp-range-marker" :style="{ left: callLtpRangeWidth + '%' }"></div>
-                <div class="ltp-range-open-marker" :style="{ left: callOpenMarkerPosition + '%' }"></div>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span class="ltp-range-low">L: {{ callLowPrice }}</span>
-                <span class="ltp-range-high">H: {{ callHighPrice }}</span>
-              </div>
-            </div>
+            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
+              :openMarkerPosition="callOpenMarkerPosition" :lowPrice="callLowPrice" :highPrice="callHighPrice" />
             <!-- Call Market Depth -->
             <div v-if="isCallDepthAvailable & marketDepth">
               <h6>Market Depth</h6>
@@ -343,17 +334,8 @@
               <span class="text-warning">C: {{ masterClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Live Underlying Price -->
-            <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
-              <div class="ltp-range">
-                <div class="ltp-range-fill" :style="{ width: ltpRangeWidth + '%' }"></div>
-                <div class="ltp-range-marker" :style="{ left: ltpMarkerPosition + '%' }"></div>
-                <div class="ltp-range-open-marker" :style="{ left: openMarkerPosition + '%' }"></div>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span class="ltp-range-low">L: {{ masterLowPrice }}</span>
-                <span class="ltp-range-high">H: {{ masterHighPrice }}</span>
-              </div>
-            </div>
+            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="ltpRangeWidth"
+              :openMarkerPosition="openMarkerPosition" :lowPrice="masterLowPrice" :highPrice="masterHighPrice" />
           </div>
 
           <!-- Put Strike Selection -->
@@ -395,17 +377,8 @@
               <span class="text-warning">C: {{ putClosePrice }}</span>
             </div>
             <!-- LTP Range Bar for Put Strike -->
-            <div v-if="showLTPRangeBar" class="ltp-range-bar mt-3 mb-2">
-              <div class="ltp-range">
-                <div class="ltp-range-fill" :style="{ width: putLtpRangeWidth + '%' }"></div>
-                <div class="ltp-range-marker" :style="{ left: putLtpRangeWidth + '%' }"></div>
-                <div class="ltp-range-open-marker" :style="{ left: putOpenMarkerPosition + '%' }"></div>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span class="ltp-range-low">L: {{ putLowPrice }}</span>
-                <span class="ltp-range-high">H: {{ putHighPrice }}</span>
-              </div>
-            </div>
+            <LtpRangeBarComponent :showLTPRangeBar="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
+              :openMarkerPosition="putOpenMarkerPosition" :lowPrice="putLowPrice" :highPrice="putHighPrice" />
             <!-- Put Market Depth -->
             <div v-if="isPutDepthAvailable & marketDepth">
               <h6>Market Depth</h6>
@@ -1183,6 +1156,7 @@ import ToastAlert from '@/components/ToastAlertComponent.vue';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import ChatAIComponent from '@/components/ChatAIComponent.vue';
+import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
 
 const {
   // Methods
