@@ -9,8 +9,10 @@
                     <div class="card-body">
                         <p class="text-danger mb-2 text-uppercase fw-bold">FOR 1 MONTH</p>
                         <p class="display-4 text-danger mb-2">
+                            <small class="text-decoration-line-through text-muted fs-1">₹1200</small>
                             ₹800<span class="fs-6"> / month</span>
                         </p>
+                        <p class="text-success fw-bold">20% OFF</p>
                         <p class="text-muted mb-0">(Excluding GST from payment gateway)</p>
                     </div>
                 </div>
@@ -30,6 +32,7 @@
                     <li class="list-group-item">✅ Predefined SL & Target</li>
                     <li class="list-group-item">✅ Keyboard Shortcuts</li>
                     <li class="list-group-item">🟨 Parallel Copy Trading (Coming Soon)</li>
+                    <li class="list-group-item">🟨 More Brokers (Coming Soon)</li>
                     <li class="list-group-item">✅ Email Support available</li>
                 </ul>
                 <button class="btn btn-danger btn-lg">Subscribe Now</button>
