@@ -269,12 +269,9 @@
               </div>
               <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedCallStrike.securityId }}</div>
             </div>
-            <label for="CallStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
-              <span>Call Strike</span>
-              <span class="me-4">LTP</span>
-            </label>
-            <div class="input-group">
-              <span class="input-group-text" :class="{
+            <div class="d-flex">
+              <span>LTP: </span>
+              <span class="ms-2 fw-bold" :class="{
                 'text-success': parseFloat(latestCallLTP) > parseFloat(callOpenPrice),
                 'text-danger': parseFloat(latestCallLTP) < parseFloat(callOpenPrice)
               }">{{ latestCallLTP }}
@@ -435,18 +432,15 @@
               </div>
               <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
             </div>
-            <label for="PutStrike" class="form-label mb-0 d-flex flex-row justify-content-between">
-              <span class="ms-4">LTP</span>
-              <span>Put Strike</span>
-            </label>
-            <div class="input-group">
-              <span class="input-group-text" :class="{
+            <div class="d-flex justify-content-end">
+              <span class="fw-bold" :class="{
                 'text-success': parseFloat(latestPutLTP) > parseFloat(putOpenPrice),
                 'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
               }">{{ latestPutLTP }}
               </span>
+              <span class="ms-2"> :LTP</span>
             </div>
-            <div class="mt-1">
+            <div class="mt-1 text-end">
               <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
                 Margin Required: ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
               </span>
