@@ -8,7 +8,7 @@
       <select class="form-select form-select-sm me-2" v-model="selectedBrokerName" @change="updateSelectedBroker">
         <option value="" disabled selected>Select broker</option>
         <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-          {{ brokerName }} {{ getBrokerClientId(brokerName) }}
+          {{ brokerName }} {{ maskBrokerClientId(getBrokerClientId(brokerName)) }}
         </option>
       </select>
       <span class="badge me-2" :class="{
@@ -63,6 +63,12 @@
         </span>
       </span>
       <span>
+        <small class="text-muted">Net Qty</small>
+        <span class="ms-1 fw-bold" :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
+          {{ totalNetQty }}
+        </span>
+      </span>
+      <span>
         <small class="text-muted">Total Capital</small>
         <span class="ms-1 fw-bold"
           :class="totalCapitalPercentage > 0 ? 'text-success' : totalCapitalPercentage < 0 ? 'text-danger' : null">
@@ -81,7 +87,7 @@
   </section>
 
   <!-- Kill Switch MessageWindow -->
-  <section v-if="killSwitchActive" class="row py-1">
+  <section v-if="killSwitchActive" class="row my-2">
     <div class="col-12">
       <div class="bg-danger text-white p-3 rounded-3 shadow">
         <div class="d-flex align-items-center justify-content-between">
@@ -92,7 +98,7 @@
             </p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-6 fw-bold">
               {{ killSwitchRemainingTime }}
             </span>
           </div>
@@ -102,7 +108,7 @@
   </section>
 
   <!-- Trade Warning MessageWindow -->
-  <section v-if="riskReached && !killSwitchActive" class="row py-1">
+  <section v-if="riskReached && !killSwitchActive" class="row my-2">
     <div class="col-12">
       <div class="bg-warning text-dark p-3 rounded-3 shadow">
         <div class="d-flex align-items-center justify-content-between">
@@ -111,7 +117,7 @@
             <p class="mb-0">Risk Threshold Reached!</p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-6 fw-bold">
               Make adjustments or close positions
             </span>
           </div>
@@ -121,7 +127,7 @@
   </section>
 
   <!-- Trade Success MessageWindow -->
-  <section v-if="targetReached && !killSwitchActive" class="row py-1">
+  <section v-if="targetReached && !killSwitchActive" class="row my-2">
     <div class="col-12">
       <div class="bg-success text-white p-3 rounded-3 shadow">
         <div class="d-flex align-items-center justify-content-between">
@@ -130,7 +136,7 @@
             <p class="mb-0">Target Reached!</p>
           </div>
           <div class="text-center">
-            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-5 fw-bold">
+            <span class="d-flex bg-white text-dark py-2 px-3 rounded-2 fs-6 fw-bold">
               Close positions to lock in profits
             </span>
           </div>
