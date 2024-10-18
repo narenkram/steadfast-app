@@ -3725,7 +3725,7 @@ export function useTradeView() {
       const jDataString = JSON.stringify(jData)
       const payload = `jData=${jDataString}&jKey=${apiKey}`
 
-      const response = await axios.post('/shoonyaApi/NorenWClientTP/QuickAuth', payload, {
+      const response = await axios.post('/api/shoonya/login', payload, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
