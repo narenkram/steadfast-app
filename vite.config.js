@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env.BASE_URL': isProduction
-        ? JSON.stringify('https://steadfastapp.in')
+        ? JSON.stringify('https://api.steadfastapp.in')
         : JSON.stringify('http://localhost:3000')
     }
   }
