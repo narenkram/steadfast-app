@@ -447,7 +447,9 @@
 
   <!-- Trading Status Message -->
   <TradingStatusMessageComponent :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime"
-    :riskReached="riskReached" :targetReached="targetReached" />
+    :riskReached="riskReached" :targetReached="targetReached" :activeFetchFunction="activeFetchFunction"
+    :flatTradePositionBook="flatTradePositionBook" :shoonyaPositionBook="shoonyaPositionBook"
+    :paperTradingPositionBook="paperTradingPositionBook" />
 
   <!-- Positions & Trades -->
   <section class="row py-3">

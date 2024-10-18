@@ -21,7 +21,7 @@
     </section>
 
     <!-- Trade Warning MessageWindow -->
-    <section v-if="riskReached && !killSwitchActive" class="row my-2">
+    <section v-if="riskReached && !killSwitchActive && totalPositionQuantity !== 0" class="row my-2">
         <div class="col-12">
             <div class="bg-warning text-dark p-3 rounded-3 shadow">
                 <div class="d-flex align-items-center justify-content-between">
@@ -40,7 +40,7 @@
     </section>
 
     <!-- Trade Success MessageWindow -->
-    <section v-if="targetReached && !killSwitchActive" class="row my-2">
+    <section v-if="targetReached && !killSwitchActive && totalPositionQuantity !== 0" class="row my-2">
         <div class="col-12">
             <div class="bg-success text-white p-3 rounded-3 shadow">
                 <div class="d-flex align-items-center justify-content-between">
@@ -60,12 +60,26 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 
 const props = defineProps({
     killSwitchActive: Boolean,
     killSwitchRemainingTime: String,
     riskReached: Boolean,
-    targetReached: Boolean
+    targetReached: Boolean,
+    activeFetchFunction: String,
+    flatTradePositionBook: Array,
+    shoonyaPositionBook: Array,
+    paperTradingPositionBook: Array,
+});
+
+const totalPositionQuantity = computed(() => {
+    const positions = props.activeFetchFunction === 'fetchFlattradePositions'
+        ? props.flatTradePositionBook
+        : props.activeFetchFunction === 'fetchShoonyaPositions'
+            ? props.shoonyaPositionBook
+            : props.paperTradingPositionBook;
+
+    return positions.reduce((total, position) => total + Math.abs(position.netqty), 0);
 });
 </script>
