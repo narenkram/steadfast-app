@@ -15,7 +15,8 @@
                         </p>
                     </div>
                     <div class="col-md-4 mb-4 text-center">
-                        <video autoplay loop muted playsinline class="img-fluid mb-3 rounded" style="max-height: 100px;">
+                        <video autoplay loop muted playsinline class="img-fluid mb-3 rounded"
+                            style="max-height: 100px;">
                             <source src="/activate_killswitch.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
@@ -23,6 +24,8 @@
                         <p>Automatically block overtrading to protect your profits or prevent excessive losses.</p>
                     </div>
                     <div class="col-md-4 mb-4 text-center">
+                        <img src="/message_1.png" alt="1-Click Trading" class="img-fluid mb-3 rounded"
+                            style="max-height: 100px;">
                         <h3>Enforces Discipline</h3>
                         <p>Set predefined deployment values and risk limits to protect your capital.</p>
                     </div>
