@@ -7,27 +7,64 @@
             <div class="col-lg-10 mx-auto">
                 <h2 class="text-center mb-5">Key Features</h2>
                 <div class="row">
-                    <div class="col-md-4 mb-4 text-center">
-                        <img src="/1click_arrow_keys.png" alt="1-Click Trading" class="img-fluid mb-3 rounded"
-                            style="max-height: 100px;">
-                        <h3>1-Click Trading</h3>
-                        <p>Execute trades with lightning speed, perfect for capturing real-time market opportunities.
-                        </p>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h3 class="card-title h4 mb-4">1-Click Trading</h3>
+                                <img src="/1click_arrow_keys.png" alt="Keyboard Shortcuts for Trading"
+                                    class="img-fluid mb-3" style="max-height: 100px;">
+                                <p class="card-text">Execute trades instantly using arrow keys, providing lightning-fast
+                                    control for capturing real-time market opportunities.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-4 text-center">
-                        <video autoplay loop muted playsinline class="img-fluid mb-3 rounded"
-                            style="max-height: 100px;">
-                            <source src="/activate_killswitch.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <h3>Kill Switch</h3>
-                        <p>Automatically block overtrading to protect your profits or prevent excessive losses.</p>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h3 class="card-title h4 mb-4">Kill Switch</h3>
+                                <video autoplay loop muted playsinline class="img-fluid mb-3"
+                                    style="max-height: 100px;">
+                                    <source src="/activate_killswitch.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <p class="card-text">Activate to prevent overtrading, block further trades for the day,
+                                    and put your mind at ease. Helps protect profits and limit potential losses.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-4 text-center">
-                        <img src="/message_1.png" alt="1-Click Trading" class="img-fluid mb-3 rounded"
-                            style="max-height: 100px;">
-                        <h3>Enforces Discipline</h3>
-                        <p>Set predefined deployment values and risk limits to protect your capital.</p>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h3 class="card-title h4 mb-4">Enforces Discipline</h3>
+                                <img src="/message_1.png" alt="Discipline Enforcing Messages" class="img-fluid mb-3"
+                                    style="max-height: 100px;">
+                                <p class="card-text">Receive timely alerts for trade outcomes, including success
+                                    messages and warnings for losing trades. Helps maintain trading discipline and
+                                    awareness.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h3 class="card-title h4 mb-4">Automatic TSL</h3>
+                                <img src="/message_1.png" alt="Automatic Trailing Stop Loss" class="img-fluid mb-3"
+                                    style="max-height: 100px;">
+                                <p class="card-text">Implement automatic profit trailing with Trailing Stop Loss on
+                                    individual positions, maximizing gains while minimizing risks.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h3 class="card-title h4 mb-4">MTM Trailing</h3>
+                                <img src="/message_1.png" alt="MTM Trailing" class="img-fluid mb-3"
+                                    style="max-height: 100px;">
+                                <p class="card-text">Enable automatic trailing on overall Mark-to-Market (MTM), ensuring
+                                    optimal performance across your entire portfolio.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
