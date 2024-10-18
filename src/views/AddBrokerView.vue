@@ -74,7 +74,10 @@ import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const redirectURL = computed(() => `${import.meta.env.VITE_BASE_URL}/${selectedBroker.value.toLowerCase()}/redirect?`);
+const redirectURL = computed(() => {
+  const baseUrl = import.meta.env.DEV ? 'http://localhost:5173' : import.meta.env.VITE_BASE_URL;
+  return `${baseUrl}/${selectedBroker.value.toLowerCase()}/redirect?`;
+});
 
 const selectedBroker = ref('');
 const apiKey = ref('');
