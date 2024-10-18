@@ -4241,7 +4241,7 @@ export function useTradeView() {
       try {
         const apiUrl = import.meta.env.PROD
           ? `${BASE_URL}/flattrade/generateToken`
-          : '/flattrade/generateToken'
+          : `${BASE_URL}/flattrade/generateToken`
         const res = await axios.post(apiUrl, payload)
         const token = res.data.token
         if (!token) {
