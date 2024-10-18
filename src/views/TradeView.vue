@@ -141,12 +141,15 @@
             </div>
           </div>
 
-          <!-- Steadfast AI Assistant -->
-          <div class="col-6 col-md-4 col-lg-1 mt-md-1 mt-lg-2">
-            <label for="SteadfastAIAssistant" class="form-label mb-0 small"></label>
-            <div class="input-group input-group-sm mb-3">
-              <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
-                class="btn btn-sm btn-outline-danger w-100">✨</button>
+          <!-- 1 Click Keys -->
+          <div class="col-6 col-md-4 col-lg-2 mt-md-1 mt-lg-2">
+            <label for="enableHotKeys" class="form-label mb-0 small">1 Click Keys</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
+                :class="{ 'disabled-form': isFormDisabled }" />
+              <label class="form-check-label" for="enableHotKeys">
+                {{ enableHotKeys ? 'Enabled' : 'Disabled' }}
+              </label>
             </div>
           </div>
         </div>
@@ -904,19 +907,6 @@
     </div>
   </div>
 
-
-  <!-- Steadfast AI Assistant Modal -->
-  <div class="modal fade" id="SteadfastAIAssistantModal" tabindex="-1" aria-labelledby="SteadfastAIAssistantModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-body">
-          <ChatAIComponent />
-        </div>
-      </div>
-    </div>
-  </div>
-
 </template>
 
 <script setup>
@@ -928,7 +918,6 @@ import { checkAllTokens } from '@/utils/brokerTokenValidator';
 import ToastAlert from '@/components/ToastAlertComponent.vue';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
-import ChatAIComponent from '@/components/ChatAIComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
 import MarketDepthComponent from '@/components/MarketDepthComponent.vue';
 import MultiStrikeComponent from '@/components/MultiStrikeComponent.vue';

@@ -197,21 +197,6 @@
               </label>
             </div>
           </div>
-          <!-- 1 Click Keys -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <form @submit.prevent>
-              <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
-                <label for="enableHotKeys" class="form-label">1 Click Keys ⌨️</label>
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
-                    :class="{ 'disabled-form': isFormDisabled }" />
-                  <label class="form-check-label" for="enableHotKeys">
-                    {{ enableHotKeys ? 'Enabled' : 'Disabled' }}
-                  </label>
-                </div>
-              </fieldset>
-            </form>
-          </div>
           <!-- Show/Hide OHLC Values -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <label for="showOHLCValues" class="form-label">Show OHLC Values</label>
@@ -324,7 +309,6 @@ const {
   stickyMTM,
   savedStickyMTM,
 
-  enableHotKeys,
   callStrikeOffset,
   putStrikeOffset,
   expiryOffset,

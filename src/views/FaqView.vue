@@ -117,11 +117,33 @@
                 </div>
             </div>
         </section>
+
+        <!-- Steadfast AI Assistant -->
+        <div class="col-6 col-md-4 col-lg-1 mt-md-1 mt-lg-2">
+            <label for="SteadfastAIAssistant" class="form-label mb-0 small"></label>
+            <div class="input-group input-group-sm mb-3">
+                <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal"
+                    class="btn btn-sm btn-outline-danger w-100">✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Steadfast AI Assistant Modal -->
+    <div class="modal fade" id="SteadfastAIAssistantModal" tabindex="-1"
+        aria-labelledby="SteadfastAIAssistantModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <ChatAIComponent />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import ChatAIComponent from '@/components/ChatAIComponent.vue';
 
 onMounted(() => {
 
