@@ -30,6 +30,11 @@ export default defineConfig(({ mode }) => {
               target: 'https://api.shoonya.com',
               changeOrigin: true,
               rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
+            },
+            '/api': {
+              target: 'http://localhost:3000',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/api/, '')
             }
           }
     },
