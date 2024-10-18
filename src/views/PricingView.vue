@@ -10,15 +10,15 @@
                         <p class="text-danger mb-2 text-uppercase fw-bold">FOR 1 MONTH</p>
                         <p class="display-4 text-danger mb-2">
                             <small class="text-decoration-line-through text-muted fs-1">₹1200</small>
-                            ₹800<span class="fs-6"> / month</span>
+                            ₹500<span class="fs-6"> / month</span>
                         </p>
-                        <p class="text-success fw-bold">20% OFF</p>
+                        <p class="text-success fw-bold">58% OFF</p>
                         <p class="text-muted mb-0">(Excluding GST from payment gateway)</p>
                     </div>
                 </div>
                 <ul class="list-group list-group-flush mb-4 text-start">
-                    <li class="list-group-item">✅ 2 Broker(s) Allowed + 1 Paper
-                        Trading Account</li>
+                    <li class="list-group-item">✅ 2 Broker(s) Allowed (Flattrade, Shoonya)</li>
+                    <li class="list-group-item">✅ 1 Paper Trading Account</li>
                     <li class="list-group-item">✅ Basket Order</li>
                     <li class="list-group-item">✅ Place Unlimited Qty</li>
                     <li class="list-group-item">✅ Order Types: Market, Limit,
