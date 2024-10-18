@@ -45,9 +45,12 @@
             id="APISecretKey" required>
 
           <!-- Redirect URL -->
-          <label v-show="selectedBroker !== ''" for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect URL</b></label>
-          <input v-show="selectedBroker !== ''" type="text" class="form-control" id="RedirectURL" :value="redirectURL" disabled required>
-          <p v-show="selectedBroker !== ''" class="form-text text-info">If your broker requires a redirect URL, register this URL in your broker's
+          <label v-show="selectedBroker !== ''" for="RedirectURL" class="form-label mb-0 mt-3"><b>Redirect
+              URL</b></label>
+          <input v-show="selectedBroker !== ''" type="text" class="form-control" id="RedirectURL" :value="redirectURL"
+            disabled required>
+          <p v-show="selectedBroker !== ''" class="form-text text-info">If your broker requires a redirect URL, register
+            this URL in your broker's
             portal to get API details.
           </p>
 
@@ -71,7 +74,7 @@ import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const redirectURL = computed(() => `http://localhost:5173/${selectedBroker.value.toLowerCase()}/redirect?`);
+const redirectURL = computed(() => `${import.meta.env.VITE_BASE_URL}/${selectedBroker.value.toLowerCase()}/redirect?`);
 
 const selectedBroker = ref('');
 const apiKey = ref('');
