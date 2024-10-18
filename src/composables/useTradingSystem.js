@@ -4239,7 +4239,10 @@ export function useTradeView() {
       }
 
       try {
-        const res = await axios.post('/flattradeApi/trade/apitoken', payload)
+        const apiUrl = import.meta.env.PROD
+          ? `${BASE_URL}/flattrade/flattradeApi/trade/apitoken`
+          : '/flattradeApi/trade/apitoken'
+        const res = await axios.post(apiUrl, payload)
         const token = res.data.token
         if (!token) {
           errorMessage.value = 'Token generation failed'
