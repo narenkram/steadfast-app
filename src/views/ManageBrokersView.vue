@@ -198,10 +198,8 @@ onMounted(() => {
 
   <section class="row">
     <div class="col-12">
-      <div>
-        <span v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</span>
-        <span v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</span>
-      </div>
+      <p v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</p>
+      <p v-if="statusMessage" class="alert alert-info">{{ statusMessage }}</p>
     </div>
   </section>
 
