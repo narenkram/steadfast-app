@@ -3725,7 +3725,11 @@ export function useTradeView() {
       const jDataString = JSON.stringify(jData)
       const payload = `jData=${jDataString}&jKey=${apiKey}`
 
-      const response = await axios.post('/api/shoonya/login', payload, {
+      const apiUrl = import.meta.env.PROD
+        ? `${BASE_URL}/shoonya/login`
+        : `${BASE_URL}/shoonya/login`
+
+      const response = await axios.post(apiUrl, payload, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -3740,6 +3744,7 @@ export function useTradeView() {
         shoonyaBrokerUserId.value = ''
         shoonyaBrokerPassword.value = ''
         shoonyaOneTimePassword.value = ''
+
         // Clear the status message after 5 seconds
         setTimeout(() => {
           statusMessage.value = ''
