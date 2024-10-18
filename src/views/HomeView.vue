@@ -8,13 +8,17 @@
                 <h2 class="text-center mb-5">Key Features</h2>
                 <div class="row">
                     <div class="col-md-4 mb-4 text-center">
-                        <img src="/1click_arrow_keys.png" alt="1-Click Trading" class="img-fluid mb-3"
+                        <img src="/1click_arrow_keys.png" alt="1-Click Trading" class="img-fluid mb-3 rounded"
                             style="max-height: 100px;">
                         <h3>1-Click Trading</h3>
                         <p>Execute trades with lightning speed, perfect for capturing real-time market opportunities.
                         </p>
                     </div>
                     <div class="col-md-4 mb-4 text-center">
+                        <video autoplay loop muted playsinline class="img-fluid mb-3 rounded" style="max-height: 100px;">
+                            <source src="/activate_killswitch.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <h3>Kill Switch</h3>
                         <p>Automatically block overtrading to protect your profits or prevent excessive losses.</p>
                     </div>
