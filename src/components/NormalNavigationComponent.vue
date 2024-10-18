@@ -1,6 +1,7 @@
 <template>
+    <SiteMessageComponent />
     <!-- steadfast-app/src/components/NavigationComponent.vue -->
-    <section class="Navigation">
+    <section class="Navigation NormalNavigationComponent">
         <nav class="navbar navbar-expand-lg shadow-sm mt-0 mb-3">
             <a class="navbar-brand p-0" href="#">
                 <img src="/steadfast_logo.png" class="Navigation__logo img-fluid" alt="Steadfast" />
@@ -25,8 +26,13 @@
 </template>
 
 <script>
+import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
+
 export default {
     name: "NormalNavigationComponent",
+    components: {
+        SiteMessageComponent
+    },
     data() {
         return {
             routes: [

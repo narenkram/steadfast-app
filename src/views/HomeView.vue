@@ -1,11 +1,4 @@
 <template>
-    <div class="seo-hidden">
-        <h6 class="mb-0 bg-warning text-dark p-2">
-            Regulatory Compliance Notice: If you identify any potential regulatory issues, please
-            <a href="mailto:contact@steadfast.com" class="text-dark font-weight-bold">contact me</a>.
-            I am committed to promptly addressing and resolving any concerns to ensure full compliance.
-        </h6>
-    </div>
     <NormalNavigationComponent />
     <div class="container-fluid">
 
@@ -112,15 +105,6 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
-
-onMounted(() => {
-    document.querySelector('.seo-hidden').classList.remove('seo-hidden');
-});
 </script>
-<style scoped>
-.seo-hidden {
-    display: none;
-}
-</style>
