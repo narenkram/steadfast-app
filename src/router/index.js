@@ -61,10 +61,6 @@ const router = createRouter({
       component: AddBroker
     },
     {
-      path: '/redirect',
-      component: Flattrade_Redirect
-    },
-    {
       path: '/flattrade/redirect',
       component: Flattrade_Redirect
     },
