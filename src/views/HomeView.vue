@@ -41,7 +41,7 @@
                                 </h4>
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item">
-                                        ✅ Kill Switch (Client-side, psychologically effective)
+                                        ✅ Kill Switch
                                     </li>
                                     <li class="list-group-item">
                                         ✅ Enforces discipline
@@ -56,6 +56,11 @@
                                         ✅ Automatic MTM Trailing
                                     </li>
                                 </ul>
+                                <p class="mt-3 text-muted small">
+                                    <strong>Note on Kill Switch:</strong> This client-side feature acts as a
+                                    psychological safeguard. It does not affect your ability to trade directly
+                                    through your broker's platform.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -70,7 +75,7 @@
                                         ✅ Supports truly free broker platforms
                                     </li>
                                     <li class="list-group-item">
-                                        ✅ Real-time LTP Data via free brokers
+                                        ✅ Real-time LTP via your broker's API
                                     </li>
                                     <li class="list-group-item">
                                         ✅ Dual Mode reliability for LTP Data
