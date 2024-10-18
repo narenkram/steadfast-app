@@ -1792,6 +1792,19 @@ export function useTradeView() {
       // Update both orders and positions
       await updateOrdersAndPositions()
 
+      // Find the new position after updating positions
+      const newPosition = findNewPosition(selectedStrike.tradingSymbol)
+
+      // If predefined stoploss is enabled, set stoploss for the new position
+      if (enableStoploss.value && stoplossValue.value > 0 && newPosition) {
+        setStoploss(newPosition, 'static')
+      }
+
+      // If predefined target is enabled, set target for the new position
+      if (enableTarget.value && targetValue.value > 0 && newPosition) {
+        setTarget(newPosition)
+      }
+
       // Update fund limits
       await updateFundLimits()
     } catch (error) {
