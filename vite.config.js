@@ -16,24 +16,22 @@ export default defineConfig(({ mode }) => {
       }
     },
     server: {
-      proxy: {
-        '/flattradeSymbols': 'http://localhost:3000/flattrade/',
-        '/shoonyaSymbols': 'http://localhost:3000/shoonya/',
-        '/flattradeApi': {
-          target: 'https://authapi.flattrade.in',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/flattradeApi/, '')
-        },
-        '/shoonyaApi': {
-          target: 'https://api.shoonya.com',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
-        },
-        '/flattrade': {
-          target: 'http://localhost:3000', // Or your production API URL
-          changeOrigin: true
-        }
-      }
+      proxy: isProduction
+        ? {}
+        : {
+            '/flattradeSymbols': 'http://localhost:3000/flattrade/',
+            '/shoonyaSymbols': 'http://localhost:3000/shoonya/',
+            '/flattradeApi': {
+              target: 'https://authapi.flattrade.in',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/flattradeApi/, '')
+            },
+            '/shoonyaApi': {
+              target: 'https://api.shoonya.com',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
+            }
+          }
     },
     optimizeDeps: {
       include: ['@google/generative-ai']
