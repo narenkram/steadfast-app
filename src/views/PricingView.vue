@@ -16,8 +16,8 @@
                         <div class="text-center mb-4">
                             <p class="text-uppercase fw-bold mb-1">FOR 1 MONTH</p>
                             <p class="display-3 text-primary mb-0">
-                                <span class="text-decoration-line-through text-muted"
-                                    style="font-size: 0.5em;">₹1199</span>
+                                <!-- <span class="text-decoration-line-through text-muted"
+                                    style="font-size: 0.5em;">₹1199</span> -->
                                 <span class="text-success">FREE</span>
                             </p>
                             <p class="h3 text-primary mb-0">₹0<span class="fs-6"> / month</span></p>
