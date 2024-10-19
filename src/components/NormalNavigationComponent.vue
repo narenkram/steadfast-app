@@ -14,9 +14,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item" v-for="route in routes" :key="route.path">
+                        <li class="nav-item" v-for="(route, index) in routes" :key="route.path">
                             <RouterLink :to="route.path" class="nav-link"
-                                :class="{ 'active-route': $route.path === route.path }">
+                                :class="{ 'active-route': $route.path === route.path }"
+                                :style="{ '--icon-color': route.color }">
                                 <font-awesome-icon :icon="route.icon" class="nav-icon" />
                                 <span class="nav-text">{{ route.name }}</span>
                             </RouterLink>
@@ -42,12 +43,12 @@ export default defineComponent({
     data() {
         return {
             routes: [
-                { path: '/', name: 'Home', icon: ['fas', 'bolt'] },
-                { path: '/about', name: 'About', icon: ['fas', 'lightbulb'] },
-                { path: '/pricing', name: 'Pricing', icon: ['fas', 'dollar-sign'] },
-                { path: '/contact', name: 'Contact', icon: ['fas', 'comment'] },
-                { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'] },
-                // { path: '/login', name: 'Login', icon: ['fas', 'key'] },
+                { path: '/', name: 'Home', icon: ['fas', 'bolt'], color: '#FFD700' },
+                { path: '/about', name: 'About', icon: ['fas', 'lightbulb'], color: '#4CAF50' },
+                { path: '/pricing', name: 'Pricing', icon: ['fas', 'dollar-sign'], color: '#2196F3' },
+                { path: '/contact', name: 'Contact', icon: ['fas', 'comment'], color: '#FF5722' },
+                { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'], color: '#9C27B0' },
+                // { path: '/login', name: 'Login', icon: ['fas', 'key'], color: '#607D8B' },
             ],
         };
     },
@@ -84,14 +85,14 @@ export default defineComponent({
 
     &:hover,
     &.active-route {
-        background-color: rgba(255, 255, 255, 0.2);
         transform: translateY(-2px);
     }
 
     .nav-icon {
         font-size: 1.2rem;
         margin-right: 0.5rem;
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, color 0.3s ease;
+        color: var(--icon-color, inherit);
     }
 
     .nav-text {
