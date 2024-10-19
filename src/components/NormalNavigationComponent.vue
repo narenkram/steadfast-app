@@ -41,7 +41,7 @@ export default {
                 { path: '/pricing', name: 'Pricing', icon: '💰' },
                 { path: '/contact', name: 'Contact', icon: '💬' },
                 { path: '/faq', name: 'FAQ', icon: '❓' },
-                { path: '/login', name: 'Login', icon: '🔑' },
+                // { path: '/login', name: 'Login', icon: '🔑' },
             ],
         };
     },
