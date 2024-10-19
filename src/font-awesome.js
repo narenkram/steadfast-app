@@ -13,8 +13,11 @@ import {
   faImage,
   faPaperPlane,
   faRedo,
-  faHatWizard
+  faHatWizard,
+  faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
+
+import { faTelegram } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
   faCheckCircle,
@@ -29,7 +32,9 @@ library.add(
   faImage,
   faPaperPlane,
   faRedo,
-  faHatWizard
+  faHatWizard,
+  faEnvelope,
+  faTelegram
 )
 
 export { FontAwesomeIcon }

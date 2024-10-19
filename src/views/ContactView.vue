@@ -11,10 +11,10 @@
                     <div class="col-md-6 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body">
-                                <font-awesome-icon :icon="['fas', 'envelope']" class="fa-3x text-primary mb-3" />
+                                <font-awesome-icon :icon="['fas', 'envelope']" class="fa-3x text-danger mb-3" />
                                 <h3 class="h4 mb-3">Email</h3>
                                 <p class="mb-0">
-                                    <a href="mailto:email@narenkram.com" class="text-decoration-none">
+                                    <a href="mailto:email@narenkram.com" class="text-decoration-none text-danger">
                                         email@narenkram.com
                                     </a>
                                 </p>
@@ -24,11 +24,11 @@
                     <div class="col-md-6 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body">
-                                <font-awesome-icon :icon="['fab', 'telegram']" class="fa-3x text-primary mb-3" />
+                                <font-awesome-icon :icon="['fab', 'telegram']" class="fa-3x text-success mb-3" />
                                 <h3 class="h4 mb-3">Telegram</h3>
                                 <p class="mb-0">
                                     <a href="https://t.me/narenkram" target="_blank" rel="noopener noreferrer"
-                                        class="text-decoration-none">
+                                        class="text-decoration-none text-success">
                                         Direct Message on Telegram
                                     </a>
                                 </p>

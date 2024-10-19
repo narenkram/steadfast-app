@@ -16,11 +16,12 @@
                             <div class="card-body">
                                 <h3 class="h4 mb-3">🚀 Community-Driven Evolution</h3>
                                 <p>
-                                    We harness the power of collective wisdom. Steadfast evolves continuously, shaped by
-                                    the insights and needs of our vibrant trading community.
+                                    The power of collective wisdom is harnessed. Steadfast evolves continuously, shaped
+                                    by
+                                    the insights and needs of the vibrant trading community.
                                 </p>
-                                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-primary btn-sm mt-3">
-                                    Join Our Telegram Community
+                                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-success btn-sm mt-3">
+                                    Join the Telegram Community
                                 </a>
                             </div>
                         </div>
@@ -28,10 +29,11 @@
                     <div class="col-md-6 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body">
-                                <h3 class="h4 mb-3">💡 Our Guiding Vision</h3>
+                                <h3 class="h4 mb-3">💡 The Guiding Vision</h3>
                                 <p>
-                                    To deliver a trading platform that's not just reliable and efficient, but truly
-                                    transformative. We're here to enhance your decision-making and elevate your trading
+                                    The goal is to deliver a trading platform that's not just reliable and efficient,
+                                    but truly
+                                    transformative. The aim is to enhance decision-making and elevate the trading
                                     journey.
                                 </p>
                             </div>
@@ -44,7 +46,7 @@
                         Designed and developed with <span class="heart-icon">❤️</span> by
                     </p>
                     <a href="https://narenkram.com" target="_blank" rel="noopener noreferrer"
-                        class="text-decoration-none fw-bold h5 developer-link">
+                        class="text-decoration-none text-danger fw-bold h5 developer-link">
                         narenkram
                     </a>
                     <p class="text-muted mt-2">
