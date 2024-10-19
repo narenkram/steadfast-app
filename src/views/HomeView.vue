@@ -3,7 +3,7 @@
     <div class="container-fluid">
 
         <!-- Key Features Section -->
-        <section class="row py-5 bg-gradient">
+        <section class="row py-5">
             <div class="col-lg-10 mx-auto">
                 <h2 class="text-center mb-5 display-4 fw-bold">Revolutionize Your Trading</h2>
                 <p class="lead text-center mb-5">Discover the cutting-edge features that set us apart</p>
@@ -110,10 +110,6 @@ import NormalNavigationComponent from '@/components/NormalNavigationComponent.vu
 </script>
 
 <style scoped>
-.bg-gradient {
-    background: var(--custom-gradient);
-}
-
 .hover-effect {
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }

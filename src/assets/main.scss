@@ -23,17 +23,19 @@ $light-theme: (
   'body-color': $dark,
   'border-color': $gray-300,
   'light': $light,
-  'dark': $dark
+  'dark': $dark,
+  'accent-color': #3498db // New accent color for light theme
 );
 
 // Dark theme variables
 $dark-theme: (
-  'body-bg': $gray-900,
+  'body-bg': #1a1a1a,
+  // Slightly lighter than pure black
   'body-color': $light,
   'border-color': $gray-700,
-  'light': $gray-800,
-  // Darker shade for 'light' in dark mode
-  'dark': $black
+  'light': $gray-900,
+  'dark': $black,
+  'accent-color': #2ecc71 // New accent color for dark theme
 );
 
 // Import the rest of Bootstrap
@@ -152,6 +154,7 @@ $dark-theme: (
   --bs-text-muted: #a0a0a0;
   --bs-form-disabled-bg: #{lighten($gray-900, 5%)};
   --bs-form-disabled-color: #{$gray-600};
+  --bs-accent-color: #{map-get($dark-theme, 'accent-color')};
 
   .bg-light {
     background-color: var(--bs-light) !important;
@@ -188,7 +191,8 @@ $dark-theme: (
 
   // Add other dark mode overrides here
 
-  --custom-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+  // Remove the custom gradient
+  // --custom-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
 }
 
 // Apply dark mode styles to .dark-mode class
@@ -443,4 +447,44 @@ input:focus {
 
 .sparkle-icon {
   animation: sparkle 2s infinite;
+}
+
+// Add some new styles for better visual appeal
+.card,
+.btn,
+.form-control,
+.input-group-text {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: var(--bs-accent-color);
+  border-color: var(--bs-accent-color);
+}
+
+.btn-primary:hover {
+  background-color: darken(map-get($light-theme, 'accent-color'), 10%);
+  border-color: darken(map-get($light-theme, 'accent-color'), 10%);
+}
+
+.form-control:focus,
+.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(map-get($light-theme, 'accent-color'), 0.25);
+}
+
+// Add a subtle background pattern
+body {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+body.dark-mode {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }

@@ -1,6 +1,6 @@
 <template>
     <NormalNavigationComponent />
-    <div class="container-fluid bg-gradient py-5">
+    <div class="container-fluid py-5">
         <!-- Contact Section -->
         <section class="row">
             <div class="col-lg-8 mx-auto text-center">
@@ -54,10 +54,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.bg-gradient {
-    background: var(--custom-gradient);
-}
-
 .hover-effect {
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }

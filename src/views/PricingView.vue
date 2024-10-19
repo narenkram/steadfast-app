@@ -1,6 +1,6 @@
 <template>
     <NormalNavigationComponent />
-    <div class="container-fluid bg-gradient py-5">
+    <div class="container-fluid py-5">
         <!-- Pricing Section -->
         <section class="row">
             <div class="col-lg-8 col-xl-6 mx-auto">
@@ -93,10 +93,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.bg-gradient {
-    background: var(--custom-gradient);
-}
-
 .card {
     transition: transform 0.3s ease-in-out;
 }

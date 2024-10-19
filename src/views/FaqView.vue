@@ -1,6 +1,6 @@
 <template>
     <NormalNavigationComponent />
-    <div class="container-fluid bg-gradient py-5">
+    <div class="container-fluid py-5">
         <!-- FAQ Section -->
         <section class="row">
             <div class="col-lg-8 mx-auto">
@@ -95,10 +95,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.bg-gradient {
-    background: var(--custom-gradient);
-}
-
 .accordion-button:not(.collapsed) {
     background-color: #007bff;
     color: white;
