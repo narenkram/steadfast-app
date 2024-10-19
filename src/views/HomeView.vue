@@ -8,7 +8,7 @@
                 <h2 class="text-center mb-5 display-4 fw-bold">Revolutionize Your Trading</h2>
                 <p class="lead text-center mb-5">Discover the cutting-edge features that set us apart</p>
                 <div class="row">
-                    <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body text-center">
                                 <h3 class="card-title h4 mb-4 fw-bold">1-Click Trading</h3>
@@ -19,7 +19,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body text-center">
                                 <h3 class="card-title h4 mb-4 fw-bold">Kill Switch</h3>
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body text-center">
                                 <h3 class="card-title h4 mb-4 fw-bold">Automatic TSL</h3>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body text-center">
                                 <h3 class="card-title h4 mb-4 fw-bold">Risk Management</h3>
@@ -108,3 +108,18 @@
 import { ref } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
 </script>
+
+<style scoped>
+.bg-gradient {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.hover-effect {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+</style>

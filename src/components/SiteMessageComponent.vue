@@ -1,5 +1,5 @@
 <template>
-    <div class="seo-hidden">
+    <!-- <div class="seo-hidden">
         <h6 class="mb-0 bg-warning text-dark p-2">
             Regulatory Compliance Notice: If you identify any potential regulatory issues, please
             <a href="mailto:email@narenkram.com" class="fw-bold text-dark">contact me at
@@ -11,14 +11,14 @@
             For any issues or feedback, please join our
             <a href="https://t.me/steadfastapp" target="_blank" rel="noopener noreferrer">Telegram community</a>.
         </h6>
-    </div>
+    </div> -->
 </template>
 
 <script setup>
 import { onMounted } from 'vue';
 
 onMounted(() => {
-    document.querySelector('.seo-hidden').classList.remove('seo-hidden');
+    // document.querySelector('.seo-hidden').classList.remove('seo-hidden');
 });
 </script>
 

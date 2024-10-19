@@ -1,24 +1,31 @@
 <template>
-    <div class="Steadfast-AI-Assistant">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-3">Steadfast AI Assistant</h2>
-            <div class="d-flex justify-content-end p-2">
-                <button @click="startNewChat" class="btn btn-outline btn-sm">New Chat</button>
-            </div>
+    <div class="Steadfast-AI-Assistant bg-gradient p-4 rounded-lg shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0 text-primary">
+                <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
+                Steadfast AI Assistant
+            </h2>
+            <button @click="startNewChat" class="btn btn-outline-primary btn-sm">
+                <font-awesome-icon :icon="['fas', 'sync']" class="me-2" />
+                New Chat
+            </button>
         </div>
-        <div v-if="!apiKey" class="mb-3">
+        <div v-if="!apiKey" class="mb-4">
             <div class="input-group">
                 <input v-model="apiKeyInput" type="text" class="form-control" placeholder="Enter your Gemini API key">
-                <button @click="saveApiKey" class="btn btn-primary">Save API Key</button>
+                <button @click="saveApiKey" class="btn btn-primary">
+                    <font-awesome-icon :icon="['fas', 'key']" class="me-2" />
+                    Save API Key
+                </button>
             </div>
         </div>
-        <div v-else class="border rounded">
-            <div class="overflow-auto p-3" ref="chatMessages">
+        <div v-else class="chat-container bg-white rounded-lg shadow">
+            <div class="chat-messages overflow-auto p-3" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
-                    :class="['mb-2', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
+                    :class="['mb-3', 'p-2', 'rounded-lg', message.role === 'user' ? 'text-end' : '']">
                     <div
-                        :class="['d-inline-block', 'p-2', 'rounded', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-danger', 'mw-75']">
-                        <img v-if="message.image" :src="message.image" class="user-image" />
+                        :class="['d-inline-block', 'p-3', 'rounded-lg', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark', 'mw-75', 'shadow-sm']">
+                        <img v-if="message.image" :src="message.image" class="user-image rounded" />
                         <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                             <span></span>
                             <span></span>
@@ -29,25 +36,30 @@
                     </div>
                 </div>
             </div>
-            <div class="p-3 bg-light">
-                <div class="row d-flex flex-row align-items-center justify-content-between">
-                    <div class="col-1">
+            <div class="chat-input p-3 bg-light rounded-bottom">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
                         <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"
                             id="imageUpload">
-                        <label class="input-group-text" for="imageUpload">🖼️</label>
+                        <label class="btn btn-outline-secondary" for="imageUpload">
+                            <font-awesome-icon :icon="['fas', 'image']" />
+                        </label>
                     </div>
-                    <div class="col-9">
+                    <div class="col">
                         <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
                             placeholder="Type your message..." :disabled="isWaitingForResponse">
-
                     </div>
-                    <div class="col-2">
-                        <button @click="sendMessage" class="btn btn-primary w-100"
-                            :disabled="isWaitingForResponse">Send</button>
-                        <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning w-100"
-                            :disabled="isWaitingForResponse">Retry</button>
+                    <div class="col-auto">
+                        <button @click="sendMessage" class="btn btn-primary" :disabled="isWaitingForResponse">
+                            <font-awesome-icon :icon="['fas', 'paper-plane']" />
+                        </button>
                     </div>
                 </div>
+                <button v-if="lastMessageIsError" @click="retryLastMessage" class="btn btn-warning mt-2 w-100"
+                    :disabled="isWaitingForResponse">
+                    <font-awesome-icon :icon="['fas', 'redo']" class="me-2" />
+                    Retry
+                </button>
             </div>
         </div>
     </div>
@@ -57,6 +69,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { marked } from 'marked';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const apiKey = ref(localStorage.getItem('GEMINI_API_KEY') || '');
 const apiKeyInput = ref('');
@@ -219,6 +232,21 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.bg-gradient {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.chat-container {
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    max-height: calc(70vh - 100px);
+}
+
 .typing-indicator {
     display: inline-block;
     width: 50px;
@@ -260,8 +288,12 @@ onMounted(() => {
 
 .user-image {
     max-width: 100%;
-    max-height: 300px;
+    max-height: 200px;
     object-fit: contain;
     margin-bottom: 10px;
+}
+
+.chat-input {
+    border-top: 1px solid #dee2e6;
 }
 </style>
