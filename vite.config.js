@@ -35,6 +35,11 @@ export default defineConfig(({ mode }) => {
               target: 'http://localhost:3000',
               changeOrigin: true,
               rewrite: (path) => path.replace(/^\/api/, '')
+            },
+            '/shoonya/login': {
+              target: 'https://api.steadfastapp.in',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/shoonya\/login/, '/api/shoonya/login')
             }
           }
     },
