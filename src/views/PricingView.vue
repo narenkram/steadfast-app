@@ -9,11 +9,12 @@
                     <div class="card-body">
                         <p class="text-danger mb-2 text-uppercase fw-bold">FOR 1 MONTH</p>
                         <p class="display-4 text-danger mb-2">
-                            <small class="text-decoration-line-through text-muted fs-1">₹1199</small>
-                            ₹299<span class="fs-6"> / month</span>
+                            <!-- <small class="text-decoration-line-through text-muted fs-1">₹1199</small> -->
+                            <small class="text-success fs-1">FREE</small>
+                            ₹0<span class="fs-6"> / month</span>
                         </p>
-                        <p class="text-success fw-bold">Launch Offer: 75% OFF</p>
-                        <p class="text-muted mb-0">(Excluding GST from payment gateway)</p>
+                        <p class="text-success fw-bold">Launch Offer: 100% OFF</p>
+                        <!-- <p class="text-muted mb-0">(Excluding GST from payment gateway)</p> -->
                     </div>
                 </div>
                 <ul class="list-group list-group-flush mb-4 text-start">
