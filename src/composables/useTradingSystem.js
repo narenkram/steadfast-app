@@ -3729,11 +3729,18 @@ export function useTradeView() {
         ? `${BASE_URL}/shoonya/login`
         : `${BASE_URL}/shoonya/login`
 
-      const response = await axios.post(apiUrl, payload, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+      const response = await axios.post(
+        apiUrl,
+        {
+          jKey: apiKey,
+          jData: jDataString
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      })
+      )
 
       if (response.data.stat === 'Ok') {
         SHOONYA_API_TOKEN.value = response.data.susertoken
