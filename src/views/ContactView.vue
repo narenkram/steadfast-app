@@ -55,7 +55,7 @@ onMounted(() => {
 
 <style scoped>
 .bg-gradient {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--custom-gradient);
 }
 
 .hover-effect {

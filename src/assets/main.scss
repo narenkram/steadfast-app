@@ -1,179 +1,205 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+
+// Custom color variables
+$custom-colors: (
+  'primary': $primary,
+  'secondary': $secondary,
+  'success': $success,
+  'info': $info,
+  'warning': $warning,
+  'danger': $danger,
+  'light': $light,
+  'dark': $dark
+);
+
+// Merge the maps
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+// Light theme variables
+$light-theme: (
+  'body-bg': $white,
+  'body-color': $dark,
+  'border-color': $gray-300,
+  'light': $light,
+  'dark': $dark
+);
+
+// Dark theme variables
+$dark-theme: (
+  'body-bg': $gray-900,
+  'body-color': $light,
+  'border-color': $gray-700,
+  'light': $gray-800,
+  // Darker shade for 'light' in dark mode
+  'dark': $black
+);
+
+// Import the rest of Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
-@mixin color-scheme-styles {
-  html,
+@mixin color-scheme-styles($theme) {
+  --bs-body-bg: #{map-get($theme, 'body-bg')};
+  --bs-body-color: #{map-get($theme, 'body-color')};
+  --bs-border-color: #{map-get($theme, 'border-color')};
+  --bs-light: #{map-get($theme, 'light')};
+  --bs-dark: #{map-get($theme, 'dark')};
+
+  @each $color, $value in $theme-colors {
+    --bs-#{$color}: #{$value};
+  }
+
+  // Increase specificity and use !important to override Bootstrap defaults
   body {
-    color: var(--bs-body-color);
-    background-color: var(--bs-body-bg);
-  }
+    .bg-light {
+      background-color: var(--bs-light) !important;
+    }
+    .bg-dark {
+      background-color: var(--bs-dark) !important;
+    }
+    .text-light {
+      color: var(--bs-light) !important;
+    }
+    .text-dark {
+      color: var(--bs-dark) !important;
+    }
 
-  .Card {
-    border: 1px solid var(--bs-card-border-color);
-  }
+    .card {
+      border-color: var(--bs-border-color);
+    }
 
-  .ToggleSlider {
-    background-color: var(--bs-secondary);
-  }
+    // Add these class overrides
+    .ToggleSlider {
+      background-color: var(--bs-secondary);
+    }
 
-  .ToggleSlider:before {
-    background-color: var(--bs-white);
-  }
+    .ToggleSlider:before {
+      background-color: var(--bs-white);
+    }
 
-  .ToggleInput:checked + .ToggleSlider {
-    background-color: var(--bs-success);
-  }
+    .ToggleInput:checked + .ToggleSlider {
+      background-color: var(--bs-success);
+    }
 
-  .ToggleInput:focus + .ToggleSlider {
-    box-shadow: 0 0 1px var(--bs-success);
-  }
+    .ToggleInput:focus + .ToggleSlider {
+      box-shadow: 0 0 1px var(--bs-success);
+    }
 
-  .ToggleInput:disabled + .ToggleSlider {
-    background-color: var(--bs-gray-200);
-  }
+    .ToggleInput:disabled + .ToggleSlider {
+      background-color: var(--bs-gray-200);
+    }
 
-  #enableStoploss:checked {
-    background-color: var(--bs-danger);
-    border-color: var(--bs-danger);
-  }
+    #enableStoploss:checked {
+      background-color: var(--bs-danger);
+      border-color: var(--bs-danger);
+    }
 
-  #enableTarget:checked {
-    background-color: var(--bs-success);
-    border-color: var(--bs-success);
-  }
+    #enableTarget:checked {
+      background-color: var(--bs-success);
+      border-color: var(--bs-success);
+    }
 
-  // Add table styles
-  .table,
-  th,
-  td {
-    border: 1px solid var(--bs-border-color);
-    border-collapse: collapse;
-  }
-  .table th {
-    color: var(--bs-body-color);
-    font-weight: 600;
-  }
-  .table > :not(caption) > * > * {
-    color: var(--bs-body-color);
-    border-bottom-color: var(--bs-border-color);
-  }
+    // Add table styles
+    .table,
+    th,
+    td {
+      border: 1px solid var(--bs-border-color);
+      border-collapse: collapse;
+    }
+    .table th {
+      color: var(--bs-body-color);
+      font-weight: 600;
+    }
+    .table > :not(caption) > * > * {
+      color: var(--bs-body-color);
+      border-bottom-color: var(--bs-border-color);
+    }
 
-  .input-group-text {
-    color: var(--bs-body-color);
-    background-color: var(--bs-input-bg);
-    border-color: var(--bs-border-color);
+    .input-group-text {
+      color: var(--bs-body-color);
+      background-color: var(--bs-input-bg);
+      border-color: var(--bs-border-color);
+    }
+
+    .custom-bg-light {
+      background-color: var(--bs-light) !important;
+    }
   }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    @each $color, $value in $theme-colors {
-      --bs-#{$color}: #{$value};
-    }
-    --bs-card-border-color: #{$gray-700};
-  }
-  @include color-scheme-styles;
-
-  // Light theme styles
-  .btn-outline {
-    color: var(--bs-dark); // Dark text color for light theme
-    border-color: var(--bs-dark); // Dark border color for light theme
-    background-color: var(--bs-white);
-
-    &:hover {
-      color: var(--bs-white); // white text color on hover
-      border-color: var(--bs-dark); // Dark border color on hover
-      background-color: var(--bs-dark);
-    }
-  }
-  .form-control::placeholder {
-    color: var(--bs-body-color);
-  }
-  .dropdown-item:hover,
-  .dropdown-item:focus {
-    color: var(--bs-body-color);
-    background-color: var(--bs-light);
-  }
-  .active-route {
-    background-color: var(--bs-light);
-  }
-  .MTM {
-    background: hsla(0, 0%, 100%, 0.2);
-  }
+// Apply light theme by default
+:root {
+  @include color-scheme-styles($light-theme);
 }
 
+// Dark mode styles
 @media (prefers-color-scheme: dark) {
   :root {
-    // Invert some of the theme colors for dark mode
-    --bs-primary: #6ea8fe; // Light blue
-    --bs-secondary: #6c757d; // Gray
-    --bs-light: #191c1f; // Dark gray
-    --bs-dark: #212529; // Dark background color (changed)
-    --bs-body-color: #f8f9fa; // Light text color (should be darker)
-    --bs-body-bg: #212529; // Dark background
-    --bs-border-color: #495057; // Dark gray
-    --bs-card-border-color: #dee2e6; // Light gray
+    @include color-scheme-styles($dark-theme);
   }
-  @include color-scheme-styles;
 
-  // Add this new rule
+  // Explicitly override .bg-light for dark mode
+  .bg-light {
+    background-color: var(--bs-light) !important;
+  }
+}
+
+// Define a mixin for dark mode styles
+@mixin dark-mode-styles {
+  --bs-light: #{map-get($dark-theme, 'light')};
+  --bs-dark: #{map-get($dark-theme, 'dark')};
+  --bs-text-muted: #a0a0a0;
+  --bs-form-disabled-bg: #{lighten($gray-900, 5%)};
+  --bs-form-disabled-color: #{$gray-600};
+
   .bg-light {
     background-color: var(--bs-light) !important;
   }
 
-  // Dark theme styles
-  .btn-outline {
-    color: var(--bs-white); // White text color for dark theme
-    border-color: var(--bs-white); // White border color for dark theme
-    background-color: var(--bs-dark); // Dark background color
-
-    &:hover {
-      color: var(--bs-dark); // Dark text color on hover
-      border-color: var(--bs-white); // White border color on hover
-      background-color: var(--bs-white); // Light background color on hover
-    }
-  }
-  .btn-outline-primary {
-    border-color: var(--bs-primary); // White border color for dark theme
-    color: var(--bs-primary); // White text color for dark theme
+  .bg-dark {
+    background-color: var(--bs-dark) !important;
   }
 
-  // Dark theme styles
-  .text-success {
-    color: #00ff89 !important; // Updated text-success color
-  }
-  .text-danger {
-    color: #fd3d3d !important; // Updated text-success color
-  }
-  a {
-    color: var(--bs-primary);
-  }
-  .form-control::placeholder {
-    color: var(--bs-body-color);
-  }
-  .dropdown-item:hover,
-  .dropdown-item:focus {
-    color: var(--bs-body-color);
-    background-color: var(--bs-light);
-  }
   .text-muted {
-    color: var(--bs-secondary) !important;
-  }
-  .active-route {
-    background-color: var(--bs-light);
-  }
-  .MTM {
-    background: rgba(0, 0, 0, 0.2);
+    color: var(--bs-text-muted) !important;
   }
 
-  .form-control:disabled {
-    color: var(--bs-body-color);
-    background-color: var(--bs-light);
+  // Styles for disabled form elements
+  .form-control:disabled,
+  .form-control[readonly],
+  .form-select:disabled {
+    background-color: var(--bs-form-disabled-bg);
+    color: var(--bs-form-disabled-color);
     border-color: var(--bs-border-color);
   }
+
+  // Additional styles for better visibility of placeholder text in disabled inputs
+  .form-control:disabled::placeholder,
+  .form-control[readonly]::placeholder,
   .form-select:disabled {
-    color: var(--bs-body-color);
-    background-color: var(--bs-light);
-    border-color: var(--bs-border-color);
+    color: var(--bs-form-disabled-color);
+  }
+
+  // Add this for text-muted
+  .text-muted {
+    color: #a0a0a0 !important; // Lighter gray for better visibility in dark mode
+  }
+
+  // Add other dark mode overrides here
+
+  --custom-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+}
+
+// Apply dark mode styles to .dark-mode class
+body.dark-mode {
+  @include dark-mode-styles;
+}
+
+// Apply dark mode styles when prefers-color-scheme is dark
+@media (prefers-color-scheme: dark) {
+  body {
+    @include dark-mode-styles;
   }
 }
 
