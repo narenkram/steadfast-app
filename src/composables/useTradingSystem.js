@@ -2782,35 +2782,61 @@ export function useTradeView() {
   const connectWebSocket = () => {
     let websocketUrl
 
-    if (selectedBroker.value?.brokerName === 'Flattrade' && brokerStatus.value === 'Connected') {
-      websocketUrl = 'ws://localhost:8765'
-    } else if (
-      selectedBroker.value?.brokerName === 'Shoonya' &&
-      brokerStatus.value === 'Connected'
-    ) {
-      websocketUrl = 'ws://localhost:8766'
-    } else if (
-      selectedBroker.value?.brokerName === 'PaperTrading' &&
-      brokerStatus.value === 'Connected'
-    ) {
+    const isDev = import.meta.env.DEV
+    const wsBaseUrl = isDev
+      ? 'ws://localhost'
+      : import.meta.env.VITE_BASE_URL.replace('http', 'ws').replace('https', 'wss')
+
+    const getWebSocketUrl = (broker) => {
+      if (isDev) {
+        return broker === 'Flattrade' ? `${wsBaseUrl}:8765` : `${wsBaseUrl}:8766`
+      } else {
+        return `${wsBaseUrl}/ws/${broker.toLowerCase()}`
+      }
+    }
+
+    if (selectedBroker.value?.brokerName === 'PaperTrading' && brokerStatus.value === 'Connected') {
       const selectedPaperBroker = JSON.parse(localStorage.getItem('selectedBrokerForPaper') || '{}')
-      if (selectedPaperBroker.brokerName === 'Flattrade') {
-        websocketUrl = 'ws://localhost:8765'
-      } else if (selectedPaperBroker.brokerName === 'Shoonya') {
-        websocketUrl = 'ws://localhost:8766'
+      if (['Flattrade', 'Shoonya'].includes(selectedPaperBroker.brokerName)) {
+        websocketUrl = getWebSocketUrl(selectedPaperBroker.brokerName)
       } else {
         console.error('Invalid broker selected for paper trading')
         return
       }
+    } else if (
+      ['Flattrade', 'Shoonya'].includes(selectedBroker.value?.brokerName) &&
+      brokerStatus.value === 'Connected'
+    ) {
+      websocketUrl = getWebSocketUrl(selectedBroker.value.brokerName)
+    } else {
+      console.error('Invalid broker or broker not connected')
+      return
     }
 
-    console.log(`Connecting to WebSocket at ${websocketUrl}`)
-    socket.value = new WebSocket(websocketUrl)
+    console.log(`Attempting to connect to WebSocket at ${websocketUrl}`)
 
-    socket.value.onmessage = handleWebSocketMessage
-    socket.value.onerror = handleWebSocketError
-    socket.value.onopen = handleWebSocketOpen
-    socket.value.onclose = handleWebSocketClose
+    try {
+      socket.value = new WebSocket(websocketUrl)
+
+      socket.value.onopen = (event) => {
+        console.log('WebSocket connection opened:', event)
+        handleWebSocketOpen(event)
+      }
+
+      socket.value.onmessage = handleWebSocketMessage
+
+      socket.value.onerror = (error) => {
+        console.error('WebSocket error:', error)
+        handleWebSocketError(error)
+      }
+
+      socket.value.onclose = (event) => {
+        console.log('WebSocket connection closed:', event)
+        handleWebSocketClose(event)
+      }
+    } catch (error) {
+      console.error('Error creating WebSocket connection:', error)
+    }
   }
 
   const handleWebSocketMessage = (event) => {
@@ -3726,8 +3752,8 @@ export function useTradeView() {
       const payload = `jData=${jDataString}&jKey=${apiKey}`
 
       const apiUrl = import.meta.env.PROD
-      ? `${BASE_URL}/shoonya/login`
-      : `${BASE_URL}/shoonya/login`
+        ? `${BASE_URL}/shoonya/login`
+        : `${BASE_URL}/shoonya/login`
 
       const response = await axios.post(
         apiUrl,
