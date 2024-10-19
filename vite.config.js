@@ -16,32 +16,33 @@ export default defineConfig(({ mode }) => {
       }
     },
     server: {
-      proxy: isProduction
-        ? {}
-        : {
-            '/flattradeSymbols': 'http://localhost:3000/flattrade/',
-            '/shoonyaSymbols': 'http://localhost:3000/shoonya/',
-            '/flattradeApi': {
-              target: 'https://authapi.flattrade.in',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/flattradeApi/, '')
-            },
-            '/shoonyaApi': {
-              target: 'https://api.shoonya.com',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
-            },
-            '/api': {
-              target: 'http://localhost:3000',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/api/, '')
-            },
-            '/shoonya/login': {
-              target: 'https://api.steadfastapp.in',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/shoonya\/login/, '/api/shoonya/login')
-            }
-          }
+      proxy: {
+        '/flattradeSymbols': {
+          target: isProduction ? 'https://api.steadfastapp.in' : 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/flattradeSymbols/, '/flattrade/')
+        },
+        '/shoonyaSymbols': {
+          target: isProduction ? 'https://api.steadfastapp.in' : 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/shoonyaSymbols/, '/shoonya/')
+        },
+        '/flattradeApi': {
+          target: 'https://authapi.flattrade.in',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/flattradeApi/, '')
+        },
+        '/shoonyaApi': {
+          target: 'https://api.shoonya.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/shoonyaApi/, '')
+        },
+        '/api': {
+          target: isProduction ? 'https://api.steadfastapp.in' : 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      }
     },
     optimizeDeps: {
       include: ['@google/generative-ai']

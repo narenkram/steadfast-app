@@ -3726,8 +3726,8 @@ export function useTradeView() {
       const payload = `jData=${jDataString}&jKey=${apiKey}`
 
       const apiUrl = import.meta.env.PROD
-        ? `${BASE_URL}/shoonya/login`
-        : `${BASE_URL}/shoonya/login`
+      ? `${BASE_URL}/shoonya/login`
+      : `${BASE_URL}/shoonya/login`
 
       const response = await axios.post(
         apiUrl,
