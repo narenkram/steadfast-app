@@ -14,7 +14,9 @@ import {
   faPaperPlane,
   faRedo,
   faHatWizard,
-  faEnvelope
+  faEnvelope,
+  faBars,
+  faBell
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -34,7 +36,9 @@ library.add(
   faRedo,
   faHatWizard,
   faEnvelope,
-  faTelegram
+  faTelegram,
+  faBars,
+  faBell
 )
 
 export { FontAwesomeIcon }

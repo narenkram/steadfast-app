@@ -18,13 +18,11 @@
                 <!-- Always-on Notification Area -->
                 <div class="notification-area d-flex align-items-center">
                     <div class="notification-icon me-2" :class="{ 'has-notification': showToast }">
-                        <i class="bi bi-bell-fill"></i>
+                        <font-awesome-icon icon="bell" />
                     </div>
                     <div class="notification-message" :class="{ 'show-message': showToast }">
                         {{ toastMessage || 'No new notifications' }}
                     </div>
-                    <button v-if="showToast" @click="clearNotification" class="btn btn-sm btn-close ms-2"
-                        aria-label="Close"></button>
                 </div>
             </div>
         </div>
@@ -34,13 +32,13 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
+import { FontAwesomeIcon } from '@/font-awesome';
 
 const {
     showToast,
     toastMessage,
     notificationSound,
     selectedSound,
-    updateToastVisibility
 } = useTradeView();
 
 const routes = ref([

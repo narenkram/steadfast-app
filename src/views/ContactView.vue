@@ -11,10 +11,10 @@
                     <div class="col-md-6 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body">
-                                <font-awesome-icon :icon="['fas', 'envelope']" class="fa-3x text-danger mb-3" />
+                                <font-awesome-icon :icon="['fas', 'envelope']" class="fa-3x text-secondary mb-3" />
                                 <h3 class="h4 mb-3">Email</h3>
                                 <p class="mb-0">
-                                    <a href="mailto:email@narenkram.com" class="text-decoration-none text-danger">
+                                    <a href="mailto:email@narenkram.com" class="text-decoration-none text-secondary">
                                         email@narenkram.com
                                     </a>
                                 </p>
@@ -24,11 +24,11 @@
                     <div class="col-md-6 mb-4">
                         <div class="card h-100 shadow hover-effect">
                             <div class="card-body">
-                                <font-awesome-icon :icon="['fab', 'telegram']" class="fa-3x text-success mb-3" />
+                                <font-awesome-icon :icon="['fab', 'telegram']" class="fa-3x text-secondary mb-3" />
                                 <h3 class="h4 mb-3">Telegram</h3>
                                 <p class="mb-0">
                                     <a href="https://t.me/narenkram" target="_blank" rel="noopener noreferrer"
-                                        class="text-decoration-none text-success">
+                                        class="text-decoration-none text-secondary">
                                         Direct Message on Telegram
                                     </a>
                                 </p>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
 
-                <p class="mt-5">Reach out to achieve your trading goals with Steadfast!</p>
+                <p class="mt-5">Get in touch with us for general inquiries or to learn more about our platform.</p>
             </div>
         </section>
     </div>

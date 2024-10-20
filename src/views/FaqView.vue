@@ -1,6 +1,6 @@
 <template>
     <NormalNavigationComponent />
-    <div class="container-fluid py-5">
+    <div class="container-fluid bg-color-2 py-5">
         <!-- FAQ Section -->
         <section class="row">
             <div class="col-lg-8 mx-auto">

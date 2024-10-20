@@ -11,7 +11,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <font-awesome-icon icon="bars" class="text-color" />
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto">
@@ -54,9 +54,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped>
-.text-purple {
-    color: #9C27B0;
-}
-</style>

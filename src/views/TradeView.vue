@@ -475,7 +475,7 @@
           </button>
         </li>
       </ul>
-      <div class="tab-content bg-color p-2 rounded border" id="myTabContent">
+      <div class="tab-content p-2 rounded border" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
           <div class="row align-items-center justify-content-between mb-2">
@@ -523,7 +523,7 @@
           </div> -->
           </div>
 
-          <div class="TabContent">
+          <div class="TabContent bg-color">
             <!-- Flattrade Positions -->
             <PositionsTableComponent v-if="activeFetchFunction === 'fetchFlattradePositions'"
               :positions="flatTradePositionBook" :selected-broker="selectedBroker"
@@ -560,7 +560,7 @@
         </div>
         <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
 
-          <div class="TabContent">
+          <div class="TabContent bg-color">
             <OrdersNTradesComponent v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook' ||
               activeFetchFunction === 'fetchShoonyaOrdersTradesBook' ||
               activeFetchFunction === 'fetchPaperTradingOrdersTradesBook'"

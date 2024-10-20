@@ -2,7 +2,7 @@
   <AppNavigationComponent />
   <section class="row py-3">
     <div class="row m-0">
-      <div class="col-12 border rounded p-3">
+      <div class="col-12 border rounded p-3 bg-color-2">
         <h6 class="mb-0">Offset Settings</h6>
         <div class="row">
           <!-- Select Call Strike Offset -->
@@ -62,7 +62,7 @@
 
     <!-- Risk Management Settings -->
     <div class="row m-0 mt-3">
-      <div class="col-12 border rounded p-3">
+      <div class="col-12 border rounded p-3 bg-color-2">
         <h6 class="mb-0">Risk Management Settings</h6>
         <div class="row">
           <!-- Overtrade Protection (Auto-Kill Switch) -->
@@ -183,7 +183,7 @@
 
     <!-- App Settings -->
     <div class="row m-0 mt-3">
-      <div class="col-12 rounded border p-3">
+      <div class="col-12 rounded border p-3 bg-color-2">
         <h6 class="mb-0">App Settings</h6>
         <div class="row">
           <!-- Show/Hide LTP Range Bar Toggle -->

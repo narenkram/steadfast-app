@@ -1,7 +1,7 @@
 <template>
     <div class="Steadfast-AI-Assistant p-4 rounded-lg shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0 text-primary">
+            <h2 class="mb-0 text-purple">
                 <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
                 Steadfast AI Assistant
             </h2>

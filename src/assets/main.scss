@@ -60,7 +60,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     }
   }
   .bg-color {
-    background-color: $gray-900 !important;
+    background-color: #202020 !important;
   }
   .bg-color-2 {
     background-color: $black;
@@ -85,9 +85,76 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .navbar {
     background-color: rgba(39, 39, 39, 0.85);
   }
+
+  // Form styles for dark mode
+  .form-select,
+  .form-control,
+  .input-group-text {
+    background-color: $gray-800;
+    color: $white;
+    border-color: $gray-700;
+  }
+
+  .form-select:focus,
+  .form-control:focus {
+    background-color: $gray-700;
+    color: $white;
+    border-color: $primary;
+  }
+
+  // Add styles for disabled state
+  .form-select:disabled,
+  .form-control:disabled,
+  .form-select[readonly],
+  .form-control[readonly] {
+    background-color: $gray-900;
+    color: $gray-600;
+    border-color: $gray-800;
+  }
+
+  .form-check-input {
+    background-color: $gray-700;
+    border-color: $gray-600;
+  }
+
+  .form-check-input:checked {
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  .btn-group .btn {
+    border-color: $gray-700;
+  }
+
+  .dropdown-menu {
+    background-color: $gray-800;
+    border-color: $gray-700;
+  }
+
+  .dropdown-item {
+    color: $white;
+
+    &:hover,
+    &:focus {
+      background-color: $gray-700;
+      color: $white;
+    }
+  }
+
+  // Style for select arrow
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+
+    &:disabled {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    }
+  }
+  .table-responsive {
+    background-color: #202020 !important;
+  }
 }
 
-// Dark mode styles
+// Light mode styles
 @media (prefers-color-scheme: light) {
   html,
   body {
@@ -147,6 +214,73 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .navbar {
     background-color: rgb(255 255 255 / 85%);
   }
+
+  // Form styles for light mode
+  .form-select,
+  .form-control,
+  .input-group-text {
+    background-color: $white;
+    color: $black;
+    border-color: $gray-300;
+  }
+
+  .form-select:focus,
+  .form-control:focus {
+    background-color: $white;
+    color: $black;
+    border-color: $primary;
+  }
+
+  // Add styles for disabled state
+  .form-select:disabled,
+  .form-control:disabled,
+  .form-select[readonly],
+  .form-control[readonly] {
+    background-color: $gray-200;
+    color: $gray-600;
+    border-color: $gray-300;
+  }
+
+  .form-check-input {
+    background-color: $white;
+    border-color: $gray-400;
+  }
+
+  .form-check-input:checked {
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  .btn-group .btn {
+    border-color: $gray-300;
+  }
+
+  .dropdown-menu {
+    background-color: $white;
+    border-color: $gray-300;
+  }
+
+  .dropdown-item {
+    color: $black;
+
+    &:hover,
+    &:focus {
+      background-color: $gray-200;
+      color: $black;
+    }
+  }
+
+  // Style for select arrow
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+
+    &:disabled {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    }
+  }
+  .table-responsive {
+    background-color: $gray-200;
+  }
 }
 
 // Styles that are common to both color schemes
@@ -168,8 +302,8 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   border-radius: 8px;
 }
 
-html,
-body {
+.lead {
+  font-weight: 400;
 }
 
 .Navigation {
@@ -454,10 +588,6 @@ body {
   overflow-wrap: break-word;
   hyphens: auto;
   min-width: 0;
-
-  &.show-message {
-    color: var(--bs-body-color);
-  }
 }
 
 @keyframes pulse {
