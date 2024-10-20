@@ -743,10 +743,6 @@
     </div>
   </section>
 
-  <!-- Toast Alert -->
-  <ToastAlert :show="showToast" :message="toastMessage" :sound-enabled="notificationSound"
-    :selected-sound="selectedSound" @update:show="updateToastVisibility" />
-
   <!-- Limit Price Input Modal (conditionally rendered) -->
   <div class="modal fade" id="PlaceLimitOrderWindow" tabindex="-1" aria-labelledby="PlaceLimitOrderWindowLabel"
     aria-hidden="true">
@@ -917,7 +913,6 @@ import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import BrokerComponent from '@/components/BrokerComponent.vue';
 import { checkAllTokens } from '@/utils/brokerTokenValidator';
-import ToastAlert from '@/components/ToastAlertComponent.vue';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
@@ -928,7 +923,6 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 
 const {
   // Methods
-  updateToastVisibility,
   setActiveTab,
   toggleKillSwitch,
   updateSelectedBroker,
@@ -1026,8 +1020,6 @@ const {
 
   // Reactive variables
   showLTPRangeBar,
-  showToast,
-  toastMessage,
   activeTab,
   killSwitchActive,
   experimentalFeatures,
@@ -1085,8 +1077,6 @@ const {
   additionalSymbols,
   marketDepth,
   additionalStrikeLTPs,
-  notificationSound,
-  selectedSound,
   savedBaskets,
   basketName,
   strategyType,

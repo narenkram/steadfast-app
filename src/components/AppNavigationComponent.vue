@@ -18,24 +18,35 @@
                             {{ route.icon }} {{ route.name }}
                         </RouterLink>
                     </li>
+                    <!-- Toast Alert Component -->
+                    <li class="nav-item">
+                        <ToastAlertComponent :show="showToast" :message="toastMessage"
+                            :sound-enabled="notificationSound" :selected-sound="selectedSound"
+                            @update:show="updateToastVisibility" />
+                    </li>
                 </ul>
             </div>
         </nav>
     </section>
 </template>
 
-<script>
-export default {
-    name: "NavigationComponent",
-    data() {
-        return {
-            routes: [
-                { path: '/steadfast', name: 'Trade', icon: '⚡' },
-                { path: '/app-settings', name: 'Settings', icon: '⚙️' },
-                { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
-                { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
-            ],
-        };
-    },
-}
+<script setup>
+import { ref } from 'vue';
+import ToastAlertComponent from '@/components/ToastAlertComponent.vue';
+import { useTradeView } from '@/composables/useTradingSystem';
+
+const {
+    showToast,
+    toastMessage,
+    notificationSound,
+    selectedSound,
+    updateToastVisibility
+} = useTradeView();
+
+const routes = ref([
+    { path: '/steadfast', name: 'Trade', icon: '⚡' },
+    { path: '/app-settings', name: 'Settings', icon: '⚙️' },
+    { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
+    { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
+]);
 </script>
