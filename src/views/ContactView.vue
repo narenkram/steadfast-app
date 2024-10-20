@@ -14,7 +14,7 @@
                                 <font-awesome-icon :icon="['fas', 'envelope']" class="fa-3x text-secondary mb-3" />
                                 <h3 class="h4 mb-3">Email</h3>
                                 <p class="mb-0">
-                                    <a href="mailto:email@narenkram.com" class="text-decoration-none text-secondary">
+                                    <a href="mailto:email@narenkram.com" class="text-decoration-none text-color">
                                         email@narenkram.com
                                     </a>
                                 </p>
@@ -28,7 +28,7 @@
                                 <h3 class="h4 mb-3">Telegram</h3>
                                 <p class="mb-0">
                                     <a href="https://t.me/narenkram" target="_blank" rel="noopener noreferrer"
-                                        class="text-decoration-none text-secondary">
+                                        class="text-decoration-none text-color">
                                         Direct Message on Telegram
                                     </a>
                                 </p>
