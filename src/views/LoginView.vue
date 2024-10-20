@@ -19,7 +19,17 @@
                 <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline btn-md">
                     💬 Join Telegram Community
                 </a>
-                <button @click="loginWithGoogle">Login with Google</button>
+                <div>
+                    <h2>Login with Email/Password</h2>
+                    <form @submit.prevent="loginWithEmailPassword">
+                        <input type="email" v-model="email" placeholder="Email" required>
+                        <input type="password" v-model="password" placeholder="Password" required>
+                        <button type="submit">Login</button>
+                    </form>
+                    <p>
+                        Don't have an account? <router-link to="/signup">Sign up</router-link>
+                    </p>
+                </div>
             </div>
         </section>
     </div>
@@ -27,7 +37,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 const tradeViewWindow = ref(null)
 const openTradeView = () => {
@@ -45,14 +55,16 @@ onMounted(() => {
     });
 });
 
-const loginWithGoogle = async () => {
+const email = ref('')
+const password = ref('')
+
+const loginWithEmailPassword = async () => {
     const auth = getAuth();
-    const provider = new GoogleAuthProvider();
     try {
-        await signInWithPopup(auth, provider);
+        await signInWithEmailAndPassword(auth, email.value, password.value);
         // Redirect to a protected page or update the UI accordingly
     } catch (error) {
-        console.error('Error during Google login:', error);
+        console.error('Error during email/password login:', error);
     }
 }
 </script>

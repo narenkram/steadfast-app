@@ -12,6 +12,7 @@ import AboutView from '@/views/AboutView.vue'
 import ContactView from '@/views/ContactView.vue'
 import FaqView from '@/views/FaqView.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import SignUpView from '@/views/SignUpView.vue'
 
 const requireAuth = (to, from, next) => {
   const auth = getAuth()
@@ -89,6 +90,11 @@ const router = createRouter({
       name: 'ParallelCopyTradeView',
       component: ParallelCopyTradeView,
       beforeEnter: requireAuth
+    },
+    {
+      path: '/signup',
+      name: 'SignUp',
+      component: SignUpView
     }
   ],
   scrollBehavior(to, from, savedPosition) {
