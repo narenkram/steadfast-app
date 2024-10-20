@@ -74,7 +74,11 @@ const router = createRouter({
       name: 'ParallelCopyTradeView',
       component: ParallelCopyTradeView
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    // Always scroll to top
+    return { top: 0 }
+  }
 })
 
 export default router
