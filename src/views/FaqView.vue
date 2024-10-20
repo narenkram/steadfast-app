@@ -33,7 +33,7 @@
 
         <!-- Steadfast AI Assistant -->
         <div class="col-lg-8 mx-auto mt-5 text-center">
-            <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal" class="btn btn-primary btn-lg">
+            <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal" class="btn btn-purple btn-lg">
                 <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
                 Ask Steadfast AI Assistant
             </button>
@@ -45,7 +45,7 @@
         aria-labelledby="SteadfastAIAssistantModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-body">
+                <div class="modal-body p-0">
                     <ChatAIComponent />
                 </div>
             </div>
