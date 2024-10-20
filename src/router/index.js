@@ -13,6 +13,7 @@ import ContactView from '@/views/ContactView.vue'
 import FaqView from '@/views/FaqView.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import SignUpView from '@/views/SignUpView.vue'
+import DashboardView from '@/views/account/DashboardView.vue'
 
 const requireAuth = (to, from, next) => {
   const auth = getAuth()
@@ -24,6 +25,7 @@ const requireAuth = (to, from, next) => {
     }
   })
 }
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -95,11 +97,27 @@ const router = createRouter({
       path: '/signup',
       name: 'SignUp',
       component: SignUpView
+    },
+    {
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: DashboardView,
+      meta: { requiresAuth: true }
     }
   ],
   scrollBehavior(to, from, savedPosition) {
     // Always scroll to top
     return { top: 0 }
+  },
+  beforeEach(to, from, next) {
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+    const currentUser = getAuth().currentUser
+
+    if (requiresAuth && !currentUser) {
+      next('/login')
+    } else {
+      next()
+    }
   }
 })
 
