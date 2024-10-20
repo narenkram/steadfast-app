@@ -456,22 +456,25 @@
     <div class="col-12">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions-tab-pane"
-            type="button" role="tab" aria-controls="positions-tab-pane" aria-selected="true"
+          <button class="nav-link" :class="{ 'active': activeTab === 'positions' }" id="positions-tab"
+            data-bs-toggle="tab" data-bs-target="#positions-tab-pane" type="button" role="tab"
+            aria-controls="positions-tab-pane" :aria-selected="activeTab === 'positions'"
             @click="setActiveTab('positions')">
-            💸 Positions
+            <font-awesome-icon icon="dollar-sign" class="text-success" /> <span class="ms-2">Positions</span>
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades-tab-pane" type="button"
-            role="tab" aria-controls="trades-tab-pane" aria-selected="false" @click="setActiveTab('trades')">
-            📄 Trades
+          <button class="nav-link" :class="{ 'active': activeTab === 'trades' }" id="trades-tab" data-bs-toggle="tab"
+            data-bs-target="#trades-tab-pane" type="button" role="tab" aria-controls="trades-tab-pane"
+            :aria-selected="activeTab === 'trades'" @click="setActiveTab('trades')">
+            <font-awesome-icon icon="file-alt" class="text-primary" /> <span class="ms-2">Trades</span>
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="basket-tab" data-bs-toggle="tab" data-bs-target="#basket-tab-pane" type="button"
-            role="tab" aria-controls="basket-tab-pane" aria-selected="false">
-            🧺 Basket Orders
+          <button class="nav-link" :class="{ 'active': activeTab === 'basket' }" id="basket-tab" data-bs-toggle="tab"
+            data-bs-target="#basket-tab-pane" type="button" role="tab" aria-controls="basket-tab-pane"
+            :aria-selected="activeTab === 'basket'">
+            <font-awesome-icon icon="shopping-basket" class="text-warning" /> <span class="ms-2">Basket Orders</span>
           </button>
         </li>
       </ul>

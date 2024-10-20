@@ -1,4 +1,5 @@
 <template>
+  <AppNavigationComponent />
   <section class="row py-5">
     <div class="row">
       <div class="col-6">
@@ -72,7 +73,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
+import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 const router = useRouter();
 const redirectURL = computed(() => {
   const baseUrl = import.meta.env.DEV ? 'http://localhost:5173' : import.meta.env.VITE_BASE_URL;

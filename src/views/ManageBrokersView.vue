@@ -106,7 +106,7 @@ onMounted(() => {
   <section class="row pt-5 pb-3">
     <div class="col-8 text-start">
       <RouterLink to="/add-broker">
-        <button class="btn btn-primary">Add New Broker</button>
+        <button class="btn btn-outline btn-sm">Add New Broker</button>
       </RouterLink>
     </div>
     <div class="col-4 text-end">
