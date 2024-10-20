@@ -24,18 +24,23 @@ $light-theme: (
   'border-color': $gray-300,
   'light': $light,
   'dark': $dark,
-  'accent-color': #3498db // New accent color for light theme
+  'accent-color': #3498db,
+  'text-muted': $gray-600,
+  'form-disabled-bg': $gray-200,
+  'form-disabled-color': $gray-600
 );
 
 // Dark theme variables
 $dark-theme: (
   'body-bg': #1a1a1a,
-  // Slightly lighter than pure black
   'body-color': $light,
   'border-color': $gray-700,
   'light': $gray-900,
   'dark': $black,
-  'accent-color': #2ecc71 // New accent color for dark theme
+  'accent-color': #2ecc71,
+  'text-muted': #a0a0a0,
+  'form-disabled-bg': lighten($gray-900, 5%),
+  'form-disabled-color': $gray-600
 );
 
 // Import the rest of Bootstrap
@@ -47,6 +52,10 @@ $dark-theme: (
   --bs-border-color: #{map-get($theme, 'border-color')};
   --bs-light: #{map-get($theme, 'light')};
   --bs-dark: #{map-get($theme, 'dark')};
+  --bs-accent-color: #{map-get($theme, 'accent-color')};
+  --bs-text-muted: #{map-get($theme, 'text-muted')};
+  --bs-form-disabled-bg: #{map-get($theme, 'form-disabled-bg')};
+  --bs-form-disabled-color: #{map-get($theme, 'form-disabled-color')};
 
   @each $color, $value in $theme-colors {
     --bs-#{$color}: #{$value};
@@ -66,43 +75,24 @@ $dark-theme: (
     .text-dark {
       color: var(--bs-dark) !important;
     }
-
+    .text-muted {
+      color: var(--bs-text-muted) !important;
+    }
     .card {
       border-color: var(--bs-border-color);
     }
-
-    // Add these class overrides
-    .ToggleSlider {
-      background-color: var(--bs-secondary);
+    .form-control:disabled,
+    .form-control[readonly],
+    .form-select:disabled {
+      background-color: var(--bs-form-disabled-bg);
+      color: var(--bs-form-disabled-color);
+      border-color: var(--bs-border-color);
     }
-
-    .ToggleSlider:before {
-      background-color: var(--bs-white);
+    .form-control:disabled::placeholder,
+    .form-control[readonly]::placeholder,
+    .form-select:disabled {
+      color: var(--bs-form-disabled-color);
     }
-
-    .ToggleInput:checked + .ToggleSlider {
-      background-color: var(--bs-success);
-    }
-
-    .ToggleInput:focus + .ToggleSlider {
-      box-shadow: 0 0 1px var(--bs-success);
-    }
-
-    .ToggleInput:disabled + .ToggleSlider {
-      background-color: var(--bs-gray-200);
-    }
-
-    #enableStoploss:checked {
-      background-color: var(--bs-danger);
-      border-color: var(--bs-danger);
-    }
-
-    #enableTarget:checked {
-      background-color: var(--bs-success);
-      border-color: var(--bs-success);
-    }
-
-    // Add table styles
     .table,
     th,
     td {
@@ -117,13 +107,11 @@ $dark-theme: (
       color: var(--bs-body-color);
       border-bottom-color: var(--bs-border-color);
     }
-
     .input-group-text {
       color: var(--bs-body-color);
       background-color: var(--bs-input-bg);
       border-color: var(--bs-border-color);
     }
-
     .custom-bg-light {
       background-color: var(--bs-light) !important;
     }
@@ -140,416 +128,9 @@ $dark-theme: (
   :root {
     @include color-scheme-styles($dark-theme);
   }
-
-  // Explicitly override .bg-light for dark mode
-  .bg-light {
-    background-color: var(--bs-light) !important;
-  }
-}
-
-// Define a mixin for dark mode styles
-@mixin dark-mode-styles {
-  --bs-light: #{map-get($dark-theme, 'light')};
-  --bs-dark: #{map-get($dark-theme, 'dark')};
-  --bs-text-muted: #a0a0a0;
-  --bs-form-disabled-bg: #{lighten($gray-900, 5%)};
-  --bs-form-disabled-color: #{$gray-600};
-  --bs-accent-color: #{map-get($dark-theme, 'accent-color')};
-
-  .bg-light {
-    background-color: var(--bs-light) !important;
-  }
-
-  .bg-dark {
-    background-color: var(--bs-dark) !important;
-  }
-
-  .text-muted {
-    color: var(--bs-text-muted) !important;
-  }
-
-  // Styles for disabled form elements
-  .form-control:disabled,
-  .form-control[readonly],
-  .form-select:disabled {
-    background-color: var(--bs-form-disabled-bg);
-    color: var(--bs-form-disabled-color);
-    border-color: var(--bs-border-color);
-  }
-
-  // Additional styles for better visibility of placeholder text in disabled inputs
-  .form-control:disabled::placeholder,
-  .form-control[readonly]::placeholder,
-  .form-select:disabled {
-    color: var(--bs-form-disabled-color);
-  }
-
-  // Add this for text-muted
-  .text-muted {
-    color: #a0a0a0 !important; // Lighter gray for better visibility in dark mode
-  }
-
-  // Add other dark mode overrides here
-
-  // Remove the custom gradient
-  // --custom-gradient: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
-}
-
-// Apply dark mode styles to .dark-mode class
-body.dark-mode {
-  @include dark-mode-styles;
-}
-
-// Apply dark mode styles when prefers-color-scheme is dark
-@media (prefers-color-scheme: dark) {
-  body {
-    @include dark-mode-styles;
-  }
 }
 
 // Styles that don't change based on color scheme
-.Navigation {
-}
-.Navigation__logo {
-  height: 40px;
-  width: 40px;
-}
-.active-route {
-  border-radius: 0.25rem;
-}
-.Card {
-  border-radius: $border-radius;
-  padding: $spacer;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-}
-
-button:focus,
-button:hover,
-select,
-option,
-input:focus {
-  outline: none;
-  box-shadow: none !important;
-}
-
-.ToggleSwitch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.ToggleInput {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.ToggleLabel {
-  margin-left: $spacer;
-}
-
-.ToggleSlider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: $transition-base;
-}
-
-.ToggleSlider:before {
-  position: absolute;
-  content: '';
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  transition: $transition-base;
-}
-
-.ToggleInput:checked + .ToggleSlider:before {
-  transform: translateX(26px);
-}
-
-.ToggleSlider.SliderRound {
-  border-radius: 34px;
-}
-
-.ToggleSlider.SliderRound:before {
-  border-radius: 50%;
-}
-
-.toast {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: $zindex-toast;
-  overflow: hidden;
-}
-
-.dropdown-menu {
-  width: 100%;
-  z-index: 99999;
-}
-
-.nav-link {
-  color: inherit !important;
-}
-
-.broker-logo {
-  max-height: 80px;
-  width: auto;
-}
-
-.arrow_keys {
-  max-height: 200px;
-  width: auto;
-}
-.ltp-range-bar {
-  display: block;
-  overflow: hidden;
-}
-
-.ltp-range {
-  position: relative;
-  height: 8px;
-  background-color: var(--bs-light);
-  border: 1px solid var(--bs-border-color);
-  margin: 0 10px;
-  border-radius: 4px;
-}
-
-.ltp-range-fill {
-  height: 100%;
-  background-color: #adb5bd;
-  border-radius: 4px 0 0 4px;
-}
-
-.ltp-range-marker {
-  position: absolute;
-  top: -4px;
-  width: 16px; // Changed from 0 to 16px
-  height: 16px;
-  transform: translateX(-50%); // Center the marker on its position
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid var(--bs-secondary);
-}
-.ltp-range-open-marker {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--bs-secondary); /* Orange color for open price */
-  border: 2px solid #fff;
-  z-index: 2;
-}
-
-#events-iframe {
-  width: 100%;
-  height: 80vh;
-  min-height: 300px;
-  max-height: 800px;
-}
-.strategy-card {
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-
-.strategy-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.strategy-card:active {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-// Slim scrollbar styles
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bs-body-bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--bs-body);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--bs-body);
-}
-
-// For Firefox
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--bs-body) var(--bs-body-bg);
-  outline: none;
-}
-
-.MTM {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-.NormalNavigationComponent {
-  // position: sticky;
-  // top: 0;
-  // z-index: 1000;
-  // backdrop-filter: blur(5px);
-  // -webkit-backdrop-filter: blur(5px);
-}
-.TabContent {
-  height: 500px;
-}
-.table-responsive {
-  height: 500px;
-  overflow: scroll;
-}
-
-.Steadfast-AI-Assistant {
-}
-@keyframes sparkle {
-  0% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.2) rotate(10deg);
-    opacity: 0.7;
-  }
-
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-.sparkle-icon {
-  animation: sparkle 2s infinite;
-}
-
-// Add some new styles for better visual appeal
-.card,
-.btn,
-.form-control,
-.input-group-text {
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-  background-color: var(--bs-accent-color);
-  border-color: var(--bs-accent-color);
-}
-
-.btn-primary:hover {
-  background-color: darken(map-get($light-theme, 'accent-color'), 10%);
-  border-color: darken(map-get($light-theme, 'accent-color'), 10%);
-}
-
-.form-control:focus,
-.btn:focus {
-  box-shadow: 0 0 0 0.2rem rgba(map-get($light-theme, 'accent-color'), 0.25);
-}
-
-// Add a subtle background pattern
-body {
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-body.dark-mode {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-}
-
-// Styles from ChatAIComponent.vue
-.chat-container {
-  height: 70vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-messages {
-  flex-grow: 1;
-  max-height: calc(70vh - 100px);
-}
-
-.typing-indicator {
-  display: inline-block;
-  width: 50px;
-}
-
-.typing-indicator span {
-  height: 10px;
-  width: 10px;
-  float: left;
-  margin: 0 1px;
-  background-color: #6c757d;
-  display: block;
-  border-radius: 50%;
-  opacity: 0.4;
-  animation: blink 1s infinite;
-}
-
-.typing-indicator span:nth-of-type(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-of-type(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 0.4;
-  }
-  20% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.4;
-  }
-}
-
-.user-image {
-  max-width: 100%;
-  max-height: 200px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-.chat-input {
-  border-top: 1px solid #dee2e6;
-}
-
-// Styles from NormalNavigationComponent.vue
 .Navigation {
   padding: 0.5rem 0;
   position: sticky;
@@ -610,7 +191,7 @@ body.dark-mode {
 
 .Navigation__logo {
   height: 40px;
-  width: auto;
+  width: 40px;
   transition: transform 0.3s ease;
 
   &:hover {
@@ -626,18 +207,19 @@ body.dark-mode {
   }
 }
 
-// Styles from AboutView.vue
+// Hover effect styles
 .hover-effect {
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
 }
 
-.hover-effect:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
+// Developer info styles
 .developer-info {
   background-color: var(--bs-body-bg);
   border: 1px solid var(--bs-border-color);
@@ -659,6 +241,7 @@ body.dark-mode {
   }
 }
 
+// Heart icon animation
 .heart-icon {
   display: inline-block;
   animation: heartbeat 1.5s ease-in-out infinite;
@@ -674,23 +257,7 @@ body.dark-mode {
   }
 }
 
-.text-muted {
-  color: var(--bs-secondary-color) !important;
-}
-
-// Styles from ContactView.vue
-.hover-effect {
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-}
-
-.hover-effect:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-// Styles from FaqView.vue
+// Accordion styles
 .accordion-button:not(.collapsed) {
   background-color: #007bff;
   color: white;
@@ -705,23 +272,192 @@ body.dark-mode {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
 }
 
-// Styles from HomeView.vue
-.hover-effect {
-  transition:
-    transform 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
-}
-
-.hover-effect:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-// Styles from PricingView.vue
+// Card hover effect
 .card {
   transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-10px);
+  }
 }
 
-.card:hover {
-  transform: translateY(-10px);
+// Strategy card styles
+.strategy-card {
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Slim scrollbar styles
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bs-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bs-body);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bs-body);
+}
+
+// For Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-body) var(--bs-body-bg);
+  outline: none;
+}
+
+// MTM styles
+.MTM {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+// TabContent styles
+.TabContent {
+  height: 500px;
+}
+
+.table-responsive {
+  height: 500px;
+  overflow: scroll;
+}
+
+// Sparkle animation
+@keyframes sparkle {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(10deg);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.sparkle-icon {
+  animation: sparkle 2s infinite;
+}
+
+// Styles for better visual appeal
+.card,
+.btn,
+.form-control,
+.input-group-text {
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--bs-accent-color);
+  border-color: var(--bs-accent-color);
+
+  &:hover,
+  &:focus {
+    background-color: darken(map-get($light-theme, 'accent-color'), 10%);
+    border-color: darken(map-get($light-theme, 'accent-color'), 10%);
+  }
+}
+
+.form-control:focus,
+.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(map-get($light-theme, 'accent-color'), 0.25);
+}
+
+// Subtle background pattern
+body {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+body.dark-mode {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+// Chat container styles
+.chat-container {
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  max-height: calc(70vh - 100px);
+}
+
+.typing-indicator {
+  display: inline-block;
+  width: 50px;
+}
+
+.typing-indicator span {
+  height: 10px;
+  width: 10px;
+  float: left;
+  margin: 0 1px;
+  background-color: #6c757d;
+  display: block;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: blink 1s infinite;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.4;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.user-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.chat-input {
+  border-top: 1px solid #dee2e6;
 }
