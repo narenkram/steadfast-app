@@ -16,9 +16,8 @@
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item" v-for="(route, index) in routes" :key="route.path">
                             <RouterLink :to="route.path" class="nav-link"
-                                :class="{ 'active-route': $route.path === route.path }"
-                                :style="{ '--icon-color': route.color }">
-                                <font-awesome-icon :icon="route.icon" class="nav-icon" />
+                                :class="{ 'active-route': $route.path === route.path }">
+                                <font-awesome-icon :icon="route.icon" :class="['nav-icon', route.iconClass]" />
                                 <span class="nav-text">{{ route.name }}</span>
                             </RouterLink>
                         </li>
@@ -43,14 +42,20 @@ export default defineComponent({
     data() {
         return {
             routes: [
-                { path: '/', name: 'Home', icon: ['fas', 'bolt'], color: '#FFD700' },
-                { path: '/about', name: 'About', icon: ['fas', 'lightbulb'], color: '#4CAF50' },
-                { path: '/pricing', name: 'Pricing', icon: ['fas', 'dollar-sign'], color: '#2196F3' },
-                { path: '/contact', name: 'Contact', icon: ['fas', 'comment'], color: '#FF5722' },
-                { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'], color: '#9C27B0' },
-                // { path: '/login', name: 'Login', icon: ['fas', 'key'], color: '#607D8B' },
+                { path: '/', name: 'Home', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
+                { path: '/about', name: 'About', icon: ['fas', 'lightbulb'], iconClass: 'text-warning' },
+                { path: '/pricing', name: 'Pricing', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
+                { path: '/contact', name: 'Contact', icon: ['fas', 'comment'], iconClass: 'text-secondary' },
+                { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'], iconClass: 'text-purple' },
+                // { path: '/login', name: 'Login', icon: ['fas', 'key'], iconClass: 'text-secondary' },
             ],
         };
     },
 });
 </script>
+
+<style scoped>
+.text-purple {
+    color: #9C27B0;
+}
+</style>
