@@ -108,14 +108,3 @@
 import { ref } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
 </script>
-
-<style scoped>
-.hover-effect {
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-.hover-effect:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-</style>

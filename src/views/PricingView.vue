@@ -91,13 +91,3 @@ onMounted(() => {
     // Any necessary mounted logic
 });
 </script>
-
-<style scoped>
-.card {
-    transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-10px);
-}
-</style>

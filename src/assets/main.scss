@@ -488,3 +488,240 @@ body.dark-mode {
   background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
+
+// Styles from ChatAIComponent.vue
+.chat-container {
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  max-height: calc(70vh - 100px);
+}
+
+.typing-indicator {
+  display: inline-block;
+  width: 50px;
+}
+
+.typing-indicator span {
+  height: 10px;
+  width: 10px;
+  float: left;
+  margin: 0 1px;
+  background-color: #6c757d;
+  display: block;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: blink 1s infinite;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.4;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.user-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.chat-input {
+  border-top: 1px solid #dee2e6;
+}
+
+// Styles from NormalNavigationComponent.vue
+.Navigation {
+  padding: 0.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav {
+  gap: 0.5rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  color: var(--bs-body-color);
+
+  &:hover,
+  &.active-route {
+    transform: translateY(-2px);
+  }
+
+  .nav-icon {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    transition:
+      transform 0.3s ease,
+      color 0.3s ease;
+    color: var(--icon-color, inherit);
+  }
+
+  .nav-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    .nav-icon {
+      transform: scale(1.1) rotate(15deg);
+    }
+    .nav-text {
+      opacity: 1;
+    }
+  }
+}
+
+.Navigation__logo {
+  height: 40px;
+  width: auto;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 991px) {
+  .navbar-nav {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+}
+
+// Styles from AboutView.vue
+.hover-effect {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.developer-info {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.developer-link {
+  color: var(--bs-primary);
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--bs-link-hover-color);
+  }
+}
+
+.heart-icon {
+  display: inline-block;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.text-muted {
+  color: var(--bs-secondary-color) !important;
+}
+
+// Styles from ContactView.vue
+.hover-effect {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+// Styles from FaqView.vue
+.accordion-button:not(.collapsed) {
+  background-color: #007bff;
+  color: white;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, 0.125);
+}
+
+.accordion-button:not(.collapsed)::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+// Styles from HomeView.vue
+.hover-effect {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+// Styles from PricingView.vue
+.card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
