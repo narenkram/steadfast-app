@@ -5,15 +5,24 @@
             <div class="container-fluid pt-0">
                 <RouterLink to="/" class="navbar-brand">
                     <img src="/steadfast_logo.png" class="Navigation__logo" alt="Steadfast" />
-                    <span class="ms-2 fw-bold text-color">Steadfast</span>
+                    <span class="ms-2 fw-bold text-color d-none d-md-inline">Steadfast</span>
                 </RouterLink>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <font-awesome-icon icon="bars" class="text-color" />
                 </button>
+                <!-- Always-on Notification Area -->
+                <div class="notification-area d-flex align-items-center ms-3 d-lg-none">
+                    <div class="notification-icon me-2" :class="{ 'has-notification': showToast }">
+                        <font-awesome-icon icon="bell" />
+                    </div>
+                    <div class="notification-message" :class="{ 'show-message': showToast }">
+                        {{ toastMessage || 'No new notifications' }}
+                    </div>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto">
+                    <ul class="navbar-nav me-md-auto">
                         <li class="nav-item" v-for="route in routes" :key="route.path">
                             <RouterLink :to="route.path" class="nav-link"
                                 :class="{ 'active-route': $route.path === route.path }">
@@ -23,7 +32,7 @@
                         </li>
                     </ul>
                     <!-- Always-on Notification Area -->
-                    <div class="notification-area d-flex align-items-center ms-3">
+                    <div class="notification-area d-none d-lg-flex align-items-center ms-3">
                         <div class="notification-icon me-2" :class="{ 'has-notification': showToast }">
                             <font-awesome-icon icon="bell" />
                         </div>
