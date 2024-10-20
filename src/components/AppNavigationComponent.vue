@@ -26,7 +26,7 @@
                     <div class="notification-message" :class="{ 'show-message': showToast }">
                         {{ toastMessage || 'No new notifications' }}
                     </div>
-                    <button v-if="showToast" @click="updateToastVisibility(false)" class="btn btn-sm btn-close ms-2"
+                    <button v-if="showToast" @click="clearNotification" class="btn btn-sm btn-close ms-2"
                         aria-label="Close"></button>
                 </div>
             </div>
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 
 const {
@@ -49,7 +49,48 @@ const {
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: '⚡' },
     { path: '/app-settings', name: 'Settings', icon: '⚙️' },
-    { path: '/manage-brokers', name: 'Manage Brokers', icon: '🏦' },
-    { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
+    { path: '/manage-brokers', name: 'Brokers', icon: '🏦' },
+    // { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: '🔄' },
 ]);
+
+const audio = ref(null);
+const notificationTimer = ref(null);
+
+watch([showToast, toastMessage], ([newShowToast, newToastMessage], [oldShowToast, oldToastMessage]) => {
+    if (newShowToast && (newShowToast !== oldShowToast || newToastMessage !== oldToastMessage)) {
+        if (notificationSound.value) {
+            playNotificationSound();
+        }
+        startNotificationTimer();
+    }
+});
+
+const playNotificationSound = () => {
+    if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+    }
+    audio.value = new Audio(selectedSound.value);
+    audio.value.play().catch(error => console.error('Error playing notification sound:', error));
+};
+
+const startNotificationTimer = () => {
+    if (notificationTimer.value) {
+        clearTimeout(notificationTimer.value);
+    }
+    notificationTimer.value = setTimeout(() => {
+        clearNotification();
+    }, 3000); // Hide after 3 seconds
+};
+
+const clearNotification = () => {
+    updateToastVisibility(false);
+    if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+    }
+    if (notificationTimer.value) {
+        clearTimeout(notificationTimer.value);
+    }
+};
 </script>

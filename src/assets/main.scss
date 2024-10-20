@@ -464,34 +464,39 @@ body.dark-mode {
 
 // Navigation and Notification Area Styles
 .notification-area {
-  background-color: #f8f9fa;
+  background-color: var(--bs-light);
   border-radius: 20px;
   padding: 0.5rem 1rem;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
 }
 
 .notification-icon {
   font-size: 1.2rem;
-  color: #6c757d;
+  color: var(--bs-text-muted);
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
 
   &.has-notification {
-    color: #ffc107;
+    color: var(--bs-warning);
     animation: pulse 2s infinite;
   }
 }
 
 .notification-message {
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #6c757d;
+  color: var(--bs-text-muted);
   transition: all 0.3s ease;
+  flex-grow: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  min-width: 0;
 
   &.show-message {
-    color: #212529;
-    font-weight: bold;
+    color: var(--bs-body-color);
   }
 }
 
