@@ -3691,10 +3691,10 @@ export function useTradeView() {
 
     if (status === 'Token missing') {
       statusText = `Token missing, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`
-      statusClass = 'bg-warning text-dark'
+      statusClass = 'bg-warning text-color'
     } else if (status === 'expired') {
       statusText = `Token Expired, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`
-      statusClass = 'bg-warning text-dark'
+      statusClass = 'bg-warning text-color'
     }
 
     return { status: statusText, statusClass }

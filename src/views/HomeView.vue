@@ -3,7 +3,7 @@
     <div class="container-fluid">
 
         <!-- Key Features Section -->
-        <section class="row py-5">
+        <section class="row py-5 bg-color-2 rounded">
             <div class="col-lg-10 mx-auto">
                 <h2 class="text-center mb-5 display-4 fw-bold">Revolutionize Your Trading</h2>
                 <p class="lead text-center mb-5">Discover the cutting-edge features that set us apart</p>
@@ -67,7 +67,7 @@
         </section>
 
         <!-- Multi-Broker Support Section -->
-        <section class="row py-5 bg-light rounded">
+        <section class="row py-5 bg-color rounded">
             <div class="col-lg-10 mx-auto text-center">
                 <h2 class="mb-5 display-4">Unleash the Power of Multi-Broker Trading</h2>
                 <p class="lead mb-5">Experience seamless integration and manage all your accounts from one powerful

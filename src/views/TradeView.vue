@@ -475,7 +475,7 @@
           </button>
         </li>
       </ul>
-      <div class="tab-content bg-light p-2 rounded border" id="myTabContent">
+      <div class="tab-content bg-color p-2 rounded border" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
           <div class="row align-items-center justify-content-between mb-2">

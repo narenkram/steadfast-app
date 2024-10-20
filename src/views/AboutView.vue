@@ -41,7 +41,7 @@
                     </div>
                 </div>
 
-                <div class="mt-5 p-4 bg-custom rounded shadow-sm developer-info">
+                <div class="mt-5 p-4 bg-color-2 rounded shadow-sm developer-info">
                     <p class="mb-2">
                         Designed and developed with <span class="heart-icon">❤️</span> by
                     </p>

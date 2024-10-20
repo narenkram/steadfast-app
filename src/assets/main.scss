@@ -27,8 +27,8 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   body {
     background-color: $gray-900;
     color: $white;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 1) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgba(128, 128, 128, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   ::-webkit-scrollbar-thumb {
@@ -37,8 +37,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   ::-webkit-scrollbar-thumb:hover {
     background-color: $gray-400;
   }
+  .text-color {
+    color: $white;
+  }
   .text-muted {
-    color: #a0a0a0;
+    color: $gray-400 !important;
   }
   .form-disabled-bg {
     background-color: lighten($gray-900, 5%);
@@ -47,13 +50,40 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     color: $gray-600;
   }
   .nav-link {
+    color: $white;
     &.active-route {
       color: $white;
-      background-color: $gray-800;
+      background-color: $black;
+    }
+    &:hover {
+      color: $white;
     }
   }
-  .bg-light {
-    background-color: $gray-800 !important;
+  .bg-color {
+    background-color: $gray-900 !important;
+  }
+  .bg-color-2 {
+    background-color: $black;
+  }
+  .card {
+    background-color: $gray-800;
+    color: $white;
+  }
+  .notification-area {
+    background-color: $gray-700;
+  }
+  .btn-outline {
+    border-color: $gray-100;
+    color: $white;
+    background-color: $gray-900;
+    &:hover {
+      background-color: $black;
+      color: $gray-400;
+      border-color: $gray-100;
+    }
+  }
+  .navbar {
+    background-color: rgba(39, 39, 39, 0.85);
   }
 }
 
@@ -73,6 +103,9 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   ::-webkit-scrollbar-thumb:hover {
     background-color: $gray-600;
   }
+  .text-color {
+    color: $black;
+  }
   .text-muted {
     color: $gray-600;
   }
@@ -83,13 +116,36 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     color: $gray-600;
   }
   .nav-link {
+    color: $black;
     &.active-route {
       color: $black;
       background-color: $gray-200;
     }
   }
-  .bg-light {
+  .bg-color {
     background-color: $gray-200 !important;
+  }
+  .bg-color-2 {
+    background-color: $white;
+  }
+  .card {
+    background-color: $gray-100;
+    color: $black;
+  }
+  .notification-area {
+    background-color: $gray-200;
+  }
+  .btn-outline {
+    border-color: $gray-600;
+    color: $gray-600;
+    background-color: transparent;
+    &:hover {
+      background-color: $gray-600;
+      color: $white;
+    }
+  }
+  .navbar {
+    background-color: rgb(255 255 255 / 85%);
   }
 }
 
@@ -123,9 +179,8 @@ body {
 }
 
 .navbar {
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   border-radius: 0 0 1rem 1rem;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
@@ -140,7 +195,6 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   transition: all 0.3s ease;
-  color: var(--bs-body-color);
 
   &:hover,
   &.active-route {
@@ -197,9 +251,7 @@ body {
 
 // Developer info styles
 .developer-info {
-  background-color: var(--bs-body-bg);
   border: 1px solid var(--bs-border-color);
-  color: var(--bs-body-color);
   transition: all 0.3s ease;
 
   &:hover {
@@ -373,7 +425,6 @@ body {
 
 // Navigation and Notification Area Styles
 .notification-area {
-  background-color: var(--bs-light);
   border-radius: 20px;
   padding: 0.5rem 1rem;
   transition: all 0.3s ease;

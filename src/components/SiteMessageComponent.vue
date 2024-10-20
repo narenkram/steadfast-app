@@ -1,8 +1,8 @@
 <template>
     <!-- <div class="seo-hidden">
-        <h6 class="mb-0 bg-warning text-dark p-2">
+        <h6 class="mb-0 bg-warning text-color p-2">
             Regulatory Compliance Notice: If you identify any potential regulatory issues, please
-            <a href="mailto:email@narenkram.com" class="fw-bold text-dark">contact me at
+            <a href="mailto:email@narenkram.com" class="fw-bold text-color">contact me at
                 email@narenkram.com</a>.
             I am committed to promptly addressing and resolving any concerns to ensure full compliance.
         </h6>

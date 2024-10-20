@@ -1,9 +1,6 @@
 <template>
     <nav class="navbar navbar-expand-lg shadow-sm mt-0 mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand p-0" href="#">
-                <img src="/steadfast_logo.png" class="Navigation__logo img-fluid" alt="Steadfast" />
-            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">

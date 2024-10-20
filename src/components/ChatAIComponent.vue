@@ -24,7 +24,7 @@
                 <div v-for="(message, index) in messages" :key="index"
                     :class="['mb-3', 'p-2', 'rounded-lg', message.role === 'user' ? 'text-end' : '']">
                     <div
-                        :class="['d-inline-block', 'p-3', 'rounded-lg', message.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark', 'mw-75', 'shadow-sm']">
+                        :class="['d-inline-block', 'p-3', 'rounded-lg', message.role === 'user' ? 'bg-primary text-white' : 'bg-color text-color', 'mw-75', 'shadow-sm']">
                         <img v-if="message.image" :src="message.image" class="user-image rounded" />
                         <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                             <span></span>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
             </div>
-            <div class="chat-input p-3 bg-light rounded-bottom">
+            <div class="chat-input p-3 bg-color rounded-bottom">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"

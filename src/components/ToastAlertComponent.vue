@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" class="bg-light toast show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div v-if="show" class="bg-color toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex justify-content-between align-items-center p-2">
             <div class="fw-bold">🔔 Notification</div>
             <button type="button" class="btn-close" @click="hide" aria-label="Close"></button>

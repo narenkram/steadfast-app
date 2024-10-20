@@ -182,7 +182,7 @@ onMounted(() => {
               <span v-else-if="selectedBrokerForPaper"
                 :class="`badge ${getStatus(selectedBrokerForPaper).statusClass}`">{{
                   getStatus(selectedBrokerForPaper).status }}</span>
-              <span v-else class="badge bg-warning text-dark">No broker selected</span>
+              <span v-else class="badge bg-warning text-color">No broker selected</span>
             </td>
             <td>
               <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"

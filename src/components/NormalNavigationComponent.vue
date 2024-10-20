@@ -4,9 +4,10 @@
     <section class="Navigation NormalNavigationComponent">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
+                <RouterLink to="/" class="navbar-brand">
                     <img src="/steadfast_logo.png" class="Navigation__logo" alt="Steadfast" />
-                </a>
+                    <span class="ms-2 fw-bold text-color">Steadfast</span>
+                </RouterLink>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">

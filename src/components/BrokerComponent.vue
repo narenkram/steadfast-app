@@ -11,7 +11,7 @@
             <span class="badge me-2" :class="{
                 'bg-success': brokerStatus === 'Connected',
                 'bg-danger': brokerStatus === 'Not Connected',
-                'bg-warning text-dark': brokerStatus === 'Token Expired'
+                'bg-warning text-color': brokerStatus === 'Token Expired'
             }">{{ brokerStatus }}</span>
         </div>
 

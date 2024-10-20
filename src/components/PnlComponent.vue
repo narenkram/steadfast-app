@@ -1,5 +1,5 @@
 <template>
-    <section class="row mt-3 mx-0 bg-light rounded" :class="{ 'MTM': stickyMTM }">
+    <section class="row mt-3 mx-0 bg-color rounded" :class="{ 'MTM': stickyMTM }">
         <div class="col-12 d-flex align-items-center justify-content-between p-0">
             <span class="ms-3">
                 <small class="text-muted">Total Capital</small>
