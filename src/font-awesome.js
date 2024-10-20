@@ -16,7 +16,8 @@ import {
   faHatWizard,
   faEnvelope,
   faBars,
-  faBell
+  faBell,
+  faCog
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -38,7 +39,8 @@ library.add(
   faEnvelope,
   faTelegram,
   faBars,
-  faBell
+  faBell,
+  faCog
 )
 
 export { FontAwesomeIcon }

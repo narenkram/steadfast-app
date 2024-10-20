@@ -361,6 +361,10 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   }
 }
 
+.dropdown-menu {
+  z-index: 9999;
+}
+
 .Navigation__logo {
   height: 40px;
   width: 40px;
