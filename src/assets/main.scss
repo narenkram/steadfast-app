@@ -17,122 +17,101 @@ $custom-colors: (
 // Merge the maps
 $theme-colors: map-merge($theme-colors, $custom-colors);
 
-// Light theme variables
-$light-theme: (
-  'body-bg': $white,
-  'body-color': $dark,
-  'border-color': $gray-300,
-  'light': $light,
-  'dark': $dark,
-  'accent-color': #3498db,
-  'text-muted': $gray-600,
-  'form-disabled-bg': $gray-200,
-  'form-disabled-color': $gray-600
-);
-
-// Dark theme variables
-$dark-theme: (
-  'body-bg': #1a1a1a,
-  'body-color': $light,
-  'border-color': $gray-700,
-  'light': $gray-900,
-  'dark': $black,
-  'accent-color': #2ecc71,
-  'text-muted': #a0a0a0,
-  'form-disabled-bg': lighten($gray-900, 5%),
-  'form-disabled-color': $gray-600
-);
-
 // Import the rest of Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
-@mixin color-scheme-styles($theme) {
-  --bs-body-bg: #{map-get($theme, 'body-bg')};
-  --bs-body-color: #{map-get($theme, 'body-color')};
-  --bs-border-color: #{map-get($theme, 'border-color')};
-  --bs-light: #{map-get($theme, 'light')};
-  --bs-dark: #{map-get($theme, 'dark')};
-  --bs-accent-color: #{map-get($theme, 'accent-color')};
-  --bs-text-muted: #{map-get($theme, 'text-muted')};
-  --bs-form-disabled-bg: #{map-get($theme, 'form-disabled-bg')};
-  --bs-form-disabled-color: #{map-get($theme, 'form-disabled-color')};
-
-  @each $color, $value in $theme-colors {
-    --bs-#{$color}: #{$value};
-  }
-
-  // Increase specificity and use !important to override Bootstrap defaults
+// Dark mode styles
+@media (prefers-color-scheme: dark) {
+  html,
   body {
-    .bg-light {
-      background-color: var(--bs-light) !important;
-    }
-    .bg-dark {
-      background-color: var(--bs-dark) !important;
-    }
-    .text-light {
-      color: var(--bs-light) !important;
-    }
-    .text-dark {
-      color: var(--bs-dark) !important;
-    }
-    .text-muted {
-      color: var(--bs-text-muted) !important;
-    }
-    .card {
-      border-color: var(--bs-border-color);
-    }
-    .form-control:disabled,
-    .form-control[readonly],
-    .form-select:disabled {
-      background-color: var(--bs-form-disabled-bg);
-      color: var(--bs-form-disabled-color);
-      border-color: var(--bs-border-color);
-    }
-    .form-control:disabled::placeholder,
-    .form-control[readonly]::placeholder,
-    .form-select:disabled {
-      color: var(--bs-form-disabled-color);
-    }
-    .table,
-    th,
-    td {
-      border: 1px solid var(--bs-border-color);
-      border-collapse: collapse;
-    }
-    .table th {
-      color: var(--bs-body-color);
-      font-weight: 600;
-    }
-    .table > :not(caption) > * > * {
-      color: var(--bs-body-color);
-      border-bottom-color: var(--bs-border-color);
-    }
-    .input-group-text {
-      color: var(--bs-body-color);
-      background-color: var(--bs-input-bg);
-      border-color: var(--bs-border-color);
-    }
-    .custom-bg-light {
-      background-color: var(--bs-light) !important;
+    background-color: $gray-900;
+    color: $white;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: $gray-600;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: $gray-400;
+  }
+  .text-muted {
+    color: #a0a0a0;
+  }
+  .form-disabled-bg {
+    background-color: lighten($gray-900, 5%);
+  }
+  .form-disabled-color {
+    color: $gray-600;
+  }
+  .nav-link {
+    &.active-route {
+      color: $white;
+      background-color: $gray-800;
     }
   }
-}
-
-// Apply light theme by default
-:root {
-  @include color-scheme-styles($light-theme);
+  .bg-light {
+    background-color: $gray-800 !important;
+  }
 }
 
 // Dark mode styles
-@media (prefers-color-scheme: dark) {
-  :root {
-    @include color-scheme-styles($dark-theme);
+@media (prefers-color-scheme: light) {
+  html,
+  body {
+    background-color: $gray-100;
+    color: $black;
+    background-image: linear-gradient(to right, rgba(128, 128, 128, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: $gray-400;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: $gray-600;
+  }
+  .text-muted {
+    color: $gray-600;
+  }
+  .form-disabled-bg {
+    background-color: $gray-200;
+  }
+  .form-disabled-color {
+    color: $gray-600;
+  }
+  .nav-link {
+    &.active-route {
+      color: $black;
+      background-color: $gray-200;
+    }
+  }
+  .bg-light {
+    background-color: $gray-200 !important;
   }
 }
 
-// Styles that don't change based on color scheme
+// Styles that are common to both color schemes
+* {
+  outline: none;
+  scrollbar-gutter: stable;
+}
+
+// Scrollbar styles
+::-webkit-scrollbar {
+  scrollbar-width: thin;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+}
+
+html,
+body {
+}
+
 .Navigation {
-  padding: 0.5rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -199,14 +178,6 @@ $dark-theme: (
   }
 }
 
-@media (max-width: 991px) {
-  .navbar-nav {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-  }
-}
-
 // Hover effect styles
 .hover-effect {
   transition:
@@ -257,21 +228,6 @@ $dark-theme: (
   }
 }
 
-// Accordion styles
-.accordion-button:not(.collapsed) {
-  background-color: #007bff;
-  color: white;
-}
-
-.accordion-button:focus {
-  box-shadow: none;
-  border-color: rgba(0, 0, 0, 0.125);
-}
-
-.accordion-button:not(.collapsed)::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-}
-
 // Card hover effect
 .card {
   transition: transform 0.3s ease-in-out;
@@ -297,32 +253,6 @@ $dark-theme: (
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-}
-
-// Slim scrollbar styles
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bs-body-bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--bs-body);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--bs-body);
-}
-
-// For Firefox
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--bs-body) var(--bs-body-bg);
-  outline: none;
 }
 
 // MTM styles
@@ -372,34 +302,6 @@ $dark-theme: (
 .form-control,
 .input-group-text {
   transition: all 0.3s ease;
-}
-
-.btn-primary {
-  background-color: var(--bs-accent-color);
-  border-color: var(--bs-accent-color);
-
-  &:hover,
-  &:focus {
-    background-color: darken(map-get($light-theme, 'accent-color'), 10%);
-    border-color: darken(map-get($light-theme, 'accent-color'), 10%);
-  }
-}
-
-.form-control:focus,
-.btn:focus {
-  box-shadow: 0 0 0 0.2rem rgba(map-get($light-theme, 'accent-color'), 0.25);
-}
-
-// Subtle background pattern
-body {
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-body.dark-mode {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 // Chat container styles
