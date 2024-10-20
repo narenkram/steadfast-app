@@ -461,3 +461,48 @@ body.dark-mode {
 .chat-input {
   border-top: 1px solid #dee2e6;
 }
+
+// Navigation and Notification Area Styles
+.notification-area {
+  background-color: #f8f9fa;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+  color: #6c757d;
+  transition: all 0.3s ease;
+
+  &.has-notification {
+    color: #ffc107;
+    animation: pulse 2s infinite;
+  }
+}
+
+.notification-message {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #6c757d;
+  transition: all 0.3s ease;
+
+  &.show-message {
+    color: #212529;
+    font-weight: bold;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
