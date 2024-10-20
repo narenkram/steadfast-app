@@ -9,7 +9,7 @@
                     <p class="lead">Experience the power of Steadfast with our exclusive launch offer!</p>
                 </div>
                 <div class="card shadow-lg border-0 rounded-lg overflow-hidden">
-                    <div class="card-header bg-primary text-white text-center py-4">
+                    <div class="card-header bg-success text-white text-center py-4">
                         <h3 class="mb-0 fw-bold">Go Steadfast</h3>
                     </div>
                     <div class="card-body">
@@ -20,7 +20,7 @@
                                     style="font-size: 0.5em;">₹1199</span> -->
                                 <span class="text-success">FREE</span>
                             </p>
-                            <p class="h3 text-primary mb-0">₹0<span class="fs-6"> / month</span></p>
+                            <p class="h3 mb-0">₹0<span class="fs-6"> / month</span></p>
                             <p class="text-success fw-bold mt-2">Launch Offer: 100% OFF</p>
                         </div>
                         <ul class="list-group list-group-flush mb-4">
@@ -74,7 +74,7 @@
                             </li>
                         </ul>
                         <div class="text-center">
-                            <button class="btn btn-primary btn-lg px-5 py-3 fw-bold">Subscribe Now</button>
+                            <button class="btn btn-success btn-lg px-5 py-3 fw-bold">Subscribe Now</button>
                         </div>
                     </div>
                 </div>

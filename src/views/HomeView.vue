@@ -67,7 +67,7 @@
         </section>
 
         <!-- Multi-Broker Support Section -->
-        <section class="row py-5 bg-light">
+        <section class="row py-5 bg-light rounded">
             <div class="col-lg-10 mx-auto text-center">
                 <h2 class="mb-5 display-4">Unleash the Power of Multi-Broker Trading</h2>
                 <p class="lead mb-5">Experience seamless integration and manage all your accounts from one powerful

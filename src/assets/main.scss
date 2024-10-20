@@ -96,6 +96,10 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 * {
   outline: none;
   scrollbar-gutter: stable;
+
+  &:focus {
+    box-shadow: none !important;
+  }
 }
 
 // Scrollbar styles
@@ -230,6 +234,8 @@ body {
 
 // Card hover effect
 .card {
+  scrollbar-gutter: unset;
+
   transition: transform 0.3s ease-in-out;
 
   &:hover {
