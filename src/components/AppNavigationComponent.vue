@@ -2,7 +2,7 @@
     <SiteMessageComponent />
     <section class="Navigation AppNavigationComponent">
         <nav class="navbar navbar-expand-lg shadow-sm mt-0 mb-3">
-            <div class="container-fluid">
+            <div class="container-fluid pt-0">
                 <RouterLink to="/" class="navbar-brand">
                     <img src="/steadfast_logo.png" class="Navigation__logo" alt="Steadfast" />
                     <span class="ms-2 fw-bold text-color">Steadfast</span>

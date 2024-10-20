@@ -70,7 +70,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     color: $white;
   }
   .notification-area {
-    background-color: $gray-700;
+    background-color: $gray-900;
   }
   .btn-outline {
     border-color: $gray-100;
@@ -203,6 +203,9 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
         }
       }
     }
+  }
+  .navbar-toggler {
+    border-color: $white;
   }
 }
 
@@ -387,6 +390,9 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
       }
     }
   }
+  .navbar-toggler {
+    border-color: $black;
+  }
 }
 
 // Styles that are common to both color schemes
@@ -410,6 +416,9 @@ html {
   scrollbar-gutter: stable;
 }
 
+.container {
+  min-width: 500px;
+}
 .lead {
   font-weight: 400;
 }
