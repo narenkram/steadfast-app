@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { FontAwesomeIcon } from './font-awesome'
+import { app as firebaseApp } from './firebase'
 
 const app = createApp(App)
 

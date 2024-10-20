@@ -19,6 +19,7 @@
                 <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline btn-md">
                     💬 Join Telegram Community
                 </a>
+                <button @click="loginWithGoogle">Login with Google</button>
             </div>
         </section>
     </div>
@@ -26,6 +27,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const tradeViewWindow = ref(null)
 const openTradeView = () => {
@@ -43,4 +45,14 @@ onMounted(() => {
     });
 });
 
+const loginWithGoogle = async () => {
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    try {
+        await signInWithPopup(auth, provider);
+        // Redirect to a protected page or update the UI accordingly
+    } catch (error) {
+        console.error('Error during Google login:', error);
+    }
+}
 </script>

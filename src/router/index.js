@@ -11,7 +11,18 @@ import LoginView from '@/views/LoginView.vue'
 import AboutView from '@/views/AboutView.vue'
 import ContactView from '@/views/ContactView.vue'
 import FaqView from '@/views/FaqView.vue'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
+const requireAuth = (to, from, next) => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      next()
+    } else {
+      next('/login')
+    }
+  })
+}
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -48,17 +59,20 @@ const router = createRouter({
     {
       path: '/manage-brokers',
       name: 'manage-brokers',
-      component: ManageBrokers
+      component: ManageBrokers,
+      beforeEnter: requireAuth
     },
     {
       path: '/steadfast',
       name: 'trade-view',
-      component: TradeView
+      component: TradeView,
+      beforeEnter: requireAuth
     },
     {
       path: '/add-broker',
       name: 'add-broker',
-      component: AddBroker
+      component: AddBroker,
+      beforeEnter: requireAuth
     },
     {
       path: '/flattrade/redirect',
@@ -67,12 +81,14 @@ const router = createRouter({
     {
       path: '/app-settings',
       name: 'AppSettingsView',
-      component: AppSettingsView
+      component: AppSettingsView,
+      beforeEnter: requireAuth
     },
     {
       path: '/parallel-copy-trade',
       name: 'ParallelCopyTradeView',
-      component: ParallelCopyTradeView
+      component: ParallelCopyTradeView,
+      beforeEnter: requireAuth
     }
   ],
   scrollBehavior(to, from, savedPosition) {

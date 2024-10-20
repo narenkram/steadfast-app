@@ -40,6 +40,9 @@
                             {{ toastMessage || 'No new notifications' }}
                         </div>
                     </div>
+                    <div class="ms-auto" v-if="user">
+                        <button class="btn btn-outline-secondary" @click="logout">Logout</button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -47,10 +50,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import { FontAwesomeIcon } from '@/font-awesome';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 const {
     showToast,
@@ -69,6 +73,25 @@ const routes = ref([
 
 const audio = ref(null);
 const notificationTimer = ref(null);
+
+const user = ref(null);
+
+onMounted(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (currentUser) => {
+        user.value = currentUser;
+    });
+});
+
+const logout = async () => {
+    const auth = getAuth();
+    try {
+        await signOut(auth);
+        // Redirect to the login page or update the UI accordingly
+    } catch (error) {
+        console.error('Error during logout:', error);
+    }
+};
 
 watch([showToast, toastMessage], ([newShowToast, newToastMessage], [oldShowToast, oldToastMessage]) => {
     if (newShowToast && (newShowToast !== oldShowToast || newToastMessage !== oldToastMessage)) {

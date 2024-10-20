@@ -22,6 +22,15 @@
                                 <span class="nav-text">{{ route.name }}</span>
                             </RouterLink>
                         </li>
+                        <li class="nav-item" v-if="!user">
+                            <RouterLink to="/login" class="nav-link">
+                                <font-awesome-icon icon="key" class="nav-icon text-secondary" />
+                                <span class="nav-text">Login</span>
+                            </RouterLink>
+                        </li>
+                        <li class="nav-item" v-if="user">
+                            <span class="nav-link">Welcome, {{ user.displayName }}</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -30,9 +39,10 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default defineComponent({
     name: "NormalNavigationComponent",
@@ -50,6 +60,20 @@ export default defineComponent({
                 { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'], iconClass: 'text-purple' },
                 // { path: '/login', name: 'Login', icon: ['fas', 'key'], iconClass: 'text-secondary' },
             ],
+        };
+    },
+    setup() {
+        const user = ref(null);
+
+        onMounted(() => {
+            const auth = getAuth();
+            onAuthStateChanged(auth, (currentUser) => {
+                user.value = currentUser;
+            });
+        });
+
+        return {
+            user,
         };
     },
 });
