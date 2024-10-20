@@ -668,7 +668,6 @@ html {
 
 // Chat container styles
 .chat-container {
-  height: 70vh;
   display: flex;
   flex-direction: column;
 }
@@ -720,10 +719,6 @@ html {
   max-height: 200px;
   object-fit: contain;
   margin-bottom: 10px;
-}
-
-.chat-input {
-  border-top: 1px solid #dee2e6;
 }
 
 // Navigation and Notification Area Styles

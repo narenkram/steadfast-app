@@ -6,7 +6,7 @@
             <div class="col-lg-8 mx-auto text-center">
                 <h1 class="display-3 mb-4 fw-bold">Empowering Traders</h1>
                 <p class="lead mb-5">
-                    Steadfast: Crafted by a trader, for traders. Our mission is to revolutionize your trading experience
+                    Steadfast: Crafted by a trader, for traders. On a mission to revolutionize the trading experience
                     with powerful tools and intuitive design.
                 </p>
 

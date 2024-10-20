@@ -1,11 +1,11 @@
 <template>
-    <div class="Steadfast-AI-Assistant p-4 rounded-lg shadow-lg">
+    <div class="Steadfast-AI-Assistant bg-color p-4 rounded-lg shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0 text-purple">
                 <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
                 Steadfast AI Assistant
             </h2>
-            <button @click="startNewChat" class="btn btn-outline-primary btn-sm">
+            <button @click="startNewChat" class="btn btn-outline-purple btn-sm">
                 <font-awesome-icon :icon="['fas', 'sync']" class="me-2" />
                 New Chat
             </button>
@@ -19,12 +19,12 @@
                 </button>
             </div>
         </div>
-        <div v-else class="chat-container bg-white rounded-lg shadow">
+        <div v-else class="chat-container bg-color-2 rounded shadow">
             <div class="chat-messages overflow-auto p-3" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
                     :class="['mb-3', 'p-2', 'rounded-lg', message.role === 'user' ? 'text-end' : '']">
                     <div
-                        :class="['d-inline-block', 'p-3', 'rounded-lg', message.role === 'user' ? 'bg-primary text-white' : 'bg-color text-color', 'mw-75', 'shadow-sm']">
+                        :class="['d-inline-block', 'p-3', 'rounded', message.role === 'user' ? 'bg-purple text-white' : 'bg-color text-color', 'mw-75', 'shadow-sm']">
                         <img v-if="message.image" :src="message.image" class="user-image rounded" />
                         <div v-if="message.role === 'ai' && message.content === ''" class="typing-indicator">
                             <span></span>
@@ -41,7 +41,7 @@
                     <div class="col-auto">
                         <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"
                             id="imageUpload">
-                        <label class="btn btn-outline-secondary" for="imageUpload">
+                        <label class="btn btn-outline-purple" for="imageUpload">
                             <font-awesome-icon :icon="['fas', 'image']" />
                         </label>
                     </div>
@@ -50,7 +50,7 @@
                             placeholder="Type your message..." :disabled="isWaitingForResponse">
                     </div>
                     <div class="col-auto">
-                        <button @click="sendMessage" class="btn btn-primary" :disabled="isWaitingForResponse">
+                        <button @click="sendMessage" class="btn btn-purple" :disabled="isWaitingForResponse">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" />
                         </button>
                     </div>
