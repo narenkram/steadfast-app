@@ -78,7 +78,7 @@ const faqs = ref([
     },
     {
         question: "What is Steadfast's refund policy?",
-        answer: "Steadfast has a strict no-refund policy. Here's why:",
+        answer: "Steadfast offers a 1-month free trial for new users to test the platform risk-free. After the trial period, we have a strict no-refund policy. Here's why:",
         list: [
             "Extensive effort and resources are invested in developing a high-quality, reliable trading platform.",
             "The pricing is transparent and clearly communicated before purchase.",
