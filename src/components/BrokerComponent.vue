@@ -62,7 +62,17 @@ const emit = defineEmits(['update:selectedBrokerName']);
 
 const selectedBroker = computed({
     get: () => props.selectedBrokerName,
-    set: (value) => emit('update:selectedBrokerName', value)
+    set: async (value) => {
+        emit('update:selectedBrokerName', value);
+        if (value) {
+            try {
+                await updateSelectedBrokerOnServer(value.toLowerCase());
+            } catch (error) {
+                console.error('Failed to update broker on server:', error);
+                // You might want to handle this error, perhaps by showing a notification to the user
+            }
+        }
+    }
 });
 
 const maskBrokerClientId = (clientId) => {

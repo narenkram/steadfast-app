@@ -20,8 +20,8 @@
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
           <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
             <option value="">Select a broker</option>
-            <option value="Flattrade">Flattrade</option>
-            <option value="Shoonya">Shoonya</option>
+            <option value="flattrade">Flattrade</option>
+            <option value="shoonya">Shoonya</option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->

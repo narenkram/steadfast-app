@@ -4,6 +4,7 @@ import axios from 'axios'
 import qs from 'qs'
 import { debounce } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+import { updateSelectedBrokerOnServer } from '../api/broker'
 import {
   validateToken,
   checkAllTokens,
@@ -827,13 +828,14 @@ export function useTradeView() {
       }
     }
   }
-  const updateSelectedBroker = () => {
+  const updateSelectedBroker = async () => {
     const availableBrokerNames = availableBrokers.value
 
     if (availableBrokerNames.length === 0) {
       selectedBroker.value = null
       localStorage.removeItem('selectedBroker')
       selectedBrokerName.value = ''
+      await updateSelectedBrokerOnServer('') // Clear broker on server
     } else if (
       selectedBrokerName.value &&
       availableBrokerNames.includes(selectedBrokerName.value)
@@ -843,10 +845,12 @@ export function useTradeView() {
       )
       selectedBroker.value = brokerDetails
       localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails))
+      await updateSelectedBrokerOnServer(selectedBrokerName.value.toLowerCase())
     } else {
       selectedBroker.value = null
       localStorage.removeItem('selectedBroker')
       selectedBrokerName.value = ''
+      await updateSelectedBrokerOnServer('') // Clear broker on server
     }
   }
 
@@ -1588,8 +1592,6 @@ export function useTradeView() {
       let clientId = selectedBroker.value?.clientId
       let API_TOKEN
 
-      console.log('Initial broker:', brokerName)
-      console.log('Initial clientId:', clientId)
 
       if (!['Flattrade', 'Shoonya'].includes(brokerName)) {
         throw new Error('Order margin calculation is only available for Flattrade and Shoonya')
@@ -1607,7 +1609,6 @@ export function useTradeView() {
         throw new Error(`${brokerName} client ID is missing`)
       }
 
-      // ... rest of the function remains the same
     } catch (error) {
       console.error('Error getting order margin:', error)
       orderMargin.call = null
