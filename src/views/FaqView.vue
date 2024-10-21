@@ -62,7 +62,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 const faqs = ref([
     {
         question: "What is Steadfast?",
-        answer: "Steadfast is a trading app designed by traders for traders. It offers advanced features like automatic trailing stop-loss, multi-account support, and real-time data to help traders make informed decisions and manage their trades effectively."
+        answer: "Steadfast is a trading app designed by trader for traders. It offers advanced features like automatic trailing stop-loss, multi-account support, and real-time data to help traders make informed decisions and manage their trades effectively."
+    },
+    {
+        question: "Is Steadfast a member of NSE or BSE?",
+        answer: "No, Steadfast is neither a member of NSE nor BSE."
+    },
+    {
+        question: "How does Steadfast show real-time LTP data?",
+        answer: "Since Steadfast is not a member of NSE or BSE and does not buy data from these exchanges, the app uses your API key via websocket to get the real-time LTP data from your broker."
     },
     {
         question: "How does the Kill Switch feature work?",
