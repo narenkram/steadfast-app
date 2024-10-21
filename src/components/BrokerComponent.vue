@@ -48,6 +48,7 @@
 
 <script setup>
 import { defineProps, defineEmits, computed } from 'vue';
+import { updateSelectedBrokerOnServer } from '../api/broker';
 
 const props = defineProps({
     selectedBrokerName: String,
