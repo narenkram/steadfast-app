@@ -56,9 +56,6 @@ export function useTradeView() {
     shoonyaTradeBook,
     flatTradePositionBook,
     shoonyaPositionBook,
-    paperTradingPositionBook,
-    paperTradingOrderBook,
-    paperTradingTradeBook,
     fundLimits,
     quantities,
     availableQuantities,
@@ -144,8 +141,6 @@ export function useTradeView() {
     SHOONYA_API_KEY,
     SHOONYA_CLIENT_ID,
     SHOONYA_API_TOKEN,
-    PAPERTRADING_API_KEY,
-    PAPERTRADING_CLIENT_ID,
     flattradeReqCode,
     shoonyaBrokerUserId,
     shoonyaBrokerPassword,
@@ -154,7 +149,6 @@ export function useTradeView() {
     statusMessage,
     userTriggeredTokenGeneration,
     selectedBrokerToDelete,
-    selectedBrokerForPaper,
     stickyMTM,
     savedStickyMTM
   } = globalState
@@ -163,13 +157,11 @@ export function useTradeView() {
   const brokerStatus = computed(() => {
     const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}')
     const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}')
-    const paperTradingDetails = JSON.parse(localStorage.getItem('broker_PaperTrading') || '{}')
 
     const flattradeClientId = flattradeDetails.clientId
     const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN')
     const shoonyaApiToken = localStorage.getItem('SHOONYA_API_TOKEN')
     const shoonyaClientId = shoonyaDetails.clientId
-    const paperTradingClientId = paperTradingDetails.clientId
 
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       if (flattradeClientId && flattradeApiToken) {
@@ -179,11 +171,6 @@ export function useTradeView() {
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       if (shoonyaClientId && shoonyaApiToken) {
         return tokenStatus.Shoonya === 'valid' ? 'Connected' : 'Token Expired'
-      }
-      return 'Not Connected'
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      if (paperTradingClientId) {
-        return 'Connected' // PaperTrading is always connected if a client ID exists
       }
       return 'Not Connected'
     }
@@ -289,8 +276,7 @@ export function useTradeView() {
   const orderTypes = computed(() => {
     if (
       selectedBroker.value?.brokerName === 'Flattrade' ||
-      selectedBroker.value?.brokerName === 'Shoonya' ||
-      selectedBroker.value?.brokerName === 'PaperTrading'
+      selectedBroker.value?.brokerName === 'Shoonya'
     ) {
       return ['MKT', 'LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION']
     }
@@ -321,8 +307,6 @@ export function useTradeView() {
       return ['Intraday', 'Margin']
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       return ['Intraday', 'Margin']
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      return ['Intraday', 'Margin']
     }
     return []
   })
@@ -343,17 +327,6 @@ export function useTradeView() {
 
       const balance = availableFunds - marginUsed
       // console.log(`${selectedBroker.value?.brokerName} Available Balance:`, balance);
-      return balance
-    }
-    if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      const cash = Number(fundLimits.value.cash) || 0
-      const payin = Number(fundLimits.value.payin) || 0
-      const marginUsed = Number(fundLimits.value.marginused) || 0
-
-      // Use payin if cash is zero, otherwise use cash
-      const availableFunds = cash === 0 ? payin : cash
-
-      const balance = Math.floor(availableFunds - marginUsed)
       return balance
     }
     return null
@@ -767,17 +740,6 @@ export function useTradeView() {
       })
     }
 
-    // Add PaperTrading broker
-    if (PAPERTRADING_CLIENT_ID.value && PAPERTRADING_API_KEY.value) {
-      brokersArray.push({
-        id: 'PaperTrading',
-        brokerName: 'PaperTrading',
-        brokerClientId: PAPERTRADING_CLIENT_ID.value,
-        apiKey: PAPERTRADING_API_KEY.value,
-        apiToken: '' // PaperTrading does not have an API token
-      })
-    }
-
     return brokersArray
   })
   // ... (add all other computed properties here)
@@ -891,8 +853,7 @@ export function useTradeView() {
   const updateExchangeSymbols = () => {
     if (
       selectedBroker.value?.brokerName === 'Flattrade' ||
-      selectedBroker.value?.brokerName === 'Shoonya' ||
-      selectedBroker.value?.brokerName === 'PaperTrading'
+      selectedBroker.value?.brokerName === 'Shoonya'
     ) {
       exchangeSymbols.value = {
         NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'],
@@ -967,10 +928,6 @@ export function useTradeView() {
           response = await fetch(
             `${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`
           )
-        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-          response = await fetch(
-            `${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`
-          )
         } else {
           throw new Error('Unsupported broker')
         }
@@ -1028,8 +985,7 @@ export function useTradeView() {
 
     if (
       selectedBroker.value?.brokerName === 'Flattrade' ||
-      selectedBroker.value?.brokerName === 'Shoonya' ||
-      selectedBroker.value?.brokerName === 'PaperTrading'
+      selectedBroker.value?.brokerName === 'Shoonya'
     ) {
       return dateString
     }
@@ -1483,12 +1439,6 @@ export function useTradeView() {
           marginused: response.data.marginused
           // Add any other relevant fields from the Shoonya response
         }
-      } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-        fundLimits.value = {
-          cash: 1000000,
-          marginused: 0,
-          payin: 0
-        }
       } else {
         throw new Error('Unsupported broker')
       }
@@ -1544,8 +1494,6 @@ export function useTradeView() {
       return productType === 'Intraday' ? 'I' : 'M'
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       return productType === 'Intraday' ? 'I' : 'M'
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      return productType === 'Intraday' ? 'I' : 'M'
     }
     return productType
   }
@@ -1577,14 +1525,6 @@ export function useTradeView() {
         return 'BFO'
       } else {
         throw new Error('Selected exchange is not valid for Shoonya')
-      }
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      if (selectedExchange.value === 'NFO') {
-        return 'NFO'
-      } else if (selectedExchange.value === 'BFO') {
-        return 'BFO'
-      } else {
-        throw new Error('Selected exchange is not valid for Paper Trading')
       }
     } else {
       throw new Error('Unsupported broker')
@@ -1638,15 +1578,6 @@ export function useTradeView() {
           ...commonPayload
           // Add any additional fields specific to Shoonya here
         }
-      case 'PaperTrading':
-        return {
-          ...commonPayload,
-          paperTrade: true,
-          drvOptionType,
-          strikePrice: selectedStrike.strikePrice,
-          originalOrderType: selectedOrderType.value // Store the original order type for paper trading
-          // Add any additional fields specific to PaperTrading here
-        }
       default:
         throw new Error('Unsupported broker')
     }
@@ -1659,23 +1590,6 @@ export function useTradeView() {
 
       console.log('Initial broker:', brokerName)
       console.log('Initial clientId:', clientId)
-
-      if (brokerName === 'PaperTrading') {
-        const selectedPaperBroker = JSON.parse(
-          localStorage.getItem('selectedBrokerForPaper') || '{}'
-        )
-        brokerName = selectedPaperBroker.brokerName
-        clientId = selectedPaperBroker.clientId
-        console.log('Paper trading broker:', brokerName)
-        console.log('Paper trading clientId:', clientId)
-
-        // If clientId is still undefined, try to get it from the broker details
-        if (!clientId) {
-          const brokerDetails = JSON.parse(localStorage.getItem(`broker_${brokerName}`) || '{}')
-          clientId = brokerDetails.clientId
-          console.log('Retrieved clientId from broker details:', clientId)
-        }
-      }
 
       if (!['Flattrade', 'Shoonya'].includes(brokerName)) {
         throw new Error('Order margin calculation is only available for Flattrade and Shoonya')
@@ -1765,8 +1679,6 @@ export function useTradeView() {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           })
-        } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-          response = simulatePaperTradingOrder(orderData)
         }
 
         console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`)
@@ -1823,8 +1735,6 @@ export function useTradeView() {
       await Promise.all([fetchFlattradeOrdersTradesBook(), fetchFlattradePositions()])
     } else if (selectedBroker.value?.brokerName === 'Shoonya') {
       await Promise.all([fetchShoonyaOrdersTradesBook(), fetchShoonyaPositions()])
-    } else if (selectedBroker.value?.brokerName === 'PaperTrading') {
-      await Promise.all([fetchPaperTradingOrdersTradesBook(), fetchPaperTradingPositions()])
     }
   }
   const findNewPosition = (tradingSymbol) => {
@@ -1916,69 +1826,7 @@ export function useTradeView() {
       showToast.value = true
     }
   }
-  const simulatePaperTradingOrder = (orderData) => {
-    const orderId = uuidv4()
-    const order = {
-      ...orderData,
-      orderId,
-      status: 'COMPLETE',
-      orderTimestamp: new Date().toISOString(),
-      lastUpdateTimestamp: new Date().toISOString(),
-      averagePrice: parseFloat(orderData.prc) || getMasterSymbolPrice()
-    }
 
-    paperTradingOrderBook.value.push(order)
-
-    const trade = {
-      tradeId: uuidv4(),
-      orderId,
-      exchangeOrderId: `PaperTrade-${orderId}`,
-      tradingSymbol: order.tsym,
-      tradeTimestamp: new Date().toISOString(),
-      quantity: parseInt(order.qty),
-      tradePrice: order.averagePrice,
-      product: order.prd,
-      ctcl: '',
-      remarks: 'Paper Trading Simulated Trade'
-    }
-
-    paperTradingTradeBook.value.push(trade)
-
-    updatePaperTradingPosition(order)
-    savePaperTradingData()
-
-    return { data: { stat: 'Ok', norenordno: orderId } }
-  }
-  const updatePaperTradingPosition = (order) => {
-    const existingPosition = paperTradingPositionBook.value.find(
-      (pos) => pos.tsym === order.tsym && pos.prd === order.prd
-    )
-
-    if (existingPosition) {
-      const quantity = parseInt(order.qty) * (order.trantype === 'B' ? 1 : -1)
-      existingPosition.netqty = (parseInt(existingPosition.netqty) + quantity).toString()
-      existingPosition.daybuyqty = (
-        parseInt(existingPosition.daybuyqty) + (order.trantype === 'B' ? parseInt(order.qty) : 0)
-      ).toString()
-      existingPosition.daysellqty = (
-        parseInt(existingPosition.daysellqty) + (order.trantype === 'S' ? parseInt(order.qty) : 0)
-      ).toString()
-      existingPosition.ltp = order.averagePrice.toString()
-      // Update other fields as needed
-    } else {
-      const newPosition = {
-        tsym: order.tsym,
-        exch: order.exch,
-        prd: order.prd,
-        netqty: order.trantype === 'B' ? order.qty : (-parseInt(order.qty)).toString(),
-        daybuyqty: order.trantype === 'B' ? order.qty : '0',
-        daysellqty: order.trantype === 'S' ? order.qty : '0',
-        ltp: order.averagePrice.toString()
-        // Add other necessary fields
-      }
-      paperTradingPositionBook.value.push(newPosition)
-    }
-  }
   const setStrategyType = (type) => {
     strategyType.value = type
   }
@@ -2682,9 +2530,9 @@ export function useTradeView() {
         usersession: apiToken,
         userid: clientId
       })
-      console.log('Credentials set successfully:', response.data);
-      toastMessage.value = 'Flattrade changes set successfully';
-      showToast.value = true;
+      console.log('Credentials set successfully:', response.data)
+      toastMessage.value = 'Flattrade changes set successfully'
+      showToast.value = true
     } catch (error) {
       console.error('Error setting credentials :', error)
       toastMessage.value = 'Failed to set Flattrade credentials'
@@ -2721,64 +2569,16 @@ export function useTradeView() {
         usersession: apiToken,
         userid: clientId
       })
-      console.log('Credentials set successfully:', response.data);
-      toastMessage.value = 'Shoonya changes set successfully';
-      showToast.value = true;
+      console.log('Credentials set successfully:', response.data)
+      toastMessage.value = 'Shoonya changes set successfully'
+      showToast.value = true
     } catch (error) {
       console.error('Error setting credentials: ', error)
       toastMessage.value = 'Failed to set Shoonya credentials'
       showToast.value = true
     }
   }
-  const setPaperTradingCredentials = async () => {
-    try {
-      if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'PaperTrading') {
-        toastMessage.value = 'PaperTrading broker is not selected'
-        showToast.value = true
-        return
-      }
 
-      // Check if the broker status is 'Connected'
-      if (brokerStatus.value !== 'Connected') {
-        console.error('PaperTrading broker is not connected')
-        toastMessage.value = 'PaperTrading broker is not connected'
-        showToast.value = true
-        return
-      }
-
-      const clientId = selectedBroker.value.clientId
-      const apiKey = selectedBroker.value.apiKey
-
-      if (!clientId || !apiKey) {
-        console.error('PaperTrading client ID or API key is missing')
-        toastMessage.value = 'PaperTrading credentials are missing'
-        showToast.value = true
-        return
-      }
-
-      // Get the selected broker for paper trading
-      const selectedPaperBroker = localStorage.getItem('selectedBrokerForPaper')
-      if (!selectedPaperBroker) {
-        console.error('No broker selected for paper trading')
-        toastMessage.value = 'No broker selected for paper trading'
-        showToast.value = true
-        return
-      }
-
-      // Set credentials based on the selected broker
-      if (selectedPaperBroker.brokerName === 'Flattrade') {
-        await setFlattradeCredentials()
-      } else if (selectedPaperBroker.brokerName === 'Shoonya') {
-        await setShoonyaCredentials()
-      }
-      toastMessage.value = 'PaperTrading credentials set successfully'
-      showToast.value = true
-    } catch (error) {
-      console.error('Error setting PaperTrading credentials:', error)
-      toastMessage.value = 'Failed to set PaperTrading credentials'
-      showToast.value = true
-    }
-  }
   const connectWebSocket = () => {
     let websocketUrl
 
@@ -2795,15 +2595,7 @@ export function useTradeView() {
       }
     }
 
-    if (selectedBroker.value?.brokerName === 'PaperTrading' && brokerStatus.value === 'Connected') {
-      const selectedPaperBroker = JSON.parse(localStorage.getItem('selectedBrokerForPaper') || '{}')
-      if (['Flattrade', 'Shoonya'].includes(selectedPaperBroker.brokerName)) {
-        websocketUrl = getWebSocketUrl(selectedPaperBroker.brokerName)
-      } else {
-        console.error('Invalid broker selected for paper trading')
-        return
-      }
-    } else if (
+    if (
       ['Flattrade', 'Shoonya'].includes(selectedBroker.value?.brokerName) &&
       brokerStatus.value === 'Connected'
     ) {
@@ -3433,11 +3225,9 @@ export function useTradeView() {
 
     for (const [tsym, target] of validTargets) {
       const currentLTP = positionLTPs.value[tsym]
-      const position = [
-        ...flatTradePositionBook.value,
-        ...shoonyaPositionBook.value,
-        ...paperTradingPositionBook.value
-      ].find((p) => p.tsym === tsym)
+      const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+        (p) => p.tsym === tsym
+      )
 
       // console.log(`Checking target for ${tsym}: Current LTP = ${currentLTP}, Target = ${target}`);
       if (position && currentLTP) {
@@ -3472,11 +3262,9 @@ export function useTradeView() {
     // Check static stoplosses
     for (const [tsym, sl] of Object.entries(stoplosses.value)) {
       if (sl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [
-          ...flatTradePositionBook.value,
-          ...shoonyaPositionBook.value,
-          ...paperTradingPositionBook.value
-        ].find((p) => p.tsym === tsym)
+        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+          (p) => p.tsym === tsym
+        )
         if (position) {
           const isLongPosition = position.netqty > 0
           const currentLTP = parseFloat(positionLTPs.value[tsym])
@@ -3502,11 +3290,9 @@ export function useTradeView() {
     // Check trailing stoplosses
     for (const [tsym, tsl] of Object.entries(trailingStoplosses.value)) {
       if (tsl !== null && positionLTPs.value[tsym] !== undefined) {
-        const position = [
-          ...flatTradePositionBook.value,
-          ...shoonyaPositionBook.value,
-          ...paperTradingPositionBook.value
-        ].find((p) => p.tsym === tsym)
+        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+          (p) => p.tsym === tsym
+        )
         if (position) {
           const isLongPosition = position.netqty > 0
           const currentLTP = parseFloat(positionLTPs.value[tsym])
@@ -3555,29 +3341,6 @@ export function useTradeView() {
     checkTargets()
   }
 
-  const fetchPaperTradingPositions = async () => {
-    console.log('Fetching paper trading positions...')
-    const positions = JSON.parse(localStorage.getItem('paperTradingPositions') || '[]')
-    console.log('Fetched paper trading positions:', positions)
-    paperTradingPositionBook.value = positions || [] // Ensure it's always an array
-    console.log('Updated paperTradingPositionBook:', paperTradingPositionBook.value)
-    updatePositionSecurityIds()
-    subscribeToPositionLTPs()
-    subscribeToOptions()
-  }
-
-  const fetchPaperTradingOrdersTradesBook = async () => {
-    const orders = JSON.parse(localStorage.getItem('paperTradingOrders') || '[]')
-    const trades = JSON.parse(localStorage.getItem('paperTradingTrades') || '[]')
-    paperTradingOrderBook.value = orders
-    paperTradingTradeBook.value = trades
-  }
-  const savePaperTradingData = () => {
-    localStorage.setItem('paperTradingPositions', JSON.stringify(paperTradingPositionBook.value))
-    localStorage.setItem('paperTradingOrders', JSON.stringify(paperTradingOrderBook.value))
-    localStorage.setItem('paperTradingTrades', JSON.stringify(paperTradingTradeBook.value))
-  }
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -3593,23 +3356,7 @@ export function useTradeView() {
       }
     )
   }
-  // When saving the selected broker for paper trading
-  const saveSelectedBrokerForPaper = () => {
-    if (selectedBrokerForPaper.value) {
-      localStorage.setItem(
-        'selectedBrokerForPaper',
-        JSON.stringify({
-          brokerName: selectedBrokerForPaper.value.brokerName,
-          clientId: selectedBrokerForPaper.value.clientId
-        })
-      )
-      toastMessage.value = 'Selected broker for paper trading saved'
-      showToast.value = true
-    } else {
-      toastMessage.value = 'Please select a broker for paper trading'
-      showToast.value = true
-    }
-  }
+
   const openFlattradeAuthUrl = () => {
     statusMessage.value = 'Waiting for broker auth to complete...'
 
@@ -3807,10 +3554,6 @@ export function useTradeView() {
       SHOONYA_API_TOKEN.value = ''
       SHOONYA_API_KEY.value = ''
       SHOONYA_CLIENT_ID.value = ''
-    } else if (broker.brokerName === 'PaperTrading') {
-      localStorage.removeItem('PAPERTRADING_API_TOKEN')
-      PAPERTRADING_API_KEY.value = ''
-      PAPERTRADING_CLIENT_ID.value = ''
     }
 
     // Update the brokers computed property
@@ -3826,10 +3569,6 @@ export function useTradeView() {
     Shoonya: {
       positions: 'fetchShoonyaPositions',
       trades: 'fetchShoonyaOrdersTradesBook'
-    },
-    PaperTrading: {
-      positions: 'fetchPaperTradingPositions',
-      trades: 'fetchPaperTradingOrdersTradesBook'
     }
   }
 
@@ -3981,9 +3720,6 @@ export function useTradeView() {
         if (selectedBroker.value?.brokerName === 'Shoonya') {
           setShoonyaCredentials()
         }
-        if (selectedBroker.value?.brokerName === 'PaperTrading') {
-          setPaperTradingCredentials()
-        }
       }
     },
     { deep: true }
@@ -4044,11 +3780,9 @@ export function useTradeView() {
       Object.entries(newLTPs).forEach(([tsym, ltp]) => {
         if (ltp !== oldLTPs[tsym]) {
           // console.log(`LTP changed for ${tsym}: ${oldLTPs[tsym]} -> ${ltp}`);
-          const position = [
-            ...flatTradePositionBook.value,
-            ...shoonyaPositionBook.value,
-            ...paperTradingPositionBook.value
-          ].find((p) => (p.tsym || p.tradingSymbol) === tsym)
+          const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+            (p) => (p.tsym || p.tradingSymbol) === tsym
+          )
           if (position) {
             // console.log(`Found position for ${tsym}:`, position);
             // Check stoplosses and targets immediately when LTP changes
@@ -4215,18 +3949,6 @@ export function useTradeView() {
   watch(experimentalFeatures, (newValue) => {
     localStorage.setItem('ExperimentalFeatures', JSON.stringify(newValue))
   })
-  // Watch for changes in selectedBrokerForPaper and update localStorage
-  watch(selectedBrokerForPaper, (newBroker) => {
-    if (newBroker) {
-      localStorage.setItem('selectedBrokerForPaper', JSON.stringify(newBroker))
-      statusMessage.value = 'Selected broker for paper trading saved'
-      setTimeout(() => {
-        statusMessage.value = ''
-      }, 3000)
-    } else {
-      localStorage.removeItem('selectedBrokerForPaper')
-    }
-  })
 
   // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
   watch(FLATTRADE_API_TOKEN, (newToken) => {
@@ -4307,9 +4029,6 @@ export function useTradeView() {
   watch(stickyMTM, (newValue) => {
     localStorage.setItem('stickyMTM', JSON.stringify(newValue))
   })
-  watch(paperTradingPositionBook, (newValue) => {
-    console.log('paperTradingPositionBook changed:', newValue)
-  })
   // ... (add all other watchers here)
 
   return {
@@ -4320,7 +4039,6 @@ export function useTradeView() {
     updateSelectedBroker,
     setFlattradeCredentials,
     setShoonyaCredentials,
-    setPaperTradingCredentials,
     updateExchangeSymbols,
     setDefaultExchangeAndMasterSymbol,
     fetchTradingData,
@@ -4340,8 +4058,6 @@ export function useTradeView() {
     fetchShoonyaPositions,
     fetchFlattradeOrdersTradesBook,
     fetchShoonyaOrdersTradesBook,
-    fetchPaperTradingPositions,
-    fetchPaperTradingOrdersTradesBook,
     handleHotKeys,
     placeOrder,
     placeOrderForPosition,
@@ -4409,7 +4125,6 @@ export function useTradeView() {
     formatPrice,
     selectedBrokerToDelete,
     copyToClipboard,
-    saveSelectedBrokerForPaper,
     generateToken,
     getStatus,
     maskTokenSecret,
@@ -4510,7 +4225,6 @@ export function useTradeView() {
     shoonyaTradeBook,
     flatTradePositionBook,
     shoonyaPositionBook,
-    paperTradingPositionBook,
     fundLimits,
     quantities,
     availableQuantities,
@@ -4598,9 +4312,6 @@ export function useTradeView() {
     SHOONYA_API_KEY,
     SHOONYA_CLIENT_ID,
     SHOONYA_API_TOKEN,
-    PAPERTRADING_API_KEY,
-    PAPERTRADING_CLIENT_ID,
-    selectedBrokerForPaper,
     flattradeReqCode,
     shoonyaBrokerUserId,
     shoonyaBrokerPassword,
@@ -4608,7 +4319,6 @@ export function useTradeView() {
     errorMessage,
     statusMessage,
     userTriggeredTokenGeneration,
-    saveSelectedBrokerForPaper,
     selectedBrokerToDelete,
     stickyMTM,
     savedStickyMTM

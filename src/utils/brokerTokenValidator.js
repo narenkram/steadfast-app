@@ -3,8 +3,7 @@ import { reactive } from 'vue'
 
 const tokenStatus = reactive({
   Flattrade: 'unknown',
-  Shoonya: 'unknown',
-  PaperTrading: 'valid' // Always valid for paper trading
+  Shoonya: 'unknown'
 })
 
 const flattradeFundLimits = async () => {
@@ -64,31 +63,20 @@ const validateToken = async (brokerName) => {
         await shoonyaFundLimits()
         tokenStatus.Shoonya = 'valid'
         break
-      case 'PaperTrading':
-        // Paper trading is always valid, no need to validate
-        tokenStatus.PaperTrading = 'valid'
-        break
       default:
         throw new Error('Invalid broker name')
     }
-  } catch (error) {
-    if (brokerName !== 'PaperTrading') {
-      tokenStatus[brokerName] = 'expired'
-    }
-  }
+  } catch (error) {}
 }
 
 const checkAllTokens = async () => {
-  const brokers = ['Flattrade', 'Shoonya', 'PaperTrading']
+  const brokers = ['Flattrade', 'Shoonya']
   for (const broker of brokers) {
     await validateToken(broker)
   }
 }
 
 const getBrokerStatus = (brokerName) => {
-  if (brokerName === 'PaperTrading') {
-    return 'valid' // Paper trading is always valid
-  }
   const token = localStorage.getItem(`${brokerName.toUpperCase()}_API_TOKEN`)
   if (!token) {
     return 'Token missing'

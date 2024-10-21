@@ -22,7 +22,6 @@
             <option value="">Select a broker</option>
             <option value="Flattrade">Flattrade</option>
             <option value="Shoonya">Shoonya</option>
-            <option value="PaperTrading">Paper Trading</option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
@@ -35,7 +34,7 @@
           <label for="ClientID" class="form-label mb-0 mt-3"><b>Client ID</b></label>
           <input v-model="clientId" type="text" class="form-control" id="ClientID" required>
 
-          <!-- API Key (for Flattrade, Shoonya, and Paper Trading) -->
+          <!-- API Key (for Flattrade, Shoonya) -->
           <label for="APIKey" class="form-label mb-0 mt-3"><b>API Key</b></label>
           <input v-model="apiKey" type="text" class="form-control" id="APIKey" required>
 
@@ -87,13 +86,8 @@ const clientId = ref('');
 
 // Watch for changes in selectedBroker to prefill default values
 watch(selectedBroker, (newBroker) => {
-  if (newBroker === 'PaperTrading') {
-    apiKey.value = 'simulate123';
-    clientId.value = 'VIRTUAL001';
-  } else {
-    apiKey.value = '';
-    clientId.value = '';
-  }
+  apiKey.value = '';
+  clientId.value = '';
 });
 
 const getBrokerDashboardLink = computed(() => {
@@ -102,8 +96,6 @@ const getBrokerDashboardLink = computed(() => {
       return 'https://wall.flattrade.in/';
     case 'Shoonya':
       return 'https://prism.shoonya.com/';
-    case 'PaperTrading':
-      return 'https://papertrading.example.com/';
     default:
       return '#';
   }

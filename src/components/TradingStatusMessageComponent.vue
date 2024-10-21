@@ -70,15 +70,12 @@ const props = defineProps({
     activeFetchFunction: String,
     flatTradePositionBook: Array,
     shoonyaPositionBook: Array,
-    paperTradingPositionBook: Array,
 });
 
 const totalPositionQuantity = computed(() => {
     const positions = props.activeFetchFunction === 'fetchFlattradePositions'
         ? props.flatTradePositionBook
-        : props.activeFetchFunction === 'fetchShoonyaPositions'
-            ? props.shoonyaPositionBook
-            : props.paperTradingPositionBook;
+        : props.shoonyaPositionBook;
 
     return positions.reduce((total, position) => total + Math.abs(position.netqty), 0);
 });

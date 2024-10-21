@@ -28,15 +28,12 @@ const {
   SHOONYA_API_KEY,
   SHOONYA_CLIENT_ID,
   SHOONYA_API_TOKEN,
-  PAPERTRADING_API_KEY, // Default value for PaperTrading
-  PAPERTRADING_CLIENT_ID, // Default value for PaperTrading
   flattradeReqCode,
   shoonyaBrokerPassword,
   shoonyaOneTimePassword,
   errorMessage,
   statusMessage,
   brokers,
-  selectedBrokerForPaper,
 
 } = useTradeView();
 
@@ -61,15 +58,6 @@ onMounted(() => {
   SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
   SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
   SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
-
-  // Retrieve PaperTrading details
-  const paperTradingDetails = JSON.parse(localStorage.getItem('broker_PaperTrading') || '{}');
-  PAPERTRADING_API_KEY.value = paperTradingDetails.apiKey || '';
-  PAPERTRADING_CLIENT_ID.value = paperTradingDetails.clientId || '';
-  const storedSelectedBrokerForPaper = localStorage.getItem('selectedBrokerForPaper');
-  if (storedSelectedBrokerForPaper) {
-    selectedBrokerForPaper.value = JSON.parse(storedSelectedBrokerForPaper);
-  }
 
   // fetchBrokers(); disabled, as we are using localStorage to store the broker details
 
@@ -168,21 +156,10 @@ onMounted(() => {
               <template v-else-if="broker.brokerName === 'Flattrade'">
                 <a class="link" @click.prevent="generateToken(broker)">Generate Token</a>
               </template>
-              <template v-else-if="broker.brokerName === 'PaperTrading'">
-                <select class="form-select form-select-sm w-100" v-model="selectedBrokerForPaper">
-                  <option selected>Select Broker</option>
-                  <option v-for="broker in brokers.filter(b => b.brokerName !== 'PaperTrading')" :key="broker.id"
-                    :value="broker">{{ broker.brokerName }}</option>
-                </select>
-              </template>
             </td>
             <td>
-              <span v-if="broker.brokerName !== 'PaperTrading'" :class="`badge ${getStatus(broker).statusClass}`">{{
+              <span :class="`badge ${getStatus(broker).statusClass}`">{{
                 getStatus(broker).status }}</span>
-              <span v-else-if="selectedBrokerForPaper"
-                :class="`badge ${getStatus(selectedBrokerForPaper).statusClass}`">{{
-                  getStatus(selectedBrokerForPaper).status }}</span>
-              <span v-else class="badge bg-warning text-color">No broker selected</span>
             </td>
             <td>
               <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"

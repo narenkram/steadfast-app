@@ -448,8 +448,7 @@
   <!-- Trading Status Message -->
   <TradingStatusMessageComponent :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime"
     :riskReached="riskReached" :targetReached="targetReached" :activeFetchFunction="activeFetchFunction"
-    :flatTradePositionBook="flatTradePositionBook" :shoonyaPositionBook="shoonyaPositionBook"
-    :paperTradingPositionBook="paperTradingPositionBook" />
+    :flatTradePositionBook="flatTradePositionBook" :shoonyaPositionBook="shoonyaPositionBook" />
 
   <!-- Positions & Trades -->
   <section class="row py-3">
@@ -545,14 +544,6 @@
               @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
               @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
-            <!-- PaperTrading Positions -->
-            <PositionsTableComponent v-if="activeFetchFunction === 'fetchPaperTradingPositions'"
-              :positions="paperTradingPositionBook" :selected-broker="selectedBroker"
-              :selected-positions-set="selectedPaperPositionsSet"
-              @update:selected-positions-set="selectedPaperPositionsSet = $event"
-              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
           </div>
 
 
@@ -565,8 +556,7 @@
 
           <div class="TabContent bg-color">
             <OrdersNTradesComponent v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook' ||
-              activeFetchFunction === 'fetchShoonyaOrdersTradesBook' ||
-              activeFetchFunction === 'fetchPaperTradingOrdersTradesBook'"
+              activeFetchFunction === 'fetchShoonyaOrdersTradesBook'"
               :combinedOrdersAndTrades="combinedOrdersAndTrades" :selectedBroker="selectedBroker"
               :formatTime="formatTime" />
           </div>
@@ -1048,7 +1038,6 @@ const {
   bankexPrice,
   flatTradePositionBook,
   shoonyaPositionBook,
-  paperTradingPositionBook,
   selectedStrike,
   selectedProductType,
   limitPrice,
@@ -1056,7 +1045,6 @@ const {
   modalOptionType,
   selectedShoonyaPositionsSet,
   selectedFlattradePositionsSet,
-  selectedPaperPositionsSet,
   currentClockEmoji,
   socket,
   latestCallLTP,
