@@ -2682,9 +2682,9 @@ export function useTradeView() {
         usersession: apiToken,
         userid: clientId
       })
-      // console.log('Credentials set successfully:', response.data);
-      // toastMessage.value = 'Flattrade changes set successfully';
-      // showToast.value = true;
+      console.log('Credentials set successfully:', response.data);
+      toastMessage.value = 'Flattrade changes set successfully';
+      showToast.value = true;
     } catch (error) {
       console.error('Error setting credentials :', error)
       toastMessage.value = 'Failed to set Flattrade credentials'
@@ -2701,8 +2701,8 @@ export function useTradeView() {
 
       // Check if the broker status is 'Connected'
       if (brokerStatus.value !== 'Connected') {
-        console.error('Flattrade broker is not connected')
-        toastMessage.value = 'Flattrade broker is not connected'
+        console.error('Shoonya broker is not connected')
+        toastMessage.value = 'Shoonya broker is not connected'
         showToast.value = true
         return
       }
@@ -2721,9 +2721,9 @@ export function useTradeView() {
         usersession: apiToken,
         userid: clientId
       })
-      // console.log('Credentials set successfully:', response.data);
-      // toastMessage.value = 'Shoonya changes set successfully';
-      // showToast.value = true;
+      console.log('Credentials set successfully:', response.data);
+      toastMessage.value = 'Shoonya changes set successfully';
+      showToast.value = true;
     } catch (error) {
       console.error('Error setting credentials: ', error)
       toastMessage.value = 'Failed to set Shoonya credentials'
