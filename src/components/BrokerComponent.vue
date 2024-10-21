@@ -2,7 +2,7 @@
     <section class="row justify-content-between my-3">
         <!-- Broker Information -->
         <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center justify-content-start">
-            <select class="form-select form-select-sm me-2" v-model="selectedBroker" @change="updateSelectedBroker">
+            <select class="form-select form-select-sm me-2" v-model="selectedBroker">
                 <option value="" disabled selected>Select broker</option>
                 <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
                     {{ brokerName }} {{ maskBrokerClientId(getBrokerClientId(brokerName)) }}
@@ -58,16 +58,12 @@ const props = defineProps({
     todayExpirySymbol: String,
 });
 
-const emit = defineEmits(['update:selectedBrokerName', 'updateSelectedBroker']);
+const emit = defineEmits(['update:selectedBrokerName']);
 
 const selectedBroker = computed({
     get: () => props.selectedBrokerName,
     set: (value) => emit('update:selectedBrokerName', value)
 });
-
-const updateSelectedBroker = () => {
-    emit('updateSelectedBroker');
-};
 
 const maskBrokerClientId = (clientId) => {
     if (!clientId) return 'N/A'

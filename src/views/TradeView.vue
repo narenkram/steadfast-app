@@ -1,9 +1,9 @@
 <template>
   <AppNavigationComponent />
   <!-- Brokers, Broker Status, Total Funds, Utilized Margin & Today's Date -->
-  <BrokerComponent :selectedBrokerName="selectedBrokerName" @update:selectedBrokerName="selectedBrokerName = $event"
-    :availableBrokers="availableBrokers" :brokerStatus="brokerStatus" :availableBalance="availableBalance"
-    :usedAmount="usedAmount" :todayExpirySymbol="todayExpirySymbol" @updateSelectedBroker="updateSelectedBroker" />
+  <BrokerComponent v-model:selectedBrokerName="selectedBrokerName" :availableBrokers="availableBrokers"
+    :brokerStatus="brokerStatus" :availableBalance="availableBalance" :usedAmount="usedAmount"
+    :todayExpirySymbol="todayExpirySymbol" />
 
   <!-- Place Order Form -->
   <section class="row mt-2">
