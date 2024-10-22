@@ -165,7 +165,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     }
   }
   .table > :not(caption) > * > * {
-    color: $white;
+    color: $gray-300;
     background-color: #202020;
     box-shadow: inset 0 0 0 9999px #202020;
   }
@@ -372,7 +372,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     }
   }
   .table > :not(caption) > * > * {
-    color: $black;
+    color: $gray-700;
     background-color: $white;
     box-shadow: inset 0 0 0 9999px $white;
   }
@@ -510,6 +510,10 @@ html {
       opacity: 1;
     }
   }
+}
+
+.table thead th {
+  font-weight: 600;
 }
 
 .form-check-input:checked {
