@@ -5,8 +5,9 @@
         <!-- Key Features Section -->
         <section class="row py-5 bg-color-2 rounded">
             <div class="col-lg-10 mx-auto">
-                <h2 class="text-center mb-5 display-4 fw-bold">Revolutionize Your Trading</h2>
-                <p class="lead text-center mb-5">Discover the cutting-edge features that set us apart</p>
+                <h2 class="text-center mb-5 display-4 fw-bold">Lightning-Fast Trades, Tactical Limits: Execute with
+                    Precision</h2>
+                <p class="lead text-center mb-5">Gain Your Edge with Built-in Safeguards</p>
                 <div class="row">
                     <div v-for="(feature, index) in features" :key="index" class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow hover-effect"
