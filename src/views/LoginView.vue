@@ -6,35 +6,37 @@
                 <div class="card-body p-4 text-center">
                     <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid mb-3" style="max-height: 150px;">
                     <h1 class="card-title text-center mb-3 display-5 fw-bold">Login</h1>
-                    <form @submit.prevent="loginWithEmailPassword">
+                    <form @submit.prevent="loginWithPhoneNumber" v-if="!showOtpInput">
                         <div class="mb-3">
-                            <label for="email" class="form-label text-start d-block">Email Address:</label>
+                            <label for="phoneNumber" class="form-label text-start d-block">Phone Number:</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-color-2">
-                                    <font-awesome-icon :icon="['fas', 'envelope']" />
+                                    <font-awesome-icon :icon="['fas', 'phone']" />
                                 </span>
-                                <input type="email" id="email" v-model="email" class="form-control bg-color-2"
-                                    placeholder="Enter your email" required autocomplete="username">
+                                <input type="tel" id="phoneNumber" v-model="phoneNumber" class="form-control bg-color-2"
+                                    placeholder="Enter your phone number" required autocomplete="tel">
                             </div>
                         </div>
+                        <div id="recaptcha-container"></div>
+                        <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
+                            Send OTP
+                            <font-awesome-icon :icon="['fas', 'paper-plane']" class="ms-2" />
+                        </button>
+                    </form>
+                    <form @submit.prevent="verifyOtp" v-else>
                         <div class="mb-3">
-                            <label for="password" class="form-label text-start d-block">Password:</label>
+                            <label for="otp" class="form-label text-start d-block">Enter OTP:</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-color-2">
-                                    <font-awesome-icon :icon="['fas', 'key']" />
+                                    <font-awesome-icon :icon="['fas', 'lock']" />
                                 </span>
-                                <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password"
-                                    class="form-control bg-color-2" placeholder="Enter your password" required
-                                    autocomplete="current-password">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    @click="togglePasswordVisibility">
-                                    <font-awesome-icon :icon="['fas', showPassword ? 'eye-slash' : 'eye']" />
-                                </button>
+                                <input type="text" id="otp" v-model="otp" class="form-control bg-color-2"
+                                    placeholder="Enter the OTP" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
-                            Log In
-                            <font-awesome-icon :icon="['fas', 'right-to-bracket']" class="ms-2" />
+                            Verify OTP
+                            <font-awesome-icon :icon="['fas', 'check-circle']" class="ms-2" />
                         </button>
                     </form>
                     <div class="text-center mt-3">
@@ -51,41 +53,62 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 import { FontAwesomeIcon } from '@/font-awesome';
 
-const tradeViewWindow = ref(null)
-const openTradeView = () => {
-    const url = `${window.location.origin}/steadfast`
-    window.location.href = url
-}
+const phoneNumber = ref('');
+const showOtpInput = ref(false);
+const otp = ref('');
+const confirmationResult = ref(null);
+const router = useRouter();
 
 onMounted(() => {
-    window.addEventListener('beforeunload', () => {
-        if (tradeViewWindow.value) {
-            tradeViewWindow.value.close();
+    const auth = getAuth();
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+            console.log('recaptcha resolved..')
         }
     });
 });
 
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
+const loginWithPhoneNumber = async () => {
+    const auth = getAuth();
+    const appVerifier = window.recaptchaVerifier;
 
-const router = useRouter();
+    // Format the Indian phone number
+    const indianPhoneNumber = phoneNumber.value.trim();
+    const formattedPhoneNumber = `+91${indianPhoneNumber}`;
 
-const togglePasswordVisibility = () => {
-    showPassword.value = !showPassword.value;
+    signInWithPhoneNumber(auth, formattedPhoneNumber, appVerifier)
+        .then((result) => {
+            confirmationResult.value = result;
+            showOtpInput.value = true;
+        })
+        .catch((error) => {
+            console.error('Error during login:', error);
+            if (error.code === 'auth/invalid-phone-number') {
+                // Display an error message to the user indicating invalid phone number format
+                alert('Invalid phone number format. Please enter a valid Indian phone number.');
+            }
+            // Reset reCAPTCHA on error
+            window.recaptchaVerifier.render().then(function (widgetId) {
+                grecaptcha.reset(widgetId);
+            });
+        });
 };
 
-const loginWithEmailPassword = async () => {
-    const auth = getAuth();
-    try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        // Redirect to the manage-brokers page
-        router.push('/manage-brokers');
-    } catch (error) {
-        console.error('Error during email/password login:', error);
-    }
-}
+const verifyOtp = async () => {
+    confirmationResult.value.confirm(otp.value)
+        .then((result) => {
+            // User logged in successfully.
+            const user = result.user;
+            console.log('User logged in:', user);
+            router.push('/manage-brokers');
+        })
+        .catch((error) => {
+            console.error('Error during OTP verification:', error);
+            alert('Invalid OTP. Please try again.');
+        });
+};
 </script>
