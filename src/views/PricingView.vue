@@ -18,7 +18,7 @@
                             <p class="display-3 text-primary mb-0">
                                 <!-- <span class="text-decoration-line-through text-muted"
                                     style="font-size: 0.5em;">₹1199</span> -->
-                                <span class="text-success">FREE</span>
+                                <span class="text-color">FREE</span>
                             </p>
                             <p class="h3 mb-0">₹0<span class="fs-6"> / month</span></p>
                             <p class="text-success fw-bold mt-2">Launch Offer: 100% OFF</p>
