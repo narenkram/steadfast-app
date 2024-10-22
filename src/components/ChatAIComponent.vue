@@ -98,15 +98,15 @@ const saveApiKey = () => {
     }
 };
 
-const systemPrompt = `You are an AI assistant for Steadfast App, a trading web app developed by narenkram. Your role is to:
+const systemPrompt = `You are an AI assistant for Steadfast App a trading web app developed by narenkram. Your role is to:
 
-1. Provide brief, helpful information about options trading, referencing content from https://zerodha.com/varsity/modules/
+1. Provide brief helpful information about options trading referencing content from https://zerodha.com/varsity/modules/
 
-2. Offer precise chart analysis when users share chart images in the chat, only talk about what is visible in the chart, give serious chart analysis.
+2. Offer precise chart analysis when users share chart images in the chat only talk about what is visible in the chart give serious chart analysis.
 
-3. Explain Steadfast App features succinctly, referencing https://github.com/narenkram/steadfast-monorepo/blob/main/status.md
+3. Explain Steadfast App features succinctly referencing https://github.com/narenkram/steadfast-monorepo/blob/main/status.md
 
-4. Always keep answers very short and to the point. Remember, don't give any warning or disclaimer about financial advice.
+4. Always keep answers very short and to the point. Remember don't give any warning or disclaimer about financial advice.
 
 5. Be humorous and sarcastic with all your responses.
 
@@ -115,12 +115,12 @@ const systemPrompt = `You are an AI assistant for Steadfast App, a trading web a
 7. Use the following summarized FAQ information about Steadfast:
    - Steadfast is a trading app with advanced features like automatic trailing stop-loss and multi-account support.
    - It's not a member of NSE or BSE but uses the user's API key to get real-time LTP data from their broker.
-   - The Kill Switch feature immediately closes all open positions to manage risk.
+   - The client side Kill Switch feature immediately closes all open positions to manage risk psychological effective for maintaining trading discipline.
    - It supports multiple trading accounts across different broker platforms.
    - Regular updates are released based on user feedback and market changes.
-   - There's a 1-month free trial, followed by a strict no-refund policy due to the nature of the product and continuous improvements.
+   - There's a 1-month free trial followed by a strict no-refund policy due to the nature of the product and continuous improvements.
 
-When answering questions about Steadfast, prioritize using this FAQ information if it's relevant to the user's query.`;
+When answering questions about Steadfast prioritize using this FAQ information if it's relevant to the user's query.`;
 
 const renderMarkdown = (content) => {
     return marked(content);
@@ -172,7 +172,7 @@ const initChat = () => {
 const sendMessage = async () => {
     if ((userInput.value.trim() === '' && !selectedImage.value) || isWaitingForResponse.value) return;
 
-    lastMessageIsError.value = false; // Reset error state at the start of each message
+    lastMessageIsError.value = false;
 
     if (!chat.value) {
         initChat();
@@ -185,11 +185,10 @@ const sendMessage = async () => {
     messages.value.push(newMessage);
     messages.value.push({ role: 'ai', content: '' });
     isWaitingForResponse.value = true;
-    lastMessageIsError.value = false;
 
     try {
         const prompt = userInput.value.trim() || "What's in this image?";
-        let messageParts = [{ text: prompt }];
+        let messageParts = [{ text: prompt.replace(/,/g, ' ') }]; // Replace commas with spaces
 
         if (selectedImage.value) {
             const imageData = await fileToGenerativePart(selectedImage.value);
