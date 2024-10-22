@@ -67,7 +67,7 @@ const {
 
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
-    { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-warning' },
+    { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-purple' },
     { path: '/manage-brokers', name: 'Brokers', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
     { path: '/dashboard', name: 'Account', icon: ['fas', 'user-astronaut'], iconClass: 'text-secondary' },
     // { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: ['fas', 'sync'], iconClass: 'text-info' },
