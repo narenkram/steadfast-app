@@ -36,7 +36,15 @@
                     </div>
                 </div>
             </div>
-            <div class="chat-input p-3 bg-color rounded-bottom">
+            <form @submit.prevent="sendMessage" class="chat-input p-3 bg-color rounded-bottom">
+                <div v-if="selectedImage" class="mt-2 d-flex align-items-center">
+                    <img :src="selectedImagePreview" alt="Selected image" class="img-thumbnail me-2"
+                        style="max-width: 50px; max-height: 50px;">
+                    <span class="text-muted">{{ selectedImage.name }}</span>
+                    <button @click="removeSelectedImage" class="btn btn-sm btn-outline-danger ms-2">
+                        <font-awesome-icon :icon="['fas', 'times']" />
+                    </button>
+                </div>
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <input type="file" @change="handleImageUpload" accept="image/*" class="form-control d-none"
@@ -46,11 +54,11 @@
                         </label>
                     </div>
                     <div class="col">
-                        <input v-model="userInput" @keyup.enter="sendMessage" class="form-control"
-                            placeholder="Type your message..." :disabled="isWaitingForResponse">
+                        <input v-model="userInput" class="form-control" placeholder="Type your message..."
+                            :disabled="isWaitingForResponse">
                     </div>
                     <div class="col-auto">
-                        <button @click="sendMessage" class="btn btn-purple" :disabled="isWaitingForResponse">
+                        <button type="submit" class="btn btn-purple" :disabled="isWaitingForResponse">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" />
                         </button>
                     </div>
@@ -60,7 +68,7 @@
                     <font-awesome-icon :icon="['fas', 'redo']" class="me-2" />
                     Retry
                 </button>
-            </div>
+            </form>
         </div>
     </div>
 </template>
@@ -79,6 +87,7 @@ const chatMessages = ref(null);
 const isWaitingForResponse = ref(false);
 const lastMessageIsError = ref(false);
 const selectedImage = ref(null);
+const selectedImagePreview = ref(null);
 const chat = ref(null);
 
 const saveApiKey = () => {
@@ -101,7 +110,17 @@ const systemPrompt = `You are an AI assistant for Steadfast App, a trading web a
 
 5. Be humorous and sarcastic with all your responses.
 
-6. Use emojis in your responses whenever applicable.`;
+6. Use emojis in your responses whenever applicable.
+
+7. Use the following summarized FAQ information about Steadfast:
+   - Steadfast is a trading app with advanced features like automatic trailing stop-loss and multi-account support.
+   - It's not a member of NSE or BSE but uses the user's API key to get real-time LTP data from their broker.
+   - The Kill Switch feature immediately closes all open positions to manage risk.
+   - It supports multiple trading accounts across different broker platforms.
+   - Regular updates are released based on user feedback and market changes.
+   - There's a 1-month free trial, followed by a strict no-refund policy due to the nature of the product and continuous improvements.
+
+When answering questions about Steadfast, prioritize using this FAQ information if it's relevant to the user's query.`;
 
 const renderMarkdown = (content) => {
     return marked(content);
@@ -117,10 +136,17 @@ const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
         selectedImage.value = file;
+        selectedImagePreview.value = URL.createObjectURL(file);
     } else {
         alert('Please select a valid image file.');
         event.target.value = ''; // Clear the file input
     }
+};
+
+const removeSelectedImage = () => {
+    selectedImage.value = null;
+    selectedImagePreview.value = null;
+    document.getElementById('imageUpload').value = '';
 };
 
 const initChat = () => {
@@ -154,7 +180,7 @@ const sendMessage = async () => {
 
     const newMessage = { role: 'user', content: userInput.value };
     if (selectedImage.value) {
-        newMessage.image = URL.createObjectURL(selectedImage.value);
+        newMessage.image = selectedImagePreview.value;
     }
     messages.value.push(newMessage);
     messages.value.push({ role: 'ai', content: '' });
@@ -180,6 +206,7 @@ const sendMessage = async () => {
 
         userInput.value = '';
         selectedImage.value = null;
+        selectedImagePreview.value = null;
         document.getElementById('imageUpload').value = '';
 
         await nextTick();

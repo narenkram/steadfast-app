@@ -24,7 +24,8 @@ import {
   faRightToBracket,
   faEye,
   faEyeSlash,
-  faHardDrive
+  faHardDrive,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -54,7 +55,8 @@ library.add(
   faRightToBracket,
   faEye,
   faEyeSlash,
-  faHardDrive
+  faHardDrive,
+  faTimes
 )
 
 export { FontAwesomeIcon }
