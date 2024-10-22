@@ -1,5 +1,6 @@
 <template>
-    <div class="table-responsive">
+    <!-- Desktop view -->
+    <div class="table-responsive d-none d-md-block">
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -143,6 +144,93 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Mobile view -->
+    <div class="d-md-none mt-2">
+        <div v-if="sortedPositions.length > 0" class="list-group">
+            <div v-for="position in sortedPositions" :key="position.tsym" class="list-group-item bg-color">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong>{{ formatTradingSymbol(position.tsym) }}</strong>
+                        <span :class="[
+                            'badge ms-2',
+                            position.netqty > 0 ? 'bg-success' : position.netqty < 0 ? 'bg-danger' : 'bg-secondary'
+                        ]">
+                            {{ position.netqty > 0 ? 'BUY' : position.netqty < 0 ? 'SELL' : 'CLOSED' }} </span>
+                    </div>
+                    <div>
+                        <span :class="[
+                            'badge',
+                            position.calculatedUrmtom > 0 ? 'bg-success' : 'bg-danger'
+                        ]">
+                            {{ position.calculatedUrmtom != null ? position.calculatedUrmtom.toFixed(2) : '-' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <small>Qty: {{ position.netqty }}</small>
+                    </div>
+                    <div>
+                        <small>LTP: {{ positionLTPs[position.tsym] }}</small>
+                    </div>
+                </div>
+
+                <!-- SL & TSL -->
+                <div v-if="position.netqty != 0" class="mb-2">
+                    <div v-if="trailingStoplosses[position.tsym] !== null" class="d-flex align-items-center">
+                        <span class="me-2">TSL:</span>
+                        <span class="bg-danger text-white px-2 py-1 rounded">
+                            {{ trailingStoplosses[position.tsym] }}
+                        </span>
+                    </div>
+                    <div v-else-if="stoplosses[position.tsym] !== null" class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-danger" @click="$emit('decrease-stoploss', position)">-</button>
+                        <span class="btn btn-danger">{{ stoplosses[position.tsym] }}</span>
+                        <button class="btn btn-outline-danger" @click="$emit('increase-stoploss', position)">+</button>
+                    </div>
+                    <div v-else class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-danger" @click="$emit('set-stoploss', position, 'static')">Set
+                            SL</button>
+                    </div>
+                </div>
+
+                <!-- Target -->
+                <div v-if="position.netqty != 0" class="mb-2">
+                    <div v-if="targets[position.tsym] !== null" class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-success" @click="$emit('decrease-target', position)">-</button>
+                        <span class="btn btn-success">{{ targets[position.tsym] }}</span>
+                        <button class="btn btn-outline-success" @click="$emit('increase-target', position)">+</button>
+                    </div>
+                    <div v-else class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-success" @click="$emit('set-target', position)">Set
+                            Target</button>
+                    </div>
+                </div>
+
+                <!-- SL/TSL/Target Management -->
+                <div v-if="position.netqty != 0" class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-outline-secondary"
+                        v-if="trailingStoplosses[position.tsym] !== null || stoplosses[position.tsym] !== null"
+                        @click="$emit('set-stoploss', position, trailingStoplosses[position.tsym] !== null ? 'convert_to_sl' : 'convert_to_tsl')">
+                        {{ trailingStoplosses[position.tsym] !== null ? 'Convert to SL' : 'Convert to TSL' }}
+                    </button>
+                    <button class="btn btn-outline-secondary"
+                        v-if="trailingStoplosses[position.tsym] !== null || stoplosses[position.tsym] !== null"
+                        @click="$emit('remove-stoploss', position)">
+                        Remove SL/TSL
+                    </button>
+                    <button class="btn btn-outline-secondary" v-if="targets[position.tsym] !== null"
+                        @click="$emit('remove-target', position)">
+                        Remove Target
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div v-else class="text-center p-3">
+            No positions on selected broker {{ selectedBroker.brokerName }}
+        </div>
     </div>
 </template>
 
