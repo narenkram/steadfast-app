@@ -1103,7 +1103,7 @@ onMounted(async () => {
     currentTime.value = Date.now();
   }, 1000);
 
-  await connectWebSocket();
+  connectWebSocket();
 
   const ltpBarsavedPreference = localStorage.getItem('showLTPRangeBar');
   if (ltpBarsavedPreference !== null) {
