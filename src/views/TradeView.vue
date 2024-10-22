@@ -453,8 +453,8 @@
   <!-- Positions & Trades -->
   <section class="row py-3">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <div class="row m-0">
+        <ul class="nav nav-tabs col-12 col-md-6 order-2 order-md-1" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link" :class="{ 'active': activeTab === 'positions' }" id="positions-tab"
               data-bs-toggle="tab" data-bs-target="#positions-tab-pane" type="button" role="tab"
@@ -479,12 +479,16 @@
             </button>
           </li>
         </ul>
-        <div class="d-flex justify-content-between me-2">
+        <div class="d-flex justify-content-between align-items-center col-12 col-md-6 order-1 order-md-2 my-3 my-md-0">
           <b>
             <span>
               Total Buy Value: <span class="text-success">₹ {{ totalBuyValue.toFixed(2) }}</span>
             </span>
-            <span class="ms-4">
+            <span class="ms-md-4 d-none d-md-inline">
+              Total Sell Value: <span class="text-danger">₹ {{ totalSellValue.toFixed(2) }}</span>
+            </span>
+            <span class="d-md-none">
+              <br>
               Total Sell Value: <span class="text-danger">₹ {{ totalSellValue.toFixed(2) }}</span>
             </span>
           </b>
