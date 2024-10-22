@@ -729,6 +729,7 @@ html {
   display: flex;
   align-items: center;
   max-width: 100%;
+  font-size: small;
 }
 
 .notification-icon {
@@ -770,4 +771,44 @@ html {
 }
 .accordion-button:not(.collapsed) {
   box-shadow: none;
+}
+.ltp-range-bar {
+  display: block;
+  overflow: hidden;
+}
+
+.ltp-range {
+  position: relative;
+  height: 8px;
+  background-color: var(--bs-light);
+  border: 1px solid var(--bs-border-color);
+  margin: 0 10px;
+  border-radius: 4px;
+}
+.ltp-range-fill {
+  height: 100%;
+  background-color: #adb5bd;
+  border-radius: 4px 0 0 4px;
+}
+
+.ltp-range-marker {
+  position: absolute;
+  top: -4px;
+  width: 16px; // Changed from 0 to 16px
+  height: 16px;
+  transform: translateX(-50%); // Center the marker on its position
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bs-secondary);
+}
+.ltp-range-open-marker {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--bs-secondary); /* Orange color for open price */
+  border: 2px solid #fff;
+  z-index: 2;
 }
