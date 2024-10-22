@@ -18,18 +18,13 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label text-start d-block">Password:</label>
+                            <label for="email" class="form-label text-start d-block">Email:</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-color-2">
-                                    <font-awesome-icon :icon="['fas', 'key']" />
+                                    <font-awesome-icon :icon="['fas', 'envelope']" />
                                 </span>
-                                <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password"
-                                    class="form-control bg-color-2" placeholder="Enter your password" required
-                                    autocomplete="new-password">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    @click="togglePasswordVisibility">
-                                    <font-awesome-icon :icon="['fas', showPassword ? 'eye-slash' : 'eye']" />
-                                </button>
+                                <input type="email" id="email" v-model="email" class="form-control bg-color-2"
+                                    placeholder="Enter your email" required autocomplete="email">
                             </div>
                         </div>
                         <div id="recaptcha-container"></div>
@@ -67,21 +62,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
-import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier, updateProfile } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@/font-awesome';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 const phoneNumber = ref('');
-const password = ref('');
-const showPassword = ref(false);
+const email = ref('');
 const showOtpInput = ref(false);
 const otp = ref('');
 const confirmationResult = ref(null);
 const router = useRouter();
-
-const togglePasswordVisibility = () => {
-    showPassword.value = !showPassword.value;
-};
 
 onMounted(() => {
     const auth = getAuth();
@@ -125,7 +116,34 @@ const verifyOtp = async () => {
             // User signed in successfully.
             const user = result.user;
             console.log('User signed up:', user);
-            router.push('/dashboard');
+
+            // Update the user's profile with the email
+            updateProfile(user, {
+                email: email.value
+            })
+                .then(() => {
+                    console.log('Email updated successfully');
+
+                    // Store the user's email in Firestore
+                    const db = getFirestore();
+                    const userRef = doc(db, 'users', user.uid);
+                    setDoc(userRef, {
+                        email: email.value,
+                        // Add other user details as needed
+                    })
+                        .then(() => {
+                            console.log('User data stored in Firestore');
+                            router.push('/dashboard');
+                        })
+                        .catch((error) => {
+                            console.error('Error storing user data in Firestore:', error);
+                            // Handle the error appropriately (e.g., show an error message)
+                        });
+                })
+                .catch((error) => {
+                    console.error('Error updating email:', error);
+                    // Handle the error appropriately (e.g., show an error message)
+                });
         })
         .catch((error) => {
             console.error('Error during OTP verification:', error);
