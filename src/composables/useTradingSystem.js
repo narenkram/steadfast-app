@@ -1592,7 +1592,6 @@ export function useTradeView() {
       let clientId = selectedBroker.value?.clientId
       let API_TOKEN
 
-
       if (!['Flattrade', 'Shoonya'].includes(brokerName)) {
         throw new Error('Order margin calculation is only available for Flattrade and Shoonya')
       }
@@ -1608,7 +1607,6 @@ export function useTradeView() {
         console.log('Missing clientId for broker:', brokerName)
         throw new Error(`${brokerName} client ID is missing`)
       }
-
     } catch (error) {
       console.error('Error getting order margin:', error)
       orderMargin.call = null
@@ -3438,11 +3436,14 @@ export function useTradeView() {
     let statusClass = 'bg-success'
 
     if (status === 'Token missing') {
-      statusText = `Token missing, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`
-      statusClass = 'bg-warning text-color'
+      statusText = `Token missing, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'Generate'}`
+      statusClass = 'bg-warning text-dark'
     } else if (status === 'expired') {
-      statusText = `Token Expired, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'generate'}`
-      statusClass = 'bg-warning text-color'
+      statusText = `Token Expired, Click ${broker.brokerName === 'Shoonya' ? 'Login' : 'Generate'}`
+      statusClass = 'bg-warning text-dark'
+    } else if (status === 'invalid') {
+      statusText = 'Token Invalid'
+      statusClass = 'bg-danger'
     }
 
     return { status: statusText, statusClass }

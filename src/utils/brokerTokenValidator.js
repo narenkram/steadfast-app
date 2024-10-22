@@ -66,7 +66,10 @@ const validateToken = async (brokerName) => {
       default:
         throw new Error('Invalid broker name')
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error(`Error validating token for ${brokerName}:`, error)
+    tokenStatus[brokerName] = 'invalid'
+  }
 }
 
 const checkAllTokens = async () => {
@@ -81,7 +84,7 @@ const getBrokerStatus = (brokerName) => {
   if (!token) {
     return 'Token missing'
   } else {
-    return tokenStatus[brokerName]
+    return tokenStatus[brokerName] || 'unknown'
   }
 }
 
