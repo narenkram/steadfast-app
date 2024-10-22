@@ -1171,7 +1171,6 @@ export function useTradeView() {
       lotsPerSymbol.value[selectedMasterSymbol.value] = lots
       selectedQuantity.value = lots * instrument.lotSize
       saveLots()
-      getOrderMargin()
     }
   }
   const handleHotKeys = (event) => {
@@ -1586,33 +1585,7 @@ export function useTradeView() {
         throw new Error('Unsupported broker')
     }
   }
-  const getOrderMargin = async () => {
-    try {
-      let brokerName = selectedBroker.value?.brokerName
-      let clientId = selectedBroker.value?.clientId
-      let API_TOKEN
 
-      if (!['Flattrade', 'Shoonya'].includes(brokerName)) {
-        throw new Error('Order margin calculation is only available for Flattrade and Shoonya')
-      }
-
-      API_TOKEN = localStorage.getItem(`${brokerName.toUpperCase()}_API_TOKEN`)
-      console.log('API_TOKEN:', API_TOKEN ? 'Present' : 'Missing')
-
-      if (!API_TOKEN) {
-        throw new Error(`${brokerName} API Token is missing`)
-      }
-
-      if (!clientId) {
-        console.log('Missing clientId for broker:', brokerName)
-        throw new Error(`${brokerName} client ID is missing`)
-      }
-    } catch (error) {
-      console.error('Error getting order margin:', error)
-      orderMargin.call = null
-      orderMargin.put = null
-    }
-  }
   const placeOrder = async (transactionType, drvOptionType) => {
     try {
       let selectedStrike =
@@ -2773,7 +2746,6 @@ export function useTradeView() {
           symbols: symbolsToSubscribe
         }
         socket.value.send(JSON.stringify(data))
-        getOrderMargin()
       }
 
       if (additionalSymbols.value) {
