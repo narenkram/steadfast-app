@@ -4,7 +4,7 @@
         <div class="card bg-dark text-white shadow-lg border-0">
             <div class="card-body p-5 text-center">
                 <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
-                <h2 class="card-title text-center mb-4 display-4 fw-bold text-warning">Join Steadfast</h2>
+                <h2 class="card-title text-center mb-4 display-4 fw-bold text-warning">Sign Up</h2>
                 <form @submit.prevent="signUp">
                     <div class="text-start mb-4">
                         <label for="email" class="form-label fs-5">

@@ -4,7 +4,7 @@
         <div class="card bg-dark text-white shadow-lg border-0">
             <div class="card-body p-5 text-center">
                 <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
-                <h1 class="card-title text-center mb-4 display-4 fw-bold text-warning">Steadfast</h1>
+                <h1 class="card-title text-center mb-4 display-4 fw-bold text-warning">Login</h1>
                 <form @submit.prevent="loginWithEmailPassword">
                     <div class="text-start mb-4">
                         <label for="email" class="form-label fs-5">
@@ -24,22 +24,12 @@
                     </div>
                     <button type="submit" class="btn btn-warning btn-lg w-100 mt-4 fw-bold text-uppercase">
                         Log In
-                        <font-awesome-icon :icon="['fas', 'sign-in-alt']" class="ms-2" />
+                        <font-awesome-icon :icon="['fas', 'right-to-bracket']" class="ms-2" />
                     </button>
                 </form>
                 <div class="text-center mt-4">
                     <p class="mb-2">Don't have an account?</p>
                     <router-link to="/signup" class="btn btn-link text-warning">Sign Up</router-link>
-                </div>
-                <div class="d-flex justify-content-center mt-4">
-                    <button @click="openTradeView" class="btn btn-success btn-lg me-3">
-                        <font-awesome-icon :icon="['fas', 'bolt']" class="me-2" />
-                        Launch App
-                    </button>
-                    <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline-light btn-lg">
-                        <font-awesome-icon :icon="['fab', 'telegram']" class="me-2" />
-                        Join Telegram
-                    </a>
                 </div>
             </div>
         </div>
