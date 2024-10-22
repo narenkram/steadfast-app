@@ -1,5 +1,5 @@
 <template>
-    <div class="Steadfast-AI-Assistant bg-color p-4 rounded-lg shadow-lg">
+    <div class="Steadfast-AI-Assistant rounded bg-color p-4 shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0 text-purple">
                 <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
@@ -18,11 +18,18 @@
                     Save API Key
                 </button>
             </div>
+            <div class="mt-3 text-muted">
+                <p class="mb-0">
+                    Get your Gemini API key from
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                        rel="nofollow noopener noreferrer">Google AI Studio</a>
+                </p>
+            </div>
         </div>
         <div v-else class="chat-container bg-color-2 rounded shadow">
             <div class="chat-messages overflow-auto p-3" ref="chatMessages">
                 <div v-for="(message, index) in messages" :key="index"
-                    :class="['mb-3', 'p-2', 'rounded-lg', message.role === 'user' ? 'text-end' : '']">
+                    :class="['mb-3', 'p-2', 'rounded', message.role === 'user' ? 'text-end' : '']">
                     <div
                         :class="['d-inline-block', 'p-3', 'rounded', message.role === 'user' ? 'bg-purple text-white' : 'bg-color text-color', 'mw-75', 'shadow-sm']">
                         <img v-if="message.image" :src="message.image" class="user-image rounded" />
