@@ -223,6 +223,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     background-color: $gray-900;
     color: $white;
   }
+  .notification-message {
+    &.show-message {
+      color: $gray-400;
+    }
+  }
 }
 
 // Light mode styles
@@ -424,6 +429,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .modal-content {
     background-color: $gray-100;
     color: $black;
+  }
+  .notification-message {
+    &.show-message {
+      color: $gray-900;
+    }
   }
 }
 
@@ -733,19 +743,19 @@ html {
 
 .notification-icon {
   font-size: 1.2rem;
-  color: var(--bs-text-muted);
+  color: $gray-600;
   transition: all 0.3s ease;
   flex-shrink: 0;
   margin-right: 0.5rem;
 
   &.has-notification {
-    color: var(--bs-warning);
+    color: $warning;
     animation: pulse 2s infinite;
   }
 }
 
 .notification-message {
-  color: var(--bs-text-muted);
+  color: $gray-600;
   transition: all 0.3s ease;
   flex-grow: 1;
   word-wrap: break-word;
