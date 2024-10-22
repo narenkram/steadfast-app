@@ -453,77 +453,47 @@
   <!-- Positions & Trades -->
   <section class="row py-3">
     <div class="col-12">
-      <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" :class="{ 'active': activeTab === 'positions' }" id="positions-tab"
-            data-bs-toggle="tab" data-bs-target="#positions-tab-pane" type="button" role="tab"
-            aria-controls="positions-tab-pane" :aria-selected="activeTab === 'positions'"
-            @click="setActiveTab('positions')">
-            <font-awesome-icon icon="dollar-sign" class="text-success" /> <span class="ms-2">Positions</span>
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" :class="{ 'active': activeTab === 'trades' }" id="trades-tab" data-bs-toggle="tab"
-            data-bs-target="#trades-tab-pane" type="button" role="tab" aria-controls="trades-tab-pane"
-            :aria-selected="activeTab === 'trades'" @click="setActiveTab('trades')">
-            <font-awesome-icon icon="file-alt" class="text-primary" /> <span class="ms-2">Trades</span>
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" :class="{ 'active': activeTab === 'basket' }" id="basket-tab" data-bs-toggle="tab"
-            data-bs-target="#basket-tab-pane" type="button" role="tab" aria-controls="basket-tab-pane"
-            :aria-selected="activeTab === 'basket'">
-            <font-awesome-icon icon="shopping-basket" class="text-warning" /> <span class="ms-2">Basket Orders</span>
-          </button>
-        </li>
-      </ul>
-      <div class="tab-content p-2 rounded border" id="myTabContent">
+      <div class="d-flex justify-content-between align-items-center">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" :class="{ 'active': activeTab === 'positions' }" id="positions-tab"
+              data-bs-toggle="tab" data-bs-target="#positions-tab-pane" type="button" role="tab"
+              aria-controls="positions-tab-pane" :aria-selected="activeTab === 'positions'"
+              @click="setActiveTab('positions')">
+              <font-awesome-icon icon="hard-drive" class="text-success nav-icon" /> <span class="ms-2">Positions</span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" :class="{ 'active': activeTab === 'trades' }" id="trades-tab" data-bs-toggle="tab"
+              data-bs-target="#trades-tab-pane" type="button" role="tab" aria-controls="trades-tab-pane"
+              :aria-selected="activeTab === 'trades'" @click="setActiveTab('trades')">
+              <font-awesome-icon icon="up-down" class="text-primary nav-icon" /> <span class="ms-2">Trades</span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation" v-if="experimentalFeatures">
+            <button class="nav-link" :class="{ 'active': activeTab === 'basket' }" id="basket-tab" data-bs-toggle="tab"
+              data-bs-target="#basket-tab-pane" type="button" role="tab" aria-controls="basket-tab-pane"
+              :aria-selected="activeTab === 'basket'">
+              <font-awesome-icon icon="shopping-basket" class="text-warning nav-icon" /> <span class="ms-2">Basket
+                Orders</span>
+            </button>
+          </li>
+        </ul>
+        <div class="d-flex justify-content-between me-2">
+          <b>
+            <span>
+              Total Buy Value: <span class="text-success">₹ {{ totalBuyValue.toFixed(2) }}</span>
+            </span>
+            <span class="ms-4">
+              Total Sell Value: <span class="text-danger">₹ {{ totalSellValue.toFixed(2) }}</span>
+            </span>
+          </b>
+        </div>
+      </div>
+
+      <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="positions-tab-pane" role="tabpanel" aria-labelledby="positions-tab"
           tabindex="0">
-          <div class="row align-items-center justify-content-between mb-2">
-            <div class="col-md-4 col-lg-4 text-center py-2">
-              <p class="mb-0">
-                <b>
-                  Net Qty:
-                  <span :class="totalNetQty > 0 ? 'text-success' : totalNetQty < 0 ? 'text-danger' : null">
-                    {{ totalNetQty }}
-                  </span>
-                </b>
-              </p>
-            </div>
-            <div class="col-md-4 col-lg-6 text-center py-2">
-              <p class="mb-0">
-                <b>
-                  <span>
-                    Total Buy Value: <span class="text-success">₹ {{ totalBuyValue.toFixed(2) }}</span>
-                  </span>
-                  <span class="ms-4">
-                    Total Sell Value: <span class="text-danger">₹ {{ totalSellValue.toFixed(2) }}</span>
-                  </span>
-                </b>
-              </p>
-            </div>
-            <!-- 1 Click Reverse Positions for Reverse All & Selected positions -->
-            <!-- <div class="col-md-4 col-lg-2 text-center">
-            <button
-              class="btn btn-sm btn-outline-secondary me-1"
-              data-bs-toggle="modal"
-              data-bs-target="#ReversePositionsConfirmationModal"
-              @click="setReverseMode('selected')"
-              v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
-            >
-              🔃 Selected
-            </button>
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              data-bs-toggle="modal"
-              data-bs-target="#ReversePositionsConfirmationModal"
-              @click="setReverseMode('all')"
-            >
-              🔃 Reverse
-            </button>
-          </div> -->
-          </div>
 
           <div class="TabContent bg-color">
             <!-- Flattrade Positions -->
@@ -567,8 +537,9 @@
             respective trade.
           </p>
         </div>
-        <div class="tab-pane fade" id="basket-tab-pane" role="tabpanel" aria-labelledby="basket-tab" tabindex="0">
-          <div class="row py-3" v-if="experimentalFeatures">
+        <div class="tab-pane fade" id="basket-tab-pane" role="tabpanel" aria-labelledby="basket-tab" tabindex="0"
+          v-if="experimentalFeatures">
+          <div class="row py-3">
             <div class="col-12">
               <h5>Ready Made Strategies</h5>
               <div class="mb-3">

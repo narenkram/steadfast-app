@@ -175,10 +175,8 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
       .nav-link {
         display: flex;
         align-items: center;
-        padding: 0.5rem 1rem;
         color: $gray-400;
         background-color: $black;
-        margin-bottom: 0.5rem;
         transition:
           color 0.15s ease-in-out,
           background-color 0.15s ease-in-out;
@@ -375,9 +373,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
       .nav-link {
         display: flex;
         align-items: center;
-        padding: 0.5rem 1rem;
-        background-color: $gray-100;
-        margin-bottom: 0.5rem;
+        background-color: transparent;
         color: $gray-600;
         transition:
           color 0.15s ease-in-out,

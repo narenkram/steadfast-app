@@ -19,11 +19,12 @@ import {
   faBell,
   faCog,
   faShoppingBasket,
-  faFileAlt,
-  faUser,
+  faUpDown,
+  faUserAstronaut,
   faRightToBracket,
   faEye,
-  faEyeSlash
+  faEyeSlash,
+  faHardDrive
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -48,11 +49,12 @@ library.add(
   faBell,
   faCog,
   faShoppingBasket,
-  faFileAlt,
-  faUser,
+  faUpDown,
+  faUserAstronaut,
   faRightToBracket,
   faEye,
-  faEyeSlash
+  faEyeSlash,
+  faHardDrive
 )
 
 export { FontAwesomeIcon }
