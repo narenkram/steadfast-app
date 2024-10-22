@@ -117,11 +117,6 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     border-color: $gray-600;
   }
 
-  .form-check-input:checked {
-    background-color: $primary;
-    border-color: $primary;
-  }
-
   .btn-group .btn {
     border-color: $gray-700;
   }
@@ -321,11 +316,6 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     border-color: $gray-400;
   }
 
-  .form-check-input:checked {
-    background-color: $primary;
-    border-color: $primary;
-  }
-
   .btn-group .btn {
     border-color: $gray-300;
   }
@@ -506,6 +496,11 @@ html {
       opacity: 1;
     }
   }
+}
+
+.form-check-input:checked {
+  background-color: $success;
+  border-color: $success;
 }
 
 .dropdown-menu {

@@ -116,7 +116,7 @@
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableStoploss"
                   aria-label="Enable Predefined Stoploss" v-model="enableStoploss"
-                  :class="{ 'disabled-form': isFormDisabled }" />
+                  :class="{ 'disabled-form': isFormDisabled, 'border-danger bg-danger': enableStoploss }" />
               </div>
               <input type="number" class="form-control form-control-sm" id="stoplossValue"
                 aria-label="Predefined Stoploss (points)" v-model="stoplossValue"
@@ -132,7 +132,7 @@
               <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" id="enableTarget"
                   aria-label="Enable Predefined Target" v-model="enableTarget"
-                  :class="{ 'disabled-form': isFormDisabled }" />
+                  :class="{ 'disabled-form': isFormDisabled, 'border-success bg-success': enableTarget }" />
               </div>
               <input type="number" class="form-control form-control-sm" id="targetValue"
                 aria-label="Predefined Target (points)" v-model="targetValue"
