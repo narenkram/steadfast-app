@@ -1,9 +1,9 @@
 <template>
     <AppNavigationComponent />
     <div class="container my-4">
-        <h5 class="mb-4">Account Information</h5>
-        <div v-if="user" class="row">
-            <div class="col-md-6">
+        <div class="row py-3">
+            <div class="col-md-6 mx-auto" v-if="user">
+                <h5 class="text-center mb-4">Account Information</h5>
                 <div class="mb-3">
                     <label for="phoneNumber" class="form-label">Phone Number</label>
                     <input type="text" id="phoneNumber" class="form-control" :value="user.phoneNumber" disabled>
@@ -18,10 +18,11 @@
                 </div>
                 <!-- Display other user details as needed -->
             </div>
+            <div v-else class="col-12 text-center">
+                <p class="text-muted fw-bold m-0">Loading user details...</p>
+            </div>
         </div>
-        <div v-else class="alert alert-info">
-            Loading user details...
-        </div>
+
     </div>
 </template>
 
