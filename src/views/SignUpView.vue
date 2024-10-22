@@ -8,16 +8,6 @@
                     <h2 class="card-title text-center mb-3 display-5 fw-bold">Sign Up</h2>
                     <form @submit.prevent="signUp" v-if="!showOtpInput">
                         <div class="mb-3">
-                            <label for="phoneNumber" class="form-label text-start d-block">Phone Number:</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-color-2">
-                                    <font-awesome-icon :icon="['fas', 'phone']" />
-                                </span>
-                                <input type="tel" id="phoneNumber" v-model="phoneNumber" class="form-control bg-color-2"
-                                    placeholder="Enter your phone number" required autocomplete="tel">
-                            </div>
-                        </div>
-                        <div class="mb-3">
                             <label for="email" class="form-label text-start d-block">Email:</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-color-2">
@@ -27,9 +17,19 @@
                                     placeholder="Enter your email" required autocomplete="email">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label text-start d-block">Phone Number:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-color-2">
+                                    <font-awesome-icon :icon="['fas', 'phone']" />
+                                </span>
+                                <input type="tel" id="phoneNumber" v-model="phoneNumber" class="form-control bg-color-2"
+                                    placeholder="Enter your phone number" required autocomplete="tel">
+                            </div>
+                        </div>
                         <div id="recaptcha-container"></div>
                         <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
-                            Send OTP
+                            Get SMS OTP
                             <font-awesome-icon :icon="['fas', 'paper-plane']" class="ms-2" />
                         </button>
                     </form>
