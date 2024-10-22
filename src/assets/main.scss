@@ -803,3 +803,41 @@ html {
   border: 2px solid #fff;
   z-index: 2;
 }
+
+// Placeholder styles
+.form-control::placeholder,
+.form-select::placeholder,
+.form-check-input::placeholder {
+  color: $gray-600;
+  opacity: 1;
+}
+
+// For older browsers
+.form-control::-webkit-input-placeholder,
+.form-select::-webkit-input-placeholder,
+.form-check-input::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
+  color: $gray-600;
+  opacity: 1;
+}
+.form-control::-moz-placeholder,
+.form-select::-moz-placeholder,
+.form-check-input::-moz-placeholder {
+  /* Firefox 19+ */
+  color: $gray-600;
+  opacity: 1;
+}
+.form-control:-ms-input-placeholder,
+.form-select:-ms-input-placeholder,
+.form-check-input:-ms-input-placeholder {
+  /* IE 10+ */
+  color: $gray-600;
+  opacity: 1;
+}
+.form-control:-moz-placeholder,
+.form-select:-moz-placeholder,
+.form-check-input:-moz-placeholder {
+  /* Firefox 18- */
+  color: $gray-600;
+  opacity: 1;
+}
