@@ -21,7 +21,9 @@ import {
   faShoppingBasket,
   faFileAlt,
   faUser,
-  faRightToBracket
+  faRightToBracket,
+  faEye,
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -48,7 +50,9 @@ library.add(
   faShoppingBasket,
   faFileAlt,
   faUser,
-  faRightToBracket
+  faRightToBracket,
+  faEye,
+  faEyeSlash
 )
 
 export { FontAwesomeIcon }

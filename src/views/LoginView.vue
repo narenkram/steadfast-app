@@ -10,21 +10,26 @@
                         <div class="mb-3">
                             <label for="email" class="form-label text-start d-block">Email Address:</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-color-2 border-0">
+                                <span class="input-group-text bg-color-2">
                                     <font-awesome-icon :icon="['fas', 'envelope']" />
                                 </span>
-                                <input type="email" id="email" v-model="email" class="form-control bg-color-2 border-0"
-                                    placeholder="Enter your email" required>
+                                <input type="email" id="email" v-model="email" class="form-control bg-color-2"
+                                    placeholder="Enter your email" required autocomplete="username">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label text-start d-block">Password:</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-color-2 border-0">
+                                <span class="input-group-text bg-color-2">
                                     <font-awesome-icon :icon="['fas', 'key']" />
                                 </span>
-                                <input type="password" id="password" v-model="password"
-                                    class="form-control bg-color-2 border-0" placeholder="Enter your password" required>
+                                <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password"
+                                    class="form-control bg-color-2" placeholder="Enter your password" required
+                                    autocomplete="current-password">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    @click="togglePasswordVisibility">
+                                    <font-awesome-icon :icon="['fas', showPassword ? 'eye-slash' : 'eye']" />
+                                </button>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
@@ -65,8 +70,13 @@ onMounted(() => {
 
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 
 const router = useRouter();
+
+const togglePasswordVisibility = () => {
+    showPassword.value = !showPassword.value;
+};
 
 const loginWithEmailPassword = async () => {
     const auth = getAuth();
