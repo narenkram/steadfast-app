@@ -65,7 +65,7 @@ import NormalNavigationComponent from '@/components/NormalNavigationComponent.vu
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier, updateProfile } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@/font-awesome';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const phoneNumber = ref('');
 const email = ref('');
@@ -92,6 +92,20 @@ const signUp = async () => {
     const indianPhoneNumber = phoneNumber.value.trim();
     const formattedPhoneNumber = `+91${indianPhoneNumber}`;
 
+    // Check if a user with the same email already exists
+    const emailExists = await checkEmailExists(email.value);
+    if (emailExists) {
+        alert('An account with this email already exists. Please use a different email.');
+        return;
+    }
+
+    // Check if a user with the same phone number already exists
+    const phoneNumberExists = await checkPhoneNumberExists(formattedPhoneNumber);
+    if (phoneNumberExists) {
+        alert('An account with this phone number already exists. Please use a different phone number.');
+        return;
+    }
+
     signInWithPhoneNumber(auth, formattedPhoneNumber, appVerifier)
         .then((result) => {
             confirmationResult.value = result;
@@ -108,6 +122,24 @@ const signUp = async () => {
                 grecaptcha.reset(widgetId);
             });
         });
+};
+
+// Function to check if a user with the given email exists
+const checkEmailExists = async (email) => {
+    const db = getFirestore();
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+};
+
+// Function to check if a user with the given phone number exists
+const checkPhoneNumberExists = async (phoneNumber) => {
+    const db = getFirestore();
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('phoneNumber', '==', phoneNumber));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
 };
 
 const verifyOtp = async () => {
