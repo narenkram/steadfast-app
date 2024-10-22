@@ -147,7 +147,7 @@
     </div>
 
     <!-- Mobile view -->
-    <div class="d-md-none mt-2">
+    <div class="d-md-none mt-3">
         <div v-if="sortedPositions.length > 0" class="list-group">
             <div v-for="position in sortedPositions" :key="position.tsym" class="list-group-item bg-color">
                 <div class="d-flex justify-content-between align-items-center mb-2">
