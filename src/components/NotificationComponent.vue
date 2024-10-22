@@ -20,7 +20,7 @@ const props = defineProps({
     selectedSound: String,
 });
 
-const emit = defineEmits(['update:showToast']);
+const emit = defineEmits(['update:showToast', 'update:message']);
 
 const audio = ref(null);
 const notificationTimer = ref(null);
@@ -54,6 +54,7 @@ const startNotificationTimer = () => {
 
 const clearNotification = () => {
     emit('update:showToast', false);
+    emit('update:message', '');
     if (audio.value) {
         audio.value.pause();
         audio.value.currentTime = 0;

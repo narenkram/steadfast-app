@@ -14,7 +14,7 @@
                 </button>
                 <!-- Always-on Notification Area -->
                 <div class="notification-area d-flex align-items-center ms-3 d-lg-none">
-                    <NotificationComponent v-model:showToast="showToast" :message="toastMessage"
+                    <NotificationComponent v-model:showToast="showToast" v-model:message="toastMessage"
                         :notificationSound="notificationSound" :selectedSound="selectedSound" />
                 </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -29,7 +29,7 @@
                     </ul>
                     <!-- Always-on Notification Area -->
                     <div class="notification-area d-none d-lg-flex align-items-center ms-3">
-                        <NotificationComponent v-model:showToast="showToast" :message="toastMessage"
+                        <NotificationComponent v-model:showToast="showToast" v-model:message="toastMessage"
                             :notificationSound="notificationSound" :selectedSound="selectedSound" />
                     </div>
                     <div class="ms-auto" v-if="user">
@@ -55,7 +55,6 @@ const {
     toastMessage,
     notificationSound,
     selectedSound,
-    updateToastVisibility,
 } = useTradeView();
 
 const routes = ref([

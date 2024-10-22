@@ -11,7 +11,7 @@
                         </p>
                     </div>
                     <div class="text-center">
-                        <span class="d-flex bg-white text-color py-2 px-3 rounded-2 fs-6 fw-bold">
+                        <span class="d-flex bg-color-2 text-color py-2 px-3 rounded-2 fs-6 fw-bold">
                             {{ killSwitchRemainingTime }}
                         </span>
                     </div>
@@ -23,14 +23,14 @@
     <!-- Trade Warning MessageWindow -->
     <section v-if="riskReached && !killSwitchActive && totalPositionQuantity !== 0" class="row my-2">
         <div class="col-12">
-            <div class="bg-warning text-color p-3 rounded-3 shadow">
+            <div class="bg-warning text-dark p-3 rounded-3 shadow">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <h5 class="mb-2">Trade Warning</h5>
                         <p class="mb-0">Risk Threshold Reached!</p>
                     </div>
                     <div class="text-center">
-                        <span class="d-flex bg-white text-color py-2 px-3 rounded-2 fs-6 fw-bold">
+                        <span class="d-flex bg-color-2 text-color py-2 px-3 rounded-2 fs-6 fw-bold">
                             Make adjustments or close positions
                         </span>
                     </div>
@@ -49,7 +49,7 @@
                         <p class="mb-0">Target Reached!</p>
                     </div>
                     <div class="text-center">
-                        <span class="d-flex bg-white text-color py-2 px-3 rounded-2 fs-6 fw-bold">
+                        <span class="d-flex bg-color-2 text-color py-2 px-3 rounded-2 fs-6 fw-bold">
                             Close positions to lock in profits
                         </span>
                     </div>
