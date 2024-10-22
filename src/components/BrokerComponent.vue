@@ -17,7 +17,7 @@
 
         <!-- Funds -->
         <div
-            class="col-7 col-md-5 col-lg-5 d-flex align-items-center justify-content-md-around justify-content-between">
+            class="col-7 col-md-5 col-lg-5 d-flex align-items-center justify-content-md-around justify-content-between mt-2 mt-md-0">
             <span class="me-3">
                 <small class="text-muted">Funds</small>
                 <span class="ms-1 fw-bold">₹{{ availableBalance !== null ? availableBalance.toLocaleString('en-IN', {
@@ -31,7 +31,7 @@
         </div>
 
         <!-- Today's Expiry -->
-        <div class="col-5 col-md-3 col-lg-3 d-flex align-items-center justify-content-lg-end justify-content-end">
+        <div class="col-5 col-md-3 col-lg-3 d-flex align-items-center justify-content-lg-end justify-content-end mt-2 mt-md-0">
             <span class="me-2">
                 <small class="text-muted">Expiry</small>
                 <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
