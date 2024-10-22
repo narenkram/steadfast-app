@@ -25,7 +25,9 @@ import {
   faEye,
   faEyeSlash,
   faHardDrive,
-  faTimes
+  faTimes,
+  faPhone,
+  faLock
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -56,7 +58,9 @@ library.add(
   faEye,
   faEyeSlash,
   faHardDrive,
-  faTimes
+  faTimes,
+  faPhone,
+  faLock
 )
 
 export { FontAwesomeIcon }

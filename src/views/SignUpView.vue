@@ -6,15 +6,15 @@
                 <div class="card-body p-4 text-center">
                     <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid mb-3" style="max-height: 150px;">
                     <h2 class="card-title text-center mb-3 display-5 fw-bold">Sign Up</h2>
-                    <form @submit.prevent="signUp">
+                    <form @submit.prevent="signUp" v-if="!showOtpInput">
                         <div class="mb-3">
-                            <label for="email" class="form-label text-start d-block">Email Address:</label>
+                            <label for="phoneNumber" class="form-label text-start d-block">Phone Number:</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-color-2">
-                                    <font-awesome-icon :icon="['fas', 'envelope']" />
+                                    <font-awesome-icon :icon="['fas', 'phone']" />
                                 </span>
-                                <input type="email" id="email" v-model="email" class="form-control bg-color-2"
-                                    placeholder="Enter your email" required autocomplete="username">
+                                <input type="tel" id="phoneNumber" v-model="phoneNumber" class="form-control bg-color-2"
+                                    placeholder="Enter your phone number" required autocomplete="tel">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -32,9 +32,26 @@
                                 </button>
                             </div>
                         </div>
+                        <div id="recaptcha-container"></div>
                         <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
-                            Create Account
-                            <font-awesome-icon :icon="['fas', 'right-to-bracket']" class="ms-2" />
+                            Send OTP
+                            <font-awesome-icon :icon="['fas', 'paper-plane']" class="ms-2" />
+                        </button>
+                    </form>
+                    <form @submit.prevent="verifyOtp" v-else>
+                        <div class="mb-3">
+                            <label for="otp" class="form-label text-start d-block">Enter OTP:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-color-2">
+                                    <font-awesome-icon :icon="['fas', 'lock']" />
+                                </span>
+                                <input type="text" id="otp" v-model="otp" class="form-control bg-color-2"
+                                    placeholder="Enter the OTP" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 mt-3 fw-bold text-uppercase">
+                            Verify OTP
+                            <font-awesome-icon :icon="['fas', 'check-circle']" class="ms-2" />
                         </button>
                     </form>
                     <div class="text-center mt-3">
@@ -48,31 +65,71 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@/font-awesome';
 
-const email = ref('');
+const phoneNumber = ref('');
 const password = ref('');
 const showPassword = ref(false);
+const showOtpInput = ref(false);
+const otp = ref('');
+const confirmationResult = ref(null);
 const router = useRouter();
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
 };
 
+onMounted(() => {
+    const auth = getAuth();
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+            console.log('recaptcha resolved..')
+        }
+    });
+});
+
 const signUp = async () => {
     const auth = getAuth();
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
-        const user = userCredential.user;
-        console.log('User signed up:', user);
-        router.push('/dashboard');
-    } catch (error) {
-        console.error('Error during sign up:', error);
-        // Handle sign up error, display error message to the user
-    }
+    const appVerifier = window.recaptchaVerifier;
+
+    // Format the Indian phone number
+    const indianPhoneNumber = phoneNumber.value.trim();
+    const formattedPhoneNumber = `+91${indianPhoneNumber}`;
+
+    signInWithPhoneNumber(auth, formattedPhoneNumber, appVerifier)
+        .then((result) => {
+            confirmationResult.value = result;
+            showOtpInput.value = true;
+        })
+        .catch((error) => {
+            console.error('Error during sign up:', error);
+            if (error.code === 'auth/invalid-phone-number') {
+                // Display an error message to the user indicating invalid phone number format
+                alert('Invalid phone number format. Please enter a valid Indian phone number.');
+            }
+            // Reset reCAPTCHA on error
+            window.recaptchaVerifier.render().then(function (widgetId) {
+                grecaptcha.reset(widgetId);
+            });
+        });
+};
+
+const verifyOtp = async () => {
+    confirmationResult.value.confirm(otp.value)
+        .then((result) => {
+            // User signed in successfully.
+            const user = result.user;
+            console.log('User signed up:', user);
+            router.push('/dashboard');
+        })
+        .catch((error) => {
+            console.error('Error during OTP verification:', error);
+            alert('Invalid OTP. Please try again.');
+        });
 };
 </script>
