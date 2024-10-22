@@ -1,16 +1,26 @@
 <template>
     <AppNavigationComponent />
-    <div class="container">
-        <h2>Dashboard</h2>
-        <p>Welcome to your dashboard!</p>
-        <div v-if="user">
-            <p><strong>Phone Number:</strong> {{ user.phoneNumber }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>User ID:</strong> {{ user.uid }}</p>
-            <!-- Display other user details as needed -->
+    <div class="container my-4">
+        <h5 class="mb-4">Account Information</h5>
+        <div v-if="user" class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="text" id="phoneNumber" class="form-control" :value="user.phoneNumber" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" :value="user.email" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="userId" class="form-label">User ID</label>
+                    <input type="text" id="userId" class="form-control" :value="user.uid" disabled>
+                </div>
+                <!-- Display other user details as needed -->
+            </div>
         </div>
-        <div v-else>
-            <p>Loading user details...</p>
+        <div v-else class="alert alert-info">
+            Loading user details...
         </div>
     </div>
 </template>
