@@ -129,6 +129,7 @@ const verifyOtp = async () => {
                     const userRef = doc(db, 'users', user.uid);
                     setDoc(userRef, {
                         email: email.value,
+                        phoneNumber: phoneNumber.value,
                         // Add other user details as needed
                     })
                         .then(() => {
