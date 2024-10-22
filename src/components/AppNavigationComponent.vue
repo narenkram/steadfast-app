@@ -3,7 +3,7 @@
     <section class="Navigation AppNavigationComponent">
         <nav class="navbar navbar-expand-lg shadow-sm mt-0 mb-3">
             <div class="container-fluid pt-0">
-                <RouterLink to="/" class="navbar-brand">
+                <RouterLink to="/" class="navbar-brand d-none">
                     <img src="/steadfast_logo.png" class="Navigation__logo" alt="Steadfast" />
                     <span class="ms-2 fw-bold text-color d-none d-md-inline">Steadfast</span>
                 </RouterLink>
@@ -55,6 +55,7 @@ import { useTradeView } from '@/composables/useTradingSystem';
 import { FontAwesomeIcon } from '@/font-awesome';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 
 const {
     showToast,
@@ -77,6 +78,8 @@ const notificationTimer = ref(null);
 
 const user = ref(null);
 
+const router = useRouter();
+
 onMounted(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, (currentUser) => {
@@ -88,7 +91,8 @@ const logout = async () => {
     const auth = getAuth();
     try {
         await signOut(auth);
-        // Redirect to the login page or update the UI accordingly
+        // Redirect to the login page after successful logout
+        router.push('/login');
     } catch (error) {
         console.error('Error during logout:', error);
     }

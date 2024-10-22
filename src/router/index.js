@@ -26,6 +26,17 @@ const requireAuth = (to, from, next) => {
   })
 }
 
+const redirectIfLoggedIn = (to, from, next) => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      next('/manage-brokers')
+    } else {
+      next()
+    }
+  })
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -57,7 +68,8 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      beforeEnter: redirectIfLoggedIn
     },
     {
       path: '/manage-brokers',
@@ -96,7 +108,8 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'SignUp',
-      component: SignUpView
+      component: SignUpView,
+      beforeEnter: redirectIfLoggedIn
     },
     {
       path: '/dashboard',

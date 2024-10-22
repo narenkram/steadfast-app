@@ -29,7 +29,10 @@
                             </RouterLink>
                         </li>
                         <li class="nav-item" v-if="user">
-                            <span class="nav-link">Welcome, {{ user.displayName }}</span>
+                            <RouterLink to="/steadfast" class="nav-link">
+                                <font-awesome-icon icon="bolt" class="nav-icon text-danger" />
+                                Trade
+                            </RouterLink>
                         </li>
                     </ul>
                 </div>
@@ -58,7 +61,6 @@ export default defineComponent({
                 { path: '/pricing', name: 'Pricing', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
                 { path: '/contact', name: 'Contact', icon: ['fas', 'comment'], iconClass: 'text-secondary' },
                 { path: '/faq', name: 'FAQ', icon: ['fas', 'question-circle'], iconClass: 'text-purple' },
-                // { path: '/login', name: 'Login', icon: ['fas', 'key'], iconClass: 'text-secondary' },
             ],
         };
     },

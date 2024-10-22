@@ -20,8 +20,8 @@
                                     by
                                     the insights and needs of the vibrant trading community.
                                 </p>
-                                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-success btn-sm mt-3">
-                                    Join the Telegram Community
+                                <a href="https://t.me/steadfastapp" target="_blank" class="btn btn-outline btn-md">
+                                    💬 Join Telegram Community
                                 </a>
                             </div>
                         </div>
