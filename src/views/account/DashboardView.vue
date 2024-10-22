@@ -4,7 +4,7 @@
         <h2>Dashboard</h2>
         <p>Welcome to your dashboard!</p>
         <div v-if="user">
-            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Phone Number:</strong> {{ user.phoneNumber }}</p>
             <p><strong>User ID:</strong> {{ user.uid }}</p>
             <!-- Display other user details as needed -->
         </div>
@@ -24,7 +24,16 @@ const user = ref(null);
 onMounted(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, (currentUser) => {
-        user.value = currentUser;
+        if (currentUser) {
+            // Fetch the user's phone number
+            const phoneNumber = currentUser.phoneNumber;
+            user.value = {
+                ...currentUser,
+                phoneNumber: phoneNumber || 'N/A',
+            };
+        } else {
+            user.value = null;
+        }
     });
 });
 </script>
