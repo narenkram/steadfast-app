@@ -9,22 +9,57 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'NotificationComponent',
-    props: {
-        showToast: {
-            type: Boolean,
-            default: false
-        },
-        message: {
-            type: String,
-            default: ''
-        }
-    }
-}
-</script>
+<script setup>
+import { ref, watch } from 'vue';
+import { FontAwesomeIcon } from '@/font-awesome';
 
-<style scoped>
-/* Add any specific styles for the notification component here */
-</style>
+const props = defineProps({
+    showToast: Boolean,
+    message: String,
+    notificationSound: Boolean,
+    selectedSound: String,
+});
+
+const emit = defineEmits(['update:showToast']);
+
+const audio = ref(null);
+const notificationTimer = ref(null);
+
+watch(() => props.showToast, (newShowToast, oldShowToast) => {
+    if (newShowToast && newShowToast !== oldShowToast) {
+        if (props.notificationSound) {
+            playNotificationSound();
+        }
+        startNotificationTimer();
+    }
+});
+
+const playNotificationSound = () => {
+    if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+    }
+    audio.value = new Audio(props.selectedSound);
+    audio.value.play().catch(error => console.error('Error playing notification sound:', error));
+};
+
+const startNotificationTimer = () => {
+    if (notificationTimer.value) {
+        clearTimeout(notificationTimer.value);
+    }
+    notificationTimer.value = setTimeout(() => {
+        clearNotification();
+    }, 3000); // Hide after 3 seconds
+};
+
+const clearNotification = () => {
+    emit('update:showToast', false);
+    if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+    }
+    if (notificationTimer.value) {
+        clearTimeout(notificationTimer.value);
+    }
+};
+</script>

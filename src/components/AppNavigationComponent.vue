@@ -14,7 +14,8 @@
                 </button>
                 <!-- Always-on Notification Area -->
                 <div class="notification-area d-flex align-items-center ms-3 d-lg-none">
-                    <NotificationComponent :showToast="showToast" :message="toastMessage" />
+                    <NotificationComponent v-model:showToast="showToast" :message="toastMessage"
+                        :notificationSound="notificationSound" :selectedSound="selectedSound" />
                 </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-md-auto">
@@ -28,7 +29,8 @@
                     </ul>
                     <!-- Always-on Notification Area -->
                     <div class="notification-area d-none d-lg-flex align-items-center ms-3">
-                        <NotificationComponent :showToast="showToast" :message="toastMessage" />
+                        <NotificationComponent v-model:showToast="showToast" :message="toastMessage"
+                            :notificationSound="notificationSound" :selectedSound="selectedSound" />
                     </div>
                     <div class="ms-auto" v-if="user">
                         <button class="btn btn-outline-secondary" @click="logout">Logout</button>
@@ -40,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import { FontAwesomeIcon } from '@/font-awesome';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
@@ -64,9 +66,6 @@ const routes = ref([
     // { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: ['fas', 'sync'], iconClass: 'text-info' },
 ]);
 
-const audio = ref(null);
-const notificationTimer = ref(null);
-
 const user = ref(null);
 
 const router = useRouter();
@@ -86,44 +85,6 @@ const logout = async () => {
         router.push('/login');
     } catch (error) {
         console.error('Error during logout:', error);
-    }
-};
-
-watch([showToast, toastMessage], ([newShowToast, newToastMessage], [oldShowToast, oldToastMessage]) => {
-    if (newShowToast && (newShowToast !== oldShowToast || newToastMessage !== oldToastMessage)) {
-        if (notificationSound.value) {
-            playNotificationSound();
-        }
-        startNotificationTimer();
-    }
-});
-
-const playNotificationSound = () => {
-    if (audio.value) {
-        audio.value.pause();
-        audio.value.currentTime = 0;
-    }
-    audio.value = new Audio(selectedSound.value);
-    audio.value.play().catch(error => console.error('Error playing notification sound:', error));
-};
-
-const startNotificationTimer = () => {
-    if (notificationTimer.value) {
-        clearTimeout(notificationTimer.value);
-    }
-    notificationTimer.value = setTimeout(() => {
-        clearNotification();
-    }, 3000); // Hide after 3 seconds
-};
-
-const clearNotification = () => {
-    updateToastVisibility(false);
-    if (audio.value) {
-        audio.value.pause();
-        audio.value.currentTime = 0;
-    }
-    if (notificationTimer.value) {
-        clearTimeout(notificationTimer.value);
     }
 };
 </script>
