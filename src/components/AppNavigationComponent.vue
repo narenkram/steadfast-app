@@ -14,12 +14,7 @@
                 </button>
                 <!-- Always-on Notification Area -->
                 <div class="notification-area d-flex align-items-center ms-3 d-lg-none">
-                    <div class="notification-icon me-2" :class="{ 'has-notification': showToast }">
-                        <font-awesome-icon icon="bell" />
-                    </div>
-                    <div class="notification-message" :class="{ 'show-message': showToast }">
-                        {{ toastMessage || 'No new notifications' }}
-                    </div>
+                    <NotificationComponent :showToast="showToast" :message="toastMessage" />
                 </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-md-auto">
@@ -33,12 +28,7 @@
                     </ul>
                     <!-- Always-on Notification Area -->
                     <div class="notification-area d-none d-lg-flex align-items-center ms-3">
-                        <div class="notification-icon me-2" :class="{ 'has-notification': showToast }">
-                            <font-awesome-icon icon="bell" />
-                        </div>
-                        <div class="notification-message" :class="{ 'show-message': showToast }">
-                            {{ toastMessage || 'No new notifications' }}
-                        </div>
+                        <NotificationComponent :showToast="showToast" :message="toastMessage" />
                     </div>
                     <div class="ms-auto" v-if="user">
                         <button class="btn btn-outline-secondary" @click="logout">Logout</button>
@@ -56,6 +46,7 @@ import { FontAwesomeIcon } from '@/font-awesome';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
+import NotificationComponent from './NotificationComponent.vue'
 
 const {
     showToast,
