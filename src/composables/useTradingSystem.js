@@ -29,6 +29,9 @@ import {
   setShoonyaCredentials
 } from '@/composables/useBrokerFunctions'
 
+// Trade Configuration Composables
+import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+
 export function useTradeView() {
   // Reactive variables (from globalState)
   const {
@@ -1385,31 +1388,6 @@ export function useTradeView() {
       return type === 'BUY' ? 'B' : 'S'
     }
     return type
-  }
-  const getExchangeSegment = () => {
-    if (!selectedBroker.value || !selectedExchange.value) {
-      throw new Error('Broker or exchange not selected')
-    }
-
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      if (selectedExchange.value === 'NFO') {
-        return 'NFO'
-      } else if (selectedExchange.value === 'BFO') {
-        return 'BFO'
-      } else {
-        throw new Error('Selected exchange is not valid for Flattrade')
-      }
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      if (selectedExchange.value === 'NFO') {
-        return 'NFO'
-      } else if (selectedExchange.value === 'BFO') {
-        return 'BFO'
-      } else {
-        throw new Error('Selected exchange is not valid for Shoonya')
-      }
-    } else {
-      throw new Error('Unsupported broker')
-    }
   }
 
   const updateOrdersAndPositions = async () => {
@@ -3434,7 +3412,6 @@ export function useTradeView() {
     handleHotKeys,
     calculateUnrealizedProfit,
     getProductTypeValue,
-    getExchangeSegment,
     connectWebSocket,
     subscribeToMasterSymbol,
     subscribeToOptions,

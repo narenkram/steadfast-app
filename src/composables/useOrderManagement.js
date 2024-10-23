@@ -5,6 +5,9 @@ import qs from 'qs'
 // Global State
 import { selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
 
+// Trade Configuration Composables
+import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   let price = '0'
   let priceType = 'MKT'
