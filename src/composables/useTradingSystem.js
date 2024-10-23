@@ -36,7 +36,8 @@ import {
   fundLimits,
   selectedExchange,
   positionLTPs,
-  selectedProductType
+  selectedProductType,
+  limitPrice
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -114,7 +115,6 @@ export function useTradeView() {
     dataFetched,
     token,
     selectedStrike,
-    limitPrice,
     modalTransactionType,
     modalOptionType,
     selectedShoonyaPositionsSet,
@@ -2864,7 +2864,6 @@ export function useTradeView() {
     dataFetched,
     token,
     selectedStrike,
-    limitPrice,
     modalTransactionType,
     modalOptionType,
     selectedShoonyaPositionsSet,

@@ -21,7 +21,8 @@ import {
   enableStoploss,
   enableTarget,
   stoplossValue,
-  targetValue
+  targetValue,
+  limitPrice
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables

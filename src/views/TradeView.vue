@@ -887,7 +887,7 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -999,7 +999,6 @@ const {
   sensexPrice,
   bankexPrice,
   selectedStrike,
-  limitPrice,
   modalTransactionType,
   modalOptionType,
   selectedShoonyaPositionsSet,
