@@ -14,6 +14,13 @@ export const experimentalFeatures = ref(
 export const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'))
 export const currentTime = ref(Date.now())
 export const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false')
+
+// Broker Status
+export const tokenStatus = reactive({
+  Flattrade: 'unknown',
+  Shoonya: 'unknown'
+})
+
 export const selectedBroker = ref(null)
 export const selectedBrokerName = ref('')
 export const selectedExchange = ref({})

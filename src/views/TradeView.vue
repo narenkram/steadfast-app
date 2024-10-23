@@ -887,6 +887,9 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Kill Switch Composables
 import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
 
+// Broker Selection Composables
+import { availableBrokers, brokerStatus, selectedBroker, selectedBrokerName } from '@/composables/useBrokerFunctions'
+
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
@@ -940,9 +943,7 @@ const {
   formatTradingSymbol,
 
   // Computed properties
-  brokerStatus,
   isFormDisabled,
-  availableBrokers,
   exchangeOptions,
   todayExpirySymbol,
   selectedLots,
@@ -987,8 +988,6 @@ const {
   experimentalFeatures,
   currentTime,
   enableHotKeys,
-  selectedBroker,
-  selectedBrokerName,
   selectedExchange,
   selectedMasterSymbol,
   selectedQuantity,

@@ -1,10 +1,6 @@
 import axios from 'axios'
-import { reactive } from 'vue'
+import { tokenStatus } from '@/stores/globalStore'
 
-const tokenStatus = reactive({
-  Flattrade: 'unknown',
-  Shoonya: 'unknown'
-})
 
 const flattradeFundLimits = async () => {
   const jKey = localStorage.getItem('FLATTRADE_API_TOKEN')
