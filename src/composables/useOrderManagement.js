@@ -3,7 +3,12 @@ import axios from 'axios'
 import qs from 'qs'
 
 // Global State
-import { selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
+import {
+  selectedCallStrike,
+  selectedPutStrike,
+  quantities,
+  selectedMasterSymbol
+} from '@/stores/globalStore'
 
 // Trade Configuration Composables
 import { getExchangeSegment } from '@/composables/useTradeConfiguration'
