@@ -891,7 +891,7 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -909,6 +909,9 @@ import { closeAllPositions, cancelPendingOrders, closeSelectedPositions } from '
 // Risk Management Composables
 import { checkStoplossesAndTargets, setStoploss, removeStoploss, increaseStoploss, decreaseStoploss, setTarget, removeTarget, increaseTarget, decreaseTarget } from '@/composables/useRiskManagement'
 
+// Keyboard Shortcuts Composables
+import { handleHotKeys } from '@/composables/useKeyboardShortcuts'
+
 // Formatters
 import {
   formatTradingSymbol,
@@ -925,7 +928,6 @@ const {
   updateStrikesForExpiry,
   updateSymbolData,
   setActiveFetchFunctionAndFetch,
-  handleHotKeys,
   connectWebSocket,
   validateAndPlaceOrder,
   handleOrderTypeChange,
@@ -973,7 +975,6 @@ const {
   activeTab,
   experimentalFeatures,
   currentTime,
-  enableHotKeys,
   selectedExpiry,
   exchangeSymbols,
   callStrikes,
@@ -1057,8 +1058,6 @@ onMounted(async () => {
 
   // Initialize with the default active tab
   await setActiveFetchFunctionAndFetch();
-
-  enableHotKeys.value = localStorage.getItem('EnableHotKeys') !== 'false';
 
   timer = setInterval(() => {
     currentTime.value = Date.now();

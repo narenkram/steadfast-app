@@ -8,7 +8,8 @@ import {
   activationTime,
   currentTime,
   clockEmojis,
-  currentClockEmoji
+  currentClockEmoji,
+  enableHotKeys
 } from '@/stores/globalStore'
 
 // Order Management Composables

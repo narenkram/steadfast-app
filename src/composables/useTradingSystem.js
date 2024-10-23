@@ -44,7 +44,8 @@ import {
   flatOrderBook,
   flatTradeBook,
   shoonyaOrderBook,
-  shoonyaTradeBook
+  shoonyaTradeBook,
+  enableHotKeys
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -102,7 +103,6 @@ export function useTradeView() {
     experimentalFeatures,
     activationTime,
     currentTime,
-    enableHotKeys,
     selectedBrokerName,
     selectedExpiry,
     callStrikeOffset,
@@ -995,42 +995,6 @@ export function useTradeView() {
     // console.log('Updating Security IDs');
     defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
     defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
-  }
-
-  const handleHotKeys = (event) => {
-    if (!enableHotKeys.value) return
-
-    switch (event.key) {
-      case 'ArrowUp':
-      case 'ArrowDown':
-      case 'ArrowRight':
-      case 'ArrowLeft':
-      case 'F6':
-      case 'F7':
-        event.preventDefault() // Prevent default browser action
-        break
-    }
-
-    switch (event.key) {
-      case 'ArrowUp':
-        placeOrder(getTransactionType('BUY'), 'CALL')
-        break
-      case 'ArrowDown':
-        placeOrder(getTransactionType('BUY'), 'PUT')
-        break
-      case 'ArrowRight':
-        placeOrder(getTransactionType('SELL'), 'PUT')
-        break
-      case 'ArrowLeft':
-        placeOrder(getTransactionType('SELL'), 'CALL')
-        break
-      case 'F6':
-        closeAllPositions()
-        break
-      case 'F7':
-        cancelPendingOrders()
-        break
-    }
   }
 
   const formatTime = (timeString) => {
@@ -2579,7 +2543,6 @@ export function useTradeView() {
     saveOffsets,
     saveExpiryOffset,
     updateSymbolData,
-    handleHotKeys,
     calculateUnrealizedProfit,
     getProductTypeValue,
     connectWebSocket,
@@ -2672,7 +2635,6 @@ export function useTradeView() {
     experimentalFeatures,
     activationTime,
     currentTime,
-    enableHotKeys,
     selectedBrokerName,
     selectedExpiry,
     callStrikeOffset,
