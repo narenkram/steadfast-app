@@ -441,9 +441,7 @@
 
   <!-- Total Profit & Net PNL -->
   <PnlComponent :stickyMTM="stickyMTM" :totalCapitalPercentage="totalCapitalPercentage" :totalProfit="totalProfit"
-    :totalNetQty="totalNetQty" :netPnl="netPnl" :killSwitchActive="killSwitchActive"
-    :killSwitchButtonClass="killSwitchButtonClass" :killSwitchButtonText="killSwitchButtonText"
-    :currentClockEmoji="currentClockEmoji" @handleKillSwitchClick="handleKillSwitchClick" />
+    :totalNetQty="totalNetQty" :netPnl="netPnl" />
 
   <!-- Trading Status Message -->
   <TradingStatusMessageComponent :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime"
@@ -886,10 +884,16 @@ import MultiStrikeComponent from '@/components/MultiStrikeComponent.vue';
 import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
+// Kill Switch Composables
+import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
+
+
+// Order Management Composables
+import { closeAllPositions } from '@/composables/useOrderManagement'
+
 const {
   // Methods
   setActiveTab,
-  toggleKillSwitch,
   updateSelectedBroker,
   updateExchangeSymbols,
   setDefaultExchangeAndMasterSymbol,
@@ -901,7 +905,6 @@ const {
   updateSymbolData,
   setActiveFetchFunctionAndFetch,
   handleHotKeys,
-  closeAllPositions,
   getProductTypeValue,
   connectWebSocket,
   saveBasket,
@@ -918,7 +921,6 @@ const {
   increaseTarget,
   decreaseTarget,
   checkStoplossesAndTargets,
-  initKillSwitch,
   formatDate,
   loadLots,
   handleOrderClick,
@@ -927,7 +929,6 @@ const {
   placeBasketOrder,
   setOrderDetails,
   cancelPendingOrders,
-  handleKillSwitchClick,
   closeSelectedPositions,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,
@@ -941,9 +942,6 @@ const {
   // Computed properties
   brokerStatus,
   isFormDisabled,
-  killSwitchRemainingTime,
-  killSwitchButtonText,
-  killSwitchButtonClass,
   availableBrokers,
   exchangeOptions,
   todayExpirySymbol,
@@ -986,7 +984,6 @@ const {
   // Reactive variables
   showLTPRangeBar,
   activeTab,
-  killSwitchActive,
   experimentalFeatures,
   currentTime,
   enableHotKeys,
@@ -1059,6 +1056,7 @@ const {
 let timer;
 let positionCheckInterval;
 let checkInterval;
+
 
 // Lifecycle hooks
 onMounted(async () => {

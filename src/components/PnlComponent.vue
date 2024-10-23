@@ -28,7 +28,8 @@
                 ₹{{ netPnl.toFixed(2) }}
             </span>
         </div>
-        <div class="col-6 col-md-3 col-lg-3 d-flex align-items-center justify-content-center justify-content-md-end" style="height: 40px">
+        <div class="col-6 col-md-3 col-lg-3 d-flex align-items-center justify-content-center justify-content-md-end"
+            style="height: 40px">
             <small class="text-muted">Kill Switch</small>
             <a :class="['ms-2', 'btn', 'btn-sm', killSwitchButtonClass]" @click="handleKillSwitchClick"
                 :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
@@ -40,7 +41,8 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps } from 'vue';
+import { killSwitchActive, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch';
 
 const props = defineProps({
     stickyMTM: Boolean,
@@ -48,15 +50,7 @@ const props = defineProps({
     totalProfit: Number,
     totalNetQty: Number,
     netPnl: Number,
-    killSwitchActive: Boolean,
-    killSwitchButtonClass: String,
-    killSwitchButtonText: String,
     currentClockEmoji: String
 });
 
-const emit = defineEmits(['handleKillSwitchClick']);
-
-const handleKillSwitchClick = () => {
-    emit('handleKillSwitchClick');
-};
 </script>

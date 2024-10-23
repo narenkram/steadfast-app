@@ -5,12 +5,19 @@ import qs from 'qs'
 import { debounce } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { updateSelectedBrokerOnServer } from '../api/broker'
+import { validateToken, getBrokerStatus, tokenStatus } from '@/composables/useBrokerTokenValidator'
+
+// Kill Switch Composables
+import { toggleKillSwitch } from '@/composables/useKillSwitch'
+import { killSwitchActive } from '@/stores/globalStore'
+
+// Order Management Composables
 import {
-  validateToken,
-  checkAllTokens,
-  getBrokerStatus,
-  tokenStatus
-} from '@/composables/useBrokerTokenValidator'
+  prepareOrderPayload,
+  placeOrder,
+  placeOrderForPosition,
+  closeAllPositions
+} from '@/composables/useOrderManagement'
 
 export function useTradeView() {
   // Reactive variables (from globalState)
@@ -20,7 +27,6 @@ export function useTradeView() {
     showToast,
     toastMessage,
     activeTab,
-    killSwitchActive,
     overtradeProtection,
     experimentalFeatures,
     activationTime,
@@ -178,26 +184,7 @@ export function useTradeView() {
     return 'Not Connected'
   })
   const isFormDisabled = computed(() => killSwitchActive.value)
-  const remainingTimeInMs = computed(() => {
-    if (!activationTime.value || !killSwitchActive.value) return 0
-    const sixHoursInMillis = 6 * 60 * 60 * 1000
-    return Math.max(0, sixHoursInMillis - (currentTime.value - activationTime.value))
-  })
-  const killSwitchRemainingTime = computed(() => {
-    if (remainingTimeInMs.value === 0) return ''
 
-    const hours = Math.floor(remainingTimeInMs.value / (60 * 60 * 1000))
-    const minutes = Math.floor((remainingTimeInMs.value % (60 * 60 * 1000)) / (60 * 1000))
-    const seconds = Math.floor((remainingTimeInMs.value % (60 * 1000)) / 1000)
-
-    return `${hours}h ${minutes}m ${seconds}s`
-  })
-  const killSwitchButtonText = computed(() => (killSwitchActive.value ? 'Deactivate' : 'Activate'))
-  const killSwitchButtonClass = computed(() =>
-    killSwitchActive.value
-      ? 'btn btn-sm btn-success shadow fs-6'
-      : 'btn btn-sm btn-danger shadow fs-6'
-  )
   const availableBrokers = computed(() => {
     return Object.keys(localStorage)
       .filter((key) => key.startsWith('broker_'))
@@ -752,60 +739,7 @@ export function useTradeView() {
   const setActiveTab = (tab) => {
     activeTab.value = tab
   }
-  const initKillSwitch = () => {
-    const storedStatus = localStorage.getItem('KillSwitchStatus')
-    const storedActivationTime = localStorage.getItem('KillSwitchActivationTime')
 
-    if (storedStatus === 'true' && storedActivationTime) {
-      killSwitchActive.value = true
-      activationTime.value = parseInt(storedActivationTime)
-    } else {
-      // Deactivate kill switch if KillSwitchActivationTime is missing
-      killSwitchActive.value = false
-      activationTime.value = 0
-      localStorage.removeItem('KillSwitchStatus')
-      localStorage.removeItem('KillSwitchActivationTime')
-    }
-  }
-  const handleKillSwitchClick = () => {
-    if (killSwitchActive.value) {
-      // If the kill switch is already active, deactivate it directly
-      toggleKillSwitch()
-    }
-    // If it's not active, the modal will be shown due to data-bs-target and data-bs-toggle
-  }
-  const toggleKillSwitch = async () => {
-    const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED'
-    if (newStatus === 'ACTIVATED') {
-      await closeAllPositions() // Wait for closeAllPositions to complete
-      await new Promise((resolve) => setTimeout(resolve, 500))
-    }
-
-    if (newStatus === 'DEACTIVATED' && remainingTimeInMs.value > 0) {
-      cycleClockEmoji()
-      toastMessage.value = 'Kill Switch cannot be deactivated within 6 hours of activation'
-      showToast.value = true
-      return
-    }
-
-    // Handle different response messages
-    if (newStatus === 'ACTIVATED') {
-      toastMessage.value = 'Kill Switch activated successfully'
-      killSwitchActive.value = true
-      localStorage.setItem('KillSwitchStatus', 'true')
-      activationTime.value = Date.now()
-      localStorage.setItem('KillSwitchActivationTime', activationTime.value.toString())
-      enableHotKeys.value = false
-    } else {
-      toastMessage.value = 'Kill Switch deactivated successfully'
-      killSwitchActive.value = false
-      localStorage.removeItem('KillSwitchStatus')
-      activationTime.value = 0
-      localStorage.removeItem('KillSwitchActivationTime')
-    }
-
-    showToast.value = true
-  }
   const toggleOvertradeProtection = () => {
     overtradeProtection.value = !overtradeProtection.value
     localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString())
@@ -1533,175 +1467,7 @@ export function useTradeView() {
       throw new Error('Unsupported broker')
     }
   }
-  const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
-    let price = '0'
-    let priceType = 'MKT'
 
-    switch (selectedOrderType.value) {
-      case 'LMT':
-        price = limitPrice.value.toString()
-        priceType = 'LMT'
-        break
-      case 'LMT_LTP':
-        price = getCurrentLTP().toString()
-        priceType = 'LMT'
-        break
-      case 'LMT_OFFSET':
-        price = (getCurrentLTP() + limitOffset.value).toString()
-        priceType = 'LMT'
-        break
-      case 'MKT_PROTECTION':
-        price = (getCurrentLTP() * 1.01).toString()
-        priceType = 'LMT'
-        break
-    }
-
-    const commonPayload = {
-      uid: selectedBroker.value.clientId,
-      actid: selectedBroker.value.clientId,
-      exch: exchangeSegment,
-      tsym: selectedStrike.tradingSymbol,
-      qty: selectedQuantity.value.toString(),
-      prc: price,
-      prd: getProductTypeValue(selectedProductType.value),
-      trantype: getTransactionType(transactionType),
-      prctyp: priceType,
-      ret: 'DAY',
-      ordersource: 'API'
-    }
-
-    switch (selectedBroker.value?.brokerName) {
-      case 'Flattrade':
-        return {
-          ...commonPayload
-          // Add any additional fields specific to Flattrade here
-        }
-      case 'Shoonya':
-        return {
-          ...commonPayload
-          // Add any additional fields specific to Shoonya here
-        }
-      default:
-        throw new Error('Unsupported broker')
-    }
-  }
-
-  const placeOrder = async (transactionType, drvOptionType) => {
-    try {
-      let selectedStrike =
-        drvOptionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
-
-      if (!selectedStrike || !selectedStrike.tradingSymbol || !selectedStrike.securityId) {
-        throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not properly defined`)
-      }
-
-      const exchangeSegment = getExchangeSegment()
-      const instrument = quantities.value[selectedMasterSymbol.value]
-      const freezeLimit = instrument.freezeLimit
-      const orderLots = selectedLots.value
-      const fullOrderQuantity = selectedQuantity.value
-
-      let remainingLots = orderLots
-      let placedLots = 0
-
-      while (remainingLots > 0) {
-        const lotsToPlace = Math.min(remainingLots, freezeLimit)
-        const quantityToPlace = lotsToPlace * instrument.lotSize
-
-        const orderData = prepareOrderPayload(
-          transactionType,
-          drvOptionType,
-          selectedStrike,
-          exchangeSegment
-        )
-        orderData.qty = quantityToPlace.toString()
-
-        // Handle dynamic price updates for LMT_LTP and LMT_OFFSET
-        if (['LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'].includes(selectedOrderType.value)) {
-          const currentLTP = getCurrentLTP()
-          switch (selectedOrderType.value) {
-            case 'LMT_LTP':
-              orderData.prc = currentLTP.toString()
-              break
-            case 'LMT_OFFSET':
-              orderData.prc = (currentLTP + limitOffset.value).toString()
-              break
-            case 'MKT_PROTECTION':
-              orderData.prc = (currentLTP * 1.01).toString()
-              break
-          }
-        }
-
-        let response
-        if (selectedBroker.value?.brokerName === 'Flattrade') {
-          const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN')
-          const payload = qs.stringify(orderData)
-          response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
-            headers: {
-              Authorization: `Bearer ${FLATTRADE_API_TOKEN}`,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-          const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN')
-          const payload = qs.stringify(orderData)
-          response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
-            headers: {
-              Authorization: `Bearer ${SHOONYA_API_TOKEN}`,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-        }
-
-        console.log(`Placed order for ${lotsToPlace} lots (${quantityToPlace} quantity)`)
-        console.log('Order placed successfully:', response.data)
-        remainingLots -= lotsToPlace
-        placedLots += lotsToPlace
-
-        // Add a small delay between orders for LMT_LTP and LMT_OFFSET to get updated LTP
-        if (['LMT_LTP', 'LMT_OFFSET'].includes(selectedOrderType.value)) {
-          await new Promise((resolve) => setTimeout(resolve, 500))
-        }
-      }
-
-      console.log(
-        `All orders placed successfully. Total: ${placedLots} lots (${fullOrderQuantity} quantity)`
-      )
-      toastMessage.value = `Order(s) placed successfully for ${placedLots} lots`
-      showToast.value = true
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Find the new position after updating positions
-      const newPosition = findNewPosition(selectedStrike.tradingSymbol)
-
-      // If predefined stoploss is enabled, set stoploss for the new position
-      if (enableStoploss.value && stoplossValue.value > 0 && newPosition) {
-        setStoploss(newPosition, 'static')
-      }
-
-      // If predefined target is enabled, set target for the new position
-      if (enableTarget.value && targetValue.value > 0 && newPosition) {
-        setTarget(newPosition)
-      }
-
-      // Update fund limits
-      await updateFundLimits()
-    } catch (error) {
-      console.error('Error placing order:', error)
-      if (error.response?.data?.message) {
-        const firstThreeWords = error.response.data.message.split(' ').slice(0, 3).join(' ')
-        toastMessage.value = firstThreeWords
-      } else {
-        toastMessage.value = 'Failed to place order unfortunately'
-      }
-      showToast.value = true
-    }
-  }
   const updateOrdersAndPositions = async () => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       await Promise.all([fetchFlattradeOrdersTradesBook(), fetchFlattradePositions()])
@@ -1716,87 +1482,6 @@ export function useTradeView() {
       return shoonyaPositionBook.value.find((p) => p.tsym === tradingSymbol)
     }
     return null
-  }
-  const placeOrderForPosition = async (transactionType, optionType, position) => {
-    try {
-      const quantity = Math.abs(Number(position.netQty || position.netqty))
-      const instrument = quantities.value[selectedMasterSymbol.value]
-      const freezeLimit = instrument.freezeLimit * instrument.lotSize
-
-      if (quantity === 0) {
-        console.log('Quantity is zero, no order will be placed.')
-        return
-      }
-
-      let remainingQuantity = quantity
-      let placedQuantity = 0
-
-      while (remainingQuantity > 0) {
-        const quantityToPlace = Math.min(remainingQuantity, freezeLimit)
-
-        let orderData
-        if (
-          selectedBroker.value?.brokerName === 'Flattrade' ||
-          selectedBroker.value?.brokerName === 'Shoonya'
-        ) {
-          orderData = {
-            uid: selectedBroker.value.clientId,
-            actid: selectedBroker.value.clientId,
-            exch: selectedExchange.value === 'NFO' ? 'NFO' : 'BFO',
-            tsym: position.tsym,
-            qty: quantityToPlace.toString(),
-            prc: '0',
-            prd: position.prd,
-            trantype: transactionType,
-            prctyp: 'MKT',
-            ret: 'DAY'
-          }
-        }
-
-        let response
-        if (selectedBroker.value?.brokerName === 'Flattrade') {
-          const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN')
-          const payload = qs.stringify(orderData)
-          response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
-            headers: {
-              Authorization: `Bearer ${FLATTRADE_API_TOKEN}`,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-          const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN')
-          const payload = qs.stringify(orderData)
-          response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
-            headers: {
-              Authorization: `Bearer ${SHOONYA_API_TOKEN}`,
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          })
-        }
-
-        console.log(`Placed order for ${quantityToPlace} quantity`)
-
-        remainingQuantity -= quantityToPlace
-        placedQuantity += quantityToPlace
-      }
-
-      console.log(`All orders placed successfully. Total: ${placedQuantity} quantity`)
-      toastMessage.value = `Order(s) placed successfully for ${getSymbol(position)}`
-      showToast.value = true
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Update fund limits
-      await updateFundLimits()
-    } catch (error) {
-      console.error('Failed to place order for position:', error)
-      toastMessage.value = 'Failed to place order for SL/Target'
-      showToast.value = true
-    }
   }
 
   const setStrategyType = (type) => {
@@ -2132,59 +1817,7 @@ export function useTradeView() {
     // Trigger a re-subscription to the new security
     subscribeToOptions()
   }
-  const closeAllPositions = async () => {
-    try {
-      let positionsClosed = false
 
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        const sortedPositions = [...flatTradePositionBook.value].sort(
-          (a, b) => Number(b.netqty) - Number(a.netqty)
-        )
-        for (const position of sortedPositions) {
-          const netqty = Number(position.netqty)
-          if (netqty !== 0) {
-            const transactionType = netqty > 0 ? 'S' : 'B'
-            const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT'
-            await placeOrderForPosition(transactionType, optionType, position)
-            positionsClosed = true
-          }
-        }
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        const sortedPositions = [...shoonyaPositionBook.value].sort(
-          (a, b) => Number(b.netqty) - Number(a.netqty)
-        )
-        for (const position of sortedPositions) {
-          const netqty = Number(position.netqty)
-          if (netqty !== 0) {
-            const transactionType = netqty > 0 ? 'S' : 'B'
-            const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT'
-            await placeOrderForPosition(transactionType, optionType, position)
-            positionsClosed = true
-          }
-        }
-      }
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Update fund limits
-      await updateFundLimits()
-
-      if (positionsClosed) {
-        toastMessage.value = `All ${selectedBroker.value?.brokerName} positions closed successfully`
-      } else {
-        toastMessage.value = `No positions to close for ${selectedBroker.value?.brokerName}`
-      }
-      showToast.value = true
-    } catch (error) {
-      console.error('Error closing positions:', error)
-      toastMessage.value = 'Failed to close all positions'
-      showToast.value = true
-    }
-  }
   const closeSelectedPositions = async () => {
     try {
       let positionsClosed = false
@@ -2452,26 +2085,7 @@ export function useTradeView() {
   const saveExpiryOffset = () => {
     localStorage.setItem('expiryOffset', expiryOffset.value)
   }
-  const cycleClockEmoji = () => {
-    const currentHour = new Date().getHours()
-    let index = currentHour % clockEmojis.length
-    let cycles = 0
 
-    const interval = setInterval(() => {
-      currentClockEmoji.value = clockEmojis[index]
-      index = (index + 1) % clockEmojis.length
-
-      if (index === currentHour % clockEmojis.length) {
-        cycles += 1
-      }
-
-      if (cycles === 1 && index === currentHour % clockEmojis.length) {
-        // Complete one full cycle
-        clearInterval(interval)
-        currentClockEmoji.value = clockEmojis[currentHour % clockEmojis.length] // Ensure it ends at the current hour
-      }
-    }, 100) // Adjust the interval time for desired speed
-  }
   const setFlattradeCredentials = async () => {
     try {
       if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
@@ -3586,18 +3200,6 @@ export function useTradeView() {
   // ... (add all other methods here)
 
   // Watchers
-  // Watch for changes in killSwitchRemainingTime
-  watch(killSwitchRemainingTime, (newValue) => {
-    if (newValue === '' && killSwitchActive.value) {
-      toggleKillSwitch()
-    }
-  })
-  // Watch for changes in remainingTimeInMs
-  watch(remainingTimeInMs, (newValue) => {
-    if (newValue === 0 && killSwitchActive.value) {
-      toggleKillSwitch()
-    }
-  })
   // Watch for the price values
   watch(
     [niftyPrice, bankNiftyPrice, finniftyPrice, midcpniftyPrice, sensexPrice, bankexPrice],
@@ -4009,7 +3611,6 @@ export function useTradeView() {
     // Methods
     updateToastVisibility,
     setActiveTab,
-    toggleKillSwitch,
     updateSelectedBroker,
     setFlattradeCredentials,
     setShoonyaCredentials,
@@ -4033,9 +3634,6 @@ export function useTradeView() {
     fetchFlattradeOrdersTradesBook,
     fetchShoonyaOrdersTradesBook,
     handleHotKeys,
-    placeOrder,
-    placeOrderForPosition,
-    closeAllPositions,
     calculateUnrealizedProfit,
     getProductTypeValue,
     getExchangeSegment,
@@ -4072,7 +3670,6 @@ export function useTradeView() {
     checkTargets,
     checkStoplosses,
     checkStoplossesAndTargets,
-    initKillSwitch,
     formatDate,
     loadLots,
     handleOrderClick,
@@ -4083,7 +3680,6 @@ export function useTradeView() {
     toggleExperimentalFeatures,
     setOrderDetails,
     cancelPendingOrders,
-    handleKillSwitchClick,
     closeSelectedPositions,
     updateTradingSymbol,
     convertToComparableDate,
@@ -4112,10 +3708,6 @@ export function useTradeView() {
     brokers,
     brokerStatus,
     isFormDisabled,
-    remainingTimeInMs,
-    killSwitchRemainingTime,
-    killSwitchButtonText,
-    killSwitchButtonClass,
     availableBrokers,
     exchangeOptions,
     todayExpirySymbol,
@@ -4162,7 +3754,6 @@ export function useTradeView() {
     showToast,
     toastMessage,
     activeTab,
-    killSwitchActive,
     overtradeProtection,
     experimentalFeatures,
     activationTime,
