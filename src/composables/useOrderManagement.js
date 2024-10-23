@@ -4,14 +4,24 @@ import qs from 'qs'
 
 // Global State
 import {
+  BASE_URL,
   selectedCallStrike,
   selectedPutStrike,
   quantities,
-  selectedMasterSymbol
+  selectedMasterSymbol,
+  selectedOrderType,
+  selectedQuantity,
+  selectedBroker,
+  selectedProductType,
+  toastMessage,
+  showToast
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
-import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+import { getExchangeSegment, getProductTypeValue } from '@/composables/useTradeConfiguration'
+
+// Order Management Composables
+import { selectedLots, getTransactionType } from '@/composables/useTradeConfiguration'
 
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   let price = '0'

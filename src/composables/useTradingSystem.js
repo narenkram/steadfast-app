@@ -9,12 +9,20 @@ import { validateToken, getBrokerStatus, tokenStatus } from '@/composables/useBr
 
 // Global State
 import {
+  BASE_URL,
   killSwitchActive,
   selectedCallStrike,
   selectedPutStrike,
   quantities,
   availableQuantities,
-  selectedMasterSymbol
+  selectedMasterSymbol,
+  lotsPerSymbol,
+  selectedQuantity,
+  selectedOrderType,
+  selectedBroker,
+  selectedProductType,
+  toastMessage,
+  showToast
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -37,25 +45,25 @@ import {
 } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+import {
+  getExchangeSegment,
+  selectedLots,
+  getProductTypeValue,
+  getTransactionType
+} from '@/composables/useTradeConfiguration'
 
 export function useTradeView() {
   // Reactive variables (from globalState)
   const {
-    BASE_URL,
     showLTPRangeBar,
-    showToast,
-    toastMessage,
     activeTab,
     overtradeProtection,
     experimentalFeatures,
     activationTime,
     currentTime,
     enableHotKeys,
-    selectedBroker,
     selectedBrokerName,
     selectedExchange,
-    selectedQuantity,
     selectedExpiry,
     callStrikeOffset,
     putStrikeOffset,
@@ -72,7 +80,6 @@ export function useTradeView() {
     sensexPrice,
     bankexPrice,
     dataFetched,
-    lotsPerSymbol,
     flatOrderBook,
     flatTradeBook,
     token,
@@ -82,7 +89,6 @@ export function useTradeView() {
     shoonyaPositionBook,
     fundLimits,
     selectedStrike,
-    selectedProductType,
     limitPrice,
     modalTransactionType,
     modalOptionType,
@@ -194,13 +200,7 @@ export function useTradeView() {
 
     return null // No expiry today
   })
-  const selectedLots = computed({
-    get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
-    set: (value) => {
-      lotsPerSymbol.value[selectedMasterSymbol.value] = value
-      saveLots()
-    }
-  })
+
   const maxLots = computed(() => {
     const instrument = quantities.value[selectedMasterSymbol.value]
     return instrument ? instrument.maxLots : 280
@@ -277,7 +277,6 @@ export function useTradeView() {
       }
     })
   })
-  const selectedOrderType = ref(orderTypes.value[0])
   const previousOrderType = ref(orderTypes.value[0])
   const productTypes = computed(() => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
@@ -1376,22 +1375,6 @@ export function useTradeView() {
 
   const resetOrderType = () => {
     selectedOrderType.value = orderTypes.value[0] // Set selectedOrderType to MARKET or MKT based on broker
-  }
-  const getProductTypeValue = (productType) => {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      return productType === 'Intraday' ? 'I' : 'M'
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      return productType === 'Intraday' ? 'I' : 'M'
-    }
-    return productType
-  }
-  const getTransactionType = (type) => {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      return type === 'BUY' ? 'B' : 'S'
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      return type === 'BUY' ? 'B' : 'S'
-    }
-    return type
   }
 
   const updateOrdersAndPositions = async () => {
@@ -3482,7 +3465,6 @@ export function useTradeView() {
     isFormDisabled,
     exchangeOptions,
     todayExpirySymbol,
-    selectedLots,
     maxLots,
     combinedOrdersAndTrades,
     orderTypes,
@@ -3522,18 +3504,14 @@ export function useTradeView() {
 
     // Reactive variables (from globalState)
     showLTPRangeBar,
-    showToast,
-    toastMessage,
     activeTab,
     overtradeProtection,
     experimentalFeatures,
     activationTime,
     currentTime,
     enableHotKeys,
-    selectedBroker,
     selectedBrokerName,
     selectedExchange,
-    selectedQuantity,
     selectedExpiry,
     callStrikeOffset,
     putStrikeOffset,
@@ -3550,7 +3528,6 @@ export function useTradeView() {
     sensexPrice,
     bankexPrice,
     dataFetched,
-    lotsPerSymbol,
     flatOrderBook,
     flatTradeBook,
     token,
@@ -3560,7 +3537,6 @@ export function useTradeView() {
     shoonyaPositionBook,
     fundLimits,
     selectedStrike,
-    selectedProductType,
     limitPrice,
     modalTransactionType,
     modalOptionType,
@@ -3633,7 +3609,6 @@ export function useTradeView() {
     putDepth,
     symbolData,
     allSymbolsData,
-    selectedOrderType,
     previousOrderType,
     API_TOKEN,
     FLATTRADE_API_KEY,

@@ -1,4 +1,11 @@
-import { selectedBroker, selectedExchange } from '@/stores/globalStore'
+import { ref, computed } from 'vue'
+
+import {
+  selectedBroker,
+  selectedExchange,
+  lotsPerSymbol,
+  selectedMasterSymbol
+} from '@/stores/globalStore'
 
 export const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
@@ -24,4 +31,30 @@ export const getExchangeSegment = () => {
   } else {
     throw new Error('Unsupported broker')
   }
+}
+
+export const selectedLots = computed({
+  get: () => lotsPerSymbol.value[selectedMasterSymbol.value] || 1,
+  set: (value) => {
+    lotsPerSymbol.value[selectedMasterSymbol.value] = value
+    saveLots()
+  }
+})
+
+export const getProductTypeValue = (productType) => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return productType === 'Intraday' ? 'I' : 'M'
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return productType === 'Intraday' ? 'I' : 'M'
+  }
+  return productType
+}
+
+export const getTransactionType = (type) => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return type === 'BUY' ? 'B' : 'S'
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return type === 'BUY' ? 'B' : 'S'
+  }
+  return type
 }
