@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
-import { checkAllTokens } from '@/utils/brokerTokenValidator';
+import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import { useTradeView } from '@/composables/useTradingSystem';
 
 const {

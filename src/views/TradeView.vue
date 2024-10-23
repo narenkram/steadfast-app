@@ -877,7 +877,7 @@ import { onMounted, onBeforeUnmount } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import BrokerComponent from '@/components/BrokerComponent.vue';
-import { checkAllTokens } from '@/utils/brokerTokenValidator';
+import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';

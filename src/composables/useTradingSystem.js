@@ -10,7 +10,7 @@ import {
   checkAllTokens,
   getBrokerStatus,
   tokenStatus
-} from '@/utils/brokerTokenValidator'
+} from '@/composables/useBrokerTokenValidator'
 
 export function useTradeView() {
   // Reactive variables (from globalState)
