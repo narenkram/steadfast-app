@@ -20,7 +20,6 @@ import {
   selectedQuantity,
   selectedOrderType,
   selectedBroker,
-  selectedProductType,
   toastMessage,
   showToast,
   flatTradePositionBook,
@@ -38,6 +37,7 @@ import {
   fundLimits,
   selectedExchange,
   positionLTPs,
+  selectedProductType
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -64,7 +64,8 @@ import {
   getExchangeSegment,
   selectedLots,
   getProductTypeValue,
-  getTransactionType
+  getTransactionType,
+  productTypes
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -283,14 +284,7 @@ export function useTradeView() {
     })
   })
   const previousOrderType = ref(orderTypes.value[0])
-  const productTypes = computed(() => {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      return ['Intraday', 'Margin']
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      return ['Intraday', 'Margin']
-    }
-    return []
-  })
+
   const availableBalance = computed(() => {
     // console.log('Fund Limits:', fundLimits.value);
     // console.log('Selected Broker:', selectedBroker.value?.brokerName);
@@ -2862,7 +2856,6 @@ export function useTradeView() {
     combinedOrdersAndTrades,
     orderTypes,
     displayOrderTypes,
-    productTypes,
     availableBalance,
     usedAmount,
     formattedDate,

@@ -885,7 +885,7 @@ import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
-import { killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket } from '@/stores/globalStore'
+import { killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType } from '@/stores/globalStore'
 
 // Kill Switch Composables
 import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
@@ -894,7 +894,7 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { getProductTypeValue } from '@/composables/useTradeConfiguration'
+import { productTypes, getProductTypeValue } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
@@ -953,7 +953,6 @@ const {
   combinedOrdersAndTrades,
   orderTypes,
   displayOrderTypes,
-  productTypes,
   availableBalance,
   usedAmount,
   totalNetQty,
@@ -1003,7 +1002,6 @@ const {
   sensexPrice,
   bankexPrice,
   selectedStrike,
-  selectedProductType,
   limitPrice,
   modalTransactionType,
   modalOptionType,

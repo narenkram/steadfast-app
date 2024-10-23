@@ -58,3 +58,12 @@ export const getTransactionType = (type) => {
   }
   return type
 }
+
+export const productTypes = computed(() => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return ['Intraday', 'Margin']
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return ['Intraday', 'Margin']
+  }
+  return []
+})
