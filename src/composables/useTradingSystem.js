@@ -52,6 +52,9 @@ import {
   getTransactionType
 } from '@/composables/useTradeConfiguration'
 
+// Portfolio Management Composables
+import { updateOrdersAndPositions } from '@/composables/usePortfolioManagement'
+
 export function useTradeView() {
   // Reactive variables (from globalState)
   const {
@@ -1377,13 +1380,6 @@ export function useTradeView() {
     selectedOrderType.value = orderTypes.value[0] // Set selectedOrderType to MARKET or MKT based on broker
   }
 
-  const updateOrdersAndPositions = async () => {
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      await Promise.all([fetchFlattradeOrdersTradesBook(), fetchFlattradePositions()])
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      await Promise.all([fetchShoonyaOrdersTradesBook(), fetchShoonyaPositions()])
-    }
-  }
   const findNewPosition = (tradingSymbol) => {
     if (selectedBroker.value?.brokerName === 'Flattrade') {
       return flatTradePositionBook.value.find((p) => p.tsym === tradingSymbol)

@@ -144,11 +144,9 @@
 
 <script setup>
 import { defineProps } from 'vue';
-import { useTradeView } from '@/composables/useTradingSystem';
 
-const {
-    formatTradingSymbol,
-} = useTradeView();
+// Formatters
+import { formatTradingSymbol } from '@/composables/useFormatters';
 
 const props = defineProps({
     combinedOrdersAndTrades: {
