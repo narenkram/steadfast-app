@@ -7,7 +7,9 @@ import {
   positionSecurityIds,
   socket,
   defaultCallSecurityId,
-  defaultPutSecurityId
+  defaultPutSecurityId,
+  additionalSymbols,
+  currentSubscriptions
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables

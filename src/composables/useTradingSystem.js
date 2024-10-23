@@ -28,7 +28,9 @@ import {
   positionSecurityIds,
   socket,
   defaultCallSecurityId,
-  defaultPutSecurityId
+  defaultPutSecurityId,
+  additionalSymbols,
+  currentSubscriptions
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -135,7 +137,6 @@ export function useTradeView() {
     showStrikeDetails,
     reverseMode,
     showBasketOrderModal,
-    additionalSymbols,
     marketDepth,
     additionalStrikeLTPs,
     ltpCallbacks,
@@ -1963,11 +1964,7 @@ export function useTradeView() {
       if (data.c) putClosePrice.value = data.c
     }
   }
-  const currentSubscriptions = ref({
-    masterSymbol: null,
-    callOption: null,
-    putOption: null
-  })
+
   const subscribeToMasterSymbol = () => {
     if (socket.value && socket.value.readyState === WebSocket.OPEN) {
       const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
@@ -3309,7 +3306,6 @@ export function useTradeView() {
     showStrikeDetails,
     reverseMode,
     showBasketOrderModal,
-    additionalSymbols,
     marketDepth,
     additionalStrikeLTPs,
     ltpCallbacks,

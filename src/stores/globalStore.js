@@ -291,3 +291,8 @@ export const savedStickyMTM = localStorage.getItem('stickyMTM')
 export const stickyMTM = ref(savedStickyMTM ? JSON.parse(savedStickyMTM) : false)
 export const userId = localStorage.getItem('userId')
 export const selectedOrderType = ref('MKT')
+export const currentSubscriptions = ref({
+  masterSymbol: null,
+  callOption: null,
+  putOption: null
+})
