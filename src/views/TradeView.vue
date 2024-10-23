@@ -885,7 +885,10 @@ import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
-import { killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType } from '@/stores/globalStore'
+import {
+  killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue
+} from '@/stores/globalStore'
 
 // Kill Switch Composables
 import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
@@ -894,7 +897,7 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { productTypes, getProductTypeValue } from '@/composables/useTradeConfiguration'
+import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
@@ -917,7 +920,6 @@ const {
   fetchTradingData,
   setDefaultExpiry,
   updateStrikesForExpiry,
-  updateAvailableQuantities,
   updateSelectedQuantity,
   updateSymbolData,
   setActiveFetchFunctionAndFetch,
@@ -951,8 +953,6 @@ const {
   selectedLots,
   maxLots,
   combinedOrdersAndTrades,
-  orderTypes,
-  displayOrderTypes,
   availableBalance,
   usedAmount,
   totalNetQty,
@@ -989,7 +989,6 @@ const {
   experimentalFeatures,
   currentTime,
   enableHotKeys,
-  selectedQuantity,
   selectedExpiry,
   exchangeSymbols,
   callStrikes,
@@ -1033,10 +1032,6 @@ const {
   strategyType,
   orderMargin,
   limitOffset,
-  enableStoploss,
-  stoplossValue,
-  enableTarget,
-  targetValue,
   callDepth,
   putDepth,
   allSymbolsData,

@@ -4,7 +4,10 @@ import {
   selectedBroker,
   selectedExchange,
   lotsPerSymbol,
-  selectedMasterSymbol
+  selectedMasterSymbol,
+  selectedQuantity,
+  availableQuantities,
+  quantities
 } from '@/stores/globalStore'
 
 export const getExchangeSegment = () => {
@@ -66,4 +69,48 @@ export const productTypes = computed(() => {
     return ['Intraday', 'Margin']
   }
   return []
+})
+
+export const updateAvailableQuantities = () => {
+  const instrument = quantities.value[selectedMasterSymbol.value]
+  if (instrument) {
+    availableQuantities.value = Array.from({ length: instrument.maxLots }, (_, i) => ({
+      lots: i + 1,
+      quantity: (i + 1) * instrument.lotSize
+    }))
+  } else {
+    availableQuantities.value = []
+  }
+  // Ensure selectedQuantity is in the available quantities list
+  if (!availableQuantities.value.some((q) => q.quantity === selectedQuantity.value)) {
+    selectedQuantity.value = availableQuantities.value[0]?.quantity || 0
+  }
+}
+
+export const orderTypes = computed(() => {
+  if (
+    selectedBroker.value?.brokerName === 'Flattrade' ||
+    selectedBroker.value?.brokerName === 'Shoonya'
+  ) {
+    return ['MKT', 'LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION']
+  }
+  return []
+})
+export const displayOrderTypes = computed(() => {
+  return orderTypes.value.map((type) => {
+    switch (type) {
+      case 'MKT':
+        return 'Market'
+      case 'LMT':
+        return 'Limit'
+      case 'LMT_LTP':
+        return 'Limit at LTP'
+      case 'LMT_OFFSET':
+        return 'Limit at Offset'
+      case 'MKT_PROTECTION':
+        return 'Market Protection'
+      default:
+        return type
+    }
+  })
 })

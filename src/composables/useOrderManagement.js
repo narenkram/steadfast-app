@@ -17,7 +17,11 @@ import {
   showToast,
   flatTradePositionBook,
   shoonyaPositionBook,
-  selectedExchange
+  selectedExchange,
+  enableStoploss,
+  enableTarget,
+  stoplossValue,
+  targetValue
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables

@@ -14,7 +14,6 @@ import {
   selectedCallStrike,
   selectedPutStrike,
   quantities,
-  availableQuantities,
   selectedMasterSymbol,
   lotsPerSymbol,
   selectedQuantity,
@@ -65,7 +64,9 @@ import {
   selectedLots,
   getProductTypeValue,
   getTransactionType,
-  productTypes
+  productTypes,
+  updateAvailableQuantities,
+  orderTypes,
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -256,33 +257,7 @@ export function useTradeView() {
       return new Date(bTime) - new Date(aTime) // Sort in descending order (most recent first)
     })
   })
-  const orderTypes = computed(() => {
-    if (
-      selectedBroker.value?.brokerName === 'Flattrade' ||
-      selectedBroker.value?.brokerName === 'Shoonya'
-    ) {
-      return ['MKT', 'LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION']
-    }
-    return []
-  })
-  const displayOrderTypes = computed(() => {
-    return orderTypes.value.map((type) => {
-      switch (type) {
-        case 'MKT':
-          return 'Market'
-        case 'LMT':
-          return 'Limit'
-        case 'LMT_LTP':
-          return 'Limit at LTP'
-        case 'LMT_OFFSET':
-          return 'Limit at Offset'
-        case 'MKT_PROTECTION':
-          return 'Market Protection'
-        default:
-          return type
-      }
-    })
-  })
+
   const previousOrderType = ref(orderTypes.value[0])
 
   const availableBalance = computed(() => {
@@ -1031,21 +1006,7 @@ export function useTradeView() {
       lotsPerSymbol.value = JSON.parse(savedLots)
     }
   }
-  const updateAvailableQuantities = () => {
-    const instrument = quantities.value[selectedMasterSymbol.value]
-    if (instrument) {
-      availableQuantities.value = Array.from({ length: instrument.maxLots }, (_, i) => ({
-        lots: i + 1,
-        quantity: (i + 1) * instrument.lotSize
-      }))
-    } else {
-      availableQuantities.value = []
-    }
-    // Ensure selectedQuantity is in the available quantities list
-    if (!availableQuantities.value.some((q) => q.quantity === selectedQuantity.value)) {
-      selectedQuantity.value = availableQuantities.value[0]?.quantity || 0
-    }
-  }
+
   const updateSelectedQuantity = () => {
     const instrument = quantities.value[selectedMasterSymbol.value]
     if (instrument) {
@@ -2790,7 +2751,6 @@ export function useTradeView() {
     updateStrikesForExpiry,
     synchronizeCallStrikes,
     synchronizePutStrikes,
-    updateAvailableQuantities,
     updateSelectedQuantity,
     saveUserChoice,
     saveLots,
@@ -2854,8 +2814,6 @@ export function useTradeView() {
     todayExpirySymbol,
     maxLots,
     combinedOrdersAndTrades,
-    orderTypes,
-    displayOrderTypes,
     availableBalance,
     usedAmount,
     formattedDate,
