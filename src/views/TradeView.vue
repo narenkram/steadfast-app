@@ -885,13 +885,13 @@ import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
-import { selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols } from '@/stores/globalStore'
+import { selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange } from '@/stores/globalStore'
 
 // Kill Switch Composables
 import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
 
 // Broker Selection Composables
-import { availableBrokers, brokerStatus, selectedBroker, selectedBrokerName } from '@/composables/useBrokerFunctions'
+import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
 import { getProductTypeValue } from '@/composables/useTradeConfiguration'
@@ -997,7 +997,6 @@ const {
   experimentalFeatures,
   currentTime,
   enableHotKeys,
-  selectedExchange,
   selectedQuantity,
   selectedExpiry,
   exchangeSymbols,

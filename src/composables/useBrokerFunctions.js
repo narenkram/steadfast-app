@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { validateToken } from './useBrokerTokenValidator'
+import { validateToken } from '@/composables/useBrokerTokenValidator'
 import { updateSelectedBrokerOnServer } from '../api/broker'
 import axios from 'axios'
 
@@ -14,13 +14,13 @@ import {
   showToast
 } from '@/stores/globalStore'
 
-const availableBrokers = computed(() => {
+export const availableBrokers = computed(() => {
   return Object.keys(localStorage)
     .filter((key) => key.startsWith('broker_'))
     .map((key) => key.replace('broker_', ''))
 })
 
-const brokerStatus = computed(() => {
+export const brokerStatus = computed(() => {
   const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}')
   const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}')
 
@@ -43,7 +43,7 @@ const brokerStatus = computed(() => {
   return 'Not Connected'
 })
 
-const updateSelectedBroker = async () => {
+export const updateSelectedBroker = async () => {
   const availableBrokerNames = availableBrokers.value
 
   if (availableBrokerNames.length === 0) {
@@ -66,7 +66,7 @@ const updateSelectedBroker = async () => {
   }
 }
 
-const deleteBroker = (broker) => {
+export const deleteBroker = (broker) => {
   // Remove broker details from localStorage
   localStorage.removeItem(`broker_${broker.brokerName}`)
 
@@ -88,7 +88,7 @@ const deleteBroker = (broker) => {
   // This will automatically update the table
 }
 
-const setFlattradeCredentials = async () => {
+export const setFlattradeCredentials = async () => {
   try {
     if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Flattrade') {
       toastMessage.value = 'Realtime LTP data only available for Flattrade'
@@ -127,7 +127,7 @@ const setFlattradeCredentials = async () => {
     showToast.value = true
   }
 }
-const setShoonyaCredentials = async () => {
+export const setShoonyaCredentials = async () => {
   try {
     if (!selectedBroker.value || selectedBroker.value?.brokerName !== 'Shoonya') {
       toastMessage.value = 'Realtime LTP data only available for Shoonya'
@@ -168,22 +168,9 @@ const setShoonyaCredentials = async () => {
 }
 
 // Initialize selected broker from localStorage
-const initializeBroker = () => {
+export const initializeBroker = () => {
   const storedBroker = localStorage.getItem('selectedBroker')
   if (storedBroker) {
     updateSelectedBroker(JSON.parse(storedBroker))
   }
-}
-
-export {
-  selectedBroker,
-  selectedBrokerName,
-  selectedBrokerToDelete,
-  availableBrokers,
-  brokerStatus,
-  updateSelectedBroker,
-  deleteBroker,
-  setFlattradeCredentials,
-  setShoonyaCredentials,
-  initializeBroker
 }

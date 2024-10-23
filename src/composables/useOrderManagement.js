@@ -16,7 +16,8 @@ import {
   toastMessage,
   showToast,
   flatTradePositionBook,
-  shoonyaPositionBook
+  shoonyaPositionBook,
+  selectedExchange
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
@@ -26,9 +27,22 @@ import { getExchangeSegment, getProductTypeValue } from '@/composables/useTradeC
 import { selectedLots, getTransactionType } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
-import { updateOrdersAndPositions } from '@/composables/usePortfolioManagement'
+import {
+  updateOrdersAndPositions,
+  updateFundLimits,
+  findNewPosition,
+  getSymbol
+} from '@/composables/usePortfolioManagement'
 
-const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
+// Risk Management Composables
+import { setStoploss, setTarget } from '@/composables/useRiskManagement'
+
+export const prepareOrderPayload = (
+  transactionType,
+  drvOptionType,
+  selectedStrike,
+  exchangeSegment
+) => {
   let price = '0'
   let priceType = 'MKT'
 
@@ -80,7 +94,7 @@ const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exc
       throw new Error('Unsupported broker')
   }
 }
-const placeOrder = async (transactionType, drvOptionType) => {
+export const placeOrder = async (transactionType, drvOptionType) => {
   try {
     let selectedStrike =
       drvOptionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
@@ -196,7 +210,7 @@ const placeOrder = async (transactionType, drvOptionType) => {
     showToast.value = true
   }
 }
-const placeOrderForPosition = async (transactionType, optionType, position) => {
+export const placeOrderForPosition = async (transactionType, optionType, position) => {
   try {
     const quantity = Math.abs(Number(position.netQty || position.netqty))
     const instrument = quantities.value[selectedMasterSymbol.value]
@@ -277,7 +291,7 @@ const placeOrderForPosition = async (transactionType, optionType, position) => {
     showToast.value = true
   }
 }
-const closeAllPositions = async () => {
+export const closeAllPositions = async () => {
   try {
     let positionsClosed = false
 
@@ -330,5 +344,3 @@ const closeAllPositions = async () => {
     showToast.value = true
   }
 }
-
-export { placeOrder, placeOrderForPosition, closeAllPositions, prepareOrderPayload }

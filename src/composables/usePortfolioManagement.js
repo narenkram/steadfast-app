@@ -16,11 +16,66 @@ import {
   flatOrderBook,
   flatTradeBook,
   shoonyaOrderBook,
-  shoonyaTradeBook
+  shoonyaTradeBook,
+  fundLimits
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
 import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+
+export const updateFundLimits = async () => {
+  await fetchFundLimit()
+  // console.log('Updated Fund Limits:', fundLimits.value);
+}
+export const fetchFundLimit = async () => {
+  try {
+    if (!selectedBroker.value) {
+      throw new Error('No broker selected')
+    }
+
+    let response
+    if (selectedBroker.value?.brokerName === 'Flattrade') {
+      const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN')
+      if (!FLATTRADE_API_TOKEN) {
+        throw new Error('Flattrade API Token is missing')
+      }
+      response = await axios.post(`${BASE_URL}/flattrade/fundLimit`, null, {
+        params: {
+          FLATTRADE_API_TOKEN,
+          FLATTRADE_CLIENT_ID: selectedBroker.value.clientId
+        }
+      })
+      fundLimits.value = {
+        cash: response.data.cash,
+        payin: response.data.payin,
+        marginused: response.data.marginused
+      }
+    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+      const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN')
+      if (!SHOONYA_API_TOKEN) {
+        throw new Error('Shoonya API Token is missing')
+      }
+      response = await axios.post(`${BASE_URL}/shoonya/fundLimit`, null, {
+        params: {
+          SHOONYA_API_TOKEN,
+          SHOONYA_CLIENT_ID: selectedBroker.value.clientId
+        }
+      })
+      // Make sure the response data has the correct structure
+      fundLimits.value = {
+        cash: response.data.cash,
+        payin: response.data.payin,
+        marginused: response.data.marginused
+        // Add any other relevant fields from the Shoonya response
+      }
+    } else {
+      throw new Error('Unsupported broker')
+    }
+    // fundLimits.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch fund limits:', error)
+  }
+}
 
 export const fetchFlattradeOrdersTradesBook = async () => {
   let jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value
@@ -289,4 +344,17 @@ export const subscribeToOptions = () => {
 
   // Subscribe to position LTPs separately
   subscribeToPositionLTPs()
+}
+
+export const findNewPosition = (tradingSymbol) => {
+  if (selectedBroker.value?.brokerName === 'Flattrade') {
+    return flatTradePositionBook.value.find((p) => p.tsym === tradingSymbol)
+  } else if (selectedBroker.value?.brokerName === 'Shoonya') {
+    return shoonyaPositionBook.value.find((p) => p.tsym === tradingSymbol)
+  }
+  return null
+}
+
+export const getSymbol = (position) => {
+  return position.tsym || position.tradingSymbol || ''
 }
