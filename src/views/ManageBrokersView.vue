@@ -2,6 +2,10 @@
 import { onMounted, ref } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
+
+// Formatters
+import { manageBrokerMaskClientId, maskTokenSecret } from '@/composables/useFormatters';
+
 import { useTradeView } from '@/composables/useTradingSystem';
 
 const {
@@ -10,14 +14,8 @@ const {
   copyToClipboard,
   generateToken,
   getStatus,
-  maskTokenSecret,
   handleShoonyaLogin,
   deleteBroker,
-  ManageBrokerMaskClientId,
-
-
-  // Computed properties
-
 
   // Reactive variables
   API_TOKEN, // Not used right now
@@ -124,7 +122,7 @@ onMounted(() => {
             <td>{{ broker.brokerName }}</td>
             <td>
               <span class="badge bg-primary">
-                {{ visibleClientIds[broker.id] ? broker.brokerClientId : ManageBrokerMaskClientId(broker.brokerClientId)
+                {{ visibleClientIds[broker.id] ? broker.brokerClientId : manageBrokerMaskClientId(broker.brokerClientId)
                 }}
               </span>
               <button class="btn btn-sm btn-outline-secondary ms-2" @click="toggleBrokerClientIdVisibility(broker.id)">
@@ -196,7 +194,7 @@ onMounted(() => {
               <div class="mb-2">
                 <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
                 <input type="text" id="ShoonyaBrokerUserId" class="form-control"
-                  :value="ManageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
+                  :value="manageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
               </div>
 
               <div class="mb-2">

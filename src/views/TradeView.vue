@@ -893,6 +893,8 @@ import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSw
 // Broker Selection Composables
 import { availableBrokers, brokerStatus, selectedBroker, selectedBrokerName } from '@/composables/useBrokerFunctions'
 
+// Trade Configuration Composables
+import { getProductTypeValue } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
@@ -918,7 +920,6 @@ const {
   updateSymbolData,
   setActiveFetchFunctionAndFetch,
   handleHotKeys,
-  getProductTypeValue,
   connectWebSocket,
   saveBasket,
   loadBasket,
