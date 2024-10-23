@@ -114,3 +114,12 @@ export const displayOrderTypes = computed(() => {
     }
   })
 })
+export const saveLots = () => {
+  localStorage.setItem('lotsPerSymbol', JSON.stringify(lotsPerSymbol.value))
+}
+export const loadLots = () => {
+  const savedLots = localStorage.getItem('lotsPerSymbol')
+  if (savedLots) {
+    lotsPerSymbol.value = JSON.parse(savedLots)
+  }
+}

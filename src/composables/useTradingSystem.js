@@ -67,6 +67,8 @@ import {
   productTypes,
   updateAvailableQuantities,
   orderTypes,
+  saveLots,
+  loadLots
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -996,15 +998,6 @@ export function useTradeView() {
     // console.log('Updating Security IDs');
     defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
     defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
-  }
-  const saveLots = () => {
-    localStorage.setItem('lotsPerSymbol', JSON.stringify(lotsPerSymbol.value))
-  }
-  const loadLots = () => {
-    const savedLots = localStorage.getItem('lotsPerSymbol')
-    if (savedLots) {
-      lotsPerSymbol.value = JSON.parse(savedLots)
-    }
   }
 
   const updateSelectedQuantity = () => {
@@ -2753,7 +2746,6 @@ export function useTradeView() {
     synchronizePutStrikes,
     updateSelectedQuantity,
     saveUserChoice,
-    saveLots,
     saveOffsets,
     saveExpiryOffset,
     updateSymbolData,
@@ -2780,7 +2772,6 @@ export function useTradeView() {
     validateAndPlaceOrder,
     handleOrderTypeChange,
     getCurrentLTP,
-    loadLots,
     handleOrderClick,
     formatTime,
     loadStrategy,

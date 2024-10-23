@@ -887,7 +887,7 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -897,7 +897,7 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes } from '@/composables/useTradeConfiguration'
+import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
@@ -930,7 +930,6 @@ const {
   deleteBasket,
   validateAndPlaceOrder,
   handleOrderTypeChange,
-  loadLots,
   handleOrderClick,
   formatTime,
   loadStrategy,
@@ -950,7 +949,6 @@ const {
   isFormDisabled,
   exchangeOptions,
   todayExpirySymbol,
-  selectedLots,
   maxLots,
   combinedOrdersAndTrades,
   availableBalance,
@@ -1035,7 +1033,6 @@ const {
   callDepth,
   putDepth,
   allSymbolsData,
-  selectedOrderType,
   stickyMTM,
 } = useTradeView();
 
