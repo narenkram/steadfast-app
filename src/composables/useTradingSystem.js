@@ -30,7 +30,11 @@ import {
   defaultCallSecurityId,
   defaultPutSecurityId,
   additionalSymbols,
-  currentSubscriptions
+  currentSubscriptions,
+  flatOrderBook,
+  flatTradeBook,
+  shoonyaOrderBook,
+  shoonyaTradeBook
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -100,11 +104,7 @@ export function useTradeView() {
     sensexPrice,
     bankexPrice,
     dataFetched,
-    flatOrderBook,
-    flatTradeBook,
     token,
-    shoonyaOrderBook,
-    shoonyaTradeBook,
     fundLimits,
     selectedStrike,
     limitPrice,
@@ -3269,11 +3269,7 @@ export function useTradeView() {
     sensexPrice,
     bankexPrice,
     dataFetched,
-    flatOrderBook,
-    flatTradeBook,
     token,
-    shoonyaOrderBook,
-    shoonyaTradeBook,
     fundLimits,
     selectedStrike,
     limitPrice,

@@ -12,7 +12,11 @@ import {
   additionalSymbols,
   currentSubscriptions,
   toastMessage,
-  showToast
+  showToast,
+  flatOrderBook,
+  flatTradeBook,
+  shoonyaOrderBook,
+  shoonyaTradeBook
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
