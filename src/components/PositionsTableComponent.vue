@@ -271,8 +271,9 @@ const {
     targets,
     trailingStoplosses,
     positionsWithCalculatedProfit,
-    formatTradingSymbol,
 } = useTradeView();
+
+import { formatTradingSymbol } from '@/composables/useFormatters';
 
 const sortedPositions = computed(() => {
     return [...positionsWithCalculatedProfit.value].sort((a, b) => {
