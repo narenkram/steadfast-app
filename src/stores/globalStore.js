@@ -282,3 +282,4 @@ export const userTriggeredTokenGeneration = ref(false) // Flag to track user-tri
 export const selectedBrokerToDelete = ref(null) // Store the broker to be deleted
 export const savedStickyMTM = localStorage.getItem('stickyMTM')
 export const stickyMTM = ref(savedStickyMTM ? JSON.parse(savedStickyMTM) : false)
+export const userId = localStorage.getItem('userId')

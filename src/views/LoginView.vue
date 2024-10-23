@@ -103,6 +103,8 @@ const verifyOtp = async () => {
         .then((result) => {
             // User logged in successfully.
             const user = result.user;
+            // After successful login
+            localStorage.setItem('userId', user.uid);
             console.log('User logged in:', user);
             router.push('/manage-brokers');
         })

@@ -166,6 +166,8 @@ const verifyOtp = async () => {
                     })
                         .then(() => {
                             console.log('User data stored in Firestore');
+                            // After successful sign-up
+                            localStorage.setItem('userId', user.uid);
                             router.push('/dashboard');
                         })
                         .catch((error) => {
