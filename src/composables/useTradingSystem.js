@@ -27,10 +27,6 @@ import {
   defaultPutSecurityId,
   additionalSymbols,
   currentSubscriptions,
-  flatOrderBook,
-  flatTradeBook,
-  shoonyaOrderBook,
-  shoonyaTradeBook,
   fundLimits,
   selectedExchange,
   positionLTPs,
@@ -44,7 +40,11 @@ import {
   FLATTRADE_API_TOKEN,
   SHOONYA_CLIENT_ID,
   SHOONYA_API_TOKEN,
-  SHOONYA_API_KEY
+  SHOONYA_API_KEY,
+  flatOrderBook,
+  flatTradeBook,
+  shoonyaOrderBook,
+  shoonyaTradeBook
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -55,7 +55,8 @@ import {
   prepareOrderPayload,
   placeOrder,
   placeOrderForPosition,
-  closeAllPositions
+  closeAllPositions,
+  cancelPendingOrders
 } from '@/composables/useOrderManagement'
 
 // Broker Selection Composables
@@ -1419,67 +1420,6 @@ export function useTradeView() {
     subscribeToOptions()
   }
 
-  const closeSelectedPositions = async () => {
-    try {
-      let positionsClosed = false
-
-      if (selectedBroker.value?.brokerName === 'Shoonya') {
-        // Create a copy of the selected positions to iterate over
-        const positionsToClose = [...selectedShoonyaPositionsSet.value]
-
-        for (const tsym of positionsToClose) {
-          const position = shoonyaPositionBook.value.find((p) => p.tsym === tsym)
-          const netqty = Number(position.netqty)
-          if (netqty !== 0) {
-            const transactionType = netqty > 0 ? 'S' : 'B'
-            const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT'
-            await placeOrderForPosition(transactionType, optionType, position)
-            positionsClosed = true
-
-            // Remove the closed position from the selected positions
-            selectedShoonyaPositionsSet.value.delete(tsym)
-          }
-        }
-      } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-        // Create a copy of the selected positions to iterate over
-        const positionsToClose = [...selectedFlattradePositionsSet.value]
-
-        for (const tsym of positionsToClose) {
-          const position = flatTradePositionBook.value.find((p) => p.tsym === tsym)
-          const netqty = Number(position.netqty)
-          if (netqty !== 0) {
-            const transactionType = netqty > 0 ? 'S' : 'B'
-            const optionType = position.tsym.includes('C') ? 'CALL' : 'PUT'
-            await placeOrderForPosition(transactionType, optionType, position)
-            positionsClosed = true
-
-            // Remove the closed position from the selected positions
-            selectedFlattradePositionsSet.value.delete(tsym)
-          }
-        }
-      }
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Update fund limits
-      await updateFundLimits()
-
-      if (positionsClosed) {
-        toastMessage.value = `Selected positions closed successfully`
-      } else {
-        toastMessage.value = `No positions to close`
-      }
-      showToast.value = true
-    } catch (error) {
-      console.error('Error closing selected positions:', error)
-      toastMessage.value = 'Failed to close selected positions'
-      showToast.value = true
-    }
-  }
   const setReverseMode = (mode) => {
     reverseMode.value = mode
   }
@@ -1554,101 +1494,6 @@ export function useTradeView() {
     } catch (error) {
       console.error('Error reversing positions:', error)
       toastMessage.value = `Failed to reverse ${reverseMode.value === 'all' ? 'all' : 'selected'} positions`
-      showToast.value = true
-    }
-  }
-  const cancelOrder = async (order) => {
-    const orderId = order.norenordno
-    const orderStatus = order.status
-
-    console.log(`Attempting to cancel order ${orderId} with status ${orderStatus}`)
-    // console.log(`Broker: ${selectedBroker.value?.brokerName}`);
-
-    if (orderStatus !== 'OPEN') {
-      console.log(`Order ${orderId} is not in a cancellable state and cannot be canceled.`)
-      return
-    }
-
-    try {
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        const jKey = localStorage.getItem('FLATTRADE_API_TOKEN') || token.value
-        const clientId = selectedBroker.value.clientId
-        console.log(`Sending request to cancel Flattrade order ${orderId}`)
-        await axios.post(
-          `${BASE_URL}/flattrade/cancelOrder`,
-          {
-            norenordno: orderId,
-            uid: clientId
-          },
-          {
-            params: {
-              FLATTRADE_API_TOKEN: jKey
-            }
-          }
-        )
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        const jKey = localStorage.getItem('SHOONYA_API_TOKEN') || token.value
-        const clientId = selectedBroker.value.clientId
-        console.log(`Sending request to cancel Shoonya order ${orderId}`)
-        await axios.post(
-          `${BASE_URL}/shoonya/cancelOrder`,
-          {
-            norenordno: orderId,
-            uid: clientId
-          },
-          {
-            params: {
-              SHOONYA_API_TOKEN: jKey
-            }
-          }
-        )
-      }
-      console.log(`Order ${orderId} canceled successfully.`)
-      // Update fund limits
-      await updateFundLimits()
-    } catch (error) {
-      console.error(`Failed to cancel order ${orderId}:`, error)
-      toastMessage.value = 'Failed to cancel order'
-      showToast.value = true
-      throw error // Rethrow to handle in cancelPendingOrders
-    }
-  }
-  const cancelPendingOrders = async () => {
-    // Fetch orders based on the selected broker
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      await fetchFlattradeOrdersTradesBook()
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      await fetchShoonyaOrdersTradesBook()
-    }
-
-    let pendingOrders
-    if (selectedBroker.value?.brokerName === 'Flattrade') {
-      pendingOrders = flatOrderBook.value.filter((order) => order.status === 'OPEN')
-    } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-      pendingOrders = shoonyaOrderBook.value.filter((order) => order.status === 'OPEN')
-    } else {
-      console.error('Unknown broker')
-      return
-    }
-
-    const cancelPromises = pendingOrders.map((order) => cancelOrder(order))
-    console.log(`Canceling pending orders for broker: ${selectedBroker.value?.brokerName}`) // placed here to prevent delay and debugging if required
-    console.log(`Pending orders:`, pendingOrders) // placed here to prevent delay and debugging if required
-
-    try {
-      await Promise.all(cancelPromises)
-      toastMessage.value = 'Pending orders canceled successfully'
-      showToast.value = true
-
-      // Refresh the orders list based on the selected broker
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        await fetchFlattradeOrdersTradesBook()
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        await fetchShoonyaOrdersTradesBook()
-      }
-    } catch (error) {
-      console.error('Failed to cancel orders:', error)
-      toastMessage.value = 'Failed to cancel some orders'
       showToast.value = true
     }
   }
@@ -2765,8 +2610,6 @@ export function useTradeView() {
     toggleOvertradeProtection,
     toggleExperimentalFeatures,
     setOrderDetails,
-    cancelPendingOrders,
-    closeSelectedPositions,
     updateTradingSymbol,
     convertToComparableDate,
     resetOrderTypeIfNeeded,

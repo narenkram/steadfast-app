@@ -900,7 +900,7 @@ import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions
 import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
-import { closeAllPositions } from '@/composables/useOrderManagement'
+import { closeAllPositions, cancelPendingOrders, closeSelectedPositions } from '@/composables/useOrderManagement'
 
 // Risk Management Composables
 import { checkStoplossesAndTargets, setStoploss, removeStoploss, increaseStoploss, decreaseStoploss, setTarget, removeTarget, increaseTarget, decreaseTarget } from '@/composables/useRiskManagement'
@@ -929,8 +929,6 @@ const {
   formatTime,
   loadStrategy,
   setOrderDetails,
-  cancelPendingOrders,
-  closeSelectedPositions,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,
   setStrategyType,
