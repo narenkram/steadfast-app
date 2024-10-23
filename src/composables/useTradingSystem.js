@@ -36,7 +36,8 @@ import {
   shoonyaOrderBook,
   shoonyaTradeBook,
   fundLimits,
-  selectedExchange
+  selectedExchange,
+  positionLTPs,
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -119,7 +120,6 @@ export function useTradeView() {
     currentClockEmoji,
     latestCallLTP,
     latestPutLTP,
-    positionLTPs,
     totalRiskType,
     totalRiskTypeToggle,
     activeFetchFunction,
@@ -164,14 +164,6 @@ export function useTradeView() {
     targetAction,
     orderMargin,
     limitOffset,
-    stoplosses,
-    targets,
-    trailingStoplosses,
-    enableStoploss,
-    stoplossValue,
-    enableTarget,
-    targetValue,
-    tslHitPositions,
     callDepth,
     putDepth,
     symbolData,
@@ -2172,7 +2164,6 @@ export function useTradeView() {
       : parseFloat(latestPutLTP.value)
   }
 
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -2943,7 +2934,6 @@ export function useTradeView() {
     currentClockEmoji,
     latestCallLTP,
     latestPutLTP,
-    positionLTPs,
     totalRiskType,
     totalRiskTypeToggle,
     activeFetchFunction,
@@ -2988,14 +2978,6 @@ export function useTradeView() {
     targetAction,
     orderMargin,
     limitOffset,
-    stoplosses,
-    targets,
-    trailingStoplosses,
-    enableStoploss,
-    stoplossValue,
-    enableTarget,
-    targetValue,
-    tslHitPositions,
     callDepth,
     putDepth,
     symbolData,

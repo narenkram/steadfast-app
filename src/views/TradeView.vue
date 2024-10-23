@@ -899,6 +899,8 @@ import { getProductTypeValue } from '@/composables/useTradeConfiguration'
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
 
+// Risk Management Composables
+import { checkStoplossesAndTargets, setStoploss, removeStoploss, increaseStoploss, decreaseStoploss, setTarget, removeTarget, increaseTarget, decreaseTarget } from '@/composables/useRiskManagement'
 
 // Formatters
 import {
@@ -926,15 +928,6 @@ const {
   deleteBasket,
   validateAndPlaceOrder,
   handleOrderTypeChange,
-  setStoploss,
-  removeStoploss,
-  increaseStoploss,
-  decreaseStoploss,
-  setTarget,
-  removeTarget,
-  increaseTarget,
-  decreaseTarget,
-  checkStoplossesAndTargets,
   loadLots,
   handleOrderClick,
   formatTime,

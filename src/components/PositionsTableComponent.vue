@@ -266,14 +266,15 @@ const emit = defineEmits([
 ]);
 
 const {
-    positionLTPs,
-    stoplosses,
-    targets,
-    trailingStoplosses,
     positionsWithCalculatedProfit,
 } = useTradeView();
 
+// Formatters
 import { formatTradingSymbol } from '@/composables/useFormatters';
+
+// Global State
+import { positionLTPs, stoplosses, targets, trailingStoplosses } from '@/stores/globalStore'
+
 
 const sortedPositions = computed(() => {
     return [...positionsWithCalculatedProfit.value].sort((a, b) => {

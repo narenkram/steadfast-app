@@ -1,3 +1,21 @@
+import {
+  stoplossValue,
+  targetValue,
+  enableStoploss,
+  positionLTPs,
+  stoplosses,
+  targets,
+  trailingStoplosses,
+  tslHitPositions,
+  flatTradePositionBook,
+  shoonyaPositionBook,
+  toastMessage,
+  showToast
+} from '@/stores/globalStore'
+
+// Order Management Composables
+import { placeOrderForPosition } from '@/composables/useOrderManagement'
+
 export const setStoploss = (position, type) => {
   if (!enableStoploss.value) {
     console.log('Stoploss is disabled.')
