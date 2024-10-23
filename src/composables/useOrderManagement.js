@@ -14,7 +14,9 @@ import {
   selectedBroker,
   selectedProductType,
   toastMessage,
-  showToast
+  showToast,
+  flatTradePositionBook,
+  shoonyaPositionBook
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
@@ -22,6 +24,9 @@ import { getExchangeSegment, getProductTypeValue } from '@/composables/useTradeC
 
 // Order Management Composables
 import { selectedLots, getTransactionType } from '@/composables/useTradeConfiguration'
+
+// Portfolio Management Composables
+import { updateOrdersAndPositions } from '@/composables/usePortfolioManagement'
 
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   let price = '0'
