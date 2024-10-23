@@ -583,7 +583,7 @@
               </div>
             </div>
           </div>
-          <div class="row py-3">
+          <!-- <div class="row py-3">
             <div class="col-12">
               <h5>Basket Name</h5>
               <div class="mb-3">
@@ -703,7 +703,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -871,7 +871,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import BrokerComponent from '@/components/BrokerComponent.vue';
@@ -884,6 +884,9 @@ import MultiStrikeComponent from '@/components/MultiStrikeComponent.vue';
 import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
+// Global State
+import { selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
+
 // Kill Switch Composables
 import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
 
@@ -893,6 +896,13 @@ import { availableBrokers, brokerStatus, selectedBroker, selectedBrokerName } fr
 
 // Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
+
+
+// Formatters
+import {
+  formatTradingSymbol,
+  formatDate
+} from '@/composables/useFormatters'
 
 const {
   // Methods
@@ -924,7 +934,6 @@ const {
   increaseTarget,
   decreaseTarget,
   checkStoplossesAndTargets,
-  formatDate,
   loadLots,
   handleOrderClick,
   formatTime,
@@ -940,7 +949,6 @@ const {
   removeFromBasket,
   placeBasket,
   reversePositions,
-  formatTradingSymbol,
 
   // Computed properties
   isFormDisabled,
@@ -992,8 +1000,6 @@ const {
   selectedMasterSymbol,
   selectedQuantity,
   selectedExpiry,
-  selectedCallStrike,
-  selectedPutStrike,
   exchangeSymbols,
   callStrikes,
   putStrikes,

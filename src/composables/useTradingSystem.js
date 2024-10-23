@@ -7,9 +7,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { updateSelectedBrokerOnServer } from '../api/broker'
 import { validateToken, getBrokerStatus, tokenStatus } from '@/composables/useBrokerTokenValidator'
 
+// Global State
+import { killSwitchActive, selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
+
 // Kill Switch Composables
 import { toggleKillSwitch } from '@/composables/useKillSwitch'
-import { killSwitchActive } from '@/stores/globalStore'
 
 // Order Management Composables
 import {
@@ -24,7 +26,7 @@ import {
   brokerStatus,
   updateSelectedBroker,
   setFlattradeCredentials,
-  setShoonyaCredentials,
+  setShoonyaCredentials
 } from '@/composables/useBrokerFunctions'
 
 export function useTradeView() {
@@ -46,8 +48,6 @@ export function useTradeView() {
     selectedMasterSymbol,
     selectedQuantity,
     selectedExpiry,
-    selectedCallStrike,
-    selectedPutStrike,
     callStrikeOffset,
     putStrikeOffset,
     expiryOffset,
@@ -873,19 +873,6 @@ export function useTradeView() {
     }
   }
 
-  const formatDate = (dateString) => {
-    if (!dataFetched.value || !dateString) {
-      return '' // Return empty string if data hasn't been fetched or dateString is null
-    }
-
-    if (
-      selectedBroker.value?.brokerName === 'Flattrade' ||
-      selectedBroker.value?.brokerName === 'Shoonya'
-    ) {
-      return dateString
-    }
-    return dateString
-  }
   const convertToComparableDate = (dateString) => {
     const date = new Date(dateString)
     const options = { day: '2-digit', month: 'short', year: 'numeric' }
@@ -2008,13 +1995,7 @@ export function useTradeView() {
       showToast.value = true
     }
   }
-  const formatPrice = (price) => {
-    if (price == null || isNaN(price)) {
-      return '-'
-    }
-    const numPrice = Number(price)
-    return numPrice.toFixed(2)
-  }
+
   const getSymbol = (position) => {
     return position.tsym || position.tradingSymbol || ''
   }
@@ -2873,22 +2854,6 @@ export function useTradeView() {
       return
     }
   }
-  function ManageBrokerMaskClientId(brokerClientId) {
-    if (!brokerClientId) return brokerClientId // Ensure brokerClientId is defined and not a placeholder
-
-    const length = brokerClientId.length
-    if (length <= 2) return brokerClientId // If the length is 2 or less, return as is
-
-    const maskLength = Math.max(1, Math.floor(length / 2)) // Mask at least 1 character, up to half the length
-    const startUnmaskedLength = Math.ceil((length - maskLength) / 2)
-    const endUnmaskedLength = length - startUnmaskedLength - maskLength
-
-    const firstPart = brokerClientId.slice(0, startUnmaskedLength)
-    const lastPart = brokerClientId.slice(-endUnmaskedLength)
-    const middleMask = '*'.repeat(maskLength) // Mask middle portion dynamically
-
-    return `${firstPart}${middleMask}${lastPart}`
-  }
 
   const getStatus = (broker) => {
     if (!broker || !broker.brokerName) {
@@ -2911,14 +2876,6 @@ export function useTradeView() {
     }
 
     return { status: statusText, statusClass }
-  }
-
-  function maskTokenSecret(apiSecret) {
-    if (!apiSecret || apiSecret.length < 10) return apiSecret // Ensure there are enough characters to mask and not a placeholder
-
-    const start = apiSecret.slice(0, 3)
-    const end = apiSecret.slice(-3)
-    return `${start}******${end}`
   }
 
   const handleShoonyaLogin = async () => {
@@ -3040,19 +2997,7 @@ export function useTradeView() {
   const debouncedFetchData = debounce(async () => {
     await setActiveFetchFunctionAndFetch()
   })
-  const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
-    if (!symbol) return ''
 
-    const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
-    const match = symbol.match(regex)
-
-    if (match) {
-      const [, index, year, month, date, optionType, strikePrice] = match
-      return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
-    }
-
-    return symbol
-  }
   // ... (add all other methods here)
 
   // Watchers
@@ -3523,7 +3468,6 @@ export function useTradeView() {
     checkTargets,
     checkStoplosses,
     checkStoplossesAndTargets,
-    formatDate,
     loadLots,
     handleOrderClick,
     formatTime,
@@ -3545,15 +3489,11 @@ export function useTradeView() {
     placeAllBasketOrders,
     setReverseMode,
     reversePositions,
-    formatPrice,
     selectedBrokerToDelete,
     copyToClipboard,
     generateToken,
     getStatus,
-    maskTokenSecret,
     handleShoonyaLogin,
-    ManageBrokerMaskClientId,
-    formatTradingSymbol,
     setActiveFetchFunctionAndFetch,
 
     // Computed properties
@@ -3615,8 +3555,6 @@ export function useTradeView() {
     selectedMasterSymbol,
     selectedQuantity,
     selectedExpiry,
-    selectedCallStrike,
-    selectedPutStrike,
     callStrikeOffset,
     putStrikeOffset,
     expiryOffset,

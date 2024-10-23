@@ -2,6 +2,9 @@ import { ref } from 'vue'
 import axios from 'axios'
 import qs from 'qs'
 
+// Global State
+import { selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
+
 const prepareOrderPayload = (transactionType, drvOptionType, selectedStrike, exchangeSegment) => {
   let price = '0'
   let priceType = 'MKT'
