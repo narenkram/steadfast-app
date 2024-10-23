@@ -43,19 +43,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useTradeView } from '@/composables/useTradingSystem';
 import { FontAwesomeIcon } from '@/font-awesome';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import NotificationComponent from './NotificationComponent.vue'
 
-const {
-    showToast,
-    toastMessage,
-    notificationSound,
-    selectedSound,
-} = useTradeView();
+// Global State
+import { notificationSound, toastMessage, selectedSound, showToast } from '@/stores/globalStore';
 
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
