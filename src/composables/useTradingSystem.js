@@ -154,7 +154,9 @@ import {
   updateAvailableQuantities,
   orderTypes,
   updateSelectedQuantity,
-  updateStrikesForExpiry
+  updateStrikesForExpiry,
+  synchronizeCallStrikes,
+  synchronizePutStrikes
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -834,44 +836,6 @@ export function useTradeView() {
   const saveOffsets = () => {
     localStorage.setItem('callStrikeOffset', callStrikeOffset.value)
     localStorage.setItem('putStrikeOffset', putStrikeOffset.value)
-  }
-  const synchronizeStrikes = () => {
-    synchronizeCallStrikes()
-    synchronizePutStrikes()
-    updateSecurityIds()
-    subscribeToOptions()
-  }
-  const synchronizeCallStrikes = () => {
-    if (selectedPutStrike.value && selectedPutStrike.value.strikePrice) {
-      const matchingCallStrike = callStrikes.value.find(
-        (strike) => strike.strikePrice === selectedPutStrike.value.strikePrice
-      )
-      if (matchingCallStrike) {
-        selectedCallStrike.value = matchingCallStrike
-      } else {
-        selectedCallStrike.value = {}
-      }
-    }
-    updateSecurityIds()
-  }
-
-  const synchronizePutStrikes = () => {
-    if (selectedCallStrike.value && selectedCallStrike.value.strikePrice) {
-      const matchingPutStrike = putStrikes.value.find(
-        (strike) => strike.strikePrice === selectedCallStrike.value.strikePrice
-      )
-      if (matchingPutStrike) {
-        selectedPutStrike.value = matchingPutStrike
-      } else {
-        selectedPutStrike.value = {}
-      }
-    }
-    updateSecurityIds()
-  }
-  const updateSecurityIds = () => {
-    // console.log('Updating Security IDs');
-    defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
-    defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
   }
 
   const formatTime = (timeString) => {
@@ -2372,8 +2336,6 @@ export function useTradeView() {
     setDefaultExchangeAndMasterSymbol,
     fetchTradingData,
     setDefaultExpiry,
-    synchronizeCallStrikes,
-    synchronizePutStrikes,
     saveUserChoice,
     saveOffsets,
     saveExpiryOffset,

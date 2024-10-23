@@ -8,8 +8,24 @@ import {
   selectedQuantity,
   availableQuantities,
   quantities,
-  allSymbolsData
+  allSymbolsData,
+  callStrikes,
+  putStrikes,
+  selectedCallStrike,
+  selectedPutStrike,
+  niftyPrice,
+  bankNiftyPrice,
+  finniftyPrice,
+  midcpniftyPrice,
+  sensexPrice,
+  bankexPrice,
+  synchronizeOnLoad,
+  defaultCallSecurityId,
+  defaultPutSecurityId
 } from '@/stores/globalStore'
+
+// Trade Configuration Composables
+import { subscribeToOptions } from '@/composables/usePortfolioManagement'
 
 export const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
@@ -230,4 +246,42 @@ export const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
     defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
     defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
   }
+}
+export const synchronizeStrikes = () => {
+  synchronizeCallStrikes()
+  synchronizePutStrikes()
+  updateSecurityIds()
+  subscribeToOptions()
+}
+export const synchronizeCallStrikes = () => {
+  if (selectedPutStrike.value && selectedPutStrike.value.strikePrice) {
+    const matchingCallStrike = callStrikes.value.find(
+      (strike) => strike.strikePrice === selectedPutStrike.value.strikePrice
+    )
+    if (matchingCallStrike) {
+      selectedCallStrike.value = matchingCallStrike
+    } else {
+      selectedCallStrike.value = {}
+    }
+  }
+  updateSecurityIds()
+}
+
+export const synchronizePutStrikes = () => {
+  if (selectedCallStrike.value && selectedCallStrike.value.strikePrice) {
+    const matchingPutStrike = putStrikes.value.find(
+      (strike) => strike.strikePrice === selectedCallStrike.value.strikePrice
+    )
+    if (matchingPutStrike) {
+      selectedPutStrike.value = matchingPutStrike
+    } else {
+      selectedPutStrike.value = {}
+    }
+  }
+  updateSecurityIds()
+}
+export const updateSecurityIds = () => {
+  // console.log('Updating Security IDs');
+  defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
+  defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
 }
