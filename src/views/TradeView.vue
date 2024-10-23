@@ -887,7 +887,7 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -914,7 +914,6 @@ import {
 const {
   // Methods
   setActiveTab,
-  updateSelectedBroker,
   updateExchangeSymbols,
   setDefaultExchangeAndMasterSymbol,
   fetchTradingData,
@@ -924,24 +923,17 @@ const {
   setActiveFetchFunctionAndFetch,
   handleHotKeys,
   connectWebSocket,
-  saveBasket,
-  loadBasket,
-  deleteBasket,
   validateAndPlaceOrder,
   handleOrderTypeChange,
   handleOrderClick,
   formatTime,
   loadStrategy,
-  placeBasketOrder,
   setOrderDetails,
   cancelPendingOrders,
   closeSelectedPositions,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,
   setStrategyType,
-  updateBasketOrderQuantity,
-  removeFromBasket,
-  placeBasket,
   reversePositions,
 
   // Computed properties
@@ -959,7 +951,6 @@ const {
   riskReached,
   targetReached,
   ltpRangeWidth,
-  ltpMarkerPosition,
   netPnl,
   totalCapitalPercentage,
   isOffsetOrderType,
@@ -968,17 +959,12 @@ const {
   isCallDepthAvailable,
   isPutDepthAvailable,
   filteredStrategies,
-  sortedBasketOrders,
-  availableStrikes,
-  basketLTPs,
   callLtpRangeWidth,
   callOpenMarkerPosition,
   openMarkerPosition,
   putLtpRangeWidth,
   putOpenMarkerPosition,
   additionalStrikes,
-  getBrokerClientId,
-
 
   // Reactive variables
   showLTPRangeBar,
@@ -1000,9 +986,6 @@ const {
   selectedStrike,
   modalTransactionType,
   modalOptionType,
-  selectedShoonyaPositionsSet,
-  selectedFlattradePositionsSet,
-  currentClockEmoji,
   latestCallLTP,
   latestPutLTP,
   activeFetchFunction,
@@ -1024,7 +1007,6 @@ const {
   marketDepth,
   additionalStrikeLTPs,
   savedBaskets,
-  basketName,
   strategyType,
   orderMargin,
   limitOffset,
@@ -1036,7 +1018,6 @@ const {
 
 let timer;
 let positionCheckInterval;
-let checkInterval;
 
 
 // Lifecycle hooks
