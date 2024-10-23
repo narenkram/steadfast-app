@@ -8,7 +8,7 @@ import { updateSelectedBrokerOnServer } from '../api/broker'
 import { validateToken, getBrokerStatus, tokenStatus } from '@/composables/useBrokerTokenValidator'
 
 // Global State
-import { killSwitchActive, selectedCallStrike, selectedPutStrike } from '@/stores/globalStore'
+import { killSwitchActive, selectedCallStrike, selectedPutStrike, quantities, availableQuantities } from '@/stores/globalStore'
 
 // Kill Switch Composables
 import { toggleKillSwitch } from '@/composables/useKillSwitch'
@@ -75,8 +75,6 @@ export function useTradeView() {
     flatTradePositionBook,
     shoonyaPositionBook,
     fundLimits,
-    quantities,
-    availableQuantities,
     selectedStrike,
     selectedProductType,
     limitPrice,
@@ -3556,8 +3554,6 @@ export function useTradeView() {
     flatTradePositionBook,
     shoonyaPositionBook,
     fundLimits,
-    quantities,
-    availableQuantities,
     selectedStrike,
     selectedProductType,
     limitPrice,
