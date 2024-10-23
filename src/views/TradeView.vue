@@ -159,8 +159,8 @@
           <!-- Call Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
             <!-- Call Strike Details -->
-            <div class="text-start mt-2">
-              <div>
+            <div class="row mt-2">
+              <div class="col-12 d-flex align-items-center justify-content-between">
                 {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
                 <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
                   aria-label="Call Strike" v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }"
@@ -169,24 +169,27 @@
                     {{ strike.strikePrice }}
                   </option>
                 </select>
+                <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedCallStrike.securityId }}</div>
               </div>
-              <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedCallStrike.securityId }}</div>
+              <div class="col-12 mt-2 d-flex align-items-center justify-content-between">
+                <span>
+                  <span>LTP: </span>
+                  <span class="ms-2 fw-bold" :class="{
+                    'text-success': parseFloat(latestCallLTP) > parseFloat(callOpenPrice),
+                    'text-danger': parseFloat(latestCallLTP) < parseFloat(callOpenPrice)
+                  }">{{ latestCallLTP }}
+                  </span>
+                </span>
+
+                <span class="ms-2 fw-bold text-secondary"
+                  v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
+                  ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
+                </span>
+                <span v-else>-</span>
+              </div>
             </div>
-            <div class="d-flex">
-              <span>LTP: </span>
-              <span class="ms-2 fw-bold" :class="{
-                'text-success': parseFloat(latestCallLTP) > parseFloat(callOpenPrice),
-                'text-danger': parseFloat(latestCallLTP) < parseFloat(callOpenPrice)
-              }">{{ latestCallLTP }}
-              </span>
-            </div>
-            <div class="mt-1">
-              <span v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
-                Margin Required: ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
-              </span>
-              <span v-else-if="orderMargin.call !== null">Margin Required: ₹{{ orderMargin.call }}</span>
-              <span v-else>Margin: Not available</span>
-            </div>
+
+
 
             <!-- Call OHLC Values -->
             <div class="d-flex w-100 justify-content-around flex-wrap" v-if="showOHLCValues">
@@ -262,8 +265,8 @@
           <!-- Put Strike Selection -->
           <div class="col-12 col-md-4 col-lg-4">
             <!-- Put Strike Details -->
-            <div class="text-end mt-2">
-              <div>
+            <div class="row mt-2">
+              <div class="col-12 d-flex align-items-center justify-content-between">
                 <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto me-2"
                   aria-label="Put Strike" v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }"
                   @change="updateTradingSymbol(selectedPutStrike)">
@@ -272,23 +275,24 @@
                   </option>
                 </select>
                 {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
+                <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
               </div>
-              <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
-            </div>
-            <div class="d-flex justify-content-end">
-              <span class="fw-bold" :class="{
-                'text-success': parseFloat(latestPutLTP) > parseFloat(putOpenPrice),
-                'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
-              }">{{ latestPutLTP }}
-              </span>
-              <span class="ms-2"> :LTP</span>
-            </div>
-            <div class="mt-1 text-end">
-              <span v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
-                Margin Required: ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
-              </span>
-              <span v-else-if="orderMargin.put !== null">Margin Required: ₹{{ orderMargin.put }}</span>
-              <span v-else>Margin: Not available</span>
+              <div class="col-12 mt-2 d-flex align-items-center justify-content-between">
+                <span class="ms-2 fw-bold text-secondary"
+                  v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
+                  ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
+                </span>
+                <span v-else>-</span>
+
+                <span>
+                  <span>LTP: </span>
+                  <span class="ms-2 fw-bold" :class="{
+                    'text-success': parseFloat(latestPutLTP) > parseFloat(putOpenPrice),
+                    'text-danger': parseFloat(latestPutLTP) < parseFloat(putOpenPrice)
+                  }">{{ latestPutLTP }}
+                  </span>
+                </span>
+              </div>
             </div>
 
             <!-- Put OHLC Values -->
@@ -1006,7 +1010,6 @@ const {
   additionalStrikeLTPs,
   savedBaskets,
   strategyType,
-  orderMargin,
   limitOffset,
   callDepth,
   putDepth,
