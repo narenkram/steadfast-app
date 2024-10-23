@@ -885,7 +885,7 @@ import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
-import { selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook } from '@/stores/globalStore'
+import { selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols } from '@/stores/globalStore'
 
 // Kill Switch Composables
 import { killSwitchActive, killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch'
@@ -1037,7 +1037,6 @@ const {
   showOHLCValues,
   showStrikeDetails,
   reverseMode,
-  additionalSymbols,
   marketDepth,
   additionalStrikeLTPs,
   savedBaskets,
