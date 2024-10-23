@@ -1,22 +1,29 @@
 import { ref, computed, watch } from 'vue'
-import { killSwitchActive } from '@/stores/globalStore'
+
+// Global State
+import {
+  killSwitchActive,
+  toastMessage,
+  showToast,
+  activationTime,
+  currentTime,
+  clockEmojis,
+  currentClockEmoji
+} from '@/stores/globalStore'
+
+// Order Management Composables
 import { closeAllPositions } from '@/composables/useOrderManagement'
 
-const activationTime = ref(0)
-const currentTime = ref(Date.now())
+// Timers
+import { clockAnimatorInterval } from '@/composables/useTimers'
 
-// Update current time every second
-setInterval(() => {
-  currentTime.value = Date.now()
-}, 1000)
-
-const remainingTimeInMs = computed(() => {
+export const remainingTimeInMs = computed(() => {
   if (!activationTime.value || !killSwitchActive.value) return 0
   const sixHoursInMillis = 6 * 60 * 60 * 1000
   return Math.max(0, sixHoursInMillis - (currentTime.value - activationTime.value))
 })
 
-const killSwitchRemainingTime = computed(() => {
+export const killSwitchRemainingTime = computed(() => {
   if (remainingTimeInMs.value === 0) return ''
 
   const hours = Math.floor(remainingTimeInMs.value / (60 * 60 * 1000))
@@ -26,15 +33,17 @@ const killSwitchRemainingTime = computed(() => {
   return `${hours}h ${minutes}m ${seconds}s`
 })
 
-const killSwitchButtonText = computed(() => (killSwitchActive.value ? 'Deactivate' : 'Activate'))
+export const killSwitchButtonText = computed(() =>
+  killSwitchActive.value ? 'Deactivate' : 'Activate'
+)
 
-const killSwitchButtonClass = computed(() =>
+export const killSwitchButtonClass = computed(() =>
   killSwitchActive.value
     ? 'btn btn-sm btn-success shadow fs-6'
     : 'btn btn-sm btn-danger shadow fs-6'
 )
 
-const toggleKillSwitch = async () => {
+export const toggleKillSwitch = async () => {
   const newStatus = killSwitchActive.value ? 'DEACTIVATED' : 'ACTIVATED'
   if (newStatus === 'ACTIVATED') {
     await closeAllPositions() // Wait for closeAllPositions to complete
@@ -67,7 +76,7 @@ const toggleKillSwitch = async () => {
   showToast.value = true
 }
 
-const initKillSwitch = () => {
+export const initKillSwitch = () => {
   const storedStatus = localStorage.getItem('KillSwitchStatus')
   const storedActivationTime = localStorage.getItem('KillSwitchActivationTime')
 
@@ -83,12 +92,12 @@ const initKillSwitch = () => {
   }
 }
 
-const cycleClockEmoji = () => {
+export const cycleClockEmoji = () => {
   const currentHour = new Date().getHours()
   let index = currentHour % clockEmojis.length
   let cycles = 0
 
-  const interval = setInterval(() => {
+  const interval = clockAnimatorInterval(() => {
     currentClockEmoji.value = clockEmojis[index]
     index = (index + 1) % clockEmojis.length
 
@@ -104,7 +113,7 @@ const cycleClockEmoji = () => {
   }, 100) // Adjust the interval time for desired speed
 }
 
-const handleKillSwitchClick = () => {
+export const handleKillSwitchClick = () => {
   if (killSwitchActive.value) {
     // If the kill switch is already active, deactivate it directly
     toggleKillSwitch()
@@ -120,14 +129,3 @@ watch(remainingTimeInMs, (newValue) => {
     localStorage.removeItem('killSwitchActivationTime')
   }
 })
-
-export {
-  killSwitchActive,
-  killSwitchRemainingTime,
-  toggleKillSwitch,
-  initKillSwitch,
-  killSwitchButtonClass,
-  handleKillSwitchClick,
-  cycleClockEmoji,
-  killSwitchButtonText
-}

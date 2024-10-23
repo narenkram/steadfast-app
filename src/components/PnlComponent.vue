@@ -42,7 +42,10 @@
 
 <script setup>
 import { defineProps } from 'vue';
-import { killSwitchActive, killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch';
+import { killSwitchButtonText, killSwitchButtonClass, handleKillSwitchClick } from '@/composables/useKillSwitch';
+
+// Global State
+import { currentClockEmoji, killSwitchActive } from '@/stores/globalStore';
 
 const props = defineProps({
     stickyMTM: Boolean,
