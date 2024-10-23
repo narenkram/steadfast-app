@@ -6,6 +6,9 @@ import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 // Formatters
 import { manageBrokerMaskClientId, maskTokenSecret } from '@/composables/useFormatters';
 
+// Global State
+import { FLATTRADE_CLIENT_ID, FLATTRADE_API_SECRET, FLATTRADE_API_KEY, FLATTRADE_API_TOKEN, SHOONYA_CLIENT_ID, SHOONYA_API_TOKEN, SHOONYA_API_KEY } from '@/stores/globalStore';
+
 import { useTradeView } from '@/composables/useTradingSystem';
 
 const {
@@ -19,13 +22,6 @@ const {
 
   // Reactive variables
   API_TOKEN, // Not used right now
-  FLATTRADE_API_KEY,
-  FLATTRADE_API_SECRET,
-  FLATTRADE_CLIENT_ID,
-  FLATTRADE_API_TOKEN,
-  SHOONYA_API_KEY,
-  SHOONYA_CLIENT_ID,
-  SHOONYA_API_TOKEN,
   flattradeReqCode,
   shoonyaBrokerPassword,
   shoonyaOneTimePassword,

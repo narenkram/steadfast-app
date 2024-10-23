@@ -4,7 +4,6 @@ import axios from 'axios'
 import qs from 'qs'
 import { debounce } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { updateSelectedBrokerOnServer } from '../api/broker'
 import { validateToken, getBrokerStatus, tokenStatus } from '@/composables/useBrokerTokenValidator'
 
 // Global State
@@ -15,7 +14,6 @@ import {
   selectedPutStrike,
   quantities,
   selectedMasterSymbol,
-  lotsPerSymbol,
   selectedQuantity,
   selectedOrderType,
   selectedBroker,
@@ -39,7 +37,14 @@ import {
   selectedProductType,
   limitPrice,
   selectedFlattradePositionsSet,
-  selectedShoonyaPositionsSet
+  selectedShoonyaPositionsSet,
+  FLATTRADE_CLIENT_ID,
+  FLATTRADE_API_SECRET,
+  FLATTRADE_API_KEY,
+  FLATTRADE_API_TOKEN,
+  SHOONYA_CLIENT_ID,
+  SHOONYA_API_TOKEN,
+  SHOONYA_API_KEY
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -170,13 +175,6 @@ export function useTradeView() {
     symbolData,
     allSymbolsData,
     API_TOKEN,
-    FLATTRADE_API_KEY,
-    FLATTRADE_API_SECRET,
-    FLATTRADE_CLIENT_ID,
-    FLATTRADE_API_TOKEN,
-    SHOONYA_API_KEY,
-    SHOONYA_CLIENT_ID,
-    SHOONYA_API_TOKEN,
     flattradeReqCode,
     shoonyaBrokerUserId,
     shoonyaBrokerPassword,
@@ -2907,13 +2905,6 @@ export function useTradeView() {
     allSymbolsData,
     previousOrderType,
     API_TOKEN,
-    FLATTRADE_API_KEY,
-    FLATTRADE_API_SECRET,
-    FLATTRADE_CLIENT_ID,
-    FLATTRADE_API_TOKEN,
-    SHOONYA_API_KEY,
-    SHOONYA_CLIENT_ID,
-    SHOONYA_API_TOKEN,
     flattradeReqCode,
     shoonyaBrokerUserId,
     shoonyaBrokerPassword,
