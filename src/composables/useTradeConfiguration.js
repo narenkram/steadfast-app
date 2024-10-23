@@ -123,3 +123,13 @@ export const loadLots = () => {
     lotsPerSymbol.value = JSON.parse(savedLots)
   }
 }
+export const updateSelectedQuantity = () => {
+  const instrument = quantities.value[selectedMasterSymbol.value]
+  if (instrument) {
+    const maxLots = instrument.maxLots // Use maxLots from the instrument
+    const lots = Math.min(Math.max(1, selectedLots.value), maxLots)
+    lotsPerSymbol.value[selectedMasterSymbol.value] = lots
+    selectedQuantity.value = lots * instrument.lotSize
+    saveLots()
+  }
+}

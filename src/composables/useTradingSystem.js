@@ -68,8 +68,7 @@ import {
   productTypes,
   updateAvailableQuantities,
   orderTypes,
-  saveLots,
-  loadLots
+  updateSelectedQuantity
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -1000,16 +999,6 @@ export function useTradeView() {
     defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
   }
 
-  const updateSelectedQuantity = () => {
-    const instrument = quantities.value[selectedMasterSymbol.value]
-    if (instrument) {
-      const maxLots = instrument.maxLots // Use maxLots from the instrument
-      const lots = Math.min(Math.max(1, selectedLots.value), maxLots)
-      lotsPerSymbol.value[selectedMasterSymbol.value] = lots
-      selectedQuantity.value = lots * instrument.lotSize
-      saveLots()
-    }
-  }
   const handleHotKeys = (event) => {
     if (!enableHotKeys.value) return
 
@@ -2744,7 +2733,6 @@ export function useTradeView() {
     updateStrikesForExpiry,
     synchronizeCallStrikes,
     synchronizePutStrikes,
-    updateSelectedQuantity,
     saveUserChoice,
     saveOffsets,
     saveExpiryOffset,
