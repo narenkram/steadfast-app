@@ -21,7 +21,9 @@ import {
   bankexPrice,
   synchronizeOnLoad,
   defaultCallSecurityId,
-  defaultPutSecurityId
+  defaultPutSecurityId,
+  callStrikeOffset,
+  putStrikeOffset
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables

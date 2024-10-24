@@ -31,7 +31,7 @@ const props = defineProps({
         required: true
     },
     marketDepth: {
-        type: Boolean,
+        type: Object,
         required: true
     },
     depth: {

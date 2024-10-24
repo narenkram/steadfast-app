@@ -875,7 +875,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { useTradeView } from '@/composables/useTradingSystem';
 import BrokerComponent from '@/components/BrokerComponent.vue';
@@ -891,7 +891,20 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData,
+  currentTime,
+  showLTPRangeBar,
+  showOHLCValues,
+  showStrikeDetails,
+  reverseMode,
+  marketDepth,
+  additionalStrikeLTPs,
+  savedBaskets,
+  strategyType,
+  limitOffset,
+  callDepth,
+  putDepth,
+  stickyMTM
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -901,7 +914,7 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity } from '@/composables/useTradeConfiguration'
+import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity, updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions, cancelPendingOrders, closeSelectedPositions } from '@/composables/useOrderManagement'
@@ -928,7 +941,6 @@ const {
   setDefaultExchangeAndMasterSymbol,
   fetchTradingData,
   setDefaultExpiry,
-  updateStrikesForExpiry,
   updateSymbolData,
   setActiveFetchFunctionAndFetch,
   connectWebSocket,
@@ -973,10 +985,8 @@ const {
   putOpenMarkerPosition,
 
   // Reactive variables
-  showLTPRangeBar,
   activeTab,
   experimentalFeatures,
-  currentTime,
   expiryDates,
   niftyPrice,
   bankNiftyPrice,
@@ -1001,17 +1011,6 @@ const {
   putHighPrice,
   putLowPrice,
   putClosePrice,
-  showOHLCValues,
-  showStrikeDetails,
-  reverseMode,
-  marketDepth,
-  additionalStrikeLTPs,
-  savedBaskets,
-  strategyType,
-  limitOffset,
-  callDepth,
-  putDepth,
-  stickyMTM,
 } = useTradeView();
 
 let timer;
@@ -1020,6 +1019,11 @@ let positionCheckInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
+  // Initialize any additional refs if needed
+  marketDepth.value = {}
+  additionalStrikeLTPs.value = {}
+  savedBaskets.value = []
+
   await checkAllTokens();
   initKillSwitch();
 

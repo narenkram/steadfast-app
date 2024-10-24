@@ -293,3 +293,4 @@ export const currentSubscriptions = ref({
   callOption: null,
   putOption: null
 })
+export const supportedBrokers = ['Flattrade', 'Shoonya']

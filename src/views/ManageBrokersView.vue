@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
 import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 
@@ -7,28 +7,34 @@ import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import { manageBrokerMaskClientId, maskTokenSecret } from '@/composables/useFormatters';
 
 // Global State
-import { FLATTRADE_CLIENT_ID, FLATTRADE_API_SECRET, FLATTRADE_API_KEY, FLATTRADE_API_TOKEN, SHOONYA_CLIENT_ID, SHOONYA_API_TOKEN, SHOONYA_API_KEY } from '@/stores/globalStore';
-
-import { useTradeView } from '@/composables/useTradingSystem';
-
-const {
-  // Methods
-  selectedBrokerToDelete,
-  copyToClipboard,
-  generateToken,
-  getStatus,
-  handleShoonyaLogin,
-  deleteBroker,
-
-  // Reactive variables
-  API_TOKEN, // Not used right now
+import {
+  FLATTRADE_CLIENT_ID,
+  FLATTRADE_API_SECRET,
+  FLATTRADE_API_KEY,
+  FLATTRADE_API_TOKEN,
+  SHOONYA_CLIENT_ID,
+  SHOONYA_API_TOKEN,
+  SHOONYA_API_KEY,
+  // Add these new imports
   flattradeReqCode,
   shoonyaBrokerPassword,
   shoonyaOneTimePassword,
   errorMessage,
   statusMessage,
-  brokers,
+  selectedBrokerToDelete,
+  API_TOKEN,
+  supportedBrokers  // Add this import
+} from '@/stores/globalStore';
 
+import { useTradeView } from '@/composables/useTradingSystem';
+import { deleteBroker } from '@/composables/useBrokerFunctions';
+
+const {
+  // Methods only - remove the reactive variables
+  copyToClipboard,
+  generateToken,
+  getStatus,
+  handleShoonyaLogin,
 } = useTradeView();
 
 // Add this new ref to track visibility for each broker
@@ -39,21 +45,47 @@ const toggleBrokerClientIdVisibility = (brokerId) => {
   visibleClientIds.value[brokerId] = !visibleClientIds.value[brokerId];
 };
 
+// Add this computed property to map supported brokers to their details
+const brokerDetails = computed(() => {
+  return supportedBrokers.map(brokerName => {
+    if (brokerName === 'Flattrade') {
+      return {
+        id: 'flattrade',
+        brokerName: 'Flattrade',
+        brokerClientId: FLATTRADE_CLIENT_ID.value,
+        apiToken: FLATTRADE_API_TOKEN.value,
+        apiKey: FLATTRADE_API_KEY.value,
+        apiSecret: FLATTRADE_API_SECRET.value
+      };
+    } else if (brokerName === 'Shoonya') {
+      return {
+        id: 'shoonya',
+        brokerName: 'Shoonya',
+        brokerClientId: SHOONYA_CLIENT_ID.value,
+        apiToken: SHOONYA_API_TOKEN.value,
+        apiKey: SHOONYA_API_KEY.value
+      };
+    }
+    return null;
+  }).filter(broker => broker !== null);
+});
+
 onMounted(() => {
-  // Retrieve Flattrade details
-  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
-  FLATTRADE_API_KEY.value = flattradeDetails.apiKey || '';
-  FLATTRADE_API_SECRET.value = flattradeDetails.apiSecret || '';
-  FLATTRADE_CLIENT_ID.value = flattradeDetails.clientId || '';
-  FLATTRADE_API_TOKEN.value = localStorage.getItem('FLATTRADE_API_TOKEN') || '';
-
-  // Retrieve Shoonya details
-  const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
-  SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
-  SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
-  SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
-
-  // fetchBrokers(); disabled, as we are using localStorage to store the broker details
+  // Retrieve broker details for each supported broker
+  for (const broker of supportedBrokers) {
+    if (broker === 'Flattrade') {
+      const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}');
+      FLATTRADE_API_KEY.value = flattradeDetails.apiKey || '';
+      FLATTRADE_API_SECRET.value = flattradeDetails.apiSecret || '';
+      FLATTRADE_CLIENT_ID.value = flattradeDetails.clientId || '';
+      FLATTRADE_API_TOKEN.value = localStorage.getItem('FLATTRADE_API_TOKEN') || '';
+    } else if (broker === 'Shoonya') {
+      const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}');
+      SHOONYA_API_KEY.value = shoonyaDetails.apiKey || '';
+      SHOONYA_CLIENT_ID.value = shoonyaDetails.clientId || '';
+      SHOONYA_API_TOKEN.value = localStorage.getItem('SHOONYA_API_TOKEN') || '';
+    }
+  }
 
   const storedCode = localStorage.getItem('flattradeReqCode');
   if (storedCode) {
@@ -111,10 +143,10 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-if="brokers.length === 0">
+          <tr v-if="brokerDetails.length === 0">
             <td colspan="7" class="text-center">No brokers added yet. Please add a broker to get started.</td>
           </tr>
-          <tr v-else v-for="broker in brokers" :key="broker.id">
+          <tr v-else v-for="broker in brokerDetails" :key="broker.id">
             <td>{{ broker.brokerName }}</td>
             <td>
               <span class="badge bg-primary">
@@ -127,8 +159,8 @@ onMounted(() => {
             </td>
             <td>
               <div class="d-flex align-items-center">
-                <span v-if="broker.brokerName === 'Flattrade' || broker.brokerName === 'Shoonya'">
-                  {{ maskTokenSecret(broker.apiToken) }}
+                <span>
+                  {{ maskTokenSecret(broker.apiToken || '') }}
                 </span>
                 <button v-if="broker.apiToken" class="btn btn-sm btn-outline-secondary ms-2"
                   @click="copyToClipboard(broker.apiToken)" title="Copy token">
@@ -137,8 +169,10 @@ onMounted(() => {
               </div>
             </td>
             <td>
-              <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
-              <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
+              <div class="d-flex align-items-center">
+                <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
+                <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
+              </div>
             </td>
             <td class="text-center">
               <template v-if="broker.brokerName === 'Shoonya'">

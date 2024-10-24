@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { tokenStatus } from '@/stores/globalStore'
-
+import { tokenStatus, supportedBrokers } from '@/stores/globalStore'
 
 const flattradeFundLimits = async () => {
   const jKey = localStorage.getItem('FLATTRADE_API_TOKEN')
@@ -69,8 +68,7 @@ const validateToken = async (brokerName) => {
 }
 
 const checkAllTokens = async () => {
-  const brokers = ['Flattrade', 'Shoonya']
-  for (const broker of brokers) {
+  for (const broker of supportedBrokers) {
     await validateToken(broker)
   }
 }

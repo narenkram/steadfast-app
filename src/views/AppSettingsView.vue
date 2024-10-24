@@ -291,18 +291,9 @@
 
 <script setup>
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue'
-import { useTradeView } from '@/composables/useTradingSystem';
-const {
-  // Methods
-  toggleAdditionalSymbols,
-  toggleMarketDepth,
-  playNotificationSound,
-  toggleOvertradeProtection,
 
-  // Computed properties
-  isFormDisabled,
-
-  // Reactive variables
+// Global state
+import {
   showLTPRangeBar,
   overtradeProtection,
   experimentalFeatures,
@@ -328,5 +319,17 @@ const {
   closePositionsTarget,
   riskAction,
   targetAction,
+} from '@/stores/globalStore';
+
+import { useTradeView } from '@/composables/useTradingSystem';
+const {
+  // Methods
+  toggleAdditionalSymbols,
+  toggleMarketDepth,
+  playNotificationSound,
+  toggleOvertradeProtection,
+
+  // Computed properties
+  isFormDisabled,
 } = useTradeView();
 </script>
