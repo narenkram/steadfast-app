@@ -891,7 +891,7 @@ import TradingStatusMessageComponent from '@/components/TradingStatusMessageComp
 // Global State
 import {
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
-  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData
+  selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -917,9 +917,6 @@ import {
   formatTradingSymbol,
   formatDate
 } from '@/composables/useFormatters'
-
-// Additional Strikes Composables
-import { additionalStrikes } from '@/composables/useAdditionalStrikes'
 
 const {
   // Methods
@@ -971,12 +968,17 @@ const {
   openMarkerPosition,
   putLtpRangeWidth,
   putOpenMarkerPosition,
+  additionalStrikes,
 
   // Reactive variables
   showLTPRangeBar,
   activeTab,
   experimentalFeatures,
   currentTime,
+  selectedExpiry,
+  exchangeSymbols,
+  callStrikes,
+  putStrikes,
   expiryDates,
   niftyPrice,
   bankNiftyPrice,
@@ -984,6 +986,7 @@ const {
   midcpniftyPrice,
   sensexPrice,
   bankexPrice,
+  selectedStrike,
   modalTransactionType,
   modalOptionType,
   latestCallLTP,
@@ -1011,6 +1014,7 @@ const {
   limitOffset,
   callDepth,
   putDepth,
+  allSymbolsData,
   stickyMTM,
 } = useTradeView();
 

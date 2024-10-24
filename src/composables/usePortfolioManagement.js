@@ -17,19 +17,11 @@ import {
   flatTradeBook,
   shoonyaOrderBook,
   shoonyaTradeBook,
-  fundLimits,
-  callStrikes,
-  putStrikes
+  fundLimits
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
 import { getExchangeSegment } from '@/composables/useTradeConfiguration'
-
-// Additional Strikes Composables
-import { additionalStrikes } from '@/composables/useAdditionalStrikes'
-
-// Real Time LTP Data Composables
-import { subscribeToLTP, updateAdditionalStrikeLTP } from '@/composables/useRealTimeLtpData'
 
 export const updateFundLimits = async () => {
   await fetchFundLimit()
