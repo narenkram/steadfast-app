@@ -18,23 +18,33 @@ import {
   FLATTRADE_API_SECRET,
   SHOONYA_CLIENT_ID,
   SHOONYA_API_KEY,
-  SHOONYA_API_TOKEN,
+  SHOONYA_API_TOKEN
 } from '@/stores/globalStore'
 
 export const availableBrokers = computed(() => {
   return Object.keys(localStorage)
     .filter((key) => key.startsWith('broker_'))
-    .map((key) => key.replace('broker_', ''))
+    .map((key) => {
+      const [_, brokerName, clientId] = key.split('_')
+      return { brokerName, clientId }
+    })
 })
 
 export const brokerStatus = computed(() => {
-  const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}')
-  const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}')
+  let flattradeDetails, shoonyaDetails
 
-  const flattradeClientId = flattradeDetails.clientId
+  for (const key of Object.keys(localStorage)) {
+    if (key.startsWith('broker_Flattrade_')) {
+      flattradeDetails = JSON.parse(localStorage.getItem(key))
+    } else if (key.startsWith('broker_Shoonya_')) {
+      shoonyaDetails = JSON.parse(localStorage.getItem(key))
+    }
+  }
+
+  const flattradeClientId = flattradeDetails?.clientId
   const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN')
   const shoonyaApiToken = localStorage.getItem('SHOONYA_API_TOKEN')
-  const shoonyaClientId = shoonyaDetails.clientId
+  const shoonyaClientId = shoonyaDetails?.clientId
 
   if (selectedBroker.value?.brokerName === 'Flattrade') {
     if (flattradeClientId && flattradeApiToken) {
@@ -51,20 +61,37 @@ export const brokerStatus = computed(() => {
 })
 
 export const updateSelectedBroker = async () => {
-  const availableBrokerNames = availableBrokers.value
+  const availableBrokers = Object.keys(localStorage)
+    .filter((key) => key.startsWith('broker_'))
+    .map((key) => {
+      const [_, brokerName, clientId] = key.split('_')
+      return { brokerName, clientId }
+    })
 
-  if (availableBrokerNames.length === 0) {
+  if (availableBrokers.length === 0) {
     selectedBroker.value = null
     localStorage.removeItem('selectedBroker')
     selectedBrokerName.value = ''
     await updateSelectedBrokerOnServer('') // Clear broker on server
-  } else if (selectedBrokerName.value && availableBrokerNames.includes(selectedBrokerName.value)) {
-    const brokerDetails = JSON.parse(
-      localStorage.getItem(`broker_${selectedBrokerName.value}`) || '{}'
+  } else if (
+    selectedBrokerName.value &&
+    availableBrokers.some((broker) => broker.brokerName === selectedBrokerName.value)
+  ) {
+    const selectedBrokerKey = Object.keys(localStorage).find((key) =>
+      key.startsWith(`broker_${selectedBrokerName.value}_`)
     )
-    selectedBroker.value = brokerDetails
-    localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails))
-    await updateSelectedBrokerOnServer(selectedBrokerName.value.toLowerCase())
+    if (selectedBrokerKey) {
+      const brokerDetails = JSON.parse(localStorage.getItem(selectedBrokerKey) || '{}')
+      selectedBroker.value = brokerDetails
+      localStorage.setItem('selectedBroker', JSON.stringify(brokerDetails))
+      await updateSelectedBrokerOnServer(selectedBrokerName.value.toLowerCase())
+    } else {
+      // Handle case where broker name is found but details are missing
+      selectedBroker.value = null
+      localStorage.removeItem('selectedBroker')
+      selectedBrokerName.value = ''
+      await updateSelectedBrokerOnServer('') // Clear broker on server
+    }
   } else {
     selectedBroker.value = null
     localStorage.removeItem('selectedBroker')
@@ -75,24 +102,13 @@ export const updateSelectedBroker = async () => {
 
 export const deleteBroker = (broker) => {
   // Remove broker details from localStorage
-  localStorage.removeItem(`broker_${broker.brokerName}`)
-
-  // Remove API token from localStorage if it exists
-  if (broker.brokerName === 'Flattrade') {
-    localStorage.removeItem('FLATTRADE_API_TOKEN')
-    FLATTRADE_API_TOKEN.value = ''
-    FLATTRADE_API_KEY.value = ''
-    FLATTRADE_API_SECRET.value = ''
-    FLATTRADE_CLIENT_ID.value = ''
-  } else if (broker.brokerName === 'Shoonya') {
-    localStorage.removeItem('SHOONYA_API_TOKEN')
-    SHOONYA_API_TOKEN.value = ''
-    SHOONYA_API_KEY.value = ''
-    SHOONYA_CLIENT_ID.value = ''
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.startsWith(`broker_${broker.brokerName}_${broker.clientId}`)) {
+      localStorage.removeItem(key)
+      break
+    }
   }
-
-  // Update the brokers computed property
-  // This will automatically update the table
 }
 
 export const setFlattradeCredentials = async () => {

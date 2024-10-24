@@ -1857,14 +1857,22 @@ export function useTradeView() {
     try {
       const encoder = new TextEncoder()
 
-      // Retrieve Shoonya details from localStorage
-      const shoonyaDetails = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}')
-      const clientId = shoonyaDetails.clientId
-      const apiKey = shoonyaDetails.apiKey
+      // Find the Shoonya broker details
+      let shoonyaDetails = null
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key.startsWith('broker_Shoonya_')) {
+          shoonyaDetails = JSON.parse(localStorage.getItem(key))
+          break
+        }
+      }
 
-      if (!clientId || !apiKey) {
+      if (!shoonyaDetails || !shoonyaDetails.clientId || !shoonyaDetails.apiKey) {
         throw new Error('Shoonya client ID or API key is missing')
       }
+
+      const clientId = shoonyaDetails.clientId
+      const apiKey = shoonyaDetails.apiKey
 
       // Hash the password
       const pwdBuffer = await crypto.subtle.digest(
@@ -1876,7 +1884,7 @@ export function useTradeView() {
         .join('')
 
       // Create and hash the appkey
-      const appkeyRaw = `${SHOONYA_CLIENT_ID.value}|${apiKey}`
+      const appkeyRaw = `${clientId}|${apiKey}`
       const appkeyBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(appkeyRaw))
       const appkey = Array.from(new Uint8Array(appkeyBuffer))
         .map((b) => b.toString(16).padStart(2, '0'))
@@ -1884,7 +1892,7 @@ export function useTradeView() {
 
       const jData = {
         apkversion: '1.0.0',
-        uid: SHOONYA_CLIENT_ID.value,
+        uid: clientId,
         pwd: pwd,
         factor2: shoonyaOneTimePassword.value,
         vc: `${clientId}_U`,

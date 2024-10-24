@@ -45,17 +45,19 @@ const toggleBrokerClientIdVisibility = (brokerId) => {
   visibleClientIds.value[brokerId] = !visibleClientIds.value[brokerId];
 };
 
-// New function to get brokers from localStorage
+// Function to get brokers from localStorage
 const getBrokersFromLocalStorage = () => {
   const brokers = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key.startsWith('broker_')) {
       const brokerData = JSON.parse(localStorage.getItem(key));
+      const [_, brokerName, ...clientIdParts] = key.split('_');
       brokers.push({
-        id: key.split('_')[2], // Extract the broker ID from the key
+        id: clientIdParts.join('_'), // Join all parts after broker name to form the full client ID
+        brokerName: brokerName,
         ...brokerData,
-        apiToken: localStorage.getItem(`${brokerData.brokerName.toUpperCase()}_API_TOKEN`) || ''
+        apiToken: localStorage.getItem(`${brokerName.toUpperCase()}_API_TOKEN`) || ''
       });
     }
   }

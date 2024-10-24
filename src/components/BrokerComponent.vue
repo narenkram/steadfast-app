@@ -31,7 +31,8 @@
         </div>
 
         <!-- Today's Expiry -->
-        <div class="col-5 col-md-3 col-lg-3 d-flex align-items-center justify-content-lg-end justify-content-end mt-2 mt-md-0">
+        <div
+            class="col-5 col-md-3 col-lg-3 d-flex align-items-center justify-content-lg-end justify-content-end mt-2 mt-md-0">
             <span class="me-2">
                 <small class="text-muted">Expiry</small>
                 <span class="ms-1 fw-bold" :class="todayExpirySymbol ? 'text-danger' : 'text-secondary'">
@@ -90,7 +91,15 @@ const maskBrokerClientId = (clientId) => {
 }
 
 const getBrokerClientId = (brokerName) => {
-    const brokerDetails = JSON.parse(localStorage.getItem(`broker_${brokerName}`) || '{}')
-    return brokerDetails.clientId ? `(${brokerDetails.clientId})` : ''
+    let clientId = '';
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith(`broker_${brokerName}_`)) {
+            const brokerDetails = JSON.parse(localStorage.getItem(key));
+            clientId = brokerDetails.clientId;
+            break;
+        }
+    }
+    return clientId ? `(${clientId})` : '';
 }
 </script>
