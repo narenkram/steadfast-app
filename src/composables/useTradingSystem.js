@@ -121,7 +121,8 @@ import {
   statusMessage,
   userTriggeredTokenGeneration,
   callStrikes,
-  putStrikes
+  putStrikes,
+  currentTime
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -1327,6 +1328,27 @@ export function useTradeView() {
     localStorage.setItem('expiryOffset', expiryOffset.value)
   }
 
+  // WebSocket
+  const wsConnectionState = ref('disconnected')
+  const isWebSocketReady = () => {
+    return socket.value && socket.value.readyState === WebSocket.OPEN
+  }
+  const safeWebSocketSend = (data) => {
+    if (!isWebSocketReady()) {
+      console.warn('WebSocket not ready, queuing message:', data)
+      // Queue the message to be sent when connection is restored
+      messageQueue.push(data)
+      return false
+    }
+
+    try {
+      socket.value.send(JSON.stringify(data))
+      return true
+    } catch (error) {
+      console.error('Error sending WebSocket message:', error)
+      return false
+    }
+  }
   const connectWebSocket = () => {
     let websocketUrl
 
@@ -1378,7 +1400,6 @@ export function useTradeView() {
       console.error('Error creating WebSocket connection:', error)
     }
   }
-
   const handleWebSocketMessage = (event) => {
     const quoteData = JSON.parse(event.data)
     if (quoteData.lp) {
@@ -1388,6 +1409,40 @@ export function useTradeView() {
       handleAdditionalStrikeLTPs(quoteData)
     }
     handleDepthFeed(quoteData)
+  }
+  const handleWebSocketError = (error) => {
+    console.error('WebSocket Error:', error)
+    wsConnectionState.value = 'error'
+  }
+  const handleWebSocketOpen = () => {
+    console.log('WebSocket connected')
+    wsConnectionState.value = 'connected'
+    initializeSubscriptions()
+  }
+  const handleWebSocketClose = (event) => {
+    console.log('WebSocket disconnected:', event)
+    wsConnectionState.value = 'disconnected'
+    handleReconnection()
+  }
+  const handleReconnection = () => {
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      const delay = INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts)
+      console.log(
+        `Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})`
+      )
+
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout)
+      }
+
+      reconnectTimeout = setTimeout(() => {
+        reconnectAttempts++
+        connectWebSocket()
+      }, delay)
+    } else {
+      console.error('Max reconnection attempts reached')
+      errorMessage.value = 'Unable to establish WebSocket connection. Please refresh the page.'
+    }
   }
 
   const updateMasterSymbolPrice = (quoteData) => {
@@ -1441,20 +1496,6 @@ export function useTradeView() {
       putDepth.value = { ...putDepth.value, ...quoteData }
     }
   }
-
-  const handleWebSocketError = (error) => {
-    console.error('WebSocket Error:', error)
-  }
-
-  const handleWebSocketOpen = () => {
-    console.log('WebSocket connected')
-    initializeSubscriptions()
-  }
-
-  const handleWebSocketClose = () => {
-    console.log('WebSocket disconnected. Attempting to reconnect...')
-    setTimeout(connectWebSocket, 5000)
-  }
   // Helper function to update OHLC values if they are not empty
   const updateOHLCIfNotEmpty = (type, data) => {
     if (type === 'master') {
@@ -1476,20 +1517,21 @@ export function useTradeView() {
   }
 
   const subscribeToMasterSymbol = () => {
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-      const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
-      if (symbolInfo) {
-        const symbolToSubscribe = `${symbolInfo.exchangeCode}|${symbolInfo.exchangeSecurityId}`
-        if (
-          symbolToSubscribe !==
-          `${currentSubscriptions.value.masterSymbolExchangeCode}|${currentSubscriptions.value.masterSymbolSecurityId}`
-        ) {
-          const data = {
-            action: 'subscribe',
-            symbols: [symbolToSubscribe]
-          }
-          // console.log('Sending master symbol subscribe data:', data);
-          socket.value.send(JSON.stringify(data))
+    if (!isWebSocketReady()) return
+
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
+    if (symbolInfo) {
+      const symbolToSubscribe = `${symbolInfo.exchangeCode}|${symbolInfo.exchangeSecurityId}`
+      if (
+        symbolToSubscribe !==
+        `${currentSubscriptions.value.masterSymbolExchangeCode}|${currentSubscriptions.value.masterSymbolSecurityId}`
+      ) {
+        const data = {
+          action: 'subscribe',
+          symbols: [symbolToSubscribe]
+        }
+
+        if (safeWebSocketSend(data)) {
           currentSubscriptions.value.masterSymbol = selectedMasterSymbol.value
           currentSubscriptions.value.masterSymbolExchangeCode = symbolInfo.exchangeCode
           currentSubscriptions.value.masterSymbolSecurityId = symbolInfo.exchangeSecurityId

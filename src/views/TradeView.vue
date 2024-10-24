@@ -181,11 +181,9 @@
                   </span>
                 </span>
 
-                <span class="ms-2 fw-bold text-secondary"
-                  v-if="socket && socket.readyState === 1 && latestCallLTP && selectedQuantity">
+                <span class="ms-2 fw-bold text-secondary">
                   ₹{{ (parseFloat(latestCallLTP) * selectedQuantity).toFixed(2) }}
                 </span>
-                <span v-else>-</span>
               </div>
             </div>
 
@@ -278,12 +276,9 @@
                 <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
               </div>
               <div class="col-12 mt-2 d-flex align-items-center justify-content-between">
-                <span class="ms-2 fw-bold text-secondary"
-                  v-if="socket && socket.readyState === 1 && latestPutLTP && selectedQuantity">
+                <span class="ms-2 fw-bold text-secondary">
                   ₹{{ (parseFloat(latestPutLTP) * selectedQuantity).toFixed(2) }}
                 </span>
-                <span v-else>-</span>
-
                 <span>
                   <span>LTP: </span>
                   <span class="ms-2 fw-bold" :class="{
@@ -904,7 +899,33 @@ import {
   limitOffset,
   callDepth,
   putDepth,
-  stickyMTM
+  stickyMTM,
+  activeTab,
+  experimentalFeatures,
+  expiryDates,
+  niftyPrice,
+  bankNiftyPrice,
+  finniftyPrice,
+  midcpniftyPrice,
+  sensexPrice,
+  bankexPrice,
+  modalTransactionType,
+  modalOptionType,
+  latestCallLTP,
+  latestPutLTP,
+  activeFetchFunction,
+  masterOpenPrice,
+  masterHighPrice,
+  masterLowPrice,
+  masterClosePrice,
+  callOpenPrice,
+  callHighPrice,
+  callLowPrice,
+  callClosePrice,
+  putOpenPrice,
+  putHighPrice,
+  putLowPrice,
+  putClosePrice,
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -984,33 +1005,6 @@ const {
   putLtpRangeWidth,
   putOpenMarkerPosition,
 
-  // Reactive variables
-  activeTab,
-  experimentalFeatures,
-  expiryDates,
-  niftyPrice,
-  bankNiftyPrice,
-  finniftyPrice,
-  midcpniftyPrice,
-  sensexPrice,
-  bankexPrice,
-  modalTransactionType,
-  modalOptionType,
-  latestCallLTP,
-  latestPutLTP,
-  activeFetchFunction,
-  masterOpenPrice,
-  masterHighPrice,
-  masterLowPrice,
-  masterClosePrice,
-  callOpenPrice,
-  callHighPrice,
-  callLowPrice,
-  callClosePrice,
-  putOpenPrice,
-  putHighPrice,
-  putLowPrice,
-  putClosePrice,
 } = useTradeView();
 
 let timer;
@@ -1085,9 +1079,16 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleHotKeys);
+
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+  }
+
   if (socket.value) {
     socket.value.close();
+    socket.value = null;
   }
+
   clearInterval(timer);
   if (positionCheckInterval) {
     clearInterval(positionCheckInterval);
