@@ -1774,16 +1774,23 @@ export function useTradeView() {
 
     localStorage.setItem('statusMessage', statusMessage.value)
 
-    const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}')
-    const storedFlattradeApiKey = flattradeDetails.apiKey
+    // Find the Flattrade broker details
+    let flattradeDetails = null
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key.startsWith('broker_Flattrade_')) {
+        flattradeDetails = JSON.parse(localStorage.getItem(key))
+        break
+      }
+    }
 
-    if (!storedFlattradeApiKey) {
-      errorMessage.value = 'API key is missing'
+    if (!flattradeDetails || !flattradeDetails.apiKey) {
+      errorMessage.value = 'Flattrade API key is missing'
       clearErrorMessage()
       return
     }
 
-    const authUrl = `https://auth.flattrade.in/?app_key=${storedFlattradeApiKey}`
+    const authUrl = `https://auth.flattrade.in/?app_key=${flattradeDetails.apiKey}`
     window.open(authUrl, '_blank')
 
     // Clear status message after 2 minutes if token generation doesn't complete
@@ -2318,15 +2325,24 @@ export function useTradeView() {
     if (newCode && userTriggeredTokenGeneration.value) {
       statusMessage.value = `Received flattradeReqCode: ${newCode}`
 
-      const flattradeDetails = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}')
-      const storedApiKey = flattradeDetails.apiKey
-      const storedApiSecret = flattradeDetails.apiSecret
+      // Find the Flattrade broker details
+      let flattradeDetails = null
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key.startsWith('broker_Flattrade_')) {
+          flattradeDetails = JSON.parse(localStorage.getItem(key))
+          break
+        }
+      }
 
-      if (!storedApiKey || !storedApiSecret) {
+      if (!flattradeDetails || !flattradeDetails.apiKey || !flattradeDetails.apiSecret) {
         errorMessage.value = 'API key or secret is missing'
         clearErrorMessage()
         return
       }
+
+      const storedApiKey = flattradeDetails.apiKey
+      const storedApiSecret = flattradeDetails.apiSecret
 
       const api_secret = storedApiKey + newCode + storedApiSecret
       const hashedSecret = await crypto.subtle.digest(

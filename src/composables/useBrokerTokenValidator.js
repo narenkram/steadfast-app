@@ -74,8 +74,23 @@ const checkAllTokens = async () => {
 }
 
 const getBrokerStatus = (brokerName) => {
-  const token = localStorage.getItem(`${brokerName.toUpperCase()}_API_TOKEN`)
-  if (!token) {
+  // Find the broker details
+  let brokerDetails = null
+  let brokerToken = null
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.startsWith(`broker_${brokerName}_`)) {
+      brokerDetails = JSON.parse(localStorage.getItem(key))
+      brokerToken = localStorage.getItem(`${brokerName.toUpperCase()}_API_TOKEN`)
+      break
+    }
+  }
+
+  if (!brokerDetails) {
+    return 'Broker not found'
+  }
+
+  if (!brokerToken) {
     return 'Token missing'
   } else {
     return tokenStatus[brokerName] || 'unknown'
