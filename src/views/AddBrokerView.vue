@@ -20,8 +20,8 @@
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
           <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
             <option value="">Select a broker</option>
-            <option value="flattrade">Flattrade</option>
-            <option value="shoonya">Shoonya</option>
+            <option value="Flattrade">Flattrade</option>
+            <option value="Shoonya">Shoonya</option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
@@ -117,8 +117,11 @@ const addBroker = () => {
     brokerDetails.apiSecret = apiSecret.value;
   }
 
+  // Generate a unique key for the broker
+  const brokerKey = `broker_${selectedBroker.value}_${clientId.value}`;
+
   // Store in localStorage
-  localStorage.setItem(`broker_${selectedBroker.value}`, JSON.stringify(brokerDetails));
+  localStorage.setItem(brokerKey, JSON.stringify(brokerDetails));
 
   // Navigate to manage-brokers page
   router.push('/manage-brokers');
