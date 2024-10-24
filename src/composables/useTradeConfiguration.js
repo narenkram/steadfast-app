@@ -27,7 +27,7 @@ import {
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
-import { subscribeToOptions } from '@/composables/usePortfolioManagement'
+import { subscribeToOptions } from '@/composables/usePositionManagement'
 
 export const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {

@@ -178,7 +178,7 @@ import {
   subscribeToOptions,
   updateFundLimits,
   fetchFundLimit
-} from '@/composables/usePortfolioManagement'
+} from '@/composables/usePositionManagement'
 
 // Real Time LTP Data Composables
 import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'

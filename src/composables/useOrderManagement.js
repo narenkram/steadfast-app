@@ -41,7 +41,7 @@ import {
   getSymbol,
   fetchFlattradeOrdersTradesBook,
   fetchShoonyaOrdersTradesBook
-} from '@/composables/usePortfolioManagement'
+} from '@/composables/usePositionManagement'
 
 // Risk Management Composables
 import { setStoploss, setTarget } from '@/composables/useRiskManagement'
