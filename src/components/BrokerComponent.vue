@@ -3,9 +3,9 @@
         <!-- Broker Information -->
         <div class="col-12 col-md-4 col-lg-4 d-flex align-items-center justify-content-start">
             <select class="form-select form-select-sm me-2" v-model="selectedBroker">
-                <option value="" disabled selected>Select broker</option>
-                <option v-for="brokerName in availableBrokers" :key="brokerName" :value="brokerName">
-                    {{ brokerName }} {{ maskBrokerClientId(getBrokerClientId(brokerName)) }}
+                <option value="" disabled>Select broker</option>
+                <option v-for="broker in availableBrokers" :key="broker.clientId" :value="broker.brokerName">
+                    {{ broker.brokerName }} {{ maskBrokerClientId(broker.clientId) }}
                 </option>
             </select>
             <span class="badge me-2" :class="{

@@ -1,6 +1,25 @@
 import { ref } from 'vue'
 import { dataFetched, selectedBroker } from '@/stores/globalStore'
 
+// Broker Formatter
+// Parse broker key
+export const parseBrokerKey = (key) => {
+  const [_, brokerName, ...clientIdParts] = key.split('_')
+  const clientId = clientIdParts.join('_')
+  return { brokerName, clientId }
+}
+
+// Get all brokers from localStorage
+export const getAllBrokersFromLocalStorage = () => {
+  return Object.keys(localStorage)
+    .filter((key) => key.startsWith('broker_'))
+    .map((key) => {
+      const { brokerName, clientId } = parseBrokerKey(key)
+      const brokerData = JSON.parse(localStorage.getItem(key))
+      return { ...brokerData, brokerName, clientId }
+    })
+}
+
 // Trading Symbol Formatter
 export const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
   if (!symbol) return ''

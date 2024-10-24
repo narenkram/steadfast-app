@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { validateToken } from '@/composables/useBrokerTokenValidator'
 import { updateSelectedBrokerOnServer } from '../api/broker'
 import axios from 'axios'
+import { parseBrokerKey, getAllBrokersFromLocalStorage } from '@/composables/useFormatters'
 
 // Global State
 import {
@@ -22,24 +23,13 @@ import {
 } from '@/stores/globalStore'
 
 export const availableBrokers = computed(() => {
-  return Object.keys(localStorage)
-    .filter((key) => key.startsWith('broker_'))
-    .map((key) => {
-      const [_, brokerName, clientId] = key.split('_')
-      return { brokerName, clientId }
-    })
+  return getAllBrokersFromLocalStorage()
 })
 
 export const brokerStatus = computed(() => {
-  let flattradeDetails, shoonyaDetails
-
-  for (const key of Object.keys(localStorage)) {
-    if (key.startsWith('broker_Flattrade_')) {
-      flattradeDetails = JSON.parse(localStorage.getItem(key))
-    } else if (key.startsWith('broker_Shoonya_')) {
-      shoonyaDetails = JSON.parse(localStorage.getItem(key))
-    }
-  }
+  const brokers = getAllBrokersFromLocalStorage()
+  const flattradeDetails = brokers.find((b) => b.brokerName === 'Flattrade')
+  const shoonyaDetails = brokers.find((b) => b.brokerName === 'Shoonya')
 
   const flattradeClientId = flattradeDetails?.clientId
   const flattradeApiToken = localStorage.getItem('FLATTRADE_API_TOKEN')
@@ -61,12 +51,7 @@ export const brokerStatus = computed(() => {
 })
 
 export const updateSelectedBroker = async () => {
-  const availableBrokers = Object.keys(localStorage)
-    .filter((key) => key.startsWith('broker_'))
-    .map((key) => {
-      const [_, brokerName, clientId] = key.split('_')
-      return { brokerName, clientId }
-    })
+  const availableBrokers = getAllBrokersFromLocalStorage()
 
   if (availableBrokers.length === 0) {
     selectedBroker.value = null
@@ -101,13 +86,11 @@ export const updateSelectedBroker = async () => {
 }
 
 export const deleteBroker = (broker) => {
-  // Remove broker details from localStorage
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key.startsWith(`broker_${broker.brokerName}_${broker.clientId}`)) {
-      localStorage.removeItem(key)
-      break
-    }
+  const key = Object.keys(localStorage).find((key) =>
+    key.startsWith(`broker_${broker.brokerName}_${broker.clientId}`)
+  )
+  if (key) {
+    localStorage.removeItem(key)
   }
 }
 
