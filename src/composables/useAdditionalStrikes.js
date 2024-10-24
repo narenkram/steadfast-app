@@ -5,7 +5,7 @@ import { additionalSymbols, callStrikes, putStrikes } from '@/stores/globalStore
 import { computed } from 'vue'
 
 // Composables
-import { getMasterSymbolPrice } from '@/composables/useRealTimeLtpData'
+import { getMasterSymbolPrice } from '@/composables/useMarketData'
 export const additionalStrikes = computed(() => {
   if (!additionalSymbols.value) return []
 

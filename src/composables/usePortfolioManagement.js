@@ -29,7 +29,7 @@ import { getExchangeSegment } from '@/composables/useTradeConfiguration'
 import { additionalStrikes } from '@/composables/useAdditionalStrikes'
 
 // Real Time LTP Data Composables
-import { subscribeToLTP, updateAdditionalStrikeLTP } from '@/composables/useRealTimeLtpData'
+import { subscribeToLTP, updateAdditionalStrikeLTP } from '@/composables/useMarketData'
 
 export const updateFundLimits = async () => {
   await fetchFundLimit()

@@ -174,7 +174,7 @@ import {
 } from '@/composables/usePortfolioManagement'
 
 // Real Time LTP Data Composables
-import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useRealTimeLtpData'
+import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'
 
 export function useTradeView() {
   const isFormDisabled = computed(() => killSwitchActive.value)
