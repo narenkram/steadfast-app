@@ -45,7 +45,83 @@ import {
   flatTradeBook,
   shoonyaOrderBook,
   shoonyaTradeBook,
-  enableHotKeys
+  enableHotKeys,
+  additionalStrikeLTPs,
+  ltpCallbacks,
+  niftyPrice,
+  bankNiftyPrice,
+  finniftyPrice,
+  midcpniftyPrice,
+  sensexPrice,
+  bankexPrice,
+  selectedBrokerName,
+  activeTab,
+  selectedExpiry,
+  callStrikeOffset,
+  putStrikeOffset,
+  expiryOffset,
+  showLTPRangeBar,
+  showOHLCValues,
+  masterOpenPrice,
+  masterHighPrice,
+  masterLowPrice,
+  masterClosePrice,
+  showStrikeDetails,
+  callOpenPrice,
+  callHighPrice,
+  callLowPrice,
+  callClosePrice,
+  putOpenPrice,
+  putHighPrice,
+  putLowPrice,
+  putClosePrice,
+  selectedSound,
+  totalRiskTargetToggle,
+  totalRiskTargetType,
+  totalRiskAmount,
+  totalRiskPercentage,
+  totalTargetAmount,
+  totalTargetPercentage,
+  closePositionsRisk,
+  closePositionsTarget,
+  riskAction,
+  targetAction,
+  experimentalFeatures,
+  flattradeReqCode,
+  stickyMTM,
+  overtradeProtection,
+  exchangeSymbols,
+  expiryDates,
+  dataFetched,
+  selectedStrike,
+  modalTransactionType,
+  modalOptionType,
+  latestCallLTP,
+  latestPutLTP,
+  activeFetchFunction,
+  reverseMode,
+  showBasketOrderModal,
+  marketDepth,
+  notificationSound,
+  savedBaskets,
+  basketName,
+  editingBasketId,
+  basketOrders,
+  strategyType,
+  strategies,
+  limitOffset,
+  callDepth,
+  putDepth,
+  symbolData,
+  allSymbolsData,
+  shoonyaBrokerUserId,
+  shoonyaBrokerPassword,
+  shoonyaOneTimePassword,
+  errorMessage,
+  statusMessage,
+  userTriggeredTokenGeneration,
+  callStrikes,
+  putStrikes
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -77,7 +153,10 @@ import {
   productTypes,
   updateAvailableQuantities,
   orderTypes,
-  updateSelectedQuantity
+  updateSelectedQuantity,
+  updateStrikesForExpiry,
+  synchronizeCallStrikes,
+  synchronizePutStrikes
 } from '@/composables/useTradeConfiguration'
 
 // Portfolio Management Composables
@@ -94,101 +173,10 @@ import {
   fetchFundLimit
 } from '@/composables/usePortfolioManagement'
 
+// Real Time LTP Data Composables
+import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useRealTimeLtpData'
+
 export function useTradeView() {
-  // Reactive variables (from globalState)
-  const {
-    showLTPRangeBar,
-    activeTab,
-    overtradeProtection,
-    experimentalFeatures,
-    activationTime,
-    currentTime,
-    selectedBrokerName,
-    selectedExpiry,
-    callStrikeOffset,
-    putStrikeOffset,
-    expiryOffset,
-    exchangeSymbols,
-    callStrikes,
-    putStrikes,
-    expiryDates,
-    synchronizeOnLoad,
-    niftyPrice,
-    bankNiftyPrice,
-    finniftyPrice,
-    midcpniftyPrice,
-    sensexPrice,
-    bankexPrice,
-    dataFetched,
-    token,
-    selectedStrike,
-    modalTransactionType,
-    modalOptionType,
-    positionsInExecution,
-    latestCallLTP,
-    latestPutLTP,
-    totalRiskType,
-    totalRiskTypeToggle,
-    activeFetchFunction,
-    masterOpenPrice,
-    masterHighPrice,
-    masterLowPrice,
-    masterClosePrice,
-    callOpenPrice,
-    callHighPrice,
-    callLowPrice,
-    callClosePrice,
-    putOpenPrice,
-    putHighPrice,
-    putLowPrice,
-    putClosePrice,
-    showOHLCValues,
-    showStrikeDetails,
-    reverseMode,
-    showBasketOrderModal,
-    marketDepth,
-    additionalStrikeLTPs,
-    ltpCallbacks,
-    customStrikePrice,
-    notificationSound,
-    selectedSound,
-    riskClosingCountdown,
-    totalRiskTargetToggle,
-    totalRiskTargetType,
-    totalRiskAmount,
-    totalRiskPercentage,
-    totalTargetAmount,
-    totalTargetPercentage,
-    savedBaskets,
-    basketName,
-    editingBasketId,
-    basketOrders,
-    closePositionsRisk,
-    closePositionsTarget,
-    strategyType,
-    strategies,
-    riskAction,
-    targetAction,
-    limitOffset,
-    callDepth,
-    putDepth,
-    symbolData,
-    allSymbolsData,
-    API_TOKEN,
-    flattradeReqCode,
-    shoonyaBrokerUserId,
-    shoonyaBrokerPassword,
-    shoonyaOneTimePassword,
-    errorMessage,
-    statusMessage,
-    userTriggeredTokenGeneration,
-    selectedBrokerToDelete,
-    stickyMTM,
-    savedStickyMTM
-  } = globalState
-
-  // Computed Variables
-
   const isFormDisabled = computed(() => killSwitchActive.value)
 
   const exchangeOptions = computed(() => {
@@ -601,20 +589,7 @@ export function useTradeView() {
       return 0
     })
   })
-  const additionalStrikes = computed(() => {
-    if (!additionalSymbols.value) return []
 
-    const currentPrice = getMasterSymbolPrice()
-    const allStrikes = [
-      ...new Set([...callStrikes.value, ...putStrikes.value].map((strike) => strike.strikePrice))
-    ].sort((a, b) => a - b)
-
-    const currentIndex = allStrikes.findIndex((strike) => strike >= currentPrice)
-    const startIndex = Math.max(0, currentIndex - 3)
-    const endIndex = Math.min(allStrikes.length - 1, currentIndex + 3)
-
-    return allStrikes.slice(startIndex, endIndex + 1)
-  })
   const availableStrikes = computed(() => {
     const allStrikes = new Set([
       ...callStrikes.value.map((strike) => strike.strikePrice),
@@ -857,144 +832,10 @@ export function useTradeView() {
     const options = { day: '2-digit', month: 'short', year: 'numeric' }
     return date.toLocaleDateString('en-US', options).replace(/,/g, '')
   }
-  const updateStrikesForExpiry = (expiryDate, forceUpdate = false) => {
-    let filteredCallStrikes, filteredPutStrikes
 
-    if (allSymbolsData[selectedMasterSymbol.value]) {
-      filteredCallStrikes = allSymbolsData[selectedMasterSymbol.value].callStrikes.filter(
-        (strike) => strike.expiryDate === expiryDate
-      )
-      filteredPutStrikes = allSymbolsData[selectedMasterSymbol.value].putStrikes.filter(
-        (strike) => strike.expiryDate === expiryDate
-      )
-
-      const uniqueStrikePrices = [
-        ...new Set(
-          [...filteredCallStrikes, ...filteredPutStrikes].map((strike) => strike.strikePrice)
-        )
-      ].sort((a, b) => a - b)
-
-      filteredCallStrikes = uniqueStrikePrices.map(
-        (strikePrice) =>
-          filteredCallStrikes.find((strike) => strike.strikePrice === strikePrice) || {
-            strikePrice,
-            expiryDate,
-            securityId: null,
-            tradingSymbol: null
-          }
-      )
-      filteredPutStrikes = uniqueStrikePrices.map(
-        (strikePrice) =>
-          filteredPutStrikes.find((strike) => strike.strikePrice === strikePrice) || {
-            strikePrice,
-            expiryDate,
-            securityId: null,
-            tradingSymbol: null
-          }
-      )
-
-      callStrikes.value = filteredCallStrikes
-      putStrikes.value = filteredPutStrikes
-    } else {
-      console.error(`No data found for ${selectedMasterSymbol.value}`)
-      return
-    }
-
-    if (
-      forceUpdate ||
-      !selectedCallStrike.value.securityId ||
-      !selectedPutStrike.value.securityId ||
-      selectedCallStrike.value.expiryDate !== expiryDate
-    ) {
-      let currentPrice
-      switch (selectedMasterSymbol.value) {
-        case 'NIFTY':
-          currentPrice = parseFloat(niftyPrice.value)
-          break
-        case 'BANKNIFTY':
-          currentPrice = parseFloat(bankNiftyPrice.value)
-          break
-        case 'FINNIFTY':
-          currentPrice = parseFloat(finniftyPrice.value)
-          break
-        case 'MIDCPNIFTY':
-          currentPrice = parseFloat(midcpniftyPrice.value)
-          break
-        case 'SENSEX':
-          currentPrice = parseFloat(sensexPrice.value)
-          break
-        case 'BANKEX':
-          currentPrice = parseFloat(bankexPrice.value)
-          break
-        default:
-          console.error(`Unknown master symbol: ${selectedMasterSymbol.value}`)
-          return
-      }
-
-      if (currentPrice && !isNaN(currentPrice) && filteredCallStrikes.length > 0) {
-        const nearestStrikeIndex = filteredCallStrikes.findIndex(
-          (strike) =>
-            Math.abs(strike.strikePrice - currentPrice) ===
-            Math.min(...filteredCallStrikes.map((s) => Math.abs(s.strikePrice - currentPrice)))
-        )
-
-        const callOffsetIndex = nearestStrikeIndex - parseInt(callStrikeOffset.value)
-        const putOffsetIndex = nearestStrikeIndex + parseInt(putStrikeOffset.value)
-
-        selectedCallStrike.value = filteredCallStrikes[callOffsetIndex] || {}
-        selectedPutStrike.value = filteredPutStrikes[putOffsetIndex] || {}
-      }
-
-      if (synchronizeOnLoad.value) {
-        synchronizeStrikes()
-        synchronizeOnLoad.value = false
-      }
-
-      defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
-      defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
-    }
-  }
   const saveOffsets = () => {
     localStorage.setItem('callStrikeOffset', callStrikeOffset.value)
     localStorage.setItem('putStrikeOffset', putStrikeOffset.value)
-  }
-  const synchronizeStrikes = () => {
-    synchronizeCallStrikes()
-    synchronizePutStrikes()
-    updateSecurityIds()
-    subscribeToOptions()
-  }
-  const synchronizeCallStrikes = () => {
-    if (selectedPutStrike.value && selectedPutStrike.value.strikePrice) {
-      const matchingCallStrike = callStrikes.value.find(
-        (strike) => strike.strikePrice === selectedPutStrike.value.strikePrice
-      )
-      if (matchingCallStrike) {
-        selectedCallStrike.value = matchingCallStrike
-      } else {
-        selectedCallStrike.value = {}
-      }
-    }
-    updateSecurityIds()
-  }
-
-  const synchronizePutStrikes = () => {
-    if (selectedCallStrike.value && selectedCallStrike.value.strikePrice) {
-      const matchingPutStrike = putStrikes.value.find(
-        (strike) => strike.strikePrice === selectedCallStrike.value.strikePrice
-      )
-      if (matchingPutStrike) {
-        selectedPutStrike.value = matchingPutStrike
-      } else {
-        selectedPutStrike.value = {}
-      }
-    }
-    updateSecurityIds()
-  }
-  const updateSecurityIds = () => {
-    // console.log('Updating Security IDs');
-    defaultCallSecurityId.value = selectedCallStrike.value.securityId || 'N/A'
-    defaultPutSecurityId.value = selectedPutStrike.value.securityId || 'N/A'
   }
 
   const formatTime = (timeString) => {
@@ -1707,30 +1548,7 @@ export function useTradeView() {
     subscribeToOptions()
     subscribeToPositionLTPs()
   }
-  const subscribeToLTP = (securityId, callback) => {
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-      const exchangeSegment = getExchangeSegment()
-      const symbolToSubscribe = `${exchangeSegment}|${securityId}`
-      const data = {
-        action: 'subscribe',
-        symbols: [symbolToSubscribe]
-      }
-      socket.value.send(JSON.stringify(data))
 
-      // Store the callback for this security ID
-      ltpCallbacks.value[securityId] = callback
-    }
-  }
-  const updateAdditionalStrikeLTP = (data) => {
-    const callStrike = callStrikes.value.find((s) => s.securityId === data.tk)
-    const putStrike = putStrikes.value.find((s) => s.securityId === data.tk)
-
-    if (callStrike) {
-      additionalStrikeLTPs.value.call[callStrike.strikePrice] = data.lp
-    } else if (putStrike) {
-      additionalStrikeLTPs.value.put[putStrike.strikePrice] = data.lp
-    }
-  }
   const unsubscribeFromAdditionalStrikes = () => {
     if (socket.value && socket.value.readyState === WebSocket.OPEN) {
       const exchangeSegment = getExchangeSegment()
@@ -1755,25 +1573,7 @@ export function useTradeView() {
     subscribeToMasterSymbol()
     subscribeToOptions()
   }
-  // Helper function to get the correct price for the selected master symbol
-  const getMasterSymbolPrice = () => {
-    switch (selectedMasterSymbol.value) {
-      case 'NIFTY':
-        return parseFloat(niftyPrice.value)
-      case 'BANKNIFTY':
-        return parseFloat(bankNiftyPrice.value)
-      case 'FINNIFTY':
-        return parseFloat(finniftyPrice.value)
-      case 'MIDCPNIFTY':
-        return parseFloat(midcpniftyPrice.value)
-      case 'SENSEX':
-        return parseFloat(sensexPrice.value)
-      case 'BANKEX':
-        return parseFloat(bankexPrice.value)
-      default:
-        return 0
-    }
-  }
+
   const toggleAdditionalSymbols = () => {
     additionalSymbols.value = !additionalSymbols.value
   }
@@ -2536,9 +2336,6 @@ export function useTradeView() {
     setDefaultExchangeAndMasterSymbol,
     fetchTradingData,
     setDefaultExpiry,
-    updateStrikesForExpiry,
-    synchronizeCallStrikes,
-    synchronizePutStrikes,
     saveUserChoice,
     saveOffsets,
     saveExpiryOffset,
@@ -2549,8 +2346,6 @@ export function useTradeView() {
     subscribeToMasterSymbol,
     updateSubscriptions,
     checkOvertradeProtection,
-    subscribeToLTP,
-    updateAdditionalStrikeLTP,
     unsubscribeFromAdditionalStrikes,
     toggleAdditionalSymbols,
     toggleMarketDepth,
@@ -2582,7 +2377,6 @@ export function useTradeView() {
     placeAllBasketOrders,
     setReverseMode,
     reversePositions,
-    selectedBrokerToDelete,
     copyToClipboard,
     generateToken,
     getStatus,
@@ -2625,98 +2419,8 @@ export function useTradeView() {
     openMarkerPosition,
     putLtpRangeWidth,
     putLtpMarkerPosition,
-    putOpenMarkerPosition,
-    additionalStrikes,
+    putOpenMarkerPosition
 
     // Reactive variables (from globalState)
-    showLTPRangeBar,
-    activeTab,
-    overtradeProtection,
-    experimentalFeatures,
-    activationTime,
-    currentTime,
-    selectedBrokerName,
-    selectedExpiry,
-    callStrikeOffset,
-    putStrikeOffset,
-    expiryOffset,
-    exchangeSymbols,
-    callStrikes,
-    putStrikes,
-    expiryDates,
-    synchronizeOnLoad,
-    niftyPrice,
-    bankNiftyPrice,
-    finniftyPrice,
-    midcpniftyPrice,
-    sensexPrice,
-    bankexPrice,
-    dataFetched,
-    token,
-    selectedStrike,
-    modalTransactionType,
-    modalOptionType,
-    positionsInExecution,
-    latestCallLTP,
-    latestPutLTP,
-    totalRiskType,
-    totalRiskTypeToggle,
-    activeFetchFunction,
-    masterOpenPrice,
-    masterHighPrice,
-    masterLowPrice,
-    masterClosePrice,
-    callOpenPrice,
-    callHighPrice,
-    callLowPrice,
-    callClosePrice,
-    putOpenPrice,
-    putHighPrice,
-    putLowPrice,
-    putClosePrice,
-    showOHLCValues,
-    showStrikeDetails,
-    reverseMode,
-    showBasketOrderModal,
-    marketDepth,
-    additionalStrikeLTPs,
-    ltpCallbacks,
-    customStrikePrice,
-    notificationSound,
-    selectedSound,
-    riskClosingCountdown,
-    totalRiskTargetToggle,
-    totalRiskTargetType,
-    totalRiskAmount,
-    totalRiskPercentage,
-    totalTargetAmount,
-    totalTargetPercentage,
-    savedBaskets,
-    basketName,
-    editingBasketId,
-    basketOrders,
-    closePositionsRisk,
-    closePositionsTarget,
-    strategyType,
-    strategies,
-    riskAction,
-    targetAction,
-    limitOffset,
-    callDepth,
-    putDepth,
-    symbolData,
-    allSymbolsData,
-    previousOrderType,
-    API_TOKEN,
-    flattradeReqCode,
-    shoonyaBrokerUserId,
-    shoonyaBrokerPassword,
-    shoonyaOneTimePassword,
-    errorMessage,
-    statusMessage,
-    userTriggeredTokenGeneration,
-    selectedBrokerToDelete,
-    stickyMTM,
-    savedStickyMTM
   }
 }
