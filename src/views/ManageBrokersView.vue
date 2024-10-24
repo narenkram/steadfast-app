@@ -45,32 +45,30 @@ const toggleBrokerClientIdVisibility = (brokerId) => {
   visibleClientIds.value[brokerId] = !visibleClientIds.value[brokerId];
 };
 
-// Add this computed property to map supported brokers to their details
-const brokerDetails = computed(() => {
-  return supportedBrokers.map(brokerName => {
-    if (brokerName === 'Flattrade') {
-      return {
-        id: 'flattrade',
-        brokerName: 'Flattrade',
-        brokerClientId: FLATTRADE_CLIENT_ID.value,
-        apiToken: FLATTRADE_API_TOKEN.value,
-        apiKey: FLATTRADE_API_KEY.value,
-        apiSecret: FLATTRADE_API_SECRET.value
-      };
-    } else if (brokerName === 'Shoonya') {
-      return {
-        id: 'shoonya',
-        brokerName: 'Shoonya',
-        brokerClientId: SHOONYA_CLIENT_ID.value,
-        apiToken: SHOONYA_API_TOKEN.value,
-        apiKey: SHOONYA_API_KEY.value
-      };
+// New function to get brokers from localStorage
+const getBrokersFromLocalStorage = () => {
+  const brokers = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('broker_')) {
+      const brokerData = JSON.parse(localStorage.getItem(key));
+      brokers.push({
+        id: key.split('_')[2], // Extract the broker ID from the key
+        ...brokerData,
+        apiToken: localStorage.getItem(`${brokerData.brokerName.toUpperCase()}_API_TOKEN`) || ''
+      });
     }
-    return null;
-  }).filter(broker => broker !== null);
-});
+  }
+  return brokers;
+};
+
+// Replace brokerDetails computed property
+const brokerDetails = ref([]);
 
 onMounted(() => {
+  // Populate brokerDetails from localStorage
+  brokerDetails.value = getBrokersFromLocalStorage();
+
   // Retrieve broker details for each supported broker
   for (const broker of supportedBrokers) {
     if (broker === 'Flattrade') {
@@ -135,6 +133,7 @@ onMounted(() => {
           <tr>
             <th scope="col">Broker</th>
             <th scope="col">Broker Client ID</th>
+            <th scope="col">API Key</th>
             <th scope="col">API Token</th>
             <th scope="col">Validity</th>
             <th scope="col" class="text-center">Activation</th>
@@ -150,17 +149,17 @@ onMounted(() => {
             <td>{{ broker.brokerName }}</td>
             <td>
               <span class="badge bg-primary">
-                {{ visibleClientIds[broker.id] ? broker.brokerClientId : manageBrokerMaskClientId(broker.brokerClientId)
-                }}
+                {{ visibleClientIds[broker.id] ? broker.clientId : manageBrokerMaskClientId(broker.clientId) }}
               </span>
               <button class="btn btn-sm btn-outline-secondary ms-2" @click="toggleBrokerClientIdVisibility(broker.id)">
                 {{ visibleClientIds[broker.id] ? '👁️' : '👀' }}
               </button>
             </td>
+            <td>{{ maskTokenSecret(broker.apiKey) }}</td>
             <td>
               <div class="d-flex align-items-center">
                 <span>
-                  {{ maskTokenSecret(broker.apiToken || '') }}
+                  {{ maskTokenSecret(broker.apiToken || '-') }}
                 </span>
                 <button v-if="broker.apiToken" class="btn btn-sm btn-outline-secondary ms-2"
                   @click="copyToClipboard(broker.apiToken)" title="Copy token">
@@ -170,8 +169,7 @@ onMounted(() => {
             </td>
             <td>
               <div class="d-flex align-items-center">
-                <span v-if="broker.brokerName === 'Flattrade'">24 Hours</span>
-                <span v-if="broker.brokerName === 'Shoonya'">24 Hours</span>
+                <span>24 Hours</span>
               </div>
             </td>
             <td class="text-center">
@@ -186,8 +184,7 @@ onMounted(() => {
               </template>
             </td>
             <td>
-              <span :class="`badge ${getStatus(broker).statusClass}`">{{
-                getStatus(broker).status }}</span>
+              <span :class="`badge ${getStatus(broker).statusClass}`">{{ getStatus(broker).status }}</span>
             </td>
             <td>
               <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
