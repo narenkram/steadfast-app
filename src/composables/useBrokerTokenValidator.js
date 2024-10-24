@@ -3,7 +3,17 @@ import { tokenStatus, supportedBrokers } from '@/stores/globalStore'
 
 const flattradeFundLimits = async () => {
   const jKey = localStorage.getItem('FLATTRADE_API_TOKEN')
-  const clientId = JSON.parse(localStorage.getItem('broker_Flattrade') || '{}').clientId
+
+  // Find the Flattrade broker details
+  let clientId = null
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.startsWith('broker_Flattrade_')) {
+      const brokerDetails = JSON.parse(localStorage.getItem(key))
+      clientId = brokerDetails.clientId
+      break
+    }
+  }
 
   if (!jKey || !clientId) {
     throw new Error('Token or client ID is missing for Flattrade.')
@@ -26,7 +36,17 @@ const flattradeFundLimits = async () => {
 
 const shoonyaFundLimits = async () => {
   const jKey = localStorage.getItem('SHOONYA_API_TOKEN')
-  const clientId = JSON.parse(localStorage.getItem('broker_Shoonya') || '{}').clientId
+
+  // Find the Shoonya broker details
+  let clientId = null
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.startsWith('broker_Shoonya_')) {
+      const brokerDetails = JSON.parse(localStorage.getItem(key))
+      clientId = brokerDetails.clientId
+      break
+    }
+  }
 
   if (!jKey || !clientId) {
     throw new Error('Token or client ID is missing for Shoonya.')
