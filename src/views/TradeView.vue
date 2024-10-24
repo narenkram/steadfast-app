@@ -926,6 +926,8 @@ import {
   putHighPrice,
   putLowPrice,
   putClosePrice,
+  reconnectTimeout,
+  wsConnectionState,
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -1080,8 +1082,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleHotKeys);
 
-  if (reconnectTimeout) {
-    clearTimeout(reconnectTimeout);
+  if (reconnectTimeout.value) {  // Access the ref value
+    clearTimeout(reconnectTimeout.value);
+    reconnectTimeout.value = null;
   }
 
   if (socket.value) {

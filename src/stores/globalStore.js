@@ -294,3 +294,9 @@ export const currentSubscriptions = ref({
   putOption: null
 })
 export const supportedBrokers = ['Flattrade', 'Shoonya']
+export const MAX_RECONNECT_ATTEMPTS = 5
+export const INITIAL_RECONNECT_DELAY = 1000
+export const reconnectAttempts = ref(0)
+export const reconnectTimeout = ref(null)
+export const wsConnectionState = ref('disconnected')
+export const messageQueue = ref([])

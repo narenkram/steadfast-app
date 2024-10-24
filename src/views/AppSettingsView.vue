@@ -291,24 +291,32 @@
 
 <script setup>
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue'
+import { useAppSettings } from '@/composables/useAppSettings'
 
-// Global state
+// Import global state
 import {
+  // UI Settings
   showLTPRangeBar,
-  overtradeProtection,
-  experimentalFeatures,
+  showOHLCValues,
+  showStrikeDetails,
   stickyMTM,
-  savedStickyMTM,
+  experimentalFeatures,
 
+  // Trading Settings
   callStrikeOffset,
   putStrikeOffset,
   expiryOffset,
-  showOHLCValues,
-  showStrikeDetails,
+  overtradeProtection,
+
+  // Feature Settings
   additionalSymbols,
   marketDepth,
+
+  // Notification Settings
   notificationSound,
   selectedSound,
+
+  // Risk Management Settings
   totalRiskTargetToggle,
   totalRiskTargetType,
   totalRiskAmount,
@@ -318,18 +326,19 @@ import {
   closePositionsRisk,
   closePositionsTarget,
   riskAction,
-  targetAction,
-} from '@/stores/globalStore';
+  targetAction
+} from '@/stores/globalStore'
 
-import { useTradeView } from '@/composables/useTradingSystem';
 const {
-  // Methods
+  toggleLTPRangeBar,
+  toggleOHLCValues,
+  toggleStrikeDetails,
+  toggleStickyMTM,
+  toggleExperimentalFeatures,
+  saveOffsets,
+  toggleOvertradeProtection,
   toggleAdditionalSymbols,
   toggleMarketDepth,
-  playNotificationSound,
-  toggleOvertradeProtection,
-
-  // Computed properties
-  isFormDisabled,
-} = useTradeView();
+  playNotificationSound
+} = useAppSettings()
 </script>

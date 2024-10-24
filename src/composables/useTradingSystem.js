@@ -122,7 +122,13 @@ import {
   userTriggeredTokenGeneration,
   callStrikes,
   putStrikes,
-  currentTime
+  currentTime,
+  MAX_RECONNECT_ATTEMPTS,
+  INITIAL_RECONNECT_DELAY,
+  reconnectAttempts,
+  reconnectTimeout,
+  wsConnectionState,
+  messageQueue
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -178,14 +184,6 @@ import {
 import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'
 
 export function useTradeView() {
-  // Add these at the top of useTradeView
-  const MAX_RECONNECT_ATTEMPTS = 5
-  const INITIAL_RECONNECT_DELAY = 1000
-  let reconnectAttempts = 0
-  let reconnectTimeout = null
-  const wsConnectionState = ref('disconnected')
-  const messageQueue = []
-
   const isFormDisabled = computed(() => killSwitchActive.value)
 
   const exchangeOptions = computed(() => {
@@ -1388,7 +1386,7 @@ export function useTradeView() {
 
       socket.value.onopen = (event) => {
         console.log('WebSocket connection opened:', event)
-        reconnectAttempts = 0 // Reset attempts on successful connection
+        reconnectAttempts.value = 0 // Reset attempts on successful connection
         handleWebSocketOpen(event)
       }
 
@@ -1433,18 +1431,18 @@ export function useTradeView() {
     handleReconnection()
   }
   const handleReconnection = () => {
-    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-      const delay = INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts)
+    if (reconnectAttempts.value < MAX_RECONNECT_ATTEMPTS) {
+      const delay = INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts.value)
       console.log(
-        `Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})`
+        `Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts.value + 1}/${MAX_RECONNECT_ATTEMPTS})`
       )
 
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout)
+      if (reconnectTimeout.value) {
+        clearTimeout(reconnectTimeout.value)
       }
 
-      reconnectTimeout = setTimeout(() => {
-        reconnectAttempts++
+      reconnectTimeout.value = setTimeout(() => {
+        reconnectAttempts.value++
         connectWebSocket()
       }, delay)
     } else {
