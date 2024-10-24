@@ -20,8 +20,9 @@
           <label for="SelectBroker" class="mt-3 form-label mb-0"><b>Select Broker</b></label>
           <select v-model="selectedBroker" class="form-select" aria-label="Select Broker">
             <option value="">Select a broker</option>
-            <option value="Flattrade">Flattrade</option>
-            <option value="Shoonya">Shoonya</option>
+            <option v-for="supportedBroker in supportedBrokers" :key="supportedBroker" :value="supportedBroker">
+              {{ supportedBroker }}
+            </option>
           </select>
 
           <!-- Link to Open Selected Broker's API Dashboard -->
@@ -73,6 +74,7 @@
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
+import { supportedBrokers } from '@/stores/globalStore';
 const router = useRouter();
 const redirectURL = computed(() => {
   const baseUrl = import.meta.env.DEV ? 'http://localhost:5173' : import.meta.env.VITE_BASE_URL;
