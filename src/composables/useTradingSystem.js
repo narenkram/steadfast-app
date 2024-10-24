@@ -178,6 +178,14 @@ import {
 import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'
 
 export function useTradeView() {
+  // Add these at the top of useTradeView
+  const MAX_RECONNECT_ATTEMPTS = 5
+  const INITIAL_RECONNECT_DELAY = 1000
+  let reconnectAttempts = 0
+  let reconnectTimeout = null
+  const wsConnectionState = ref('disconnected')
+  const messageQueue = []
+
   const isFormDisabled = computed(() => killSwitchActive.value)
 
   const exchangeOptions = computed(() => {
@@ -278,11 +286,6 @@ export function useTradeView() {
       return marginUsed
     }
     return 0
-  })
-  const formattedDate = computed(() => {
-    const today = new Date()
-    const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }
-    return today.toLocaleDateString('en-US', options).replace(/,/g, '')
   })
   const totalNetQty = computed(() => {
     const calculateTotalQty = (positions) => {
@@ -1329,7 +1332,6 @@ export function useTradeView() {
   }
 
   // WebSocket
-  const wsConnectionState = ref('disconnected')
   const isWebSocketReady = () => {
     return socket.value && socket.value.readyState === WebSocket.OPEN
   }
@@ -1378,10 +1380,15 @@ export function useTradeView() {
     console.log(`Attempting to connect to WebSocket at ${websocketUrl}`)
 
     try {
+      if (socket.value) {
+        socket.value.close()
+      }
+
       socket.value = new WebSocket(websocketUrl)
 
       socket.value.onopen = (event) => {
         console.log('WebSocket connection opened:', event)
+        reconnectAttempts = 0 // Reset attempts on successful connection
         handleWebSocketOpen(event)
       }
 
@@ -1398,6 +1405,7 @@ export function useTradeView() {
       }
     } catch (error) {
       console.error('Error creating WebSocket connection:', error)
+      handleReconnection()
     }
   }
   const handleWebSocketMessage = (event) => {
@@ -2434,7 +2442,6 @@ export function useTradeView() {
     combinedOrdersAndTrades,
     availableBalance,
     usedAmount,
-    formattedDate,
     totalNetQty,
     totalProfit,
     positionsWithCalculatedProfit,
