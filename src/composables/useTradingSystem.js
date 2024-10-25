@@ -1406,10 +1406,17 @@ export function useTradeView() {
       handleReconnection()
     }
   }
+  const isMasterSymbolPrice = (quoteData) => {
+    const masterSymbol = selectedMasterSymbol.value
+    return quoteData.tk === masterSymbol
+  }
   const handleWebSocketMessage = (event) => {
     const quoteData = JSON.parse(event.data)
     if (quoteData.lp) {
       updateMasterSymbolPrice(quoteData)
+      if (isMasterSymbolPrice(quoteData)) {
+        subscribeToOptions()
+      }
       updateOptionPrices(quoteData)
       updatePositionLTPs(quoteData)
       handleAdditionalStrikeLTPs(quoteData)
@@ -1619,7 +1626,6 @@ export function useTradeView() {
   const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300)
   const initializeSubscriptions = () => {
     subscribeToMasterSymbol()
-    subscribeToOptions()
   }
 
   const toggleAdditionalSymbols = () => {
