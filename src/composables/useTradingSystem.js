@@ -2170,10 +2170,6 @@ export function useTradeView() {
     saveExpiryOffset()
     setDefaultExpiry()
   })
-  // Watch for changes to showLTPRangeBar and save to localStorage
-  watch(showLTPRangeBar, (newValue) => {
-    localStorage.setItem('showLTPRangeBar', JSON.stringify(newValue))
-  })
   // Watch for changes to showOHLCValues and save to localStorage
   watch(showOHLCValues, (newValue) => {
     localStorage.setItem('showOHLCValues', JSON.stringify(newValue))

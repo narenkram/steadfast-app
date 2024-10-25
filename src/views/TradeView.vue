@@ -1060,8 +1060,8 @@ onMounted(async () => {
   connectWebSocket();
 
   const ltpBarsavedPreference = localStorage.getItem('showLTPRangeBar');
-  if (ltpBarsavedPreference !== null) {
-    showLTPRangeBar.value = JSON.parse(ltpBarsavedPreference);
+  if (ltpBarsavedPreference !== null && JSON.parse(ltpBarsavedPreference) !== showLTPRangeBar.value) {
+    toggleLTPRangeBar();
   }
   const ohlcValuesSavedPreference = localStorage.getItem('showOHLCValues');
   if (ohlcValuesSavedPreference !== null) {
