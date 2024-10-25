@@ -200,8 +200,8 @@
             <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
               :openMarkerPosition="callOpenMarkerPosition" :lowPrice="callLowPrice" :highPrice="callHighPrice" />
             <!-- Call Market Depth -->
-            <MarketDepthComponent :isDepthAvailable="isCallDepthAvailable" :marketDepth="marketDepth"
-              :depth="callDepth" />
+            <MarketDepthComponent :isDepthAvailable="isCallDepthAvailable" :marketDepth="marketDepth || {}"
+              :depth="callDepth || {}" />
           </div>
 
           <!-- Live Underlying Price -->
@@ -301,8 +301,8 @@
             <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
               :openMarkerPosition="putOpenMarkerPosition" :lowPrice="putLowPrice" :highPrice="putHighPrice" />
             <!-- Put Market Depth -->
-            <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth"
-              :depth="putDepth" />
+            <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth || {}"
+              :depth="putDepth || {}" />
           </div>
           <!-- Multi Strike Mode -->
           <MultiStrikeComponent :additionalSymbols="additionalSymbols" :additionalStrikes="additionalStrikes"
@@ -1015,8 +1015,6 @@ let positionCheckInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
-  // Initialize any additional refs if needed
-  marketDepth.value = {}
   additionalStrikeLTPs.value = {}
   savedBaskets.value = []
 

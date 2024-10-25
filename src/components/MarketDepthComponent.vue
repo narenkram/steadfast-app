@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isDepthAvailable && marketDepth">
+    <div v-if="isDepthAvailable && Object.keys(marketDepth).length > 0">
         <h6>Market Depth</h6>
         <table class="table table-sm">
             <thead>
@@ -32,11 +32,13 @@ const props = defineProps({
     },
     marketDepth: {
         type: Object,
-        required: true
+        required: true,
+        default: () => ({}) // Provide a default empty object
     },
     depth: {
         type: Object,
-        required: true
+        required: true,
+        default: () => ({}) // Provide a default empty object
     }
 });
 </script>
