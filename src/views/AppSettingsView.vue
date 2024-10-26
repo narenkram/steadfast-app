@@ -219,17 +219,6 @@
             </div>
             <small class="text-muted">For development purposes only</small>
           </div>
-          <!-- Multi Strike Mode Subscibe LTP for 3 more additional symbols -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="additionalSymbols" class="form-label">Multi Strike Mode</label>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="additionalSymbols" :checked="additionalSymbols"
-                @change="toggleAdditionalSymbols" />
-              <label class="form-check-label" for="additionalSymbols">
-                {{ additionalSymbols ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
           <!-- Notification Sound -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <label for="notificationSound" class="form-label">Notification Sound</label>
@@ -247,7 +236,7 @@
               <!-- Add more sound options as needed -->
             </select>
           </div>
-          <!-- Subscibe LTP for 3 more additional symbols -->
+          <!-- Market Depth Toggle -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <label for="marketDepth" class="form-label">Market Depth</label>
             <div class="form-check form-switch">
@@ -297,7 +286,6 @@ import {
   overtradeProtection,
 
   // Feature Settings
-  additionalSymbols,
   marketDepth,
 
   // Notification Settings
@@ -324,7 +312,6 @@ const {
   toggleStickyMTM,
   saveOffsets,
   toggleOvertradeProtection,
-  toggleAdditionalSymbols,
   toggleMarketDepth,
   playNotificationSound
 } = useAppSettings()

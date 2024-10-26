@@ -25,7 +25,6 @@ import {
   socket,
   defaultCallSecurityId,
   defaultPutSecurityId,
-  additionalSymbols,
   currentSubscriptions,
   fundLimits,
   selectedExchange,
@@ -46,7 +45,6 @@ import {
   shoonyaOrderBook,
   shoonyaTradeBook,
   enableHotKeys,
-  additionalStrikeLTPs,
   ltpCallbacks,
   niftyPrice,
   bankNiftyPrice,
@@ -1070,7 +1068,6 @@ export function useTradeView() {
       }
       updateOptionPrices(quoteData)
       updatePositionLTPs(quoteData)
-      handleAdditionalStrikeLTPs(quoteData)
     }
     handleDepthFeed(quoteData)
   }
@@ -1144,12 +1141,6 @@ export function useTradeView() {
     if (positionTsym) {
       positionLTPs.value[positionTsym] = quoteData.lp
       // console.log(`Updated LTP for position ${positionTsym}: ${quoteData.lp}`)
-    }
-  }
-
-  const handleAdditionalStrikeLTPs = (quoteData) => {
-    if (ltpCallbacks.value[quoteData.tk]) {
-      ltpCallbacks.value[quoteData.tk](quoteData)
     }
   }
 
@@ -1255,33 +1246,11 @@ export function useTradeView() {
     subscribeToPositionLTPs()
   }
 
-  const unsubscribeFromAdditionalStrikes = () => {
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-      const exchangeSegment = getExchangeSegment()
-      const symbolsToUnsubscribe = Object.keys(ltpCallbacks.value).map(
-        (securityId) => `${exchangeSegment}|${securityId}`
-      )
-
-      if (symbolsToUnsubscribe.length > 0) {
-        const data = {
-          action: 'unsubscribe',
-          symbols: symbolsToUnsubscribe
-        }
-        socket.value.send(JSON.stringify(data))
-      }
-
-      // Clear the callbacks
-      ltpCallbacks.value = {}
-    }
-  }
   const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300)
   const initializeSubscriptions = () => {
     subscribeToMasterSymbol()
   }
 
-  const toggleAdditionalSymbols = () => {
-    additionalSymbols.value = !additionalSymbols.value
-  }
   const toggleMarketDepth = () => {
     marketDepth.value = !marketDepth.value
     localStorage.setItem('marketDepth', JSON.stringify(marketDepth.value))
@@ -1814,15 +1783,6 @@ export function useTradeView() {
       // console.log('Marker Position:', ltpMarkerPosition.value);
     }
   )
-  watch(additionalSymbols, (newValue) => {
-    localStorage.setItem('additionalSymbols', JSON.stringify(newValue))
-    if (newValue) {
-      subscribeToOptions()
-    } else {
-      unsubscribeFromAdditionalStrikes()
-      additionalStrikeLTPs.value = { call: {}, put: {} }
-    }
-  })
   watch(selectedSound, (newValue) => {
     localStorage.setItem('selectedSound', newValue)
     if (notificationSound.value) {
@@ -2005,8 +1965,6 @@ export function useTradeView() {
     subscribeToMasterSymbol,
     updateSubscriptions,
     checkOvertradeProtection,
-    unsubscribeFromAdditionalStrikes,
-    toggleAdditionalSymbols,
     toggleMarketDepth,
     playNotificationSound,
     showToastNotification,

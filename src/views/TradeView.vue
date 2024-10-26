@@ -304,11 +304,6 @@
             <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth || {}"
               :depth="putDepth || {}" />
           </div>
-          <!-- Multi Strike Mode -->
-          <MultiStrikeComponent :additionalSymbols="additionalSymbols" :additionalStrikes="additionalStrikes"
-            :additionalStrikeLTPs="additionalStrikeLTPs" :selectedCallStrike="selectedCallStrike"
-            :selectedPutStrike="selectedPutStrike" :handleOrderClick="handleOrderClick" :callStrikes="callStrikes"
-            :putStrikes="putStrikes" />
         </div>
 
         <div class="row align-items-center justify-content-between mt-3">
@@ -693,13 +688,12 @@ import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
 import MarketDepthComponent from '@/components/MarketDepthComponent.vue';
-import MultiStrikeComponent from '@/components/MultiStrikeComponent.vue';
 import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
 import {
-  killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, additionalSymbols, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
+  killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
   selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData,
   currentTime,
   showLTPRangeBar,
@@ -707,7 +701,6 @@ import {
   showStrikeDetails,
   reverseMode,
   marketDepth,
-  additionalStrikeLTPs,
   limitOffset,
   callDepth,
   putDepth,
@@ -765,9 +758,6 @@ import {
   formatDate
 } from '@/composables/useFormatters'
 
-// Additional Strikes Composables
-import { additionalStrikes } from '@/composables/useAdditionalStrikes'
-
 const {
   // Methods
   setActiveTab,
@@ -823,7 +813,6 @@ let positionCheckInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
-  additionalStrikeLTPs.value = {}
 
   await checkAllTokens();
   initKillSwitch();

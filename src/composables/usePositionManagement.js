@@ -9,7 +9,6 @@ import {
   socket,
   defaultCallSecurityId,
   defaultPutSecurityId,
-  additionalSymbols,
   currentSubscriptions,
   toastMessage,
   showToast,
@@ -25,11 +24,8 @@ import {
 // Trade Configuration Composables
 import { getExchangeSegment } from '@/composables/useTradeConfiguration'
 
-// Additional Strikes Composables
-import { additionalStrikes } from '@/composables/useAdditionalStrikes'
-
 // Real Time LTP Data Composables
-import { subscribeToLTP, updateAdditionalStrikeLTP } from '@/composables/useMarketData'
+import { subscribeToLTP } from '@/composables/useMarketData'
 
 export const updateFundLimits = async () => {
   await fetchFundLimit()
@@ -337,16 +333,6 @@ export const subscribeToOptions = () => {
         symbols: symbolsToSubscribe
       }
       socket.value.send(JSON.stringify(data))
-    }
-
-    if (additionalSymbols.value) {
-      additionalStrikes.value.forEach((strike) => {
-        const callStrike = callStrikes.value.find((s) => s.strikePrice === strike)
-        const putStrike = putStrikes.value.find((s) => s.strikePrice === strike)
-
-        if (callStrike) subscribeToLTP(callStrike.securityId, updateAdditionalStrikeLTP)
-        if (putStrike) subscribeToLTP(putStrike.securityId, updateAdditionalStrikeLTP)
-      })
     }
   }
 

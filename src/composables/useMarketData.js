@@ -8,7 +8,6 @@ import {
   bankexPrice,
   socket,
   ltpCallbacks,
-  additionalStrikeLTPs,
   callStrikes,
   putStrikes
 } from '@/stores/globalStore'
@@ -46,16 +45,5 @@ export const subscribeToLTP = (securityId, callback) => {
 
     // Store the callback for this security ID
     ltpCallbacks.value[securityId] = callback
-  }
-}
-
-export const updateAdditionalStrikeLTP = (data) => {
-  const callStrike = callStrikes.value.find((s) => s.securityId === data.tk)
-  const putStrike = putStrikes.value.find((s) => s.securityId === data.tk)
-
-  if (callStrike) {
-    additionalStrikeLTPs.value.call[callStrike.strikePrice] = data.lp
-  } else if (putStrike) {
-    additionalStrikeLTPs.value.put[putStrike.strikePrice] = data.lp
   }
 }

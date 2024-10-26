@@ -94,14 +94,7 @@ export const putClosePrice = ref(localStorage.getItem('putClosePrice') || null)
 export const showOHLCValues = ref(false)
 export const showStrikeDetails = ref(false)
 export const reverseMode = ref('all')
-export const additionalSymbols = ref(
-  JSON.parse(localStorage.getItem('additionalSymbols') || 'false')
-)
 export const marketDepth = ref(JSON.parse(localStorage.getItem('marketDepth') || 'false'))
-export const additionalStrikeLTPs = ref({
-  call: {},
-  put: {}
-})
 export const ltpCallbacks = ref({})
 export const customStrikePrice = ref('')
 export const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false')

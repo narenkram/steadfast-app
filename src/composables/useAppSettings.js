@@ -13,7 +13,6 @@ import {
   overtradeProtection,
 
   // Feature Settings
-  additionalSymbols,
   marketDepth,
 
   // Notification Settings
@@ -72,11 +71,6 @@ export function useAppSettings() {
   }
 
   // Feature Settings
-  const toggleAdditionalSymbols = () => {
-    additionalSymbols.value = !additionalSymbols.value
-    localStorage.setItem('additionalSymbols', JSON.stringify(additionalSymbols.value))
-  }
-
   const toggleMarketDepth = () => {
     marketDepth.value = !marketDepth.value
     localStorage.setItem('marketDepth', JSON.stringify(marketDepth.value))
@@ -138,7 +132,6 @@ export function useAppSettings() {
     toggleOvertradeProtection,
 
     // Feature Settings
-    toggleAdditionalSymbols,
     toggleMarketDepth,
 
     // Notification Settings
