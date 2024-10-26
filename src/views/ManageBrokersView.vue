@@ -223,7 +223,8 @@ onMounted(() => {
               <div class="mb-2">
                 <label for="ShoonyaBrokerUserId" class="form-label mb-0">Broker User ID</label>
                 <input type="text" id="ShoonyaBrokerUserId" class="form-control"
-                  :value="manageBrokerMaskClientId(SHOONYA_CLIENT_ID)" placeholder="Enter Broker User ID" disabled>
+                  :value="manageBrokerMaskClientId(brokerDetails.find(b => b.brokerName === 'Shoonya')?.clientId)"
+                  placeholder="Enter Broker User ID" disabled>
               </div>
 
               <div class="mb-2">
