@@ -73,7 +73,6 @@ import {
   putHighPrice,
   putLowPrice,
   putClosePrice,
-  selectedSound,
   totalRiskTargetToggle,
   totalRiskTargetType,
   totalRiskAmount,
@@ -1754,14 +1753,6 @@ export function useTradeView() {
       // console.log('Marker Position:', ltpMarkerPosition.value);
     }
   )
-  watch(selectedSound, (newValue) => {
-    localStorage.setItem('selectedSound', newValue)
-    if (notificationSound.value) {
-      const audio = new Audio(`/${newValue}`)
-      audio.play()
-    }
-    showToastNotification(`Sound changed to ${newValue.replace('.mp3', '')}`)
-  })
   watch(totalRiskTargetToggle, (newValue) => {
     localStorage.setItem('totalRiskTargetToggle', JSON.stringify(newValue))
   })

@@ -229,12 +229,6 @@
                 {{ notificationSound ? 'Enabled' : 'Disabled' }}
               </label>
             </div>
-            <select v-model="selectedSound" class="form-select mt-2" :disabled="!notificationSound">
-              <option value="cyberpunk-notification.mp3">Cyberpunk</option>
-              <option value="long-pop.wav">Long Pop</option>
-              <option value="classical.mp3">Classical</option>
-              <!-- Add more sound options as needed -->
-            </select>
           </div>
           <!-- Market Depth Toggle -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
@@ -290,7 +284,6 @@ import {
 
   // Notification Settings
   notificationSound,
-  selectedSound,
 
   // Risk Management Settings
   totalRiskTargetToggle,
@@ -313,6 +306,5 @@ const {
   saveOffsets,
   toggleOvertradeProtection,
   toggleMarketDepth,
-  playNotificationSound
 } = useAppSettings()
 </script>

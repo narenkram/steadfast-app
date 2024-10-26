@@ -17,7 +17,6 @@ import {
 
   // Notification Settings
   notificationSound,
-  selectedSound,
 
   // Risk Management Settings
   totalRiskTargetToggle,

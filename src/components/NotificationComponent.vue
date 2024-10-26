@@ -17,7 +17,6 @@ const props = defineProps({
     showToast: Boolean,
     message: String,
     notificationSound: Boolean,
-    selectedSound: String,
 });
 
 const emit = defineEmits(['update:showToast', 'update:message']);
@@ -39,7 +38,7 @@ const playNotificationSound = () => {
         audio.value.pause();
         audio.value.currentTime = 0;
     }
-    audio.value = new Audio(props.selectedSound);
+    audio.value = new Audio('/long-pop.wav');
     audio.value.play().catch(error => console.error('Error playing notification sound:', error));
 };
 

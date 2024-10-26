@@ -15,7 +15,7 @@
                 <!-- Always-on Notification Area -->
                 <div class="notification-area d-flex align-items-center ms-3 d-lg-none">
                     <NotificationComponent v-model:showToast="showToast" v-model:message="toastMessage"
-                        :notificationSound="notificationSound" :selectedSound="selectedSound" />
+                        :notificationSound="notificationSound" />
                 </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-md-auto">
@@ -30,7 +30,7 @@
                     <!-- Always-on Notification Area -->
                     <div class="notification-area d-none d-lg-flex align-items-center ms-3">
                         <NotificationComponent v-model:showToast="showToast" v-model:message="toastMessage"
-                            :notificationSound="notificationSound" :selectedSound="selectedSound" />
+                            :notificationSound="notificationSound" />
                     </div>
                     <div class="ms-auto" v-if="user">
                         <button class="btn btn-outline-secondary" @click="logout">Logout</button>
@@ -50,7 +50,7 @@ import { useRouter } from 'vue-router';
 import NotificationComponent from './NotificationComponent.vue'
 
 // Global State
-import { notificationSound, toastMessage, selectedSound, showToast } from '@/stores/globalStore';
+import { notificationSound, toastMessage, showToast } from '@/stores/globalStore';
 
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
