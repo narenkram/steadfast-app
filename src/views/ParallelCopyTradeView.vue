@@ -7,7 +7,7 @@
         <h1 class="mb-4">Parallel Copy Trade</h1>
         <p>
           Replicate trades across multiple broker accounts instantly.
-          Execute your strategy uniformly, manage diverse portfolios efficiently,
+          Execute your trades uniformly, manage diverse portfolios efficiently,
           and scale your trading operations with ease.
         </p>
       </div>

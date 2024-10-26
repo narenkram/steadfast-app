@@ -258,17 +258,6 @@
               </label>
             </div>
           </div>
-          <!-- Enable / Disable Experimental Features -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="experimentalFeatures" class="form-label">Experimental Features</label>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="experimentalFeatures"
-                v-model="experimentalFeatures" />
-              <label class="form-check-label" for="experimentalFeatures">
-                {{ experimentalFeatures ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
           <!-- Enable / Disable Sticky MTM -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <label for="stickyMTM" class="form-label">Sticky MTM Section</label>
@@ -300,7 +289,6 @@ import {
   showOHLCValues,
   showStrikeDetails,
   stickyMTM,
-  experimentalFeatures,
 
   // Trading Settings
   callStrikeOffset,
@@ -334,7 +322,6 @@ const {
   toggleOHLCValues,
   toggleStrikeDetails,
   toggleStickyMTM,
-  toggleExperimentalFeatures,
   saveOffsets,
   toggleOvertradeProtection,
   toggleAdditionalSymbols,

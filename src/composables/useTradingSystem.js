@@ -86,7 +86,6 @@ import {
   closePositionsTarget,
   riskAction,
   targetAction,
-  experimentalFeatures,
   flattradeReqCode,
   stickyMTM,
   overtradeProtection,
@@ -100,15 +99,8 @@ import {
   latestPutLTP,
   activeFetchFunction,
   reverseMode,
-  showBasketOrderModal,
   marketDepth,
   notificationSound,
-  savedBaskets,
-  basketName,
-  editingBasketId,
-  basketOrders,
-  strategyType,
-  strategies,
   limitOffset,
   callDepth,
   putDepth,
@@ -584,13 +576,6 @@ export function useTradeView() {
     }
     return false
   })
-  const sortedBasketOrders = computed(() => {
-    return [...basketOrders.value].sort((a, b) => {
-      if (a.transactionType === 'B' && b.transactionType !== 'B') return -1
-      if (a.transactionType !== 'B' && b.transactionType === 'B') return 1
-      return 0
-    })
-  })
 
   const availableStrikes = computed(() => {
     const allStrikes = new Set([
@@ -599,16 +584,7 @@ export function useTradeView() {
     ])
     return Array.from(allStrikes).sort((a, b) => a - b)
   })
-  const basketLTPs = computed(() => {
-    const ltps = {}
-    basketOrders.value.forEach((order) => {
-      ltps[order.id] = positionLTPs.value[order.tradingSymbol] || 'N/A'
-    })
-    return ltps
-  })
-  const filteredStrategies = computed(() => {
-    return strategies.value.filter((strategy) => strategy.type === strategyType.value)
-  })
+
   const isValidLimitPrice = computed(() => {
     return limitPrice.value > 0 && limitPrice.value !== ''
   })
@@ -681,10 +657,6 @@ export function useTradeView() {
   const toggleOvertradeProtection = () => {
     overtradeProtection.value = !overtradeProtection.value
     localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString())
-  }
-  const toggleExperimentalFeatures = () => {
-    experimentalFeatures.value = !experimentalFeatures.value
-    localStorage.setItem('ExperimentalFeatures', JSON.stringify(experimentalFeatures.value))
   }
   const checkOvertradeProtection = () => {
     if (!overtradeProtection.value) return
@@ -892,327 +864,6 @@ export function useTradeView() {
     selectedOrderType.value = orderTypes.value[0] // Set selectedOrderType to MARKET or MKT based on broker
   }
 
-  const setStrategyType = (type) => {
-    strategyType.value = type
-  }
-  const loadStrategy = (strategy) => {
-    // Clear existing basket orders
-    basketOrders.value = []
-
-    // Implement the logic for each strategy
-    switch (strategy.name) {
-      case 'Short Straddle':
-        addToBasket('SELL', 'CALL')
-        addToBasket('SELL', 'PUT')
-        break
-      case 'Iron Butterfly':
-        addToBasket('BUY', 'PUT', -1)
-        addToBasket('SELL', 'PUT')
-        addToBasket('SELL', 'CALL')
-        addToBasket('BUY', 'CALL', 1)
-        break
-      case 'Short Strangle':
-        addToBasket('SELL', 'PUT', -1)
-        addToBasket('SELL', 'CALL', 1)
-        break
-      case 'Short Iron Condor':
-        addToBasket('BUY', 'PUT', -2)
-        addToBasket('SELL', 'PUT', -1)
-        addToBasket('SELL', 'CALL', 1)
-        addToBasket('BUY', 'CALL', 2)
-        break
-      case 'Batman':
-        addToBasket('BUY', 'PUT', -2)
-        addToBasket('SELL', 'PUT', -1)
-        addToBasket('SELL', 'CALL')
-        addToBasket('SELL', 'CALL', 1)
-        addToBasket('BUY', 'CALL', 2)
-        break
-      case 'Double Plateau':
-        addToBasket('BUY', 'PUT', -2)
-        addToBasket('SELL', 'PUT', -1, 2) // Sell 2 contracts
-        addToBasket('SELL', 'CALL', 1, 2) // Sell 2 contracts
-        addToBasket('BUY', 'CALL', 2)
-        break
-      case 'Jade Lizard':
-        addToBasket('SELL', 'PUT')
-        addToBasket('SELL', 'CALL', 1)
-        addToBasket('SELL', 'CALL', 2)
-        break
-      case 'Reverse Jade Lizard':
-        addToBasket('SELL', 'CALL')
-        addToBasket('SELL', 'PUT', -1)
-        addToBasket('SELL', 'PUT', -2)
-        break
-      case 'Buy Put':
-        addToBasket('BUY', 'PUT')
-        break
-      case 'Sell Call':
-        addToBasket('SELL', 'CALL')
-        break
-      case 'Bear Call Spread':
-        addToBasket('SELL', 'CALL')
-        addToBasket('BUY', 'CALL', 1)
-        break
-      case 'Bear Put Spread':
-        addToBasket('BUY', 'PUT')
-        addToBasket('SELL', 'PUT', -1)
-        break
-      case 'Put Ratio Back Spread':
-        addToBasket('SELL', 'PUT')
-        addToBasket('BUY', 'PUT', -1, 2) // Buy 2 contracts
-        break
-      case 'Long Calendar with Puts':
-        addToBasket('SELL', 'PUT', 0, 1, 'near') // Sell near-term expiry
-        addToBasket('BUY', 'PUT', 0, 1, 'far') // Buy far-term expiry
-        break
-      case 'Bear Condor':
-        addToBasket('BUY', 'PUT', -1)
-        addToBasket('SELL', 'PUT')
-        addToBasket('SELL', 'CALL', 1)
-        addToBasket('BUY', 'CALL', 2)
-        break
-      case 'Bear Butterfly':
-        addToBasket('BUY', 'PUT', -1)
-        addToBasket('SELL', 'PUT', 0, 2) // Sell 2 contracts
-        addToBasket('BUY', 'PUT', 1)
-        break
-      case 'Buy Call':
-        addToBasket('BUY', 'CALL')
-        break
-      case 'Sell Put':
-        addToBasket('SELL', 'PUT')
-        break
-      case 'Bull Call Spread':
-        addToBasket('BUY', 'CALL')
-        addToBasket('SELL', 'CALL', 1)
-        break
-      case 'Bull Put Spread':
-        addToBasket('SELL', 'PUT')
-        addToBasket('BUY', 'PUT', -1)
-        break
-      case 'Call Ratio Back Spread':
-        addToBasket('SELL', 'CALL')
-        addToBasket('BUY', 'CALL', 1, 2) // Buy 2 contracts
-        break
-      case 'Long Calendar with Calls':
-        addToBasket('SELL', 'CALL', 0, 1, 'near') // Sell near-term expiry
-        addToBasket('BUY', 'CALL', 0, 1, 'far') // Buy far-term expiry
-        break
-      case 'Bull Condor':
-        addToBasket('BUY', 'CALL', -1)
-        addToBasket('SELL', 'CALL')
-        addToBasket('SELL', 'CALL', 1)
-        addToBasket('BUY', 'CALL', 2)
-        break
-      case 'Bull Butterfly':
-        addToBasket('BUY', 'CALL', -1)
-        addToBasket('SELL', 'CALL', 0, 2) // Sell 2 contracts
-        addToBasket('BUY', 'CALL', 1)
-        break
-      case 'Call Ratio Spread':
-        addToBasket('BUY', 'CALL')
-        addToBasket('SELL', 'CALL', 1, 2) // Sell 2 contracts
-        break
-      case 'Put Ratio Spread':
-        addToBasket('BUY', 'PUT')
-        addToBasket('SELL', 'PUT', -1, 2) // Sell 2 contracts
-        break
-      case 'Long Straddle':
-        addToBasket('BUY', 'CALL')
-        addToBasket('BUY', 'PUT')
-        break
-      case 'Long Iron Butterfly':
-        addToBasket('SELL', 'PUT', -1)
-        addToBasket('BUY', 'PUT')
-        addToBasket('BUY', 'CALL')
-        addToBasket('SELL', 'CALL', 1)
-        break
-      case 'Long Strangle':
-        addToBasket('BUY', 'PUT', -1)
-        addToBasket('BUY', 'CALL', 1)
-        break
-      case 'Long Iron Condor':
-        addToBasket('SELL', 'PUT', -2)
-        addToBasket('BUY', 'PUT', -1)
-        addToBasket('BUY', 'CALL', 1)
-        addToBasket('SELL', 'CALL', 2)
-        break
-      case 'Strip':
-        addToBasket('BUY', 'PUT', 0, 2) // Buy 2 puts
-        addToBasket('BUY', 'CALL')
-        break
-      case 'Strap':
-        addToBasket('BUY', 'CALL', 0, 2) // Buy 2 calls
-        addToBasket('BUY', 'PUT')
-        break
-      default:
-        console.log('Strategy not implemented')
-    }
-
-    // Update the basket name
-    basketName.value = strategy.name
-  }
-  const addToBasket = (transactionType, optionType, strikeOffset = 0, contracts = 1) => {
-    let selectedStrike = optionType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
-
-    // Adjust the strike based on the offset
-    if (strikeOffset !== 0) {
-      const strikes = optionType === 'CALL' ? callStrikes.value : putStrikes.value
-      const currentIndex = strikes.findIndex(
-        (strike) => strike.strikePrice === selectedStrike.strikePrice
-      )
-      selectedStrike = strikes[currentIndex + strikeOffset] || selectedStrike
-    }
-
-    basketOrders.value.push({
-      id: uuidv4(),
-      tradingSymbol: selectedStrike.tradingSymbol,
-      transactionType: getTransactionType(transactionType),
-      optionType,
-      strikePrice: selectedStrike.strikePrice,
-      lots: selectedLots.value * contracts,
-      quantity: selectedQuantity.value * contracts,
-      productType: selectedProductType.value,
-      orderType: selectedOrderType.value,
-      price: limitPrice.value
-    })
-  }
-  const updateBasketOrderQuantity = (order) => {
-    const instrument = quantities.value[selectedMasterSymbol.value]
-    if (instrument) {
-      order.quantity = order.lots * instrument.lotSize
-    }
-  }
-  const removeFromBasket = (id) => {
-    basketOrders.value = basketOrders.value.filter((order) => order.id !== id)
-  }
-  const placeBasket = async (basketId) => {
-    const basket = savedBaskets.value.find((b) => b.id === basketId)
-    if (!basket) {
-      toastMessage.value = 'Basket not found'
-      showToast.value = true
-      return
-    }
-
-    for (const order of basket.orders) {
-      const success = await placeBasketOrder(order)
-      if (!success) {
-        toastMessage.value = `Failed to place order for ${order.tradingSymbol}`
-        showToast.value = true
-        break
-      }
-    }
-
-    // Add a delay before fetching updated data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Update both orders and positions
-    await updateOrdersAndPositions()
-
-    // Update fund limits
-    await updateFundLimits()
-
-    toastMessage.value = `Basket "${basket.name}" orders placed successfully`
-    showToast.value = true
-  }
-  const placeBasketOrder = async (order) => {
-    try {
-      const exchangeSegment = getExchangeSegment()
-      const orderData = prepareOrderPayload(
-        order.transactionType,
-        order.optionType,
-        { tradingSymbol: order.tradingSymbol },
-        exchangeSegment
-      )
-      orderData.qty = order.quantity.toString()
-      orderData.prd = order.productType
-      orderData.prctyp = order.orderType
-      orderData.prc = order.orderType === 'LMT' ? order.price.toString() : '0'
-
-      let response
-      if (selectedBroker.value?.brokerName === 'Flattrade') {
-        const FLATTRADE_API_TOKEN = localStorage.getItem('FLATTRADE_API_TOKEN')
-        const payload = qs.stringify({
-          ...orderData,
-          uid: selectedBroker.value.clientId,
-          actid: selectedBroker.value.clientId
-        })
-        response = await axios.post(`${BASE_URL}/flattrade/placeOrder`, payload, {
-          headers: {
-            Authorization: `Bearer ${FLATTRADE_API_TOKEN}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
-      } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-        const SHOONYA_API_TOKEN = localStorage.getItem('SHOONYA_API_TOKEN')
-        const payload = qs.stringify({
-          ...orderData,
-          uid: selectedBroker.value.clientId,
-          actid: selectedBroker.value.clientId
-        })
-        response = await axios.post(`${BASE_URL}/shoonya/placeOrder`, payload, {
-          headers: {
-            Authorization: `Bearer ${SHOONYA_API_TOKEN}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
-      }
-
-      console.log(`Placed basket order for ${order.tradingSymbol}`)
-      console.log('Basket order placed successfully:', response.data)
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Update fund limits
-      await updateFundLimits()
-
-      return true
-    } catch (error) {
-      console.error('Error placing basket order:', error)
-      return false
-    }
-  }
-  const placeAllBasketOrders = async () => {
-    const executedBasket = {
-      id: uuidv4(),
-      name: basketName.value || `Basket ${new Date().toLocaleString()}`,
-      orders: [...basketOrders.value],
-      executionTime: new Date().toISOString()
-    }
-
-    for (const order of sortedBasketOrders.value) {
-      const success = await placeBasketOrder(order)
-      if (!success) {
-        toastMessage.value = `Failed to place order for ${order.tradingSymbol}`
-        showToast.value = true
-        break
-      }
-    }
-
-    // Add a delay before fetching updated data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Update both orders and positions
-    await updateOrdersAndPositions()
-
-    // Update fund limits
-    await updateFundLimits()
-
-    savedBaskets.value.push(executedBasket)
-    localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value))
-
-    basketOrders.value = []
-    basketName.value = ''
-    editingBasketId.value = null
-    toastMessage.value = 'All basket orders placed successfully'
-    showToast.value = true
-    showBasketOrderModal.value = false
-  }
   const updateTradingSymbol = (strike) => {
     if (strike.optionType === 'CALL') {
       selectedCallStrike.value = strike
@@ -1652,74 +1303,11 @@ export function useTradeView() {
       updateToastVisibility(false)
     }, 3000)
   }
-  const subscribeToBasketLTPs = () => {
-    basketOrders.value.forEach((order) => {
-      const securityId = getSecurityIdForSymbol(order.tradingSymbol)
-      if (securityId) {
-        subscribeToLTP(securityId, updateBasketLTP)
-      }
-    })
-  }
-  const updateBasketLTP = (data) => {
-    const order = basketOrders.value.find(
-      (o) => getSecurityIdForSymbol(o.tradingSymbol) === data.tk
-    )
-    if (order) {
-      positionLTPs.value[order.tradingSymbol] = data.lp
-    }
-  }
   const getSecurityIdForSymbol = (symbol) => {
     const strike = [...callStrikes.value, ...putStrikes.value].find(
       (s) => s.tradingSymbol === symbol
     )
     return strike ? strike.securityId : null
-  }
-  const saveBasket = () => {
-    if (basketName.value.trim() === '') {
-      toastMessage.value = 'Please enter a basket name'
-      showToast.value = true
-      return
-    }
-
-    if (editingBasketId.value !== null) {
-      const index = savedBaskets.value.findIndex((b) => b.id === editingBasketId.value)
-      if (index !== -1) {
-        savedBaskets.value[index] = {
-          id: editingBasketId.value,
-          name: basketName.value,
-          orders: [...basketOrders.value]
-        }
-      }
-    } else {
-      savedBaskets.value.push({
-        id: uuidv4(),
-        name: basketName.value,
-        orders: [...basketOrders.value]
-      })
-    }
-
-    localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value))
-    basketName.value = ''
-    editingBasketId.value = null
-    toastMessage.value = 'Basket saved successfully'
-    showToast.value = true
-  }
-  const loadBasket = (basketId) => {
-    const basket = savedBaskets.value.find((b) => b.id === basketId)
-    if (basket) {
-      basketOrders.value = [...basket.orders]
-      basketName.value = basket.name
-      editingBasketId.value = basketId
-      subscribeToBasketLTPs()
-    }
-  }
-  const deleteBasket = (basketId) => {
-    savedBaskets.value = savedBaskets.value.filter((b) => b.id !== basketId)
-    localStorage.setItem('savedBaskets', JSON.stringify(savedBaskets.value))
-    if (editingBasketId.value === basketId) {
-      basketName.value = ''
-      editingBasketId.value = null
-    }
   }
   const validateAndPlaceOrder = async () => {
     if (isValidLimitPrice.value) {
@@ -2308,9 +1896,6 @@ export function useTradeView() {
     await fetchFundLimit()
     checkOvertradeProtection()
   })
-  watch(experimentalFeatures, (newValue) => {
-    localStorage.setItem('ExperimentalFeatures', JSON.stringify(newValue))
-  })
 
   // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
   watch(FLATTRADE_API_TOKEN, (newToken) => {
@@ -2425,30 +2010,17 @@ export function useTradeView() {
     toggleMarketDepth,
     playNotificationSound,
     showToastNotification,
-    subscribeToBasketLTPs,
-    updateBasketLTP,
     getSecurityIdForSymbol,
-    saveBasket,
-    loadBasket,
-    deleteBasket,
     validateAndPlaceOrder,
     handleOrderTypeChange,
     getCurrentLTP,
     handleOrderClick,
     formatTime,
-    loadStrategy,
-    placeBasketOrder,
     toggleOvertradeProtection,
-    toggleExperimentalFeatures,
     setOrderDetails,
     updateTradingSymbol,
     convertToComparableDate,
     resetOrderTypeIfNeeded,
-    setStrategyType,
-    updateBasketOrderQuantity,
-    removeFromBasket,
-    placeBasket,
-    placeAllBasketOrders,
     setReverseMode,
     reversePositions,
     copyToClipboard,
@@ -2482,10 +2054,7 @@ export function useTradeView() {
     limitPriceErrorMessage,
     isCallDepthAvailable,
     isPutDepthAvailable,
-    filteredStrategies,
-    sortedBasketOrders,
     availableStrikes,
-    basketLTPs,
     callLtpRangeWidth,
     callLtpMarkerPosition,
     callOpenMarkerPosition,

@@ -5,7 +5,6 @@ import {
   showOHLCValues,
   showStrikeDetails,
   stickyMTM,
-  experimentalFeatures,
 
   // Trading Settings
   callStrikeOffset,
@@ -58,11 +57,6 @@ export function useAppSettings() {
   const toggleStickyMTM = () => {
     stickyMTM.value = !stickyMTM.value
     localStorage.setItem('stickyMTM', JSON.stringify(stickyMTM.value))
-  }
-
-  const toggleExperimentalFeatures = () => {
-    experimentalFeatures.value = !experimentalFeatures.value
-    localStorage.setItem('ExperimentalFeatures', JSON.stringify(experimentalFeatures.value))
   }
 
   // Trading Settings
@@ -138,7 +132,6 @@ export function useAppSettings() {
     toggleOHLCValues,
     toggleStrikeDetails,
     toggleStickyMTM,
-    toggleExperimentalFeatures,
 
     // Trading Settings
     saveOffsets,

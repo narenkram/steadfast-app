@@ -8,9 +8,6 @@ export const toastMessage = ref('')
 export const activeTab = ref('positions')
 export const killSwitchActive = ref(localStorage.getItem('KillSwitchStatus') === 'true')
 export const overtradeProtection = ref(localStorage.getItem('OvertradeProtection') === 'true')
-export const experimentalFeatures = ref(
-  JSON.parse(localStorage.getItem('ExperimentalFeatures') || 'false')
-)
 export const activationTime = ref(parseInt(localStorage.getItem('KillSwitchActivationTime') || '0'))
 export const currentTime = ref(Date.now())
 export const enableHotKeys = ref(localStorage.getItem('EnableHotKeys') !== 'false')
@@ -97,7 +94,6 @@ export const putClosePrice = ref(localStorage.getItem('putClosePrice') || null)
 export const showOHLCValues = ref(false)
 export const showStrikeDetails = ref(false)
 export const reverseMode = ref('all')
-export const showBasketOrderModal = ref(false)
 export const additionalSymbols = ref(
   JSON.parse(localStorage.getItem('additionalSymbols') || 'false')
 )
@@ -119,81 +115,12 @@ export const totalRiskAmount = ref(Number(localStorage.getItem('totalRiskAmount'
 export const totalRiskPercentage = ref(Number(localStorage.getItem('totalRiskPercentage')) || 1.5)
 export const totalTargetAmount = ref(Number(localStorage.getItem('totalTargetAmount')) || 3000)
 export const totalTargetPercentage = ref(Number(localStorage.getItem('totalTargetPercentage')) || 3)
-export const savedBaskets = ref([])
-export const basketName = ref('')
-export const editingBasketId = ref(null)
-export const basketOrders = ref([])
 export const closePositionsRisk = ref(
   JSON.parse(localStorage.getItem('closePositionsRisk') || 'false')
 )
 export const closePositionsTarget = ref(
   JSON.parse(localStorage.getItem('closePositionsTarget') || 'false')
 )
-export const strategyType = ref('Bullish')
-export const strategies = ref([
-  { id: 1, name: 'Short Straddle', type: 'Neutral', image: '/strategies/short-straddle.svg' },
-  { id: 2, name: 'Iron Butterfly', type: 'Neutral', image: '/strategies/iron-butterfly.svg' },
-  { id: 3, name: 'Short Strangle', type: 'Neutral', image: '/strategies/short-strangle.svg' },
-  { id: 4, name: 'Short Iron Condor', type: 'Neutral', image: '/strategies/short-iron-condor.svg' },
-  { id: 5, name: 'Batman', type: 'Neutral', image: '/strategies/batman.svg' },
-  { id: 6, name: 'Double Plateau', type: 'Neutral', image: '/strategies/double-plateau.svg' },
-  { id: 7, name: 'Jade Lizard', type: 'Neutral', image: '/strategies/jade-lizard.svg' },
-  {
-    id: 8,
-    name: 'Reverse Jade Lizard',
-    type: 'Neutral',
-    image: '/strategies/jade-reverse-lizard.svg'
-  },
-  { id: 9, name: 'Buy Put', type: 'Bearish', image: '/strategies/buy-put.svg' },
-  { id: 10, name: 'Sell Call', type: 'Bearish', image: '/strategies/sell-call.svg' },
-  { id: 11, name: 'Bear Call Spread', type: 'Bearish', image: '/strategies/bear-call-spread.svg' },
-  { id: 12, name: 'Bear Put Spread', type: 'Bearish', image: '/strategies/bear-put-spread.svg' },
-  {
-    id: 13,
-    name: 'Put Ratio Back Spread',
-    type: 'Bearish',
-    image: '/strategies/put-ratio-back-spread.svg'
-  },
-  {
-    id: 14,
-    name: 'Long Calendar with Puts',
-    type: 'Bearish',
-    image: '/strategies/long-calendar-with-puts.svg'
-  },
-  { id: 15, name: 'Bear Condor', type: 'Bearish', image: '/strategies/bear-condor.svg' },
-  { id: 16, name: 'Bear Butterfly', type: 'Bearish', image: '/strategies/bear-butterfly.svg' },
-  { id: 17, name: 'Buy Call', type: 'Bullish', image: '/strategies/buy-call.svg' },
-  { id: 18, name: 'Sell Put', type: 'Bullish', image: '/strategies/sell-put.svg' },
-  { id: 19, name: 'Bull Call Spread', type: 'Bullish', image: '/strategies/bull-call-spread.svg' },
-  { id: 20, name: 'Bull Put Spread', type: 'Bullish', image: '/strategies/bull-put-spread.svg' },
-  {
-    id: 21,
-    name: 'Call Ratio Back Spread',
-    type: 'Bullish',
-    image: '/strategies/call-ratio-back-spread.svg'
-  },
-  {
-    id: 22,
-    name: 'Long Calendar with Calls',
-    type: 'Bullish',
-    image: '/strategies/long-calendar-with-calls.svg'
-  },
-  { id: 23, name: 'Bull Condor', type: 'Bullish', image: '/strategies/bull-condor.svg' },
-  { id: 24, name: 'Bull Butterfly', type: 'Bullish', image: '/strategies/bull-butterfly.svg' },
-  { id: 25, name: 'Call Ratio Spread', type: 'Others', image: '/strategies/call-ratio-spread.svg' },
-  { id: 26, name: 'Put Ratio Spread', type: 'Others', image: '/strategies/put-ratio-spread.svg' },
-  { id: 27, name: 'Long Straddle', type: 'Others', image: '/strategies/long-straddle.svg' },
-  {
-    id: 28,
-    name: 'Long Iron Butterfly',
-    type: 'Others',
-    image: '/strategies/long-iron-butterfly.svg'
-  },
-  { id: 29, name: 'Long Strangle', type: 'Others', image: '/strategies/long-strangle.svg' },
-  { id: 30, name: 'Long Iron Condor', type: 'Others', image: '/strategies/long-iron-condor.svg' },
-  { id: 31, name: 'Strip', type: 'Others', image: '/strategies/strip.svg' },
-  { id: 32, name: 'Strap', type: 'Others', image: '/strategies/strap.svg' }
-])
 export const riskAction = ref(localStorage.getItem('riskAction') || 'close')
 export const targetAction = ref(localStorage.getItem('targetAction') || 'close')
 

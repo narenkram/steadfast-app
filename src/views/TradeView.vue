@@ -332,9 +332,6 @@
                   <a class="dropdown-item" @click="setOrderDetails('BUY', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWithResetOrderTypeWindow">Place Limit Order</a>
                 </li>
-                <li>
-                  <a class="dropdown-item" @click="addToBasket('BUY', 'CALL')">Add to Basket</a>
-                </li>
               </ul>
             </div>
             <div class="btn-group col-12 col-md-10 col-lg-10">
@@ -353,9 +350,6 @@
                 <li>
                   <a class="dropdown-item" @click="setOrderDetails('SELL', 'CALL')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWithResetOrderTypeWindow">Place Limit Order</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" @click="addToBasket('SELL', 'CALL')">Add to Basket</a>
                 </li>
               </ul>
             </div>
@@ -405,9 +399,6 @@
                   <a class="dropdown-item" @click="setOrderDetails('BUY', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWithResetOrderTypeWindow">Place Limit Order</a>
                 </li>
-                <li>
-                  <a class="dropdown-item" @click="addToBasket('BUY', 'PUT')">Add to Basket</a>
-                </li>
               </ul>
             </div>
             <div class="btn-group col-12 col-md-10 col-lg-10">
@@ -426,9 +417,6 @@
                 <li>
                   <a class="dropdown-item" @click="setOrderDetails('SELL', 'PUT')" data-bs-toggle="modal"
                     data-bs-target="#PlaceLimitOrderWithResetOrderTypeWindow">Place Limit Order</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" @click="addToBasket('SELL', 'PUT')">Add to Basket</a>
                 </li>
               </ul>
             </div>
@@ -465,14 +453,6 @@
               data-bs-target="#trades-tab-pane" type="button" role="tab" aria-controls="trades-tab-pane"
               :aria-selected="activeTab === 'trades'" @click="setActiveTab('trades')">
               <font-awesome-icon icon="up-down" class="text-primary nav-icon" /> <span class="ms-2">Trades</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation" v-if="experimentalFeatures">
-            <button class="nav-link" :class="{ 'active': activeTab === 'basket' }" id="basket-tab" data-bs-toggle="tab"
-              data-bs-target="#basket-tab-pane" type="button" role="tab" aria-controls="basket-tab-pane"
-              :aria-selected="activeTab === 'basket'">
-              <font-awesome-icon icon="shopping-basket" class="text-warning nav-icon" /> <span class="ms-2">Basket
-                Orders</span>
             </button>
           </li>
         </ul>
@@ -537,172 +517,6 @@
             failed orders are shown. If the order is successfully placed, you'll only see the
             respective trade.
           </p>
-        </div>
-        <div class="tab-pane fade" id="basket-tab-pane" role="tabpanel" aria-labelledby="basket-tab" tabindex="0"
-          v-if="experimentalFeatures">
-          <div class="row py-3">
-            <div class="col-12">
-              <h5>Ready Made Strategies</h5>
-              <div class="mb-3">
-                <div class="btn-group" role="group">
-                  <button @click="setStrategyType('Bullish')"
-                    :class="['btn', 'btn-outline-primary', { active: strategyType === 'Bullish' }]">
-                    Bullish
-                  </button>
-                  <button @click="setStrategyType('Bearish')"
-                    :class="['btn', 'btn-outline-primary', { active: strategyType === 'Bearish' }]">
-                    Bearish
-                  </button>
-                  <button @click="setStrategyType('Neutral')"
-                    :class="['btn', 'btn-outline-primary', { active: strategyType === 'Neutral' }]">
-                    Neutral
-                  </button>
-                  <button @click="setStrategyType('Others')"
-                    :class="['btn', 'btn-outline-primary', { active: strategyType === 'Others' }]">
-                    Others
-                  </button>
-                </div>
-                <select v-model="selectedExpiry" class="form-select d-inline-block w-auto ms-2">
-                  <option v-for="expiry in expiryDates" :key="expiry" :value="expiry">
-                    {{ expiry }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="row">
-                <div v-for="strategy in filteredStrategies" :key="strategy.id" class="col-md-3 mb-3">
-                  <div class="card strategy-card" @click="loadStrategy(strategy)">
-                    <div class="card-body">
-                      <h6 class="card-title">{{ strategy.name }}</h6>
-                      <img :src="strategy.image" class="img-fluid mb-2" :alt="strategy.name" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- <div class="row py-3">
-            <div class="col-12">
-              <h5>Basket Name</h5>
-              <div class="mb-3">
-                <input v-model="basketName" placeholder="Enter basket name" class="form-control mb-2" />
-              </div>
-              <table class="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>Symbol</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Product</th>
-                    <th>Order Type</th>
-                    <th>Price</th>
-                    <th>LTP</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="order in sortedBasketOrders" :key="order.id">
-                    <td>
-                      {{ order.tradingSymbol }}
-                      <select v-model="order.strikePrice" @change="updateTradingSymbol(order)"
-                        class="form-select form-select-sm mt-1">
-                        <option v-for="strike in availableStrikes" :key="strike" :value="strike">
-                          {{ strike }}
-                        </option>
-                      </select>
-                    </td>
-                    <td>
-                      <select v-model="order.transactionType" class="form-select form-select-sm">
-                        <option value="B">BUY</option>
-                        <option value="S">SELL</option>
-                      </select>
-                      {{ order.optionType }}
-                    </td>
-                    <td>
-                      <div class="input-group input-group-sm">
-                        <input type="number" class="form-control" v-model.number="order.lots" :min="1" :max="maxLots"
-                          @input="updateBasketOrderQuantity(order)" />
-                        <span class="input-group-text">{{ order.quantity }}</span>
-                      </div>
-                    </td>
-                    <td>{{ order.productType }}</td>
-                    <td>
-                      <select v-model="order.orderType" class="form-select form-select-sm">
-                        <option v-for="orderType in orderTypes" :key="orderType" :value="orderType">
-                          {{ orderType }}
-                        </option>
-                      </select>
-                    </td>
-                    <td>
-                      <input v-if="order.orderType === 'LMT'" type="number" class="form-control form-control-sm"
-                        v-model.number="order.price" placeholder="Price" />
-                      <span v-else>-</span>
-                    </td>
-                    <td>{{ basketLTPs[order.id] }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-primary me-2" @click="placeBasketOrder(order)">
-                        Place
-                      </button>
-                      <button class="btn btn-sm btn-danger" @click="removeFromBasket(order.id)">
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="d-flex justify-content-end">
-                <button @click="saveBasket" class="btn btn-outline-success ms-2">💾 Save</button>
-              </div>
-            </div>
-          </div>
-          <div class="row py-3">
-            <div class="col-12">
-              <h5>Saved Baskets</h5>
-              <div v-for="basket in savedBaskets" :key="basket.id" class="card mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h6 class="mb-0">{{ basket.name }}</h6>
-                  <div>
-                    <button @click="placeBasket(basket.id)" class="btn btn-sm btn-success me-2">
-                      Place
-                    </button>
-                    <button @click="loadBasket(basket.id)" class="btn btn-sm btn-primary me-2">
-                      Edit
-                    </button>
-                    <button @click="deleteBasket(basket.id)" class="btn btn-sm btn-danger me-2">
-                      Delete
-                    </button>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <table class="table table-sm">
-                    <thead>
-                      <tr>
-                        <th>Symbol</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Product</th>
-                        <th>Order Type</th>
-                        <th>Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="order in basket.orders" :key="order.id">
-                        <td>{{ order.tradingSymbol }}</td>
-                        <td>
-                          {{ order.transactionType === 'B' ? 'BUY' : 'SELL' }} {{ order.optionType }}
-                        </td>
-                        <td>{{ order.quantity }}</td>
-                        <td>{{ order.productType }}</td>
-                        <td>{{ order.orderType }}</td>
-                        <td>{{ order.price }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
       </div>
     </div>
@@ -894,14 +708,11 @@ import {
   reverseMode,
   marketDepth,
   additionalStrikeLTPs,
-  savedBaskets,
-  strategyType,
   limitOffset,
   callDepth,
   putDepth,
   stickyMTM,
   activeTab,
-  experimentalFeatures,
   expiryDates,
   niftyPrice,
   bankNiftyPrice,
@@ -971,11 +782,9 @@ const {
   handleOrderTypeChange,
   handleOrderClick,
   formatTime,
-  loadStrategy,
   setOrderDetails,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,
-  setStrategyType,
   reversePositions,
 
   // Computed properties
@@ -1000,7 +809,6 @@ const {
   limitPriceErrorMessage,
   isCallDepthAvailable,
   isPutDepthAvailable,
-  filteredStrategies,
   callLtpRangeWidth,
   callOpenMarkerPosition,
   openMarkerPosition,
@@ -1016,7 +824,6 @@ let positionCheckInterval;
 // Lifecycle hooks
 onMounted(async () => {
   additionalStrikeLTPs.value = {}
-  savedBaskets.value = []
 
   await checkAllTokens();
   initKillSwitch();
@@ -1069,10 +876,6 @@ onMounted(async () => {
   }
   if (selectedExpiry.value) {
     updateStrikesForExpiry(selectedExpiry.value, true);
-  }
-  const storedBaskets = localStorage.getItem('savedBaskets');
-  if (storedBaskets) {
-    savedBaskets.value = JSON.parse(storedBaskets);
   }
   positionCheckInterval = setInterval(checkStoplossesAndTargets, 1000);
 });
