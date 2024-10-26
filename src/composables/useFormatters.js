@@ -24,11 +24,26 @@ export const getAllBrokersFromLocalStorage = () => {
 export const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
   if (!symbol) return ''
 
-  const regex = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
-  const match = symbol.match(regex)
+  // Pattern 1: Format like NIFTY23DEC28C20000
+  // Example: NIFTY23DEC28C20000 -> NIFTY 28DEC23 C 20000
+  const pattern1 = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
 
-  if (match) {
-    const [, index, year, month, date, optionType, strikePrice] = match
+  // Pattern 2: Format like SENSEX24O3181400CE or BANKEX24OCT60200CE
+  // Examples:
+  // SENSEX24O3181400CE -> SENSEX 18O324 CE 1400
+  // BANKEX24OCT60200CE -> BANKEX 18OCT24 CE 60200
+  const pattern2 = /^(\w+)(\d{2})([A-Z]{1,3})(\d{2})(\d+)([CP]E)$/
+
+  const match1 = symbol.match(pattern1)
+  const match2 = symbol.match(pattern2)
+
+  if (match1) {
+    const [, index, year, month, date, optionType, strikePrice] = match1
+    return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
+  }
+
+  if (match2) {
+    const [, index, year, month, date, strikePrice, optionType] = match2
     return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
   }
 

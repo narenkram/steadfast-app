@@ -142,7 +142,7 @@
           </div>
 
           <!-- 1 Click Keys -->
-          <div class="col-6 col-md-4 col-lg-2 mt-md-1 mt-lg-2">
+          <div class="d-none d-md-block col-6 col-md-4 col-lg-2 mt-md-1 mt-lg-2">
             <label for="enableHotKeys" class="form-label mb-0 small">1 Click Keys</label>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="enableHotKeys" v-model="enableHotKeys"
@@ -161,7 +161,7 @@
             <!-- Call Strike Details -->
             <div class="row mt-2">
               <div class="col-12 d-flex align-items-center justify-content-between">
-                <span>
+                <span class="text-wrap">
                   {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
                 </span>
                 <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
@@ -274,7 +274,7 @@
                     {{ strike.strikePrice }}
                   </option>
                 </select>
-                <span>
+                <span class="text-wrap">
                   {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
                 </span>
                 <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
