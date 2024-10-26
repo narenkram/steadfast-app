@@ -121,7 +121,7 @@
               <input type="number" class="form-control form-control-sm" id="stoplossValue"
                 aria-label="Predefined Stoploss (points)" v-model="stoplossValue"
                 :class="{ 'disabled-form': isFormDisabled }" />
-              <span class="input-group-text">₹ Points</span>
+              <span class="input-group-text">Points</span>
             </div>
           </div>
 
@@ -137,7 +137,7 @@
               <input type="number" class="form-control form-control-sm" id="targetValue"
                 aria-label="Predefined Target (points)" v-model="targetValue"
                 :class="{ 'disabled-form': isFormDisabled }" />
-              <span class="input-group-text">₹ Points</span>
+              <span class="input-group-text">Points</span>
             </div>
           </div>
 
