@@ -157,11 +157,13 @@
         <!-- Trading Symbols & Strikes -->
         <div class="row align-items-center justify-content-between">
           <!-- Call Strike Selection -->
-          <div class="col-12 col-md-4 col-lg-4">
+          <div class="col-6 col-md-4 col-lg-4">
             <!-- Call Strike Details -->
             <div class="row mt-2">
               <div class="col-12 d-flex align-items-center justify-content-between">
-                {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
+                <span>
+                  {{ formatTradingSymbol(selectedCallStrike.tradingSymbol, true) }}
+                </span>
                 <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
                   aria-label="Call Strike" v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }"
                   @change="updateTradingSymbol(selectedCallStrike)">
@@ -205,7 +207,7 @@
           </div>
 
           <!-- Live Underlying Price -->
-          <div class="col-12 col-md-4 col-lg-4 text-center">
+          <div class="order-3 order-md-0 col-12 col-md-4 col-lg-4 text-center mt-3 mt-md-0">
             <p class="mb-0" v-if="selectedMasterSymbol === 'NIFTY'">
               Nifty 50:
               <b :class="{
@@ -261,7 +263,7 @@
           </div>
 
           <!-- Put Strike Selection -->
-          <div class="col-12 col-md-4 col-lg-4">
+          <div class="col-6 col-md-4 col-lg-4">
             <!-- Put Strike Details -->
             <div class="row mt-2">
               <div class="col-12 d-flex align-items-center justify-content-between">
@@ -272,7 +274,9 @@
                     {{ strike.strikePrice }}
                   </option>
                 </select>
-                {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
+                <span>
+                  {{ formatTradingSymbol(selectedPutStrike.tradingSymbol, true) }}
+                </span>
                 <div class="text-muted" v-if="showStrikeDetails">Security ID: {{ selectedPutStrike.securityId }}</div>
               </div>
               <div class="col-12 mt-2 d-flex align-items-center justify-content-between">
