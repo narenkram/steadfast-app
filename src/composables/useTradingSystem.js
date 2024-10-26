@@ -652,10 +652,6 @@ export function useTradeView() {
     activeTab.value = tab
   }
 
-  const toggleOvertradeProtection = () => {
-    overtradeProtection.value = !overtradeProtection.value
-    localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString())
-  }
   const checkOvertradeProtection = () => {
     if (!overtradeProtection.value) return
 
@@ -1251,20 +1247,6 @@ export function useTradeView() {
     subscribeToMasterSymbol()
   }
 
-  const toggleMarketDepth = () => {
-    marketDepth.value = !marketDepth.value
-    localStorage.setItem('marketDepth', JSON.stringify(marketDepth.value))
-  }
-  const playNotificationSound = () => {
-    localStorage.setItem('notificationSound', notificationSound.value.toString())
-    if (notificationSound.value) {
-      const audio = new Audio(`/${selectedSound.value}`)
-      audio.play()
-      showToastNotification('Notification sound enabled')
-    } else {
-      showToastNotification('Notification sound disabled')
-    }
-  }
   const showToastNotification = (message) => {
     toastMessage.value = message
     updateToastVisibility(true)
@@ -1965,8 +1947,6 @@ export function useTradeView() {
     subscribeToMasterSymbol,
     updateSubscriptions,
     checkOvertradeProtection,
-    toggleMarketDepth,
-    playNotificationSound,
     showToastNotification,
     getSecurityIdForSymbol,
     validateAndPlaceOrder,
@@ -1974,7 +1954,6 @@ export function useTradeView() {
     getCurrentLTP,
     handleOrderClick,
     formatTime,
-    toggleOvertradeProtection,
     setOrderDetails,
     updateTradingSymbol,
     convertToComparableDate,
