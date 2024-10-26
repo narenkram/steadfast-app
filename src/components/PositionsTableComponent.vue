@@ -13,7 +13,6 @@
                     <th scope="col">Target</th>
                     <th scope="col">Type</th>
                     <th scope="col">B.Avg</th>
-                    <th scope="col">N.Avg</th>
                     <th scope="col">S.Avg</th>
                     <th scope="col">Realized</th>
                     <th scope="col">Unrealized</th>
@@ -126,7 +125,6 @@
                         <td v-else>-</td>
                         <td>{{ formatProductType(position.prd) }}</td>
                         <td>{{ position.totbuyavgprc }}</td>
-                        <td>{{ position.netavgprc }}</td>
                         <td>{{ position.totsellavgprc }}</td>
                         <td :class="position.rpnl > 0 ? 'text-success' : position.rpnl < 0 ? 'text-danger' : null">
                             {{ position.rpnl }}
