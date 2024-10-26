@@ -25,13 +25,13 @@ export const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
   if (!symbol) return ''
 
   // Pattern 1: Format like NIFTY23DEC28C20000
-  // Example: NIFTY23DEC28C20000 -> NIFTY 28DEC23 C 20000
+  // Input Example: NIFTY23DEC28C20000
+  // Output Example: NIFTY 28DEC23 CE 20000 (note: we add 'E' to make it CE/PE)
   const pattern1 = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
 
   // Pattern 2: Format like SENSEX24O3181400CE or BANKEX24OCT60200CE
-  // Examples:
-  // SENSEX24O3181400CE -> SENSEX 18O324 CE 1400
-  // BANKEX24OCT60200CE -> BANKEX 18OCT24 CE 60200
+  // Input Example: SENSEX24O3181400CE
+  // Output Example: SENSEX 18O324 CE 1400 (already has CE/PE in input)
   const pattern2 = /^(\w+)(\d{2})([A-Z]{1,3})(\d{2})(\d+)([CP]E)$/
 
   const match1 = symbol.match(pattern1)
@@ -39,7 +39,8 @@ export const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
 
   if (match1) {
     const [, index, year, month, date, optionType, strikePrice] = match1
-    return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
+    // Add 'E' to optionType (C -> CE, P -> PE)
+    return `${index} ${date}${month}${year} ${optionType}E${excludeStrikePrice ? '' : ' ' + strikePrice}`
   }
 
   if (match2) {
