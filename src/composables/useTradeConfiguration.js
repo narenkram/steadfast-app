@@ -111,7 +111,7 @@ export const orderTypes = computed(() => {
     selectedBroker.value?.brokerName === 'Flattrade' ||
     selectedBroker.value?.brokerName === 'Shoonya'
   ) {
-    return ['MKT', 'LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION']
+    return ['MKT', 'LMT', 'LMT_LTP']
   }
   return []
 })
@@ -124,10 +124,6 @@ export const displayOrderTypes = computed(() => {
         return 'Limit'
       case 'LMT_LTP':
         return 'Limit at LTP'
-      case 'LMT_OFFSET':
-        return 'Limit at Offset'
-      case 'MKT_PROTECTION':
-        return 'Market Protection'
       default:
         return type
     }

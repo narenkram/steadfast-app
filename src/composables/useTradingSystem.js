@@ -594,11 +594,6 @@ export function useTradeView() {
     }
     return ''
   })
-  const isOffsetOrderType = computed(() => {
-    const isOffset = selectedOrderType.value === 'LMT_OFFSET'
-    console.log('Is Offset Order Type:', isOffset, 'Selected Order Type:', selectedOrderType.value)
-    return isOffset
-  })
   const isCallDepthAvailable = computed(() => {
     return (
       callDepth.value.bp1 !== null &&
@@ -839,7 +834,7 @@ export function useTradeView() {
     }
 
     // If it's a limit order type, the modal will be shown automatically due to data-bs-toggle and data-bs-target
-    if (['LMT', 'LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'].includes(selectedOrderType.value)) {
+    if (['LMT'].includes(selectedOrderType.value)) {
       // Set initial limit price based on the order type
       handleOrderTypeChange()
     } else {
@@ -1280,12 +1275,6 @@ export function useTradeView() {
       case 'LMT':
       case 'LMT_LTP':
         limitPrice.value = getCurrentLTP()
-        break
-      case 'LMT_OFFSET':
-        limitPrice.value = getCurrentLTP() + limitOffset.value
-        break
-      case 'MKT_PROTECTION':
-        limitPrice.value = getCurrentLTP() * 1.01
         break
       default:
         limitPrice.value = null
@@ -1986,7 +1975,6 @@ export function useTradeView() {
     ltpMarkerPosition,
     netPnl,
     totalCapitalPercentage,
-    isOffsetOrderType,
     isValidLimitPrice,
     limitPriceErrorMessage,
     isCallDepthAvailable,

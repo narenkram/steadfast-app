@@ -64,14 +64,6 @@ export const prepareOrderPayload = (
       price = getCurrentLTP().toString()
       priceType = 'LMT'
       break
-    case 'LMT_OFFSET':
-      price = (getCurrentLTP() + limitOffset.value).toString()
-      priceType = 'LMT'
-      break
-    case 'MKT_PROTECTION':
-      price = (getCurrentLTP() * 1.01).toString()
-      priceType = 'LMT'
-      break
   }
 
   const commonPayload = {
@@ -133,20 +125,10 @@ export const placeOrder = async (transactionType, drvOptionType) => {
       )
       orderData.qty = quantityToPlace.toString()
 
-      // Handle dynamic price updates for LMT_LTP and LMT_OFFSET
-      if (['LMT_LTP', 'LMT_OFFSET', 'MKT_PROTECTION'].includes(selectedOrderType.value)) {
+      // Handle dynamic price updates for LMT_LTP
+      if (['LMT_LTP'].includes(selectedOrderType.value)) {
         const currentLTP = getCurrentLTP()
-        switch (selectedOrderType.value) {
-          case 'LMT_LTP':
-            orderData.prc = currentLTP.toString()
-            break
-          case 'LMT_OFFSET':
-            orderData.prc = (currentLTP + limitOffset.value).toString()
-            break
-          case 'MKT_PROTECTION':
-            orderData.prc = (currentLTP * 1.01).toString()
-            break
-        }
+        orderData.prc = currentLTP.toString()
       }
 
       let response
@@ -175,8 +157,8 @@ export const placeOrder = async (transactionType, drvOptionType) => {
       remainingLots -= lotsToPlace
       placedLots += lotsToPlace
 
-      // Add a small delay between orders for LMT_LTP and LMT_OFFSET to get updated LTP
-      if (['LMT_LTP', 'LMT_OFFSET'].includes(selectedOrderType.value)) {
+      // Add a small delay between orders for LMT_LTP to get updated LTP
+      if (['LMT_LTP'].includes(selectedOrderType.value)) {
         await new Promise((resolve) => setTimeout(resolve, 500))
       }
     }
