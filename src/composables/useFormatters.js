@@ -24,30 +24,58 @@ export const getAllBrokersFromLocalStorage = () => {
 export const formatTradingSymbol = (symbol, excludeStrikePrice = false) => {
   if (!symbol) return ''
 
-  // Pattern 1: Format like NIFTY23DEC28C20000
-  // Input Example: NIFTY23DEC28C20000
-  // Output Example: NIFTY 28DEC23 CE 20000 (note: we add 'E' to make it CE/PE)
+  // Pattern 1: For symbols like NIFTY23DEC28C20000
+  // Breakdown:
+  // - (\w+)    : Index name (NIFTY)
+  // - (\d{2})  : Year (23)
+  // - ([A-Z]{3}): Month (DEC)
+  // - (\d{2})  : Date (28)
+  // - ([CP])   : Option type (C for Call, P for Put)
+  // - (\d+)    : Strike price (20000)
   const pattern1 = /^(\w+)(\d{2})([A-Z]{3})(\d{2})([CP])(\d+)$/
 
-  // Pattern 2: Format like SENSEX24O3181400CE or BANKEX24OCT60200CE
-  // Input Example: SENSEX24O3181400CE
-  // Output Example: SENSEX 18O324 CE 1400 (already has CE/PE in input)
+  // Pattern 2: For symbols like SENSEX24O3181400CE or BANKEX24OCT60200CE
+  // Breakdown:
+  // - (\w+)      : Index name (SENSEX/BANKEX)
+  // - (\d{2})    : Year (24)
+  // - ([A-Z]{1,3}): Month (O or OCT)
+  // - (\d{2})    : Date (18)
+  // - (\d+)      : Strike price (1400)
+  // - ([CP]E)    : Option type (CE for Call, PE for Put)
   const pattern2 = /^(\w+)(\d{2})([A-Z]{1,3})(\d{2})(\d+)([CP]E)$/
 
+  // Try to match the symbol against both patterns
   const match1 = symbol.match(pattern1)
   const match2 = symbol.match(pattern2)
 
+  // Handle Pattern 1 match
   if (match1) {
+    // Destructure the matched groups
     const [, index, year, month, date, optionType, strikePrice] = match1
-    // Add 'E' to optionType (C -> CE, P -> PE)
-    return `${index} ${date}${month}${year} ${optionType}E${excludeStrikePrice ? '' : ' ' + strikePrice}`
+
+    // Convert single character option type to full word
+    // C -> CALL, P -> PUT
+    const formattedOptionType = optionType === 'C' ? 'CALL' : 'PUT'
+
+    // Construct the formatted string
+    // Example: "NIFTY 28DEC23 CALL 20000"
+    return `${index} ${date}${month}${year} ${formattedOptionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
   }
 
+  // Handle Pattern 2 match
   if (match2) {
+    // Destructure the matched groups
     const [, index, year, month, date, strikePrice, optionType] = match2
-    return `${index} ${date}${month}${year} ${optionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
+
+    // Convert CE/PE to CALL/PUT
+    const formattedOptionType = optionType === 'CE' ? 'CALL' : 'PUT'
+
+    // Construct the formatted string
+    // Example: "SENSEX 18O324 CALL 1400"
+    return `${index} ${date}${month}${year} ${formattedOptionType}${excludeStrikePrice ? '' : ' ' + strikePrice}`
   }
 
+  // If no patterns match, return the original symbol unchanged
   return symbol
 }
 
