@@ -98,7 +98,7 @@ export const marketDepth = ref(JSON.parse(localStorage.getItem('marketDepth') ||
 export const ltpCallbacks = ref({})
 export const customStrikePrice = ref('')
 export const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false')
-export const selectedSound = ref(localStorage.getItem('selectedSound'))
+export const selectedSound = ref(localStorage.getItem('selectedSound') || 'long-pop.wav')
 export const riskClosingCountdown = ref(30)
 export const totalRiskTargetToggle = ref(
   JSON.parse(localStorage.getItem('totalRiskTargetToggle') || 'false')

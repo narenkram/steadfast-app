@@ -77,15 +77,11 @@ export function useAppSettings() {
   }
 
   // Notification Settings
-  const playNotificationSound = () => {
+  const toggleNotificationSound = () => {
     localStorage.setItem('notificationSound', notificationSound.value.toString())
-    if (notificationSound.value) {
-      const audio = new Audio(`/${selectedSound.value}`)
-      audio.play()
-      showToastNotification('Notification sound enabled')
-    } else {
-      showToastNotification('Notification sound disabled')
-    }
+    showToastNotification(
+      notificationSound.value ? 'Notification sound enabled' : 'Notification sound disabled'
+    )
   }
 
   // Helper Functions
@@ -135,7 +131,7 @@ export function useAppSettings() {
     toggleMarketDepth,
 
     // Notification Settings
-    playNotificationSound,
+    toggleNotificationSound,
 
     // Helper Functions
     showToastNotification

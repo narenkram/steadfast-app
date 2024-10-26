@@ -224,7 +224,7 @@
             <label for="notificationSound" class="form-label">Notification Sound</label>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="notificationSound" v-model="notificationSound"
-                @change="playNotificationSound" />
+                @change="toggleNotificationSound" />
               <label class="form-check-label" for="notificationSound">
                 {{ notificationSound ? 'Enabled' : 'Disabled' }}
               </label>
