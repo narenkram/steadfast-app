@@ -27,7 +27,11 @@ import {
   faHardDrive,
   faTimes,
   faPhone,
-  faLock
+  faLock,
+  faArrowUp,
+  faArrowDown,
+  faArrowLeft,
+  faArrowRight
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -60,7 +64,11 @@ library.add(
   faHardDrive,
   faTimes,
   faPhone,
-  faLock
+  faLock,
+  faArrowUp,
+  faArrowDown,
+  faArrowLeft,
+  faArrowRight
 )
 
 export { FontAwesomeIcon }

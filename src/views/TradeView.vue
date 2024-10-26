@@ -318,7 +318,9 @@
                 @click="handleOrderClick('BUY', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">⬆️</span>
+                <span v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-up" class="me-2" />
+                </span>
                 Buy CE
               </button>
               <button type="button"
@@ -337,7 +339,9 @@
               <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">⬅️</span>
+                <span v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-left" class="me-2" />
+                </span>
                 Sell CE
               </button>
               <button type="button"
@@ -385,7 +389,9 @@
                 @click="handleOrderClick('BUY', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">⬇️</span>
+                <span v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-down" class="me-2" />
+                </span>
                 Buy PE
               </button>
               <button type="button"
@@ -404,7 +410,9 @@
               <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">➡️</span>
+                <span v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-right" class="me-2" />
+                </span>
                 Sell PE
               </button>
               <button type="button"
