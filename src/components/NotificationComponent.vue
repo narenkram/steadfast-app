@@ -21,7 +21,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:showToast', 'update:message']);
 
-const audio = ref(null);
+const audio = ref(new Audio('/long-pop.wav')); // Preload the audio
 const notificationTimer = ref(null);
 
 watch(() => props.showToast, (newShowToast, oldShowToast) => {
@@ -34,12 +34,21 @@ watch(() => props.showToast, (newShowToast, oldShowToast) => {
 });
 
 const playNotificationSound = () => {
-    if (audio.value) {
-        audio.value.pause();
-        audio.value.currentTime = 0;
+    try {
+        if (audio.value) {
+            audio.value.currentTime = 0; // Reset to start
+            const playPromise = audio.value.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Auto-play was prevented, this is normal if no user interaction
+                    console.log('Notification sound blocked:', error);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error playing notification sound:', error);
     }
-    audio.value = new Audio('/long-pop.wav');
-    audio.value.play().catch(error => console.error('Error playing notification sound:', error));
 };
 
 const startNotificationTimer = () => {
