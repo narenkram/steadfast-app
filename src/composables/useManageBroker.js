@@ -265,6 +265,15 @@ export function useManageBroker() {
       clearErrorMessage()
     }
   }
+  // Watch for changes in SHOONYA_API_TOKEN and update localStorage
+  watch(SHOONYA_API_TOKEN, (newToken) => {
+    if (newToken) {
+      localStorage.setItem('SHOONYA_API_TOKEN', newToken)
+      validateToken('Shoonya')
+    } else {
+      localStorage.removeItem('SHOONYA_API_TOKEN')
+    }
+  })
 
   const clearErrorMessage = () => {
     setTimeout(() => {

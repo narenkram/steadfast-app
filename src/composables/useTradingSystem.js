@@ -33,9 +33,6 @@ import {
   limitPrice,
   selectedFlattradePositionsSet,
   selectedShoonyaPositionsSet,
-  SHOONYA_CLIENT_ID,
-  SHOONYA_API_TOKEN,
-  SHOONYA_API_KEY,
   flatOrderBook,
   flatTradeBook,
   shoonyaOrderBook,
@@ -98,12 +95,8 @@ import {
   putDepth,
   symbolData,
   allSymbolsData,
-  shoonyaBrokerUserId,
-  shoonyaBrokerPassword,
-  shoonyaOneTimePassword,
   errorMessage,
   statusMessage,
-  userTriggeredTokenGeneration,
   callStrikes,
   putStrikes,
   currentTime,
@@ -1662,15 +1655,7 @@ export function useTradeView() {
     checkOvertradeProtection()
   })
 
-  // Watch for changes in SHOONYA_API_TOKEN and update localStorage
-  watch(SHOONYA_API_TOKEN, (newToken) => {
-    if (newToken) {
-      localStorage.setItem('SHOONYA_API_TOKEN', newToken)
-      validateToken('Shoonya')
-    } else {
-      localStorage.removeItem('SHOONYA_API_TOKEN')
-    }
-  })
+
 
 
   watch(stickyMTM, (newValue) => {
