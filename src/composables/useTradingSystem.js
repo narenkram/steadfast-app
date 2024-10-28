@@ -1296,39 +1296,6 @@ export function useTradeView() {
     )
   }
 
-  const openFlattradeAuthUrl = () => {
-    statusMessage.value = 'Waiting for broker auth to complete...'
-
-    localStorage.setItem('statusMessage', statusMessage.value)
-
-    // Find the Flattrade broker details
-    let flattradeDetails = null
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key.startsWith('broker_Flattrade_')) {
-        flattradeDetails = JSON.parse(localStorage.getItem(key))
-        break
-      }
-    }
-
-    if (!flattradeDetails || !flattradeDetails.apiKey) {
-      errorMessage.value = 'Flattrade API key is missing'
-      clearErrorMessage()
-      return
-    }
-
-    const authUrl = `https://auth.flattrade.in/?app_key=${flattradeDetails.apiKey}`
-    window.open(authUrl, '_blank')
-
-    // Clear status message after 2 minutes if token generation doesn't complete
-    setTimeout(() => {
-      if (statusMessage.value === 'Waiting for broker auth to complete...') {
-        statusMessage.value = ''
-        localStorage.removeItem('statusMessage')
-      }
-    }, 120000) // 2 minutes
-  }
-
   const clearErrorMessage = () => {
     setTimeout(() => {
       errorMessage.value = ''
