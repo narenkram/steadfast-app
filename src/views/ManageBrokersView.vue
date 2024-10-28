@@ -37,14 +37,14 @@ const {
   brokerDetails,
   toggleBrokerClientIdVisibility,
   getBrokersFromLocalStorage,
-  generateToken
+  generateToken, // Flattrade Token Generation
+  handleShoonyaLogin // Shoonya Token Generation
 } = useManageBroker()
 
 const {
   // Methods only - remove the reactive variables
   copyToClipboard,
   getStatus,
-  handleShoonyaLogin,
 } = useTradeView();
 
 onMounted(() => {
