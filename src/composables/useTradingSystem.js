@@ -789,12 +789,6 @@ export function useTradeView() {
     }
   }
 
-  const convertToComparableDate = (dateString) => {
-    const date = new Date(dateString)
-    const options = { day: '2-digit', month: 'short', year: 'numeric' }
-    return date.toLocaleDateString('en-US', options).replace(/,/g, '')
-  }
-
   const saveOffsets = () => {
     localStorage.setItem('callStrikeOffset', callStrikeOffset.value)
     localStorage.setItem('putStrikeOffset', putStrikeOffset.value)
@@ -1936,7 +1930,6 @@ export function useTradeView() {
     formatTime,
     setOrderDetails,
     updateTradingSymbol,
-    convertToComparableDate,
     resetOrderTypeIfNeeded,
     setReverseMode,
     reversePositions,
