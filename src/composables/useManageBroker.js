@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios'
 import {
   BASE_URL,
@@ -9,8 +9,14 @@ import {
   shoonyaBrokerPassword,
   shoonyaOneTimePassword,
   SHOONYA_API_TOKEN,
-  shoonyaBrokerUserId
+  shoonyaBrokerUserId,
+  FLATTRADE_API_TOKEN,
+  FLATTRADE_CLIENT_ID,
+  FLATTRADE_API_SECRET,
+  FLATTRADE_API_KEY
 } from '@/stores/globalStore'
+
+import { validateToken } from '@/composables/useBrokerTokenValidator'
 
 export function useManageBroker() {
   // Track visibility for each broker's client ID
@@ -92,6 +98,82 @@ export function useManageBroker() {
     }, 120000)
   }
 
+  watch(flattradeReqCode, async (newCode) => {
+    if (newCode && userTriggeredTokenGeneration.value) {
+      statusMessage.value = `Received flattradeReqCode: ${newCode}`
+
+      // Find the Flattrade broker details
+      let flattradeDetails = null
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key.startsWith('broker_Flattrade_')) {
+          flattradeDetails = JSON.parse(localStorage.getItem(key))
+          break
+        }
+      }
+
+      if (!flattradeDetails || !flattradeDetails.apiKey || !flattradeDetails.apiSecret) {
+        errorMessage.value = 'API key or secret is missing'
+        clearErrorMessage()
+        return
+      }
+
+      const storedApiKey = flattradeDetails.apiKey
+      const storedApiSecret = flattradeDetails.apiSecret
+
+      const api_secret = storedApiKey + newCode + storedApiSecret
+      const hashedSecret = await crypto.subtle.digest(
+        'SHA-256',
+        new TextEncoder().encode(api_secret)
+      )
+      const apiSecretHex = Array.from(new Uint8Array(hashedSecret))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+      const payload = {
+        api_key: storedApiKey,
+        request_code: newCode,
+        api_secret: apiSecretHex
+      }
+
+      try {
+        const apiUrl = import.meta.env.PROD
+          ? `${BASE_URL}/flattrade/generateToken`
+          : `${BASE_URL}/flattrade/generateToken`
+        const res = await axios.post(apiUrl, payload)
+        const token = res.data.token
+        if (!token) {
+          errorMessage.value = 'Token generation failed'
+          clearErrorMessage()
+        } else {
+          FLATTRADE_API_TOKEN.value = token
+          errorMessage.value = ''
+          statusMessage.value = `Token generated successfully: ${token}`
+          localStorage.removeItem('statusMessage') // Clear the stored status message
+          console.log('Token generated successfully:', token)
+
+          // Clear success message after 5 seconds
+          setTimeout(() => {
+            statusMessage.value = ''
+          }, 5000)
+        }
+      } catch (error) {
+        errorMessage.value = 'Error generating token: ' + error.message
+        clearErrorMessage()
+        console.error('Error generating token:', error)
+      }
+    }
+  })
+
+  // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
+  watch(FLATTRADE_API_TOKEN, (newToken) => {
+    if (newToken) {
+      localStorage.setItem('FLATTRADE_API_TOKEN', newToken)
+      validateToken('Flattrade')
+    } else {
+      localStorage.removeItem('FLATTRADE_API_TOKEN')
+    }
+  })
   // Shoonya Token Generation
   const handleShoonyaLogin = async () => {
     try {

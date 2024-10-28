@@ -33,10 +33,6 @@ import {
   limitPrice,
   selectedFlattradePositionsSet,
   selectedShoonyaPositionsSet,
-  FLATTRADE_CLIENT_ID,
-  FLATTRADE_API_SECRET,
-  FLATTRADE_API_KEY,
-  FLATTRADE_API_TOKEN,
   SHOONYA_CLIENT_ID,
   SHOONYA_API_TOKEN,
   SHOONYA_API_KEY,
@@ -83,7 +79,6 @@ import {
   closePositionsTarget,
   riskAction,
   targetAction,
-  flattradeReqCode,
   stickyMTM,
   overtradeProtection,
   exchangeSymbols,
@@ -610,32 +605,32 @@ export function useTradeView() {
       putDepth.value.sq1 !== null
     )
   })
-  const brokers = computed(() => {
-    const brokersArray = []
+  // const brokers = computed(() => {
+  //   const brokersArray = []
 
-    if (FLATTRADE_CLIENT_ID.value && FLATTRADE_API_KEY.value && FLATTRADE_API_SECRET.value) {
-      brokersArray.push({
-        id: 'Flattrade',
-        brokerName: 'Flattrade',
-        brokerClientId: FLATTRADE_CLIENT_ID.value,
-        apiKey: FLATTRADE_API_KEY.value,
-        apiSecret: FLATTRADE_API_SECRET.value,
-        apiToken: FLATTRADE_API_TOKEN.value
-      })
-    }
+  //   if (FLATTRADE_CLIENT_ID.value && FLATTRADE_API_KEY.value && FLATTRADE_API_SECRET.value) {
+  //     brokersArray.push({
+  //       id: 'Flattrade',
+  //       brokerName: 'Flattrade',
+  //       brokerClientId: FLATTRADE_CLIENT_ID.value,
+  //       apiKey: FLATTRADE_API_KEY.value,
+  //       apiSecret: FLATTRADE_API_SECRET.value,
+  //       apiToken: FLATTRADE_API_TOKEN.value
+  //     })
+  //   }
 
-    if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
-      brokersArray.push({
-        id: 'Shoonya',
-        brokerName: 'Shoonya',
-        brokerClientId: SHOONYA_CLIENT_ID.value,
-        apiKey: SHOONYA_API_KEY.value,
-        apiToken: SHOONYA_API_TOKEN.value
-      })
-    }
+  //   if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
+  //     brokersArray.push({
+  //       id: 'Shoonya',
+  //       brokerName: 'Shoonya',
+  //       brokerClientId: SHOONYA_CLIENT_ID.value,
+  //       apiKey: SHOONYA_API_KEY.value,
+  //       apiToken: SHOONYA_API_TOKEN.value
+  //     })
+  //   }
 
-    return brokersArray
-  })
+  //   return brokersArray
+  // })
   // ... (add all other computed properties here)
 
   // Methods
@@ -1667,15 +1662,6 @@ export function useTradeView() {
     checkOvertradeProtection()
   })
 
-  // Watch for changes in FLATTRADE_API_TOKEN and update localStorage
-  watch(FLATTRADE_API_TOKEN, (newToken) => {
-    if (newToken) {
-      localStorage.setItem('FLATTRADE_API_TOKEN', newToken)
-      validateToken('Flattrade')
-    } else {
-      localStorage.removeItem('FLATTRADE_API_TOKEN')
-    }
-  })
   // Watch for changes in SHOONYA_API_TOKEN and update localStorage
   watch(SHOONYA_API_TOKEN, (newToken) => {
     if (newToken) {
@@ -1686,72 +1672,7 @@ export function useTradeView() {
     }
   })
 
-  watch(flattradeReqCode, async (newCode) => {
-    if (newCode && userTriggeredTokenGeneration.value) {
-      statusMessage.value = `Received flattradeReqCode: ${newCode}`
 
-      // Find the Flattrade broker details
-      let flattradeDetails = null
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key.startsWith('broker_Flattrade_')) {
-          flattradeDetails = JSON.parse(localStorage.getItem(key))
-          break
-        }
-      }
-
-      if (!flattradeDetails || !flattradeDetails.apiKey || !flattradeDetails.apiSecret) {
-        errorMessage.value = 'API key or secret is missing'
-        clearErrorMessage()
-        return
-      }
-
-      const storedApiKey = flattradeDetails.apiKey
-      const storedApiSecret = flattradeDetails.apiSecret
-
-      const api_secret = storedApiKey + newCode + storedApiSecret
-      const hashedSecret = await crypto.subtle.digest(
-        'SHA-256',
-        new TextEncoder().encode(api_secret)
-      )
-      const apiSecretHex = Array.from(new Uint8Array(hashedSecret))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-
-      const payload = {
-        api_key: storedApiKey,
-        request_code: newCode,
-        api_secret: apiSecretHex
-      }
-
-      try {
-        const apiUrl = import.meta.env.PROD
-          ? `${BASE_URL}/flattrade/generateToken`
-          : `${BASE_URL}/flattrade/generateToken`
-        const res = await axios.post(apiUrl, payload)
-        const token = res.data.token
-        if (!token) {
-          errorMessage.value = 'Token generation failed'
-          clearErrorMessage()
-        } else {
-          FLATTRADE_API_TOKEN.value = token
-          errorMessage.value = ''
-          statusMessage.value = `Token generated successfully: ${token}`
-          localStorage.removeItem('statusMessage') // Clear the stored status message
-          console.log('Token generated successfully:', token)
-
-          // Clear success message after 5 seconds
-          setTimeout(() => {
-            statusMessage.value = ''
-          }, 5000)
-        }
-      } catch (error) {
-        errorMessage.value = 'Error generating token: ' + error.message
-        clearErrorMessage()
-        console.error('Error generating token:', error)
-      }
-    }
-  })
   watch(stickyMTM, (newValue) => {
     localStorage.setItem('stickyMTM', JSON.stringify(newValue))
   })
@@ -1792,7 +1713,6 @@ export function useTradeView() {
     setActiveFetchFunctionAndFetch,
 
     // Computed properties
-    brokers,
     isFormDisabled,
     exchangeOptions,
     todayExpirySymbol,
