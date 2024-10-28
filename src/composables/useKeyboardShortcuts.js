@@ -22,16 +22,17 @@ export const handleHotKeys = (event) => {
 
   switch (event.key) {
     case 'ArrowUp':
-      placeOrder(getTransactionType('BUY'), 'CALL')
+      placeOrder('BUY', 'CALL')
       break
     case 'ArrowDown':
-      placeOrder(getTransactionType('BUY'), 'PUT')
+      // Remove getTransactionType here - let placeOrder handle it
+      placeOrder('BUY', 'PUT')
       break
     case 'ArrowRight':
-      placeOrder(getTransactionType('SELL'), 'PUT')
+      placeOrder('SELL', 'PUT')
       break
     case 'ArrowLeft':
-      placeOrder(getTransactionType('SELL'), 'CALL')
+      placeOrder('SELL', 'CALL')
       break
     case 'F6':
       closeAllPositions()
