@@ -29,10 +29,12 @@ import {
 import { useTradeView } from '@/composables/useTradingSystem';
 import { deleteBroker } from '@/composables/useBrokerFunctions';
 
+// Global State
+import { userTriggeredTokenGeneration } from '@/stores/globalStore';
+
 const {
   // Methods only - remove the reactive variables
   copyToClipboard,
-  generateToken,
   getStatus,
   handleShoonyaLogin,
 } = useTradeView();
@@ -66,6 +68,62 @@ const getBrokersFromLocalStorage = () => {
 
 // Replace brokerDetails computed property
 const brokerDetails = ref([]);
+
+// Flattrade
+const generateToken = async (broker) => {
+  userTriggeredTokenGeneration.value = true // Set the flag when user triggers token generation
+
+  if (!broker) {
+    errorMessage.value = 'Broker information is missing'
+    clearErrorMessage()
+    return
+  }
+
+  if (broker.brokerName === 'Flattrade') {
+    openFlattradeAuthUrl()
+    statusMessage.value = 'Waiting for flattradeReqCode...'
+    return
+  }
+
+  if (!flattradeReqCode.value) {
+    errorMessage.value = 'Request code is missing'
+    clearErrorMessage()
+    return
+  }
+}
+
+const openFlattradeAuthUrl = () => {
+  statusMessage.value = 'Waiting for broker auth to complete...'
+
+  localStorage.setItem('statusMessage', statusMessage.value)
+
+  // Find the Flattrade broker details
+  let flattradeDetails = null
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.startsWith('broker_Flattrade_')) {
+      flattradeDetails = JSON.parse(localStorage.getItem(key))
+      break
+    }
+  }
+
+  if (!flattradeDetails || !flattradeDetails.apiKey) {
+    errorMessage.value = 'Flattrade API key is missing'
+    clearErrorMessage()
+    return
+  }
+
+  const authUrl = `https://auth.flattrade.in/?app_key=${flattradeDetails.apiKey}`
+  window.open(authUrl, '_blank')
+
+  // Clear status message after 2 minutes if token generation doesn't complete
+  setTimeout(() => {
+    if (statusMessage.value === 'Waiting for broker auth to complete...') {
+      statusMessage.value = ''
+      localStorage.removeItem('statusMessage')
+    }
+  }, 120000) // 2 minutes
+}
 
 onMounted(() => {
   // Populate brokerDetails from localStorage

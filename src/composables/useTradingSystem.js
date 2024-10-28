@@ -1335,27 +1335,6 @@ export function useTradeView() {
     }, 5000) // Clear error message after 5 seconds
   }
 
-  const generateToken = async (broker) => {
-    userTriggeredTokenGeneration.value = true // Set the flag when user triggers token generation
-
-    if (!broker) {
-      errorMessage.value = 'Broker information is missing'
-      clearErrorMessage()
-      return
-    }
-
-    if (broker.brokerName === 'Flattrade') {
-      openFlattradeAuthUrl()
-      statusMessage.value = 'Waiting for flattradeReqCode...'
-      return
-    }
-
-    if (!flattradeReqCode.value) {
-      errorMessage.value = 'Request code is missing'
-      clearErrorMessage()
-      return
-    }
-  }
 
   const getStatus = (broker) => {
     if (!broker || !broker.brokerName) {
@@ -1934,7 +1913,6 @@ export function useTradeView() {
     setReverseMode,
     reversePositions,
     copyToClipboard,
-    generateToken,
     getStatus,
     handleShoonyaLogin,
     setActiveFetchFunctionAndFetch,
