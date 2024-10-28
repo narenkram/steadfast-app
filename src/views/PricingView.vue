@@ -12,13 +12,13 @@
                     <!-- Open Source Version -->
                     <div class="col-lg-6">
                         <div class="card shadow-lg border-0 rounded-lg overflow-hidden h-100">
-                            <div class="card-header bg-primary text-white text-center py-4">
+                            <div class="card-header bg-purple text-white text-center py-4">
                                 <h3 class="mb-0 fw-bold">Open Source</h3>
                             </div>
                             <div class="card-body">
                                 <div class="text-center mb-4">
                                     <p class="text-uppercase fw-bold mb-1">SELF-HOSTED</p>
-                                    <p class="display-3 text-primary mb-0">
+                                    <p class="display-3 text-purple mb-0">
                                         <span class="text-color">FREE</span>
                                     </p>
                                     <p class="text-muted mt-2">Localhost</p>
@@ -33,7 +33,7 @@
                                         Same Features as Cloud Version
                                     </li>
                                     <li class="list-group-item d-flex align-items-center">
-                                        <font-awesome-icon :icon="['fas', 'info-circle']" class="text-primary me-2" />
+                                        <font-awesome-icon :icon="['fas', 'info-circle']" class="text-purple me-2" />
                                         Manual Updates Required
                                     </li>
                                     <li class="list-group-item d-flex align-items-center">
@@ -47,7 +47,7 @@
                                 </ul>
                                 <div class="text-center">
                                     <a href="https://github.com/narenkram/steadfast-monorepo" target="_blank"
-                                        class="btn btn-primary btn-lg px-5 py-3 fw-bold">
+                                        class="btn btn-purple btn-lg px-5 py-3 fw-bold">
                                         Get Started
                                     </a>
                                 </div>
