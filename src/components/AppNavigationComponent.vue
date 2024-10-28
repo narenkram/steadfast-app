@@ -51,16 +51,17 @@ import NotificationComponent from './NotificationComponent.vue'
 
 // Global State
 import { notificationSound, toastMessage, showToast } from '@/stores/globalStore';
+const user = ref(null);
 
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
     { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-purple' },
     { path: '/manage-brokers', name: 'Brokers', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
-    { path: '/dashboard', name: 'Account', icon: ['fas', 'user-astronaut'], iconClass: 'text-secondary' },
+    // Only show Account page if user is logged in
+    ...(user.value ? [{ path: '/dashboard', name: 'Account', icon: ['fas', 'user-astronaut'], iconClass: 'text-secondary' }] : []),
     // { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: ['fas', 'sync'], iconClass: 'text-info' },
 ]);
 
-const user = ref(null);
 
 const router = useRouter();
 
