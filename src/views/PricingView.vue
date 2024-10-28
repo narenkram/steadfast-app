@@ -46,7 +46,7 @@
                                     </li>
                                 </ul>
                                 <div class="text-center">
-                                    <a href="https://github.com/your-repo" target="_blank"
+                                    <a href="https://github.com/narenkram/steadfast-monorepo" target="_blank"
                                         class="btn btn-primary btn-lg px-5 py-3 fw-bold">
                                         Get Started
                                     </a>

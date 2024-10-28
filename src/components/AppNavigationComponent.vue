@@ -75,6 +75,8 @@ const logout = async () => {
     const auth = getAuth();
     try {
         await signOut(auth);
+        // Clear all items from localStorage
+        localStorage.clear();
         // Redirect to the login page after successful logout
         router.push('/login');
     } catch (error) {
