@@ -6,7 +6,10 @@
                 <div class="card-body p-4 text-center">
                     <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid mb-3" style="max-height: 150px;">
                     <h2 class="card-title text-center mb-3 display-5 fw-bold">Sign Up</h2>
-                    <form @submit.prevent="signUp" v-if="!showOtpInput">
+                    <div v-if="isProduction" class="alert alert-warning">
+                        Signups are currently disabled. Please contact support for assistance.
+                    </div>
+                    <form @submit.prevent="signUp" v-else-if="!showOtpInput">
                         <div class="mb-3">
                             <label for="email" class="form-label text-start d-block">Email:</label>
                             <div class="input-group">
@@ -60,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier, updateProfile } from 'firebase/auth';
 import { useRouter } from 'vue-router';
@@ -74,6 +77,9 @@ const otp = ref('');
 const confirmationResult = ref(null);
 const router = useRouter();
 
+// Add environment check
+const isProduction = computed(() => process.env.NODE_ENV === 'production');
+
 onMounted(() => {
     const auth = getAuth();
     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -85,6 +91,12 @@ onMounted(() => {
 });
 
 const signUp = async () => {
+    // Prevent signup in production
+    if (isProduction.value) {
+        alert('Signups are currently disabled. Please contact support for assistance.');
+        return;
+    }
+
     const auth = getAuth();
     const appVerifier = window.recaptchaVerifier;
 
