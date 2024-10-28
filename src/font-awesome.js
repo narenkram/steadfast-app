@@ -31,7 +31,8 @@ import {
   faArrowUp,
   faArrowDown,
   faArrowLeft,
-  faArrowRight
+  faArrowRight,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram } from '@fortawesome/free-brands-svg-icons'
@@ -68,7 +69,8 @@ library.add(
   faArrowUp,
   faArrowDown,
   faArrowLeft,
-  faArrowRight
+  faArrowRight,
+  faInfoCircle
 )
 
 export { FontAwesomeIcon }

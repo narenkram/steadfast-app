@@ -679,9 +679,9 @@
         </div>
         <div class="modal-body">
           <div class="col-12">
-            <iframe id="events-iframe" style="min-height: 500px; width: 100%;"
+            <!-- <iframe id="events-iframe" style="min-height: 500px; width: 100%;"
               src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timeselector&countries=14&calType=week&timeZone=23&lang=1"
-              frameborder="0" allowtransparency="true"></iframe>
+              frameborder="0" allowtransparency="true"></iframe> -->
           </div>
         </div>
       </div>
