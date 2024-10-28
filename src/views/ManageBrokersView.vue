@@ -30,7 +30,6 @@ import { useTradeView } from '@/composables/useTradingSystem';
 import { deleteBroker } from '@/composables/useBrokerFunctions';
 
 // Global State
-import { userTriggeredTokenGeneration } from '@/stores/globalStore';
 import { useManageBroker } from '@/composables/useManageBroker'
 
 const {
