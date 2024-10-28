@@ -15,7 +15,16 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import SignUpView from '@/views/SignUpView.vue'
 import DashboardView from '@/views/account/DashboardView.vue'
 
+const isLocalhost = () => {
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+}
+
 const requireAuth = (to, from, next) => {
+  if (isLocalhost()) {
+    next()
+    return
+  }
+
   const auth = getAuth()
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -27,6 +36,11 @@ const requireAuth = (to, from, next) => {
 }
 
 const redirectIfLoggedIn = (to, from, next) => {
+  if (isLocalhost()) {
+    next()
+    return
+  }
+
   const auth = getAuth()
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -123,6 +137,11 @@ const router = createRouter({
     return { top: 0 }
   },
   beforeEach(to, from, next) {
+    if (isLocalhost()) {
+      next()
+      return
+    }
+
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
     const currentUser = getAuth().currentUser
 

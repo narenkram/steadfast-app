@@ -22,13 +22,13 @@
                                 <span class="nav-text">{{ route.name }}</span>
                             </RouterLink>
                         </li>
-                        <li class="nav-item" v-if="!user">
+                        <li class="nav-item" v-if="!user && !isLocalhost">
                             <RouterLink to="/login" class="nav-link">
                                 <font-awesome-icon icon="key" class="nav-icon text-secondary" />
                                 <span class="nav-text">Login</span>
                             </RouterLink>
                         </li>
-                        <li class="nav-item" v-if="user">
+                        <li class="nav-item" v-if="user || isLocalhost">
                             <RouterLink to="/steadfast" class="nav-link">
                                 <font-awesome-icon icon="bolt" class="nav-icon text-danger" />
                                 Trade
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -66,6 +66,9 @@ export default defineComponent({
     },
     setup() {
         const user = ref(null);
+        const isLocalhost = computed(() => {
+            return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        });
 
         onMounted(() => {
             const auth = getAuth();
@@ -76,6 +79,7 @@ export default defineComponent({
 
         return {
             user,
+            isLocalhost,
         };
     },
 });
