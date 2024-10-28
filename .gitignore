@@ -33,3 +33,4 @@ coverage
 *.csv#
 package-lock.json
 .vscode/extensions.json
+src/firebase.config.js
