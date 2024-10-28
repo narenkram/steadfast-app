@@ -77,8 +77,12 @@ const otp = ref('');
 const confirmationResult = ref(null);
 const router = useRouter();
 
-// Add environment check
-const isProduction = computed(() => process.env.NODE_ENV === 'production');
+// Update environment check to allow localhost
+const isProduction = computed(() => {
+    const isProductionEnv = process.env.NODE_ENV === 'production';
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    return isProductionEnv && !isLocalhost;
+});
 
 onMounted(() => {
     const auth = getAuth();
