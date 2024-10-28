@@ -35,7 +35,7 @@ import {
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faTelegram } from '@fortawesome/free-brands-svg-icons'
+import { faTelegram, faGithub } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
   faCheckCircle,
@@ -70,7 +70,8 @@ library.add(
   faArrowDown,
   faArrowLeft,
   faArrowRight,
-  faInfoCircle
+  faInfoCircle,
+  faGithub
 )
 
 export { FontAwesomeIcon }

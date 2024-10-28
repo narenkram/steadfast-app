@@ -60,6 +60,22 @@
             </div>
         </section>
 
+        <!-- Open Source Section -->
+        <section class="row py-5 bg-color-2 rounded">
+            <div class="col-lg-10 mx-auto text-center">
+                <h2 class="mb-4 display-4">Open Source</h2>
+                <p class="lead mb-4">Built with transparency and community in mind.</p>
+                <p class="mb-4">
+                    Steadfast is completely open source. Check out our code, contribute, or suggest improvements on
+                    GitHub.
+                </p>
+                <a href="https://github.com/narenkram/steadfast-monorepo" class="btn btn-outline btn-lg" target="_blank"
+                    rel="noopener noreferrer">
+                    <font-awesome-icon :icon="['fab', 'github']" class="me-2" />View on GitHub
+                </a>
+            </div>
+        </section>
+
     </div>
 </template>
 
