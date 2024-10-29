@@ -157,6 +157,9 @@ import {
   fetchFundLimit
 } from '@/composables/usePositionManagement'
 
+// Risk Management Composables
+import { checkStoplossesAndTargets } from '@/composables/useRiskManagement'
+
 // Real Time LTP Data Composables
 import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'
 
@@ -947,6 +950,14 @@ export function useTradeView() {
   }
   const connectWebSocket = () => {
     let websocketUrl
+    let reconnectTimer = null
+
+    // Clear any existing connection state
+    if (socket.value) {
+      console.log('Closing existing WebSocket connection')
+      socket.value.close()
+      socket.value = null
+    }
 
     const isDev = import.meta.env.DEV
     const wsBaseUrl = isDev
@@ -962,61 +973,122 @@ export function useTradeView() {
     }
 
     if (
-      ['Flattrade', 'Shoonya'].includes(selectedBroker.value?.brokerName) &&
-      brokerStatus.value === 'Connected'
+      !['Flattrade', 'Shoonya'].includes(selectedBroker.value?.brokerName) ||
+      brokerStatus.value !== 'Connected'
     ) {
-      websocketUrl = getWebSocketUrl(selectedBroker.value.brokerName)
-    } else {
       console.error('Invalid broker or broker not connected')
       return
     }
 
+    websocketUrl = getWebSocketUrl(selectedBroker.value.brokerName)
     console.log(`Attempting to connect to WebSocket at ${websocketUrl}`)
 
-    try {
-      if (socket.value) {
-        socket.value.close()
+    const connect = () => {
+      try {
+        socket.value = new WebSocket(websocketUrl)
+
+        // Set a connection timeout
+        const connectionTimeout = setTimeout(() => {
+          if (socket.value?.readyState !== WebSocket.OPEN) {
+            console.log('Connection timeout, retrying...')
+            socket.value?.close()
+            reconnect()
+          }
+        }, 5000)
+
+        socket.value.onopen = (event) => {
+          clearTimeout(connectionTimeout)
+          console.log('WebSocket connection opened:', event)
+          wsConnectionState.value = 'connected'
+          reconnectAttempts.value = 0
+
+          // Immediately send initial subscriptions
+          const initialData = {
+            action: 'initialize',
+            broker: selectedBroker.value.brokerName,
+            masterSymbol: selectedMasterSymbol.value,
+            callSecurityId: defaultCallSecurityId.value,
+            putSecurityId: defaultPutSecurityId.value
+          }
+          socket.value.send(JSON.stringify(initialData))
+
+          // Subscribe to required symbols immediately
+          subscribeToMasterSymbol()
+          subscribeToOptions()
+        }
+
+        socket.value.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            // Process message immediately
+            handleWebSocketMessage(event)
+          } catch (error) {
+            console.error('Error handling WebSocket message:', error)
+          }
+        }
+
+        socket.value.onerror = (error) => {
+          console.error('WebSocket error:', error)
+          wsConnectionState.value = 'error'
+        }
+
+        socket.value.onclose = (event) => {
+          console.log('WebSocket connection closed:', event)
+          wsConnectionState.value = 'disconnected'
+          if (!event.wasClean) {
+            reconnect()
+          }
+        }
+      } catch (error) {
+        console.error('Error creating WebSocket connection:', error)
+        reconnect()
       }
-
-      socket.value = new WebSocket(websocketUrl)
-
-      socket.value.onopen = (event) => {
-        console.log('WebSocket connection opened:', event)
-        reconnectAttempts.value = 0 // Reset attempts on successful connection
-        handleWebSocketOpen(event)
-      }
-
-      socket.value.onmessage = handleWebSocketMessage
-
-      socket.value.onerror = (error) => {
-        console.error('WebSocket error:', error)
-        handleWebSocketError(error)
-      }
-
-      socket.value.onclose = (event) => {
-        console.log('WebSocket connection closed:', event)
-        handleWebSocketClose(event)
-      }
-    } catch (error) {
-      console.error('Error creating WebSocket connection:', error)
-      handleReconnection()
     }
+
+    const reconnect = () => {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer)
+      }
+      reconnectTimer = setTimeout(connect, 1000)
+    }
+
+    connect()
   }
   const isMasterSymbolPrice = (quoteData) => {
-    const masterSymbol = selectedMasterSymbol.value
-    return quoteData.tk === masterSymbol
+    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
+    return symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId
   }
+
   const handleWebSocketMessage = (event) => {
-    const quoteData = JSON.parse(event.data)
-    if (quoteData.lp) {
-      updateMasterSymbolPrice(quoteData)
-      if (isMasterSymbolPrice(quoteData)) {
-        subscribeToOptions()
+    try {
+      const data = JSON.parse(event.data)
+      console.log('Processing WebSocket message:', data)
+
+      // Process quote data immediately
+      if (data.lp) {
+        // Update master symbol price first
+        updateMasterSymbolPrice(data)
+
+        // Update option prices
+        updateOptionPrices(data)
+
+        // Update position LTPs
+        updatePositionLTPs(data)
+
+        // Log updates for debugging
+        console.log('Updated prices:', {
+          masterSymbol: selectedMasterSymbol.value,
+          securityId: data.tk,
+          price: data.lp,
+          callSecurityId: defaultCallSecurityId.value,
+          putSecurityId: defaultPutSecurityId.value,
+          callPrice: latestCallLTP.value,
+          putPrice: latestPutLTP.value
+        })
       }
-      updateOptionPrices(quoteData)
-      updatePositionLTPs(quoteData)
+    } catch (error) {
+      console.error('Error processing WebSocket message:', error)
     }
-    handleDepthFeed(quoteData)
   }
   const handleWebSocketError = (error) => {
     console.error('WebSocket Error:', error)
@@ -1064,19 +1136,34 @@ export function useTradeView() {
         SENSEX: sensexPrice,
         BANKEX: bankexPrice
       }
+
       if (priceMap[selectedMasterSymbol.value]) {
-        priceMap[selectedMasterSymbol.value].value = quoteData.lp
-        updateOHLCIfNotEmpty('master', quoteData)
+        const newPrice = parseFloat(quoteData.lp)
+        if (!isNaN(newPrice)) {
+          priceMap[selectedMasterSymbol.value].value = newPrice
+          console.log(`Updated ${selectedMasterSymbol.value} price to:`, newPrice)
+          updateOHLCIfNotEmpty('master', quoteData)
+        } else {
+          console.warn('Invalid price received for master symbol:', quoteData.lp)
+        }
       }
     }
   }
 
   const updateOptionPrices = (quoteData) => {
+    const newPrice = parseFloat(quoteData.lp)
+    if (isNaN(newPrice)) {
+      console.warn('Invalid option price received:', quoteData.lp)
+      return
+    }
+
     if (quoteData.tk === defaultCallSecurityId.value) {
-      latestCallLTP.value = quoteData.lp
+      latestCallLTP.value = newPrice
+      console.log('Updated Call LTP:', newPrice)
       updateOHLCIfNotEmpty('call', quoteData)
     } else if (quoteData.tk === defaultPutSecurityId.value) {
-      latestPutLTP.value = quoteData.lp
+      latestPutLTP.value = newPrice
+      console.log('Updated Put LTP:', newPrice)
       updateOHLCIfNotEmpty('put', quoteData)
     }
   }
@@ -1085,9 +1172,19 @@ export function useTradeView() {
     const positionTsym = Object.keys(positionSecurityIds.value).find(
       (tsym) => positionSecurityIds.value[tsym] === quoteData.tk
     )
+
     if (positionTsym) {
-      positionLTPs.value[positionTsym] = quoteData.lp
-      // console.log(`Updated LTP for position ${positionTsym}: ${quoteData.lp}`)
+      const newPrice = parseFloat(quoteData.lp)
+      if (!isNaN(newPrice)) {
+        // Create a new object to ensure reactivity
+        positionLTPs.value = {
+          ...positionLTPs.value,
+          [positionTsym]: newPrice
+        }
+        console.log(`Updated LTP for position ${positionTsym}:`, newPrice)
+      } else {
+        console.warn(`Invalid price received for position ${positionTsym}:`, quoteData.lp)
+      }
     }
   }
 
@@ -1629,9 +1726,6 @@ export function useTradeView() {
     await fetchFundLimit()
     checkOvertradeProtection()
   })
-
-
-
 
   watch(stickyMTM, (newValue) => {
     localStorage.setItem('stickyMTM', JSON.stringify(newValue))

@@ -865,7 +865,16 @@ onMounted(async () => {
     currentTime.value = Date.now();
   }, 1000);
 
-  connectWebSocket();
+  // Attempt WebSocket connection with retry
+  const attemptWebSocketConnection = () => {
+    if (selectedBroker.value?.brokerName && brokerStatus.value === 'Connected') {
+      connectWebSocket()
+    } else {
+      setTimeout(attemptWebSocketConnection, 500)
+    }
+  }
+
+  attemptWebSocketConnection()
 
   const ltpBarsavedPreference = localStorage.getItem('showLTPRangeBar');
   if (ltpBarsavedPreference !== null && JSON.parse(ltpBarsavedPreference) !== showLTPRangeBar.value) {
