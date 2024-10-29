@@ -80,7 +80,6 @@ import {
   overtradeProtection,
   exchangeSymbols,
   expiryDates,
-  dataFetched,
   selectedStrike,
   modalTransactionType,
   modalOptionType,
@@ -160,8 +159,13 @@ import {
 // Risk Management Composables
 import { checkStoplossesAndTargets } from '@/composables/useRiskManagement'
 
-// Real Time LTP Data Composables
-import { getMasterSymbolPrice, subscribeToLTP } from '@/composables/useMarketData'
+// Market Data Composables
+import {
+  fetchTradingData,
+  getMasterSymbolPrice,
+  subscribeToLTP,
+  updateSymbolData
+} from '@/composables/useMarketData'
 
 export function useTradeView() {
   const isFormDisabled = computed(() => killSwitchActive.value)
@@ -679,80 +683,6 @@ export function useTradeView() {
       (s) => s.tradingSymbol.includes(symbol) && /C\d+$/.test(s.tradingSymbol)
     )
     return strike ? parseFloat(strike.strikePrice) : null
-  }
-  const fetchTradingData = async () => {
-    const masterSymbols = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
-
-    for (const symbol of masterSymbols) {
-      try {
-        let exchangeSymbol
-
-        // Set the correct exchange symbol
-        if (['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].includes(symbol)) {
-          exchangeSymbol = 'NFO'
-        } else if (['SENSEX', 'BANKEX'].includes(symbol)) {
-          exchangeSymbol = 'BFO'
-        } else {
-          throw new Error(`Unknown symbol: ${symbol}`)
-        }
-
-        let response
-        if (selectedBroker.value?.brokerName === 'Flattrade') {
-          response = await fetch(
-            `${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`
-          )
-        } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-          response = await fetch(
-            `${BASE_URL}/shoonya/symbols?exchangeSymbol=${exchangeSymbol}&masterSymbol=${symbol}`
-          )
-        } else {
-          throw new Error('Unsupported broker')
-        }
-
-        const data = await response.json()
-
-        allSymbolsData[symbol] = {
-          expiryDates: data.expiryDates || [],
-          callStrikes: Array.isArray(data.callStrikes)
-            ? data.callStrikes
-                .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-                .map((strike) => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }))
-            : [],
-          putStrikes: Array.isArray(data.putStrikes)
-            ? data.putStrikes
-                .sort((a, b) => parseInt(a.strikePrice) - parseInt(b.strikePrice))
-                .map((strike) => ({ ...strike, strikePrice: parseInt(strike.strikePrice) }))
-            : []
-        }
-
-        // Set initial price for each symbol
-        const priceKey = `${symbol.toLowerCase()}Price`
-        if (priceKey in window && window[priceKey].value === 'N/A') {
-          window[priceKey].value = getInitialPrice(symbol)
-        }
-      } catch (error) {
-        console.error(`Error fetching data for ${symbol}:`, error)
-        allSymbolsData[symbol] = { expiryDates: [], callStrikes: [], putStrikes: [] }
-      }
-    }
-
-    // Update the reactive properties for the currently selected symbol
-    updateSymbolData(selectedMasterSymbol.value)
-
-    updateStrikesForExpiry(selectedExpiry.value)
-    dataFetched.value = true
-
-    // Cache the fetched data
-    localStorage.setItem('cachedTradingData', JSON.stringify(allSymbolsData))
-  }
-  const updateSymbolData = (symbol) => {
-    if (allSymbolsData[symbol]) {
-      expiryDates.value = allSymbolsData[symbol].expiryDates
-      callStrikes.value = allSymbolsData[symbol].callStrikes
-      putStrikes.value = allSymbolsData[symbol].putStrikes
-    } else {
-      console.error(`No data found for ${symbol}`)
-    }
   }
 
   const saveOffsets = () => {
@@ -1734,12 +1664,10 @@ export function useTradeView() {
     setActiveTab,
     updateExchangeSymbols,
     setDefaultExchangeAndMasterSymbol,
-    fetchTradingData,
     setDefaultExpiry,
     saveUserChoice,
     saveOffsets,
     saveExpiryOffset,
-    updateSymbolData,
     calculateUnrealizedProfit,
     getProductTypeValue,
     connectWebSocket,

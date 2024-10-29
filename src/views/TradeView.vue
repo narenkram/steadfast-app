@@ -764,6 +764,9 @@ import { checkStoplossesAndTargets, setStoploss, removeStoploss, increaseStoplos
 // Keyboard Shortcuts Composables
 import { handleHotKeys } from '@/composables/useKeyboardShortcuts'
 
+// Market Data Composables
+import { fetchTradingData, updateSymbolData } from '@/composables/useMarketData'
+
 // Formatters
 import {
   formatTradingSymbol,
@@ -775,9 +778,7 @@ const {
   setActiveTab,
   updateExchangeSymbols,
   setDefaultExchangeAndMasterSymbol,
-  fetchTradingData,
   setDefaultExpiry,
-  updateSymbolData,
   setActiveFetchFunctionAndFetch,
   connectWebSocket,
   validateAndPlaceOrder,
