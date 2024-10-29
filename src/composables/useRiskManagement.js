@@ -1,6 +1,7 @@
 import {
   stoplossValue,
   targetValue,
+  enableTarget,
   enableStoploss,
   positionLTPs,
   stoplosses,
