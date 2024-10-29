@@ -1054,10 +1054,6 @@ export function useTradeView() {
 
     connect()
   }
-  const isMasterSymbolPrice = (quoteData) => {
-    const symbolInfo = exchangeSymbols.value.symbolData[selectedMasterSymbol.value]
-    return symbolInfo && quoteData.tk === symbolInfo.exchangeSecurityId
-  }
 
   const handleWebSocketMessage = (event) => {
     try {
