@@ -598,32 +598,7 @@ export function useTradeView() {
       putDepth.value.sq1 !== null
     )
   })
-  // const brokers = computed(() => {
-  //   const brokersArray = []
 
-  //   if (FLATTRADE_CLIENT_ID.value && FLATTRADE_API_KEY.value && FLATTRADE_API_SECRET.value) {
-  //     brokersArray.push({
-  //       id: 'Flattrade',
-  //       brokerName: 'Flattrade',
-  //       brokerClientId: FLATTRADE_CLIENT_ID.value,
-  //       apiKey: FLATTRADE_API_KEY.value,
-  //       apiSecret: FLATTRADE_API_SECRET.value,
-  //       apiToken: FLATTRADE_API_TOKEN.value
-  //     })
-  //   }
-
-  //   if (SHOONYA_CLIENT_ID.value && SHOONYA_API_KEY.value) {
-  //     brokersArray.push({
-  //       id: 'Shoonya',
-  //       brokerName: 'Shoonya',
-  //       brokerClientId: SHOONYA_CLIENT_ID.value,
-  //       apiKey: SHOONYA_API_KEY.value,
-  //       apiToken: SHOONYA_API_TOKEN.value
-  //     })
-  //   }
-
-  //   return brokersArray
-  // })
   // ... (add all other computed properties here)
 
   // Methods
