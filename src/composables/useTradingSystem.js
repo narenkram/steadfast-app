@@ -984,7 +984,7 @@ export function useTradeView() {
   const handleWebSocketMessage = (event) => {
     try {
       const data = JSON.parse(event.data)
-      console.log('Processing WebSocket message:', data)
+      // console.log('Processing WebSocket message:', data)
 
       // Process quote data immediately
       if (data.lp) {
@@ -998,15 +998,15 @@ export function useTradeView() {
         updatePositionLTPs(data)
 
         // Log updates for debugging
-        console.log('Updated prices:', {
-          masterSymbol: selectedMasterSymbol.value,
-          securityId: data.tk,
-          price: data.lp,
-          callSecurityId: defaultCallSecurityId.value,
-          putSecurityId: defaultPutSecurityId.value,
-          callPrice: latestCallLTP.value,
-          putPrice: latestPutLTP.value
-        })
+        // console.log('Updated prices:', {
+        //   masterSymbol: selectedMasterSymbol.value,
+        //   securityId: data.tk,
+        //   price: data.lp,
+        //   callSecurityId: defaultCallSecurityId.value,
+        //   putSecurityId: defaultPutSecurityId.value,
+        //   callPrice: latestCallLTP.value,
+        //   putPrice: latestPutLTP.value
+        // })
       }
     } catch (error) {
       console.error('Error processing WebSocket message:', error)
@@ -1063,7 +1063,7 @@ export function useTradeView() {
         const newPrice = parseFloat(quoteData.lp)
         if (!isNaN(newPrice)) {
           priceMap[selectedMasterSymbol.value].value = newPrice
-          console.log(`Updated ${selectedMasterSymbol.value} price to:`, newPrice)
+          // console.log(`Updated ${selectedMasterSymbol.value} price to:`, newPrice)
           updateOHLCIfNotEmpty('master', quoteData)
         } else {
           console.warn('Invalid price received for master symbol:', quoteData.lp)
@@ -1081,11 +1081,11 @@ export function useTradeView() {
 
     if (quoteData.tk === defaultCallSecurityId.value) {
       latestCallLTP.value = newPrice
-      console.log('Updated Call LTP:', newPrice)
+      // console.log('Updated Call LTP:', newPrice)
       updateOHLCIfNotEmpty('call', quoteData)
     } else if (quoteData.tk === defaultPutSecurityId.value) {
       latestPutLTP.value = newPrice
-      console.log('Updated Put LTP:', newPrice)
+      // console.log('Updated Put LTP:', newPrice)
       updateOHLCIfNotEmpty('put', quoteData)
     }
   }
@@ -1103,7 +1103,7 @@ export function useTradeView() {
           ...positionLTPs.value,
           [positionTsym]: newPrice
         }
-        console.log(`Updated LTP for position ${positionTsym}:`, newPrice)
+        // console.log(`Updated LTP for position ${positionTsym}:`, newPrice)
       } else {
         console.warn(`Invalid price received for position ${positionTsym}:`, quoteData.lp)
       }
