@@ -12,9 +12,6 @@ import {
   expiryOffset,
   overtradeProtection,
 
-  // Feature Settings
-  marketDepth,
-
   // Notification Settings
   notificationSound,
 
@@ -69,11 +66,6 @@ export function useAppSettings() {
     localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString())
   }
 
-  // Feature Settings
-  const toggleMarketDepth = () => {
-    marketDepth.value = !marketDepth.value
-    localStorage.setItem('marketDepth', JSON.stringify(marketDepth.value))
-  }
 
   // Notification Settings
   const toggleNotificationSound = () => {
@@ -125,9 +117,6 @@ export function useAppSettings() {
     // Trading Settings
     saveOffsets,
     toggleOvertradeProtection,
-
-    // Feature Settings
-    toggleMarketDepth,
 
     // Notification Settings
     toggleNotificationSound,

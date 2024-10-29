@@ -80,8 +80,6 @@ import {
   latestPutLTP,
   activeFetchFunction,
   reverseMode,
-  callDepth,
-  putDepth,
   symbolData,
   allSymbolsData,
   errorMessage,
@@ -118,7 +116,6 @@ import {
 
 // Trade Configuration Composables
 import {
-  getExchangeSegment,
   selectedLots,
   getProductTypeValue,
   getTransactionType,
@@ -152,7 +149,6 @@ import { checkStoplossesAndTargets } from '@/composables/useRiskManagement'
 import {
   fetchTradingData,
   getMasterSymbolPrice,
-  subscribeToLTP,
   updateSymbolData
 } from '@/composables/useMarketData'
 
@@ -576,23 +572,6 @@ export function useTradeView() {
       return 'Enter a limit price.'
     }
     return ''
-  })
-  const isCallDepthAvailable = computed(() => {
-    return (
-      callDepth.value.bp1 !== null &&
-      callDepth.value.bq1 !== null &&
-      callDepth.value.sp1 !== null &&
-      callDepth.value.sq1 !== null
-    )
-  })
-
-  const isPutDepthAvailable = computed(() => {
-    return (
-      putDepth.value.bp1 !== null &&
-      putDepth.value.bq1 !== null &&
-      putDepth.value.sp1 !== null &&
-      putDepth.value.sq1 !== null
-    )
   })
 
   // ... (add all other computed properties here)
@@ -1103,13 +1082,6 @@ export function useTradeView() {
     }
   }
 
-  const handleDepthFeed = (quoteData) => {
-    if (quoteData.tk === defaultCallSecurityId.value) {
-      callDepth.value = { ...callDepth.value, ...quoteData }
-    } else if (quoteData.tk === defaultPutSecurityId.value) {
-      putDepth.value = { ...putDepth.value, ...quoteData }
-    }
-  }
   // Helper function to update OHLC values if they are not empty
   const updateOHLCIfNotEmpty = (type, data) => {
     if (type === 'master') {
@@ -1700,8 +1672,6 @@ export function useTradeView() {
     totalCapitalPercentage,
     isValidLimitPrice,
     limitPriceErrorMessage,
-    isCallDepthAvailable,
-    isPutDepthAvailable,
     availableStrikes,
     callLtpRangeWidth,
     callLtpMarkerPosition,

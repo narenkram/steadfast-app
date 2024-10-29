@@ -230,17 +230,6 @@
               </label>
             </div>
           </div>
-          <!-- Market Depth Toggle -->
-          <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <label for="marketDepth" class="form-label">Market Depth</label>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="marketDepth" :checked="marketDepth"
-                @change="toggleMarketDepth" />
-              <label class="form-check-label" for="marketDepth">
-                {{ marketDepth ? 'Enabled' : 'Disabled' }}
-              </label>
-            </div>
-          </div>
           <!-- Enable / Disable Sticky MTM -->
           <div class="col-12 col-md-6 col-lg-4 mt-3">
             <label for="stickyMTM" class="form-label">Sticky MTM Section</label>
@@ -279,9 +268,6 @@ import {
   expiryOffset,
   overtradeProtection,
 
-  // Feature Settings
-  marketDepth,
-
   // Notification Settings
   notificationSound,
 
@@ -305,6 +291,5 @@ const {
   toggleStickyMTM,
   saveOffsets,
   toggleOvertradeProtection,
-  toggleMarketDepth,
 } = useAppSettings()
 </script>

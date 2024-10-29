@@ -201,9 +201,6 @@
             <!-- LTP Range Bar for Call Strike -->
             <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="callLtpRangeWidth"
               :openMarkerPosition="callOpenMarkerPosition" :lowPrice="callLowPrice" :highPrice="callHighPrice" />
-            <!-- Call Market Depth -->
-            <MarketDepthComponent :isDepthAvailable="isCallDepthAvailable" :marketDepth="marketDepth || {}"
-              :depth="callDepth || {}" />
           </div>
 
           <!-- Live Underlying Price -->
@@ -304,9 +301,6 @@
             <!-- LTP Range Bar for Put Strike -->
             <LtpRangeBarComponent v-if="showLTPRangeBar" :ltpRangeWidth="putLtpRangeWidth"
               :openMarkerPosition="putOpenMarkerPosition" :lowPrice="putLowPrice" :highPrice="putHighPrice" />
-            <!-- Put Market Depth -->
-            <MarketDepthComponent :isDepthAvailable="isPutDepthAvailable" :marketDepth="marketDepth || {}"
-              :depth="putDepth || {}" />
           </div>
         </div>
 
@@ -699,7 +693,6 @@ import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
-import MarketDepthComponent from '@/components/MarketDepthComponent.vue';
 import PnlComponent from '@/components/PnlComponent.vue';
 import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
@@ -712,10 +705,7 @@ import {
   showOHLCValues,
   showStrikeDetails,
   reverseMode,
-  marketDepth,
   limitOffset,
-  callDepth,
-  putDepth,
   stickyMTM,
   activeTab,
   expiryDates,
@@ -810,8 +800,6 @@ const {
   isOffsetOrderType,
   isValidLimitPrice,
   limitPriceErrorMessage,
-  isCallDepthAvailable,
-  isPutDepthAvailable,
   callLtpRangeWidth,
   callOpenMarkerPosition,
   openMarkerPosition,

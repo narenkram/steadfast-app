@@ -94,7 +94,6 @@ export const putClosePrice = ref(localStorage.getItem('putClosePrice') || null)
 export const showOHLCValues = ref(false)
 export const showStrikeDetails = ref(false)
 export const reverseMode = ref('all')
-export const marketDepth = ref(JSON.parse(localStorage.getItem('marketDepth') || 'false'))
 export const ltpCallbacks = ref({})
 export const customStrikePrice = ref('')
 export const notificationSound = ref(localStorage.getItem('notificationSound') !== 'false')
@@ -126,50 +125,7 @@ export const stoplossValue = useLocalStorage('stoplossValue', 10)
 export const enableTarget = useLocalStorage('enableTarget', false)
 export const targetValue = useLocalStorage('targetValue', 50)
 export const tslHitPositions = new Set()
-export const callDepth = ref({
-  bp1: null,
-  bq1: null,
-  sp1: null,
-  sq1: null,
-  bp2: null,
-  bq2: null,
-  sp2: null,
-  sq2: null,
-  bp3: null,
-  bq3: null,
-  sp3: null,
-  sq3: null,
-  bp4: null,
-  bq4: null,
-  sp4: null,
-  sq4: null,
-  bp5: null,
-  bq5: null,
-  sp5: null,
-  sq5: null
-})
-export const putDepth = ref({
-  bp1: null,
-  bq1: null,
-  sp1: null,
-  sq1: null,
-  bp2: null,
-  bq2: null,
-  sp2: null,
-  sq2: null,
-  bp3: null,
-  bq3: null,
-  sp3: null,
-  sq3: null,
-  bp4: null,
-  bq4: null,
-  sp4: null,
-  sq4: null,
-  bp5: null,
-  bq5: null,
-  sp5: null,
-  sq5: null
-})
+
 export const symbolData = reactive({
   NIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26000', expiryDay: 4 }, // Thursday
   BANKNIFTY: { exchangeCode: 'NSE', exchangeSecurityId: '26009', expiryDay: 3 }, // Wednesday
