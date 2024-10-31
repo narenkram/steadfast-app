@@ -631,38 +631,6 @@
     </div>
   </div>
 
-  <!-- Reverse All/Selected Positions Confirmation Modal -->
-  <div class="modal fade" id="ReversePositionsConfirmationModal" tabindex="-1"
-    aria-labelledby="ReversePositionsConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="ReversePositionsConfirmationModalLabel">
-            Confirm Reverse Positions
-          </h5>
-        </div>
-        <div class="modal-body">
-          <blockquote class="blockquote">
-            This action will
-            <b class="text-danger">reverse {{ reverseMode === 'all' ? 'all' : 'selected' }} positions</b>
-          </blockquote>
-          <p>Are you sure you want to continue?</p>
-        </div>
-        <div class="modal-footer">
-          <div class="d-flex flex-row justify-content-between w-100">
-            <button type="button" class="btn btn-sm btn-outline-secondary w-50 me-1" data-bs-dismiss="modal">
-              No
-            </button>
-            <button type="button" class="btn btn-sm btn-primary w-50 ms-1" data-bs-dismiss="modal"
-              @click="reversePositions">
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Events Modal -->
   <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -704,7 +672,6 @@ import {
   showLTPRangeBar,
   showOHLCValues,
   showStrikeDetails,
-  reverseMode,
   limitOffset,
   stickyMTM,
   activeTab,
@@ -778,7 +745,6 @@ const {
   setOrderDetails,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,
-  reversePositions,
 
   // Computed properties
   isFormDisabled,

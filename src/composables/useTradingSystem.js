@@ -79,7 +79,6 @@ import {
   latestCallLTP,
   latestPutLTP,
   activeFetchFunction,
-  reverseMode,
   symbolData,
   allSymbolsData,
   errorMessage,
@@ -721,84 +720,6 @@ export function useTradeView() {
 
     // Trigger a re-subscription to the new security
     subscribeToOptions()
-  }
-
-  const setReverseMode = (mode) => {
-    reverseMode.value = mode
-  }
-  const reversePositions = async () => {
-    try {
-      let positionsReversed = false
-      let positionsToReverse
-
-      if (reverseMode.value === 'all') {
-        positionsToReverse = [...flatTradePositionBook.value, ...shoonyaPositionBook.value]
-      } else {
-        positionsToReverse = [
-          ...selectedFlattradePositionsSet.value,
-          ...selectedShoonyaPositionsSet.value
-        ]
-          .map((tsym) =>
-            [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
-              (p) => p.tsym === tsym
-            )
-          )
-          .filter(Boolean)
-      }
-
-      for (const position of positionsToReverse) {
-        const netqty = Number(position.netqty)
-        if (netqty !== 0) {
-          // Close the current position
-          const closeTransactionType = netqty > 0 ? 'S' : 'B'
-          await placeOrderForPosition(
-            closeTransactionType,
-            position.tsym.includes('C') ? 'CALL' : 'PUT',
-            position
-          )
-
-          // Open a new position in the opposite direction
-          const openTransactionType = netqty > 0 ? 'B' : 'S'
-          const reversedPosition = { ...position, netqty: Math.abs(netqty) } // Always use positive quantity
-          await placeOrderForPosition(
-            openTransactionType,
-            position.tsym.includes('C') ? 'CALL' : 'PUT',
-            reversedPosition
-          )
-
-          positionsReversed = true
-
-          // Remove the reversed position from the selected positions if in 'selected' mode
-          if (reverseMode.value === 'selected') {
-            if (selectedBroker.value?.brokerName === 'Shoonya') {
-              selectedShoonyaPositionsSet.value.delete(position.tsym)
-            } else if (selectedBroker.value?.brokerName === 'Flattrade') {
-              selectedFlattradePositionsSet.value.delete(position.tsym)
-            }
-          }
-        }
-      }
-
-      // Add a delay before fetching updated data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update both orders and positions
-      await updateOrdersAndPositions()
-
-      // Update fund limits
-      await updateFundLimits()
-
-      if (positionsReversed) {
-        toastMessage.value = `${reverseMode.value === 'all' ? 'All' : 'Selected'} positions reversed successfully`
-      } else {
-        toastMessage.value = `No positions to reverse`
-      }
-      showToast.value = true
-    } catch (error) {
-      console.error('Error reversing positions:', error)
-      toastMessage.value = `Failed to reverse ${reverseMode.value === 'all' ? 'all' : 'selected'} positions`
-      showToast.value = true
-    }
   }
 
   const calculateUnrealizedProfit = (position) => {
@@ -1645,8 +1566,6 @@ export function useTradeView() {
     setOrderDetails,
     updateTradingSymbol,
     resetOrderTypeIfNeeded,
-    setReverseMode,
-    reversePositions,
     copyToClipboard,
     getStatus,
     setActiveFetchFunctionAndFetch,
