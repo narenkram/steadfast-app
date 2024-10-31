@@ -87,7 +87,7 @@
                             </div>
                         </td>
                         <td v-else>-</td>
-                        <td
+                        <td style="width: 80px;"
                             :class="{ 'text-success': parseFloat(positionLTPs[position.tsym]) > parseFloat(position.totbuyavgprc), 'text-danger': parseFloat(positionLTPs[position.tsym]) < parseFloat(position.totbuyavgprc) }">
                             {{ positionLTPs[position.tsym] }}
                         </td>
