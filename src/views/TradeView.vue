@@ -655,7 +655,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
-import { useTradeView } from '@/composables/useTradingSystem';
+import { useTradeView } from '@/composables/useTradeView';
 import BrokerComponent from '@/components/BrokerComponent.vue';
 import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';

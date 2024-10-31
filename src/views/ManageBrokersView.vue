@@ -26,7 +26,7 @@ import {
   supportedBrokers  // Add this import
 } from '@/stores/globalStore';
 
-import { useTradeView } from '@/composables/useTradingSystem';
+import { useTradeView } from '@/composables/useTradeView';
 import { deleteBroker } from '@/composables/useBrokerFunctions';
 
 // Global State

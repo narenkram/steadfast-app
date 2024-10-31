@@ -233,7 +233,7 @@
 </template>
 
 <script setup>
-import { useTradeView } from '@/composables/useTradingSystem';
+import { useTradeView } from '@/composables/useTradeView';
 import { computed, watch } from 'vue';
 
 const props = defineProps({
