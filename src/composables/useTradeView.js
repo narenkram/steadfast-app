@@ -645,12 +645,6 @@ export function useTradeView() {
     localStorage.setItem('selectedExchange', selectedExchange.value)
     localStorage.setItem('selectedMasterSymbol', selectedMasterSymbol.value)
   }
-  const getInitialPrice = (symbol) => {
-    const strike = callStrikes.value.find(
-      (s) => s.tradingSymbol.includes(symbol) && /C\d+$/.test(s.tradingSymbol)
-    )
-    return strike ? parseFloat(strike.strikePrice) : null
-  }
 
   const saveOffsets = () => {
     localStorage.setItem('callStrikeOffset', callStrikeOffset.value)
@@ -903,40 +897,6 @@ export function useTradeView() {
       }
     } catch (error) {
       console.error('Error processing WebSocket message:', error)
-    }
-  }
-  const handleWebSocketError = (error) => {
-    console.error('WebSocket Error:', error)
-    wsConnectionState.value = 'error'
-  }
-  const handleWebSocketOpen = () => {
-    console.log('WebSocket connected')
-    wsConnectionState.value = 'connected'
-    initializeSubscriptions()
-  }
-  const handleWebSocketClose = (event) => {
-    console.log('WebSocket disconnected:', event)
-    wsConnectionState.value = 'disconnected'
-    handleReconnection()
-  }
-  const handleReconnection = () => {
-    if (reconnectAttempts.value < MAX_RECONNECT_ATTEMPTS) {
-      const delay = INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts.value)
-      console.log(
-        `Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts.value + 1}/${MAX_RECONNECT_ATTEMPTS})`
-      )
-
-      if (reconnectTimeout.value) {
-        clearTimeout(reconnectTimeout.value)
-      }
-
-      reconnectTimeout.value = setTimeout(() => {
-        reconnectAttempts.value++
-        connectWebSocket()
-      }, delay)
-    } else {
-      console.error('Max reconnection attempts reached')
-      errorMessage.value = 'Unable to establish WebSocket connection. Please refresh the page.'
     }
   }
 
