@@ -24,7 +24,9 @@ import {
   enableTarget,
   stoplossValue,
   targetValue,
-  limitPrice
+  limitPrice,
+  selectedFlattradePositionsSet,
+  selectedShoonyaPositionsSet
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
