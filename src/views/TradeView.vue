@@ -730,6 +730,9 @@ import {
   formatDate
 } from '@/composables/useFormatters'
 
+// WebSocket Composables
+import { connectWebSocket } from '@/composables/useWebSocket'
+
 const {
   // Methods
   setActiveTab,
@@ -737,7 +740,6 @@ const {
   setDefaultExchangeAndMasterSymbol,
   setDefaultExpiry,
   setActiveFetchFunctionAndFetch,
-  connectWebSocket,
   validateAndPlaceOrder,
   handleOrderTypeChange,
   handleOrderClick,
