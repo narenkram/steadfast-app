@@ -312,9 +312,9 @@
                 @click="handleOrderClick('BUY', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">
-                  <font-awesome-icon icon="arrow-up" class="me-2" />
-                </span>
+                <kbd v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-up" />
+                </kbd>
                 Buy CE
               </button>
               <button type="button"
@@ -333,9 +333,9 @@
               <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'CALL')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">
-                  <font-awesome-icon icon="arrow-left" class="me-2" />
-                </span>
+                <kbd v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-left" />
+                </kbd>
                 Sell CE
               </button>
               <button type="button"
@@ -358,19 +358,19 @@
               <div class="col-6 col-md-12 col-lg-12">
                 <button v-if="selectedShoonyaPositionsSet.size === 0 && selectedFlattradePositionsSet.size === 0"
                   class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10" @click="closeAllPositions">
-                  <span v-if="enableHotKeys">F6 / </span>
+                  <kbd v-if="enableHotKeys">F6</kbd>
                   Close All
                 </button>
                 <button v-if="selectedShoonyaPositionsSet.size > 0 || selectedFlattradePositionsSet.size > 0"
                   class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10" @click="closeSelectedPositions">
-                  <span v-if="enableHotKeys">F6 / </span>
+                  <kbd v-if="enableHotKeys">F6</kbd>
                   Close Selected
                 </button>
               </div>
               <div class="col-6 col-md-12 col-lg-12">
                 <button class="btn btn-sm btn-outline fs-6 col-12 col-md-11 col-lg-10 mt-md-2 mt-lg-2"
                   @click="cancelPendingOrders">
-                  <span v-if="enableHotKeys">F7 / </span>
+                  <kbd v-if="enableHotKeys">F7</kbd>
                   Cancel Orders
                 </button>
               </div>
@@ -383,9 +383,9 @@
                 @click="handleOrderClick('BUY', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">
-                  <font-awesome-icon icon="arrow-down" class="me-2" />
-                </span>
+                <kbd v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-down" />
+                </kbd>
                 Buy PE
               </button>
               <button type="button"
@@ -404,9 +404,9 @@
               <button type="button" class="btn btn-sm btn-danger fs-6 w-75" @click="handleOrderClick('SELL', 'PUT')"
                 :data-bs-toggle="selectedOrderType === orderTypes[1] ? 'modal' : null"
                 :data-bs-target="selectedOrderType === orderTypes[1] ? '#PlaceLimitOrderWindow' : null">
-                <span v-if="enableHotKeys">
-                  <font-awesome-icon icon="arrow-right" class="me-2" />
-                </span>
+                <kbd v-if="enableHotKeys">
+                  <font-awesome-icon icon="arrow-right" />
+                </kbd>
                 Sell PE
               </button>
               <button type="button"
