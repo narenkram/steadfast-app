@@ -713,12 +713,14 @@ import {
 // WebSocket Composables
 import { connectWebSocket } from '@/composables/useWebSocket'
 
+// App Settings Composables
+import { setDefaultExpiry } from '@/composables/useAppSettings'
+
 const {
   // Methods
   setActiveTab,
   updateExchangeSymbols,
   setDefaultExchangeAndMasterSymbol,
-  setDefaultExpiry,
   setActiveFetchFunctionAndFetch,
   validateAndPlaceOrder,
   handleOrderTypeChange,

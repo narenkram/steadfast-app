@@ -157,6 +157,8 @@ import {
   subscribeToPositionLTPs
 } from '@/composables/useWebSocket'
 
+import { setDefaultExpiry } from '@/composables/useAppSettings'
+
 export function useTradeView() {
   const isFormDisabled = computed(() => killSwitchActive.value)
 
@@ -717,16 +719,6 @@ export function useTradeView() {
     }
     return 0
   }
-  const setDefaultExpiry = () => {
-    if (expiryDates.value.length > 0) {
-      const offsetIndex = parseInt(expiryOffset.value)
-      const selectedIndex = Math.min(offsetIndex, expiryDates.value.length - 1)
-      selectedExpiry.value = expiryDates.value[selectedIndex]
-    }
-  }
-  const saveExpiryOffset = () => {
-    localStorage.setItem('expiryOffset', expiryOffset.value)
-  }
 
   // WebSocket
   const updateSubscriptions = () => {
@@ -1074,10 +1066,6 @@ export function useTradeView() {
   watch(selectedExpiry, (newExpiry) => {
     updateStrikesForExpiry(newExpiry, true)
   })
-  watch(expiryOffset, (newValue) => {
-    saveExpiryOffset()
-    setDefaultExpiry()
-  })
   // Watch for changes to showOHLCValues and save to localStorage
   watch(showOHLCValues, (newValue) => {
     localStorage.setItem('showOHLCValues', JSON.stringify(newValue))
@@ -1211,9 +1199,7 @@ export function useTradeView() {
     setActiveTab,
     updateExchangeSymbols,
     setDefaultExchangeAndMasterSymbol,
-    setDefaultExpiry,
     saveUserChoice,
-    saveExpiryOffset,
     calculateUnrealizedProfit,
     getProductTypeValue,
     updateSubscriptions,

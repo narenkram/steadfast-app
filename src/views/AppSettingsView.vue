@@ -252,7 +252,7 @@
 
 <script setup>
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue'
-import { useAppSettings } from '@/composables/useAppSettings'
+import { toggleLTPRangeBar, toggleOHLCValues, toggleStrikeDetails, toggleStickyMTM, toggleNotificationSound, toggleOvertradeProtection, saveOffsets, saveExpiryOffset } from '@/composables/useAppSettings'
 
 // Import global state
 import {
@@ -283,13 +283,4 @@ import {
   riskAction,
   targetAction
 } from '@/stores/globalStore'
-
-const {
-  toggleLTPRangeBar,
-  toggleOHLCValues,
-  toggleStrikeDetails,
-  toggleStickyMTM,
-  saveOffsets,
-  toggleOvertradeProtection,
-} = useAppSettings()
 </script>
