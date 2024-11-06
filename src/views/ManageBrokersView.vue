@@ -26,7 +26,6 @@ import {
   supportedBrokers  // Add this import
 } from '@/stores/globalStore';
 
-import { useTradeView } from '@/composables/useTradeView';
 import { deleteBroker } from '@/composables/useBrokerFunctions';
 
 // Global State
@@ -41,11 +40,10 @@ const {
   handleShoonyaLogin // Shoonya Token Generation
 } = useManageBroker()
 
-const {
-  // Methods only - remove the reactive variables
+import {
   copyToClipboard,
   getStatus,
-} = useTradeView();
+} from '@/composables/useTradeView'
 
 onMounted(() => {
   // Populate brokerDetails from localStorage

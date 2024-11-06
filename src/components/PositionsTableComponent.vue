@@ -233,7 +233,7 @@
 </template>
 
 <script setup>
-import { useTradeView } from '@/composables/useTradeView';
+import { positionsWithCalculatedProfit } from '@/composables/useTradeView';
 import { computed, watch } from 'vue';
 
 const props = defineProps({
@@ -263,9 +263,6 @@ const emit = defineEmits([
     'decrease-target',
 ]);
 
-const {
-    positionsWithCalculatedProfit,
-} = useTradeView();
 
 // Formatters
 import { formatTradingSymbol } from '@/composables/useFormatters';

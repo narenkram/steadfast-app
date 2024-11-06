@@ -88,7 +88,7 @@
                   {{ displayType }}
                 </option>
               </select>
-              <span class="input-group-text flex-shrink w-25 p-0 ps-2" v-if="isOffsetOrderType">
+              <span class="input-group-text flex-shrink w-25 p-0 ps-2">
                 <input type="number" id="LimitOffset" class="form-control form-control-sm border-0 p-1" min="-9" max="9"
                   v-model="limitOffset" @input="handleOrderTypeChange" :class="{ 'disabled-form': isFormDisabled }" />
               </span>
@@ -635,7 +635,6 @@
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
 import AppNavigationComponent from '@/components/AppNavigationComponent.vue';
-import { useTradeView } from '@/composables/useTradeView';
 import BrokerComponent from '@/components/BrokerComponent.vue';
 import { checkAllTokens } from '@/composables/useBrokerTokenValidator';
 import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
@@ -714,9 +713,9 @@ import {
 import { connectWebSocket } from '@/composables/useWebSocket'
 
 // App Settings Composables
-import { setDefaultExpiry } from '@/composables/useAppSettings'
+import { setDefaultExpiry, riskReached, targetReached } from '@/composables/useAppSettings'
 
-const {
+import {
   // Methods
   setActiveTab,
   updateExchangeSymbols,
@@ -741,12 +740,9 @@ const {
   totalProfit,
   totalBuyValue,
   totalSellValue,
-  riskReached,
-  targetReached,
   ltpRangeWidth,
   netPnl,
   totalCapitalPercentage,
-  isOffsetOrderType,
   isValidLimitPrice,
   limitPriceErrorMessage,
   callLtpRangeWidth,
@@ -755,7 +751,7 @@ const {
   putLtpRangeWidth,
   putOpenMarkerPosition,
 
-} = useTradeView();
+} from '@/composables/useTradeView'
 
 let timer;
 let positionCheckInterval;
