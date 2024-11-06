@@ -233,7 +233,7 @@
 </template>
 
 <script setup>
-import { positionsWithCalculatedProfit } from '@/composables/useTradeView';
+import { positionsWithCalculatedProfit } from '@/composables/usePnlCalculations';
 import { computed, watch } from 'vue';
 
 const props = defineProps({

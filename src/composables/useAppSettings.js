@@ -28,6 +28,9 @@ import {
 // Trade Configuration Composables
 import { updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
 
+// PnL Calculations Composables
+import { totalCapitalPercentage } from '@/composables/usePnlCalculations'
+
 // UI Settings
 export const toggleLTPRangeBar = () => {
   showLTPRangeBar.value = !showLTPRangeBar.value

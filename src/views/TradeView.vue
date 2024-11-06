@@ -734,17 +734,9 @@ import {
   todayExpirySymbol,
   maxLots,
   combinedOrdersAndTrades,
-  availableBalance,
-  usedAmount,
-  totalNetQty,
-  totalProfit,
-  totalBuyValue,
-  totalSellValue,
-  ltpRangeWidth,
-  netPnl,
-  totalCapitalPercentage,
   isValidLimitPrice,
   limitPriceErrorMessage,
+  ltpRangeWidth,
   callLtpRangeWidth,
   callOpenMarkerPosition,
   openMarkerPosition,
@@ -752,6 +744,15 @@ import {
   putOpenMarkerPosition,
 
 } from '@/composables/useTradeView'
+
+// PnL Calculations Composables
+import {
+  netPnl, availableBalance, totalProfit, usedAmount,
+  totalNetQty,
+  totalBuyValue,
+  totalSellValue,
+  totalCapitalPercentage,
+} from '@/composables/usePnlCalculations'
 
 let timer;
 let positionCheckInterval;
