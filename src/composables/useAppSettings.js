@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import {
   showLTPRangeBar,
   showOHLCValues,
@@ -119,3 +119,47 @@ watch(
     )
   }
 )
+
+export const riskReached = computed(() => {
+  if (totalRiskTargetToggle.value) {
+    if (totalRiskTargetType.value === 'amount' && totalRiskAmount.value > 0) {
+      return totalProfit.value <= -totalRiskAmount.value
+    } else if (totalRiskTargetType.value === 'percentage' && totalRiskPercentage.value > 0) {
+      return totalCapitalPercentage.value <= -totalRiskPercentage.value
+    }
+  }
+  return false
+})
+export const targetReached = computed(() => {
+  if (totalRiskTargetToggle.value) {
+    if (totalRiskTargetType.value === 'amount' && totalTargetAmount.value > 0) {
+      return totalProfit.value >= totalTargetAmount.value
+    } else if (totalRiskTargetType.value === 'percentage' && totalTargetPercentage.value > 0) {
+      return totalCapitalPercentage.value >= totalTargetPercentage.value
+    }
+  }
+  return false
+})
+
+watch(riskReached, async (newValue) => {
+  if (newValue && closePositionsRisk.value) {
+    console.log('Risk threshold reached. Taking action.')
+    if (riskAction.value === 'close') {
+      await closeAllPositions()
+      showToastNotification('All positions closed due to risk threshold')
+    } else if (riskAction.value === 'killSwitch') {
+      await toggleKillSwitch()
+    }
+  }
+})
+watch(targetReached, async (newValue) => {
+  if (newValue && closePositionsTarget.value) {
+    console.log('Target reached. Taking action.')
+    if (targetAction.value === 'close') {
+      await closeAllPositions()
+      showToastNotification('All positions closed due to target reached')
+    } else if (targetAction.value === 'killSwitch') {
+      await toggleKillSwitch()
+    }
+  }
+})
