@@ -776,9 +776,6 @@ export function useTradeView() {
   }
 
   const debouncedUpdateSubscriptions = debounce(updateSubscriptions, 300)
-  const initializeSubscriptions = () => {
-    subscribeToMasterSymbol()
-  }
 
   const showToastNotification = (message) => {
     toastMessage.value = message
