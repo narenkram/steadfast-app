@@ -96,7 +96,7 @@ export const positionsWithCalculatedProfit = computed(() => {
 })
 export const totalCapitalPercentage = computed(() => {
   const totalMoney = Number(availableBalance.value) + Number(usedAmount.value)
-  return totalMoney ? (Number(totalProfit.value) / totalMoney) * 100 : 0
+  return totalMoney ? (Number(netPnl.value) / totalMoney) * 100 : 0
 })
 export const totalBrokerage = computed(() => {
   let total = 0
