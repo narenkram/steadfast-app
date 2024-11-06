@@ -1,21 +1,14 @@
 import { ref, watch } from 'vue'
 import {
-  // UI Settings
   showLTPRangeBar,
   showOHLCValues,
   showStrikeDetails,
   stickyMTM,
-
-  // Trading Settings
   callStrikeOffset,
   putStrikeOffset,
   expiryOffset,
   overtradeProtection,
-
-  // Notification Settings
   notificationSound,
-
-  // Risk Management Settings
   totalRiskTargetToggle,
   totalRiskTargetType,
   totalRiskAmount,
@@ -26,11 +19,13 @@ import {
   closePositionsTarget,
   riskAction,
   targetAction,
-
-  // Toast
   toastMessage,
-  showToast
+  showToast,
+  selectedExpiry
 } from '@/stores/globalStore'
+
+// Trade Configuration Composables
+import { updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
 
 export function useAppSettings() {
   // UI Settings
@@ -61,11 +56,15 @@ export function useAppSettings() {
     localStorage.setItem('expiryOffset', expiryOffset.value)
   }
 
+  watch([callStrikeOffset, putStrikeOffset], () => {
+    saveOffsets()
+    updateStrikesForExpiry(selectedExpiry.value, true)
+  })
+
   const toggleOvertradeProtection = () => {
     overtradeProtection.value = !overtradeProtection.value
     localStorage.setItem('OvertradeProtection', overtradeProtection.value.toString())
   }
-
 
   // Notification Settings
   const toggleNotificationSound = () => {

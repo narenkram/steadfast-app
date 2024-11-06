@@ -652,11 +652,6 @@ export function useTradeView() {
     localStorage.setItem('selectedMasterSymbol', selectedMasterSymbol.value)
   }
 
-  const saveOffsets = () => {
-    localStorage.setItem('callStrikeOffset', callStrikeOffset.value)
-    localStorage.setItem('putStrikeOffset', putStrikeOffset.value)
-  }
-
   const setOrderDetails = (transactionType, optionType) => {
     modalTransactionType.value = getTransactionType(transactionType) // Use getTransactionType to set modalTransactionType
     modalOptionType.value = optionType
@@ -1076,10 +1071,6 @@ export function useTradeView() {
     },
     { deep: true }
   )
-  watch([callStrikeOffset, putStrikeOffset], () => {
-    saveOffsets()
-    updateStrikesForExpiry(selectedExpiry.value, true)
-  })
   watch(selectedExpiry, (newExpiry) => {
     updateStrikesForExpiry(newExpiry, true)
   })
@@ -1222,7 +1213,6 @@ export function useTradeView() {
     setDefaultExchangeAndMasterSymbol,
     setDefaultExpiry,
     saveUserChoice,
-    saveOffsets,
     saveExpiryOffset,
     calculateUnrealizedProfit,
     getProductTypeValue,
