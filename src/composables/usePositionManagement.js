@@ -27,6 +27,9 @@ import { getExchangeSegment } from '@/composables/useTradeConfiguration'
 // Real Time LTP Data Composables
 import { subscribeToLTP } from '@/composables/useMarketData'
 
+// WebSocket Composables
+import { subscribeToOptions, subscribeToPositionLTPs } from '@/composables/useWebSocket'
+
 export const updateFundLimits = async () => {
   await fetchFundLimit()
   // console.log('Updated Fund Limits:', fundLimits.value);
@@ -281,63 +284,6 @@ export const updateOrdersAndPositions = async () => {
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
     await Promise.all([fetchShoonyaOrdersTradesBook(), fetchShoonyaPositions()])
   }
-}
-
-export const subscribeToPositionLTPs = () => {
-  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
-      .map(([tsym, token]) => {
-        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
-          (p) => p.tsym === tsym
-        )
-
-        if (!position) {
-          // console.warn(`No position found for tsym: ${tsym}`);
-          return null
-        }
-
-        const exchange = position.exch || position.exchangeSegment
-        return `${exchange}|${token}`
-      })
-      .filter(Boolean)
-
-    if (symbolsToSubscribe.length > 0) {
-      const data = {
-        action: 'subscribe',
-        symbols: symbolsToSubscribe
-      }
-      // console.log('Sending position LTPs subscribe data:', data);
-      socket.value.send(JSON.stringify(data))
-    }
-  }
-}
-
-export const subscribeToOptions = () => {
-  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    const symbolsToSubscribe = []
-    const exchangeSegment = getExchangeSegment()
-
-    // Add subscriptions for both Call and Put options
-    if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A') {
-      symbolsToSubscribe.push(`${exchangeSegment}|${defaultCallSecurityId.value}`)
-      currentSubscriptions.value.callOption = defaultCallSecurityId.value
-    }
-    if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A') {
-      symbolsToSubscribe.push(`${exchangeSegment}|${defaultPutSecurityId.value}`)
-      currentSubscriptions.value.putOption = defaultPutSecurityId.value
-    }
-
-    if (symbolsToSubscribe.length > 0) {
-      const data = {
-        action: 'subscribe',
-        symbols: symbolsToSubscribe
-      }
-      socket.value.send(JSON.stringify(data))
-    }
-  }
-
-  // Subscribe to position LTPs separately
-  subscribeToPositionLTPs()
 }
 
 export const findNewPosition = (tradingSymbol) => {

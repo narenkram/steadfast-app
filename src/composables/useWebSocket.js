@@ -30,12 +30,15 @@ import {
   putOpenPrice,
   putHighPrice,
   putLowPrice,
-  putClosePrice
+  putClosePrice,
+  flatTradePositionBook,
+  shoonyaPositionBook
 } from '@/stores/globalStore'
 
 import { brokerStatus } from '@/composables/useBrokerFunctions'
 
-import { subscribeToOptions } from '@/composables/usePositionManagement'
+// Trade Configuration Composables
+import { getExchangeSegment } from '@/composables/useTradeConfiguration'
 
 export const isWebSocketReady = () => {
   return socket.value && socket.value.readyState === WebSocket.OPEN
@@ -301,6 +304,33 @@ export const subscribeToMasterSymbol = () => {
     }
   }
 }
+export const subscribeToOptions = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = []
+    const exchangeSegment = getExchangeSegment()
+
+    // Add subscriptions for both Call and Put options
+    if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A') {
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultCallSecurityId.value}`)
+      currentSubscriptions.value.callOption = defaultCallSecurityId.value
+    }
+    if (defaultPutSecurityId.value && defaultPutSecurityId.value !== 'N/A') {
+      symbolsToSubscribe.push(`${exchangeSegment}|${defaultPutSecurityId.value}`)
+      currentSubscriptions.value.putOption = defaultPutSecurityId.value
+    }
+
+    if (symbolsToSubscribe.length > 0) {
+      const data = {
+        action: 'subscribe',
+        symbols: symbolsToSubscribe
+      }
+      socket.value.send(JSON.stringify(data))
+    }
+  }
+
+  // Subscribe to position LTPs separately
+  subscribeToPositionLTPs()
+}
 
 export const unsubscribeFromSymbols = (symbols) => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN && symbols.length > 0) {
@@ -310,5 +340,34 @@ export const unsubscribeFromSymbols = (symbols) => {
     }
     // console.log('Sending unsubscribe data:', data);
     socket.value.send(JSON.stringify(data))
+  }
+}
+
+export const subscribeToPositionLTPs = () => {
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    const symbolsToSubscribe = Object.entries(positionSecurityIds.value)
+      .map(([tsym, token]) => {
+        const position = [...flatTradePositionBook.value, ...shoonyaPositionBook.value].find(
+          (p) => p.tsym === tsym
+        )
+
+        if (!position) {
+          // console.warn(`No position found for tsym: ${tsym}`);
+          return null
+        }
+
+        const exchange = position.exch || position.exchangeSegment
+        return `${exchange}|${token}`
+      })
+      .filter(Boolean)
+
+    if (symbolsToSubscribe.length > 0) {
+      const data = {
+        action: 'subscribe',
+        symbols: symbolsToSubscribe
+      }
+      // console.log('Sending position LTPs subscribe data:', data);
+      socket.value.send(JSON.stringify(data))
+    }
   }
 }

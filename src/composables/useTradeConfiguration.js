@@ -26,8 +26,8 @@ import {
   putStrikeOffset
 } from '@/stores/globalStore'
 
-// Trade Configuration Composables
-import { subscribeToOptions } from '@/composables/usePositionManagement'
+// WebSocket Composables
+import { subscribeToOptions } from '@/composables/useWebSocket'
 
 export const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {

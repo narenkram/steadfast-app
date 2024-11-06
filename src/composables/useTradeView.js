@@ -135,8 +135,6 @@ import {
   fetchFlattradePositions,
   fetchShoonyaPositions,
   updatePositionSecurityIds,
-  subscribeToPositionLTPs,
-  subscribeToOptions,
   updateFundLimits,
   fetchFundLimit
 } from '@/composables/usePositionManagement'
@@ -152,7 +150,12 @@ import {
 } from '@/composables/useMarketData'
 
 // WebSocket Composables
-import { subscribeToMasterSymbol, unsubscribeFromSymbols } from '@/composables/useWebSocket'
+import {
+  subscribeToMasterSymbol,
+  subscribeToOptions,
+  unsubscribeFromSymbols,
+  subscribeToPositionLTPs
+} from '@/composables/useWebSocket'
 
 export function useTradeView() {
   const isFormDisabled = computed(() => killSwitchActive.value)
