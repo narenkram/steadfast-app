@@ -509,8 +509,7 @@
           <div class="TabContent bg-color">
             <OrdersNTradesComponent v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook' ||
               activeFetchFunction === 'fetchShoonyaOrdersTradesBook'"
-              :combinedOrdersAndTrades="combinedOrdersAndTrades" :selectedBroker="selectedBroker"
-              :formatTime="formatTime" />
+              :combinedOrdersAndTrades="combinedOrdersAndTrades" :selectedBroker="selectedBroker" />
           </div>
 
           <p class="text-secondary my-2">
@@ -724,7 +723,6 @@ const {
   validateAndPlaceOrder,
   handleOrderTypeChange,
   handleOrderClick,
-  formatTime,
   setOrderDetails,
   updateTradingSymbol,
   resetOrderTypeIfNeeded,

@@ -129,3 +129,18 @@ export const formatDate = (dateString) => {
   }
   return dateString
 }
+
+// Time Formatter
+export const formatTime = (timeString) => {
+  if (!timeString) return ''
+
+  const [time] = timeString.split(' ')
+  const [hours, minutes, seconds] = time.split(':')
+
+  let formattedHours = parseInt(hours, 10)
+  const ampm = formattedHours >= 12 ? 'PM' : 'AM'
+  formattedHours = formattedHours % 12 || 12
+
+  const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`
+  return `${formattedTime}`
+}

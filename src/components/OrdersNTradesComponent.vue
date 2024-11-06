@@ -146,7 +146,7 @@
 import { defineProps } from 'vue';
 
 // Formatters
-import { formatTradingSymbol } from '@/composables/useFormatters';
+import { formatTradingSymbol, formatTime } from '@/composables/useFormatters';
 
 const props = defineProps({
     combinedOrdersAndTrades: {
@@ -155,10 +155,6 @@ const props = defineProps({
     },
     selectedBroker: {
         type: Object,
-        required: true,
-    },
-    formatTime: {
-        type: Function,
         required: true,
     },
 });

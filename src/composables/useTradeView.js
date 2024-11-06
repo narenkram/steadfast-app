@@ -657,20 +657,6 @@ export function useTradeView() {
     localStorage.setItem('putStrikeOffset', putStrikeOffset.value)
   }
 
-  const formatTime = (timeString) => {
-    if (!timeString) return ''
-
-    const [time] = timeString.split(' ')
-    const [hours, minutes, seconds] = time.split(':')
-
-    let formattedHours = parseInt(hours, 10)
-    const ampm = formattedHours >= 12 ? 'PM' : 'AM'
-    formattedHours = formattedHours % 12 || 12
-
-    const formattedTime = `${formattedHours}:${minutes}:${seconds} ${ampm}`
-    return `${formattedTime}`
-  }
-
   const setOrderDetails = (transactionType, optionType) => {
     modalTransactionType.value = getTransactionType(transactionType) // Use getTransactionType to set modalTransactionType
     modalOptionType.value = optionType
@@ -1251,7 +1237,6 @@ export function useTradeView() {
     handleOrderTypeChange,
     getCurrentLTP,
     handleOrderClick,
-    formatTime,
     setOrderDetails,
     updateTradingSymbol,
     resetOrderTypeIfNeeded,
