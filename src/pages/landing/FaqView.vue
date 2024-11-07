@@ -30,33 +30,12 @@
                 </div>
             </div>
         </section>
-
-        <!-- Steadfast AI Assistant -->
-        <div class="col-lg-8 mx-auto mt-5 text-center">
-            <button data-bs-toggle="modal" data-bs-target="#SteadfastAIAssistantModal" class="btn btn-purple btn-lg">
-                <font-awesome-icon :icon="['fas', 'hat-wizard']" class="me-2 sparkle-icon" />
-                Ask Steadfast AI Assistant
-            </button>
-        </div>
-    </div>
-
-    <!-- Steadfast AI Assistant Modal -->
-    <div class="modal fade" id="SteadfastAIAssistantModal" tabindex="-1"
-        aria-labelledby="SteadfastAIAssistantModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-body p-0">
-                    <ChatAIComponent />
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
-import ChatAIComponent from '@/components/ChatAIComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const faqs = ref([
