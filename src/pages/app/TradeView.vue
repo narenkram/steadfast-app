@@ -88,10 +88,6 @@
                   {{ displayType }}
                 </option>
               </select>
-              <span class="input-group-text flex-shrink w-25 p-0 ps-2">
-                <input type="number" id="LimitOffset" class="form-control form-control-sm border-0 p-1" min="-9" max="9"
-                  v-model="limitOffset" @input="handleOrderTypeChange" :class="{ 'disabled-form': isFormDisabled }" />
-              </span>
             </div>
           </div>
 
@@ -646,7 +642,6 @@ import {
   showLTPRangeBar,
   showOHLCValues,
   showStrikeDetails,
-  limitOffset,
   stickyMTM,
   activeTab,
   expiryDates,

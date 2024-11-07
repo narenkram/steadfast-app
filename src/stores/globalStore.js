@@ -114,7 +114,6 @@ export const closePositionsTarget = ref(
 export const riskAction = ref(localStorage.getItem('riskAction') || 'close')
 export const targetAction = ref(localStorage.getItem('targetAction') || 'close')
 
-export const limitOffset = ref(0)
 export const stoplosses = useLocalStorage('stoplosses', {})
 export const targets = useLocalStorage('targets', {})
 export const trailingStoplosses = useLocalStorage('trailingStoplosses', {})
