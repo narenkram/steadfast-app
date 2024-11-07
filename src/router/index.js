@@ -1,19 +1,30 @@
+// Vue Router
 import { createRouter, createWebHistory } from 'vue-router'
+
+// Firebase Authentication
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+
+// App Views
 import TradeView from '@/pages/app/TradeView.vue'
 import ManageBrokers from '@/pages/app/ManageBrokersView.vue'
 import AddBroker from '@/pages/app/AddBrokerView.vue'
-import Flattrade_Redirect from '@/pages/BrokerRedirect/Flattrade_Redirect.vue'
-import HomeView from '@/pages/landing/HomeView.vue'
 import AppSettingsView from '@/pages/app/AppSettingsView.vue'
 import ParallelCopyTradeView from '@/pages/app/ParallelCopyTradeView.vue'
+
+// Landing Pages
+import HomeView from '@/pages/landing/HomeView.vue'
 import PricingView from '@/pages/landing/PricingView.vue'
 import LoginView from '@/pages/landing/LoginView.vue'
+import SignUpView from '@/pages/landing/SignUpView.vue'
 import AboutView from '@/pages/landing/AboutView.vue'
 import ContactView from '@/pages/landing/ContactView.vue'
 import FaqView from '@/pages/landing/FaqView.vue'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import SignUpView from '@/pages/landing/SignUpView.vue'
+
+// Account Management
 import DashboardView from '@/pages/account/DashboardView.vue'
+
+// Broker Integration
+import Flattrade_Redirect from '@/pages/BrokerRedirect/Flattrade_Redirect.vue'
 
 const isLocalhost = () => {
   return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
