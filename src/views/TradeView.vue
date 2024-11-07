@@ -432,11 +432,6 @@
     :totalNetQty="totalNetQty" :netPnl="netPnl" :riskReached="riskReached" :targetReached="targetReached"
     :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime" />
 
-  <!-- Trading Status Message -->
-  <TradingStatusMessageComponent :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime"
-    :riskReached="riskReached" :targetReached="targetReached" :activeFetchFunction="activeFetchFunction"
-    :flatTradePositionBook="flatTradePositionBook" :shoonyaPositionBook="shoonyaPositionBook" />
-
   <!-- Positions & Trades -->
   <section class="row py-3">
     <div class="col-12">
@@ -642,7 +637,6 @@ import PositionsTableComponent from '@/components/PositionsTableComponent.vue';
 import OrdersNTradesComponent from '@/components/OrdersNTradesComponent.vue';
 import LtpRangeBarComponent from '@/components/LtpRangeBarComponent.vue';
 import PnlComponent from '@/components/PnlComponent.vue';
-import TradingStatusMessageComponent from '@/components/TradingStatusMessageComponent.vue';
 
 // Global State
 import {
