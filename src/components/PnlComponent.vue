@@ -37,8 +37,10 @@
             <small class="text-muted">Kill Switch</small>
             <a :class="['ms-2', 'btn', 'btn-sm', killSwitchButtonClass]" @click="handleKillSwitchClick"
                 :data-bs-target="killSwitchActive ? '' : '#KillSwitchActivationConfirmationModal'"
-                :data-bs-toggle="killSwitchActive ? '' : 'modal'">
-                {{ killSwitchButtonText }} <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
+                :data-bs-toggle="killSwitchActive ? '' : 'modal'"
+                :title="killSwitchActive ? killSwitchRemainingTime : ''">
+                <span v-if="killSwitchActive">{{ currentClockEmoji }}</span>
+                <span>{{ killSwitchButtonText }}</span>
             </a>
         </div>
     </section>
@@ -59,7 +61,9 @@ const props = defineProps({
     netPnl: Number,
     currentClockEmoji: String,
     riskReached: Boolean,
-    targetReached: Boolean
+    targetReached: Boolean,
+    killSwitchRemainingTime: String,
+    killSwitchActive: Boolean
 });
 
 </script>
