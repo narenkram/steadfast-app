@@ -22,7 +22,7 @@
                             <td>
                                 {{ item.order.norenordno }}
                                 <br />
-                                {{ item.order.tsym }}
+                                {{ formatTradingSymbol(item.order.tsym) }}
                             </td>
                             <td>{{ item.order.qty }}</td>
                             <td>{{ item.order.prc }}</td>
@@ -76,7 +76,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Symbol:</span>
-                        <strong>{{ item.order.tsym }}</strong>
+                        <strong>{{ formatTradingSymbol(item.order.tsym) }}</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Quantity:</span>
