@@ -51,13 +51,15 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   }
   .nav-link {
     color: $white;
-    &.active-route {
-      color: $white;
-      background-color: $black;
-    }
-    &:hover {
-      color: $white;
-    }
+  }
+
+  .nav-link.active-route {
+    color: $white;
+    background-color: $black;
+  }
+
+  .nav-link:hover {
+    color: $white;
   }
   .bg-color {
     background-color: #202020 !important;
@@ -76,11 +78,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     border-color: $gray-100;
     color: $white;
     background-color: $gray-900;
-    &:hover {
-      background-color: $black;
-      color: $gray-400;
-      border-color: $gray-100;
-    }
+  }
+  .btn-outline:hover {
+    background-color: $black;
+    color: $gray-400;
+    border-color: $gray-100;
   }
   .navbar {
     background-color: rgba(22, 22, 22, 0.85);
@@ -128,21 +130,20 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 
   .dropdown-item {
     color: $white;
+  }
 
-    &:hover,
-    &:focus {
-      background-color: $gray-700;
-      color: $white;
-    }
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    background-color: $gray-700;
+    color: $white;
   }
 
   // Style for select arrow
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-
-    &:disabled {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    }
+  }
+  .form-select:disabled {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
   .table-responsive {
     background-color: #202020 !important;
@@ -150,19 +151,18 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 
   .table {
     color: $white;
-    thead {
-      color: $gray-400;
-    }
+  }
 
-    tbody {
-      tr {
-        background-color: #202020;
+  .table thead {
+    color: $gray-400;
+  }
 
-        &:hover {
-          background-color: $gray-700;
-        }
-      }
-    }
+  .table tbody tr {
+    background-color: #202020;
+  }
+
+  .table tbody tr:hover {
+    background-color: $gray-700;
   }
   .table > :not(caption) > * > * {
     color: $gray-300;
@@ -170,32 +170,28 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     box-shadow: inset 0 0 0 9999px #202020;
   }
 
-  .nav-tabs {
-    .nav-item {
-      .nav-link {
-        display: flex;
-        align-items: center;
-        color: $gray-400;
-        background-color: $black;
-        transition:
-          color 0.15s ease-in-out,
-          background-color 0.15s ease-in-out;
+  .nav-tabs .nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    color: $gray-400;
+    background-color: $black;
+    transition:
+      color 0.15s ease-in-out,
+      background-color 0.15s ease-in-out;
+  }
 
-        &.active-route {
-          color: $gray-100;
-          background-color: $gray-900;
-          border-color: $gray-700 $gray-700 $gray-900;
-        }
+  .nav-tabs .nav-item .nav-link.active-route {
+    color: $gray-100;
+    background-color: $gray-900;
+    border-color: $gray-700 $gray-700 $gray-900;
+  }
 
-        .nav-icon {
-          margin-right: 0.5rem;
-        }
+  .nav-tabs .nav-item .nav-link .nav-icon {
+    margin-right: 0.5rem;
+  }
 
-        .nav-text {
-          font-weight: 500;
-        }
-      }
-    }
+  .nav-tabs .nav-item .nav-link .nav-text {
+    font-weight: 500;
   }
   .navbar-toggler {
     border-color: $white;
@@ -223,10 +219,8 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     background-color: $gray-900;
     color: $white;
   }
-  .notification-message {
-    &.show-message {
-      color: $gray-400;
-    }
+  .notification-message.show-message {
+    color: $gray-400;
   }
 }
 
@@ -260,10 +254,10 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   }
   .nav-link {
     color: $black;
-    &.active-route {
-      color: $black;
-      background-color: $gray-200;
-    }
+  }
+  .nav-link.active-route {
+    color: $black;
+    background-color: $gray-200;
   }
   .bg-color {
     background-color: $gray-200 !important;
@@ -282,11 +276,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     border-color: $gray-900;
     color: $gray-900;
     background-color: $white;
-    &:hover {
-      border-color: $gray-900;
-      background-color: $gray-300;
-      color: $gray-900;
-    }
+  }
+  .btn-outline:hover {
+    border-color: $gray-900;
+    background-color: $gray-300;
+    color: $gray-900;
   }
   .navbar {
     background-color: rgb(255 255 255 / 85%);
@@ -334,21 +328,20 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 
   .dropdown-item {
     color: $black;
+  }
 
-    &:hover,
-    &:focus {
-      background-color: $gray-200;
-      color: $black;
-    }
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    background-color: $gray-200;
+    color: $black;
   }
 
   // Style for select arrow
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-
-    &:disabled {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    }
+  }
+  .form-select:disabled {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
   .table-responsive {
     background-color: $gray-200;
@@ -356,20 +349,18 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 
   .table {
     color: $black;
+  }
 
-    thead {
-      color: $gray-600;
-    }
+  .table thead {
+    color: $gray-600;
+  }
 
-    tbody {
-      tr {
-        background-color: $white;
+  .table tbody tr {
+    background-color: $white;
+  }
 
-        &:hover {
-          background-color: $gray-100;
-        }
-      }
-    }
+  .table tbody tr:hover {
+    background-color: $gray-100;
   }
   .table > :not(caption) > * > * {
     color: $gray-700;
@@ -377,32 +368,28 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     box-shadow: inset 0 0 0 9999px $white;
   }
 
-  .nav-tabs {
-    .nav-item {
-      .nav-link {
-        display: flex;
-        align-items: center;
-        background-color: transparent;
-        color: $gray-600;
-        transition:
-          color 0.15s ease-in-out,
-          background-color 0.15s ease-in-out;
+  .nav-tabs .nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    color: $gray-600;
+    transition:
+      color 0.15s ease-in-out,
+      background-color 0.15s ease-in-out;
+  }
 
-        &.active-route {
-          color: $gray-900;
-          background-color: $white;
-          border-color: $gray-300 $gray-300 $white;
-        }
+  .nav-tabs .nav-item .nav-link.active-route {
+    color: $gray-900;
+    background-color: $white;
+    border-color: $gray-300 $gray-300 $white;
+  }
 
-        .nav-icon {
-          margin-right: 0.5rem;
-        }
+  .nav-tabs .nav-item .nav-link .nav-icon {
+    margin-right: 0.5rem;
+  }
 
-        .nav-text {
-          font-weight: 500;
-        }
-      }
-    }
+  .nav-tabs .nav-item .nav-link .nav-text {
+    font-weight: 500;
   }
   .navbar-toggler {
     border-color: $black;
@@ -430,20 +417,17 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
     background-color: $gray-100;
     color: $black;
   }
-  .notification-message {
-    &.show-message {
-      color: $gray-900;
-    }
+  .notification-message.show-message {
+    color: $gray-900;
   }
 }
 
 // Styles that are common to both color schemes
 * {
   outline: none;
-
-  &:focus {
-    box-shadow: none !important;
-  }
+}
+*:focus {
+  box-shadow: none !important;
 }
 
 // Scrollbar styles
@@ -485,31 +469,30 @@ html {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   transition: all 0.3s ease;
+}
 
-  .nav-icon {
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-    transition:
-      transform 0.3s ease,
-      color 0.3s ease;
-    color: var(--icon-color, inherit);
-  }
+.nav-link .nav-icon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+  color: var(--icon-color, inherit);
+}
 
-  .nav-text {
-    font-size: 0.9rem;
-    font-weight: 600;
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
-  }
+.nav-link .nav-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
 
-  &:hover {
-    .nav-icon {
-      transform: scale(1.1) rotate(15deg);
-    }
-    .nav-text {
-      opacity: 1;
-    }
-  }
+.nav-link:hover .nav-icon {
+  transform: scale(1.1) rotate(15deg);
+}
+
+.nav-link:hover .nav-text {
+  opacity: 1;
 }
 
 .table thead th {
@@ -530,10 +513,9 @@ html {
   height: 40px;
   width: 40px;
   transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.1);
-  }
+}
+.Navigation__logo:hover {
+  transform: scale(1.1);
 }
 
 // Hover effect styles
@@ -541,31 +523,28 @@ html {
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
+}
+.hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 // Developer info styles
 .developer-info {
   border: 1px solid var(--bs-border-color);
   transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
+}
+.developer-info:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .developer-link {
   color: var(--bs-primary);
   transition: color 0.3s ease;
-
-  &:hover {
-    color: var(--bs-link-hover-color);
-  }
+}
+.developer-link:hover {
+  color: var(--bs-link-hover-color);
 }
 
 // Heart icon animation
@@ -587,12 +566,10 @@ html {
 // Card hover effect
 .card {
   scrollbar-gutter: unset;
-
   transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    transform: translateY(-10px);
-  }
+}
+.card:hover {
+  transform: translateY(-10px);
 }
 
 // MTM styles
@@ -617,10 +594,9 @@ html {
   margin: 0.5rem;
   scrollbar-width: none; /* For Firefox */
   -ms-overflow-style: none; /* For Internet Explorer and Edge */
-
-  &::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Opera */
-  }
+}
+.table-responsive::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
 }
 
 .table {
@@ -733,11 +709,11 @@ html {
   transition: all 0.3s ease;
   flex-shrink: 0;
   margin-right: 0.5rem;
+}
 
-  &.has-notification {
-    color: $warning;
-    animation: pulse 2s infinite;
-  }
+.notification-icon.has-notification {
+  color: $warning;
+  animation: pulse 2s infinite;
 }
 
 .notification-message {
