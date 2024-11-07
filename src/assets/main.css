@@ -1,160 +1,156 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Custom color variables
-$custom-colors: (
-  'primary': $primary,
-  'secondary': $secondary,
-  'success': $success,
-  'info': $info,
-  'warning': $warning,
-  'danger': $danger,
-  'light': $light,
-  'dark': $dark,
-  'purple': $purple
-);
-
-// Merge the maps
-$theme-colors: map-merge($theme-colors, $custom-colors);
-
-// Import the rest of Bootstrap
-@import 'bootstrap/scss/bootstrap';
-
-// Dark mode styles
+/* Dark mode styles */
 @media (prefers-color-scheme: dark) {
+
   html,
   body {
-    background-color: $gray-900;
-    color: $white;
+    background-color: var(--bs-gray-900);
+    color: var(--bs-white);
     background-image: linear-gradient(to right, rgba(128, 128, 128, 0.1) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
+
   ::-webkit-scrollbar-thumb {
-    background-color: $gray-600;
+    background-color: var(--bs-gray-600);
   }
+
   ::-webkit-scrollbar-thumb:hover {
-    background-color: $gray-400;
+    background-color: var(--bs-gray-400);
   }
+
   .text-color {
-    color: $white;
+    color: var(--bs-white);
   }
+
   .text-muted {
-    color: $gray-400 !important;
+    color: var(--bs-gray-400) !important;
   }
+
   .form-disabled-bg {
-    background-color: lighten($gray-900, 5%);
+    background-color: lighten(var(--bs-gray-900), 5%);
   }
+
   .form-disabled-color {
-    color: $gray-600;
+    color: var(--bs-gray-600);
   }
+
   .nav-link {
-    color: $white;
+    color: var(--bs-white);
   }
 
   .nav-link.active-route {
-    color: $white;
-    background-color: $black;
+    color: var(--bs-white);
+    background-color: var(--bs-black);
   }
 
   .nav-link:hover {
-    color: $white;
+    color: var(--bs-white);
   }
+
   .bg-color {
     background-color: #202020 !important;
   }
+
   .bg-color-2 {
-    background-color: $black;
+    background-color: var(--bs-black);
   }
+
   .card {
-    background-color: $gray-800;
-    color: $white;
+    background-color: var(--bs-gray-800);
+    color: var(--bs-white);
   }
+
   .notification-area {
-    background-color: $gray-900;
+    background-color: var(--bs-gray-900);
   }
+
   .btn-outline {
-    border-color: $gray-100;
-    color: $white;
-    background-color: $gray-900;
+    border-color: var(--bs-gray-100);
+    color: var(--bs-white);
+    background-color: var(--bs-gray-900);
   }
+
   .btn-outline:hover {
-    background-color: $black;
-    color: $gray-400;
-    border-color: $gray-100;
+    background-color: var(--bs-black);
+    color: var(--bs-gray-400);
+    border-color: var(--bs-gray-100);
   }
+
   .navbar {
     background-color: rgba(22, 22, 22, 0.85);
   }
 
-  // Form styles for dark mode
+  /* Form styles for dark mode */
   .form-select,
   .form-control,
   .input-group-text {
     background-color: #1f1f1f;
-    color: $white;
-    border-color: $gray-700;
+    color: var(--bs-white);
+    border-color: var(--bs-gray-700);
   }
 
   .form-select:focus,
   .form-control:focus {
-    background-color: $gray-700;
-    color: $white;
-    border-color: $primary;
+    background-color: var(--bs-gray-700);
+    color: var(--bs-white);
+    border-color: var(--bs-primary);
   }
 
-  // Add styles for disabled state
+  /* Add styles for disabled state */
   .form-select:disabled,
   .form-control:disabled,
   .form-select[readonly],
   .form-control[readonly] {
-    background-color: $gray-900;
-    color: $gray-600;
-    border-color: $gray-800;
+    background-color: var(--bs-gray-900);
+    color: var(--bs-gray-600);
+    border-color: var(--bs-gray-800);
   }
 
   .form-check-input {
-    background-color: $gray-700;
-    border-color: $gray-600;
+    background-color: var(--bs-gray-700);
+    border-color: var(--bs-gray-600);
   }
 
   .btn-group .btn {
-    border-color: $gray-700;
+    border-color: var(--bs-gray-700);
   }
 
   .dropdown-menu {
-    background-color: $gray-800;
-    border-color: $gray-700;
+    background-color: var(--bs-gray-800);
+    border-color: var(--bs-gray-700);
   }
 
   .dropdown-item {
-    color: $white;
+    color: var(--bs-white);
   }
 
   .dropdown-item:hover,
   .dropdown-item:focus {
-    background-color: $gray-700;
-    color: $white;
+    background-color: var(--bs-gray-700);
+    color: var(--bs-white);
   }
 
-  // Style for select arrow
+  /* Style for select arrow */
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
+
   .form-select:disabled {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
+
   .table-responsive {
     background-color: #202020 !important;
   }
 
   .table {
-    color: $white;
+    color: var(--bs-white);
   }
 
   .table thead {
-    color: $gray-400;
+    color: var(--bs-gray-400);
   }
 
   .table tbody tr {
@@ -162,10 +158,11 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   }
 
   .table tbody tr:hover {
-    background-color: $gray-700;
+    background-color: var(--bs-gray-700);
   }
-  .table > :not(caption) > * > * {
-    color: $gray-300;
+
+  .table> :not(caption)>*>* {
+    color: var(--bs-gray-300);
     background-color: #202020;
     box-shadow: inset 0 0 0 9999px #202020;
   }
@@ -173,17 +170,17 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .nav-tabs .nav-item .nav-link {
     display: flex;
     align-items: center;
-    color: $gray-400;
-    background-color: $black;
+    color: var(--bs-gray-400);
+    background-color: var(--bs-black);
     transition:
       color 0.15s ease-in-out,
       background-color 0.15s ease-in-out;
   }
 
   .nav-tabs .nav-item .nav-link.active-route {
-    color: $gray-100;
-    background-color: $gray-900;
-    border-color: $gray-700 $gray-700 $gray-900;
+    color: var(--bs-gray-100);
+    background-color: var(--bs-gray-900);
+    border-color: var(--bs-gray-700) var(--bs-gray-700) var(--bs-gray-900);
   }
 
   .nav-tabs .nav-item .nav-link .nav-icon {
@@ -193,195 +190,222 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .nav-tabs .nav-item .nav-link .nav-text {
     font-weight: 500;
   }
+
   .navbar-toggler {
-    border-color: $white;
+    border-color: var(--bs-white);
   }
+
   .list-group-item {
-    background-color: $gray-800;
-    color: $white;
+    background-color: var(--bs-gray-800);
+    color: var(--bs-white);
   }
+
   .accordion-item {
-    background-color: $gray-900;
-    color: $white;
+    background-color: var(--bs-gray-900);
+    color: var(--bs-white);
   }
+
   .accordion-button:not(.collapsed) {
-    background-color: $gray-700;
-    color: $white;
+    background-color: var(--bs-gray-700);
+    color: var(--bs-white);
   }
+
   .accordion-button {
-    background-color: $gray-800;
-    color: $white;
+    background-color: var(--bs-gray-800);
+    color: var(--bs-white);
   }
+
   .accordion-button:not(.collapsed)::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 0l.708.708a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-7-7a.5.5 0 0 1 0-.708l.708-.708z'/%3e%3c/svg%3e");
   }
+
   .modal-content {
-    background-color: $gray-900;
-    color: $white;
+    background-color: var(--bs-gray-900);
+    color: var(--bs-white);
   }
+
   .notification-message.show-message {
-    color: $gray-400;
+    color: var(--bs-gray-400);
   }
 }
 
-// Light mode styles
+/* Light mode styles */
 @media (prefers-color-scheme: light) {
+
   html,
   body {
-    background-color: $gray-100;
-    color: $black;
+    background-color: var(--bs-gray-100);
+    color: var(--bs-black);
     background-image: linear-gradient(to right, rgba(128, 128, 128, 0.1) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
+
   ::-webkit-scrollbar-thumb {
-    background-color: $gray-400;
+    background-color: var(--bs-gray-400);
   }
+
   ::-webkit-scrollbar-thumb:hover {
-    background-color: $gray-600;
+    background-color: var(--bs-gray-600);
   }
+
   .text-color {
-    color: $black;
+    color: var(--bs-black);
   }
+
   .text-muted {
-    color: $gray-600;
+    color: var(--bs-gray-600);
   }
+
   .form-disabled-bg {
-    background-color: $gray-200;
+    background-color: var(--bs-gray-200);
   }
+
   .form-disabled-color {
-    color: $gray-600;
+    color: var(--bs-gray-600);
   }
+
   .nav-link {
-    color: $black;
+    color: var(--bs-black);
   }
+
   .nav-link.active-route {
-    color: $black;
-    background-color: $gray-200;
+    color: var(--bs-black);
+    background-color: var(--bs-gray-200);
   }
+
   .bg-color {
-    background-color: $gray-200 !important;
+    background-color: var(--bs-gray-200) !important;
   }
+
   .bg-color-2 {
-    background-color: $white;
+    background-color: var(--bs-white);
   }
+
   .card {
-    background-color: $gray-100;
-    color: $black;
+    background-color: var(--bs-gray-100);
+    color: var(--bs-black);
   }
+
   .notification-area {
-    background-color: $gray-200;
+    background-color: var(--bs-gray-200);
   }
+
   .btn-outline {
-    border-color: $gray-900;
-    color: $gray-900;
-    background-color: $white;
+    border-color: var(--bs-gray-900);
+    color: var(--bs-gray-900);
+    background-color: var(--bs-white);
   }
+
   .btn-outline:hover {
-    border-color: $gray-900;
-    background-color: $gray-300;
-    color: $gray-900;
+    border-color: var(--bs-gray-900);
+    background-color: var(--bs-gray-300);
+    color: var(--bs-gray-900);
   }
+
   .navbar {
     background-color: rgb(255 255 255 / 85%);
   }
 
-  // Form styles for light mode
+  /* Form styles for light mode */
   .form-select,
   .form-control,
   .input-group-text {
-    background-color: $white;
-    color: $black;
-    border-color: $gray-300;
+    background-color: var(--bs-white);
+    color: var(--bs-black);
+    border-color: var(--bs-gray-300);
   }
 
   .form-select:focus,
   .form-control:focus {
-    background-color: $white;
-    color: $black;
-    border-color: $primary;
+    background-color: var(--bs-white);
+    color: var(--bs-black);
+    border-color: var(--bs-primary);
   }
 
-  // Add styles for disabled state
+  /* Add styles for disabled state */
   .form-select:disabled,
   .form-control:disabled,
   .form-select[readonly],
   .form-control[readonly] {
-    background-color: $gray-200;
-    color: $gray-600;
-    border-color: $gray-300;
+    background-color: var(--bs-gray-200);
+    color: var(--bs-gray-600);
+    border-color: var(--bs-gray-300);
   }
 
   .form-check-input {
-    background-color: $white;
-    border-color: $gray-400;
+    background-color: var(--bs-white);
+    border-color: var(--bs-gray-400);
   }
 
   .btn-group .btn {
-    border-color: $gray-300;
+    border-color: var(--bs-gray-300);
   }
 
   .dropdown-menu {
-    background-color: $white;
-    border-color: $gray-300;
+    background-color: var(--bs-white);
+    border-color: var(--bs-gray-300);
   }
 
   .dropdown-item {
-    color: $black;
+    color: var(--bs-black);
   }
 
   .dropdown-item:hover,
   .dropdown-item:focus {
-    background-color: $gray-200;
-    color: $black;
+    background-color: var(--bs-gray-200);
+    color: var(--bs-black);
   }
 
-  // Style for select arrow
+  /* Style for select arrow */
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
+
   .form-select:disabled {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   }
+
   .table-responsive {
-    background-color: $gray-200;
+    background-color: var(--bs-gray-200);
   }
 
   .table {
-    color: $black;
+    color: var(--bs-black);
   }
 
   .table thead {
-    color: $gray-600;
+    color: var(--bs-gray-600);
   }
 
   .table tbody tr {
-    background-color: $white;
+    background-color: var(--bs-white);
   }
 
   .table tbody tr:hover {
-    background-color: $gray-100;
+    background-color: var(--bs-gray-100);
   }
-  .table > :not(caption) > * > * {
-    color: $gray-700;
-    background-color: $white;
-    box-shadow: inset 0 0 0 9999px $white;
+
+  .table> :not(caption)>*>* {
+    color: var(--bs-gray-700);
+    background-color: var(--bs-white);
+    box-shadow: inset 0 0 0 9999px var(--bs-white);
   }
 
   .nav-tabs .nav-item .nav-link {
     display: flex;
     align-items: center;
     background-color: transparent;
-    color: $gray-600;
+    color: var(--bs-gray-600);
     transition:
       color 0.15s ease-in-out,
       background-color 0.15s ease-in-out;
   }
 
   .nav-tabs .nav-item .nav-link.active-route {
-    color: $gray-900;
-    background-color: $white;
-    border-color: $gray-300 $gray-300 $white;
+    color: var(--bs-gray-900);
+    background-color: var(--bs-white);
+    border-color: var(--bs-gray-300) var(--bs-gray-300) var(--bs-white);
   }
 
   .nav-tabs .nav-item .nav-link .nav-icon {
@@ -391,49 +415,59 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   .nav-tabs .nav-item .nav-link .nav-text {
     font-weight: 500;
   }
+
   .navbar-toggler {
-    border-color: $black;
+    border-color: var(--bs-black);
   }
+
   .list-group-item {
-    background-color: $white;
-    color: $black;
+    background-color: var(--bs-white);
+    color: var(--bs-black);
   }
+
   .accordion-item {
-    background-color: $white;
-    color: $black;
+    background-color: var(--bs-white);
+    color: var(--bs-black);
   }
+
   .accordion-button:not(.collapsed) {
-    background-color: $gray-100;
-    color: $black;
+    background-color: var(--bs-gray-100);
+    color: var(--bs-black);
   }
+
   .accordion-button {
-    background-color: $gray-100;
-    color: $black;
+    background-color: var(--bs-gray-100);
+    color: var(--bs-black);
   }
+
   .accordion-button:not(.collapsed)::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 0l.708.708a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-7-7a.5.5 0 0 1 0-.708l.708-.708z'/%3e%3c/svg%3e");
   }
+
   .modal-content {
-    background-color: $gray-100;
-    color: $black;
+    background-color: var(--bs-gray-100);
+    color: var(--bs-black);
   }
+
   .notification-message.show-message {
-    color: $gray-900;
+    color: var(--bs-gray-900);
   }
 }
 
-// Styles that are common to both color schemes
+/* Styles that are common to both color schemes */
 * {
   outline: none;
 }
+
 *:focus {
   box-shadow: none !important;
 }
 
-// Scrollbar styles
+/* Scrollbar styles */
 ::-webkit-scrollbar {
   scrollbar-width: thin;
 }
+
 ::-webkit-scrollbar-thumb {
   border-radius: 8px;
 }
@@ -500,8 +534,8 @@ html {
 }
 
 .form-check-input:checked {
-  background-color: $success;
-  border-color: $success;
+  background-color: var(--bs-success);
+  border-color: var(--bs-success);
 }
 
 .dropdown-menu {
@@ -514,26 +548,29 @@ html {
   width: 40px;
   transition: transform 0.3s ease;
 }
+
 .Navigation__logo:hover {
   transform: scale(1.1);
 }
 
-// Hover effect styles
+/* Hover effect styles */
 .hover-effect {
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
 }
+
 .hover-effect:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-// Developer info styles
+/* Developer info styles */
 .developer-info {
   border: 1px solid var(--bs-border-color);
   transition: all 0.3s ease;
 }
+
 .developer-info:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -543,36 +580,40 @@ html {
   color: var(--bs-primary);
   transition: color 0.3s ease;
 }
+
 .developer-link:hover {
   color: var(--bs-link-hover-color);
 }
 
-// Heart icon animation
+/* Heart icon animation */
 .heart-icon {
   display: inline-block;
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
 @keyframes heartbeat {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
 }
 
-// Card hover effect
+/* Card hover effect */
 .card {
   scrollbar-gutter: unset;
   transition: transform 0.3s ease-in-out;
 }
+
 .card:hover {
   transform: translateY(-10px);
 }
 
-// MTM styles
+/* MTM styles */
 .MTM {
   position: sticky;
   top: 0;
@@ -581,7 +622,7 @@ html {
   -webkit-backdrop-filter: blur(5px);
 }
 
-// TabContent styles
+/* TabContent styles */
 .TabContent {
   height: 500px;
   overflow: hidden;
@@ -592,11 +633,15 @@ html {
   height: 500px;
   overflow: scroll;
   margin: 0.5rem;
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  scrollbar-width: none;
+  /* For Firefox */
+  -ms-overflow-style: none;
+  /* For Internet Explorer and Edge */
 }
+
 .table-responsive::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Opera */
+  display: none;
+  /* For Chrome, Safari, and Opera */
 }
 
 .table {
@@ -607,7 +652,8 @@ html {
 .nav-tabs {
   border: none;
 }
-// Sparkle animation
+
+/* Sparkle animation */
 @keyframes sparkle {
   0% {
     transform: scale(1) rotate(0deg);
@@ -629,7 +675,7 @@ html {
   animation: sparkle 2s infinite;
 }
 
-// Styles for better visual appeal
+/* Styles for better visual appeal */
 .card,
 .btn,
 .form-control,
@@ -637,7 +683,7 @@ html {
   transition: all 0.3s ease;
 }
 
-// Chat container styles
+/* Chat container styles */
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -677,9 +723,11 @@ html {
   0% {
     opacity: 0.4;
   }
+
   20% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.4;
   }
@@ -692,7 +740,7 @@ html {
   margin-bottom: 10px;
 }
 
-// Navigation and Notification Area Styles
+/* Navigation and Notification Area Styles */
 .notification-area {
   border-radius: 20px;
   padding: 0.5rem 1rem;
@@ -705,19 +753,19 @@ html {
 
 .notification-icon {
   font-size: 1.2rem;
-  color: $gray-600;
+  color: var(--bs-gray-600);
   transition: all 0.3s ease;
   flex-shrink: 0;
   margin-right: 0.5rem;
 }
 
 .notification-icon.has-notification {
-  color: $warning;
+  color: var(--bs-warning);
   animation: pulse 2s infinite;
 }
 
 .notification-message {
-  color: $gray-600;
+  color: var(--bs-gray-600);
   transition: all 0.3s ease;
   flex-grow: 1;
   word-wrap: break-word;
@@ -730,19 +778,24 @@ html {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
 }
+
 .accordion-item {
   border: none;
 }
+
 .accordion-button:not(.collapsed) {
   box-shadow: none;
 }
+
 .ltp-range-bar {
   display: block;
   overflow: hidden;
@@ -756,6 +809,7 @@ html {
   margin: 0 10px;
   border-radius: 4px;
 }
+
 .ltp-range-fill {
   height: 100%;
   background-color: #adb5bd;
@@ -765,13 +819,14 @@ html {
 .ltp-range-marker {
   position: absolute;
   top: -4px;
-  width: 16px; // Changed from 0 to 16px
+  width: 16px;
   height: 16px;
-  transform: translateX(-50%); // Center the marker on its position
+  transform: translateX(-50%);
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-bottom: 8px solid var(--bs-secondary);
 }
+
 .ltp-range-open-marker {
   position: absolute;
   top: 50%;
@@ -779,48 +834,53 @@ html {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--bs-secondary); /* Orange color for open price */
+  background-color: var(--bs-secondary);
+  /* Orange color for open price */
   border: 2px solid #fff;
   z-index: 2;
 }
 
-// Placeholder styles
+/* Placeholder styles */
 .form-control::placeholder,
 .form-select::placeholder,
 .form-check-input::placeholder {
-  color: $gray-600;
+  color: var(--bs-gray-600);
   opacity: 1;
 }
 
-// For older browsers
+/* For older browsers */
 .form-control::-webkit-input-placeholder,
 .form-select::-webkit-input-placeholder,
 .form-check-input::-webkit-input-placeholder {
   /* Chrome/Opera/Safari */
-  color: $gray-600;
+  color: var(--bs-gray-600);
   opacity: 1;
 }
+
 .form-control::-moz-placeholder,
 .form-select::-moz-placeholder,
 .form-check-input::-moz-placeholder {
   /* Firefox 19+ */
-  color: $gray-600;
+  color: var(--bs-gray-600);
   opacity: 1;
 }
+
 .form-control:-ms-input-placeholder,
 .form-select:-ms-input-placeholder,
 .form-check-input:-ms-input-placeholder {
   /* IE 10+ */
-  color: $gray-600;
+  color: var(--bs-gray-600);
   opacity: 1;
 }
+
 .form-control:-moz-placeholder,
 .form-select:-moz-placeholder,
 .form-check-input:-moz-placeholder {
   /* Firefox 18- */
-  color: $gray-600;
+  color: var(--bs-gray-600);
   opacity: 1;
 }
+
 kbd {
   background-color: #eee;
   border-radius: 3px;
@@ -835,4 +895,17 @@ kbd {
   line-height: 1;
   padding: 2px 4px;
   white-space: nowrap;
+}
+
+.text-purple {
+  color: var(--bs-purple);
+}
+
+.btn-purple {
+  background-color: var(--bs-purple);
+  color: var(--bs-white);
+}
+
+.bg-purple {
+  background-color: var(--bs-purple);
 }
