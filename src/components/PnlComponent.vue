@@ -1,6 +1,10 @@
 <template>
-    <section class="row mt-3 mx-0 bg-color rounded justify-content-between align-items-center py-2"
-        :class="{ 'MTM': stickyMTM }">
+    <section class="row mt-3 mx-0 bg-color rounded justify-content-between align-items-center py-2" :class="{
+        'MTM': stickyMTM,
+        'border border-warning': riskReached,
+        'border border-success': targetReached,
+        'border border-danger': killSwitchActive
+    }">
         <div class="col-6 col-md-3 col-lg-3 d-flex align-items-center justify-content-center" style="height: 40px">
             <small class="text-muted">Total Capital</small>
             <span class="ms-1 fw-bold"
@@ -53,7 +57,9 @@ const props = defineProps({
     totalProfit: Number,
     totalNetQty: Number,
     netPnl: Number,
-    currentClockEmoji: String
+    currentClockEmoji: String,
+    riskReached: Boolean,
+    targetReached: Boolean
 });
 
 </script>

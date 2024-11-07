@@ -429,7 +429,8 @@
 
   <!-- Total Profit & Net PNL -->
   <PnlComponent :stickyMTM="stickyMTM" :totalCapitalPercentage="totalCapitalPercentage" :totalProfit="totalProfit"
-    :totalNetQty="totalNetQty" :netPnl="netPnl" />
+    :totalNetQty="totalNetQty" :netPnl="netPnl" :riskReached="riskReached" :targetReached="targetReached"
+    :killSwitchActive="killSwitchActive" />
 
   <!-- Trading Status Message -->
   <TradingStatusMessageComponent :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime"
