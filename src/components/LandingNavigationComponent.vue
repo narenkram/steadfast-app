@@ -1,5 +1,4 @@
 <template>
-    <SiteMessageComponent />
     <!-- steadfast-app/src/components/NavigationComponent.vue -->
     <section class="Navigation NormalNavigationComponent">
         <nav class="navbar navbar-expand-lg">
@@ -43,14 +42,12 @@
 
 <script>
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default defineComponent({
     name: "NormalNavigationComponent",
     components: {
-        SiteMessageComponent,
         FontAwesomeIcon
     },
     data() {

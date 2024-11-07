@@ -1,5 +1,4 @@
 <template>
-    <SiteMessageComponent />
     <section class="Navigation AppNavigationComponent">
         <nav class="navbar navbar-expand-lg shadow-sm mt-0 mb-3">
             <div class="container-fluid pt-0">
@@ -44,7 +43,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@/font-awesome';
-import SiteMessageComponent from '@/components/SiteMessageComponent.vue';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import NotificationComponent from './NotificationComponent.vue'
