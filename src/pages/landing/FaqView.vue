@@ -55,7 +55,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 import ChatAIComponent from '@/components/ChatAIComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 

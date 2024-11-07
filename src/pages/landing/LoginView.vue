@@ -52,7 +52,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 import { FontAwesomeIcon } from '@/font-awesome';
 

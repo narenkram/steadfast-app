@@ -45,7 +45,7 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 onMounted(() => {

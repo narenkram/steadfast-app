@@ -60,7 +60,7 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 
 onMounted(() => {
     // Any necessary mounted logic

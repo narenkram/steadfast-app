@@ -81,7 +81,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 
 const features = [
     {

@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import NormalNavigationComponent from '@/components/NormalNavigationComponent.vue';
+import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier, updateProfile } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@/font-awesome';
