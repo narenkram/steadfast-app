@@ -118,6 +118,7 @@
               </div>
               <input type="number" class="form-control form-control-sm" id="stoplossValue"
                 aria-label="Predefined Stoploss (points)" v-model="stoplossValue"
+                @wheel.prevent="(e) => handleFormInputMouseScroll(e, { type: 'stoploss' })"
                 :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">Points</span>
             </div>
@@ -134,6 +135,7 @@
               </div>
               <input type="number" class="form-control form-control-sm" id="targetValue"
                 aria-label="Predefined Target (points)" v-model="targetValue"
+                @wheel.prevent="(e) => handleFormInputMouseScroll(e, { type: 'target' })"
                 :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">Points</span>
             </div>

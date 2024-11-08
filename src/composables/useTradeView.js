@@ -90,7 +90,9 @@ import {
   reconnectAttempts,
   reconnectTimeout,
   wsConnectionState,
-  messageQueue
+  messageQueue,
+  stoplossValue,
+  targetValue
 } from '@/stores/globalStore'
 
 // Kill Switch Composables
@@ -938,10 +940,7 @@ watch(stickyMTM, (newValue) => {
 export const handleFormInputMouseScroll = (event, options) => {
   if (isFormDisabled.value) return
 
-  // Prevent default scroll behavior
   event.preventDefault()
-
-  // Determine scroll direction (up = 1, down = -1)
   const direction = event.deltaY < 0 ? 1 : -1
 
   switch (options.type) {
@@ -961,7 +960,7 @@ export const handleFormInputMouseScroll = (event, options) => {
       const currentIndex = strikes.findIndex(
         (strike) => strike.securityId === selectedStrike.securityId
       )
-      const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
+      const newIndex = currentIndex - direction
 
       if (newIndex >= 0 && newIndex < strikes.length) {
         if (options.strikeType === 'CALL') {
@@ -972,6 +971,22 @@ export const handleFormInputMouseScroll = (event, options) => {
         updateTradingSymbol(
           options.strikeType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
         )
+      }
+      break
+
+    case 'stoploss':
+      // Use the useLocalStorage ref directly
+      const newStoploss = Number(stoplossValue.value) + direction
+      if (newStoploss >= 0) {
+        stoplossValue.value = newStoploss // This will automatically update localStorage
+      }
+      break
+
+    case 'target':
+      // Use the useLocalStorage ref directly
+      const newTarget = Number(targetValue.value) + direction
+      if (newTarget >= 0) {
+        targetValue.value = newTarget // This will automatically update localStorage
       }
       break
   }
