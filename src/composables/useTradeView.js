@@ -401,8 +401,7 @@ export const updateExchangeSymbols = () => {
   ) {
     exchangeSymbols.value = {
       NFO: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'],
-      BFO: ['SENSEX', 'BANKEX'],
-      NSE: ['ZOMATO']
+      BFO: ['SENSEX', 'BANKEX']
     }
   }
 
