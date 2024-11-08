@@ -935,52 +935,44 @@ watch(stickyMTM, (newValue) => {
   localStorage.setItem('stickyMTM', JSON.stringify(newValue))
 })
 // ... (add all other watchers here)
-export const handleQuantityScroll = (event) => {
+export const handleFormInputMouseScroll = (event, options) => {
   if (isFormDisabled.value) return
 
   // Prevent default scroll behavior
   event.preventDefault()
 
-  // Determine scroll direction
+  // Determine scroll direction (up = 1, down = -1)
   const direction = event.deltaY < 0 ? 1 : -1
 
-  // Update selectedLots
-  const newValue = selectedLots.value + direction
+  switch (options.type) {
+    case 'quantity':
+      const newValue = selectedLots.value + direction
+      if (newValue >= 1 && newValue <= maxLots.value) {
+        selectedLots.value = newValue
+        updateSelectedQuantity()
+      }
+      break
 
-  // Ensure the new value is within bounds
-  if (newValue >= 1 && newValue <= maxLots.value) {
-    selectedLots.value = newValue
-    updateSelectedQuantity()
-  }
-}
-export const handleStrikeScroll = (event, type) => {
-  if (isFormDisabled.value) return
+    case 'strike':
+      const strikes = options.strikeType === 'CALL' ? callStrikes.value : putStrikes.value
+      const selectedStrike =
+        options.strikeType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
 
-  // Prevent default scroll behavior
-  event.preventDefault()
+      const currentIndex = strikes.findIndex(
+        (strike) => strike.securityId === selectedStrike.securityId
+      )
+      const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
 
-  // Determine scroll direction (up = -1, down = 1)
-  const direction = event.deltaY > 0 ? 1 : -1
-
-  if (type === 'CALL') {
-    const currentIndex = callStrikes.value.findIndex(
-      (strike) => strike.securityId === selectedCallStrike.value.securityId
-    )
-    const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
-
-    if (newIndex >= 0 && newIndex < callStrikes.value.length) {
-      selectedCallStrike.value = callStrikes.value[newIndex]
-      updateTradingSymbol(selectedCallStrike.value)
-    }
-  } else if (type === 'PUT') {
-    const currentIndex = putStrikes.value.findIndex(
-      (strike) => strike.securityId === selectedPutStrike.value.securityId
-    )
-    const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
-
-    if (newIndex >= 0 && newIndex < putStrikes.value.length) {
-      selectedPutStrike.value = putStrikes.value[newIndex]
-      updateTradingSymbol(selectedPutStrike.value)
-    }
+      if (newIndex >= 0 && newIndex < strikes.length) {
+        if (options.strikeType === 'CALL') {
+          selectedCallStrike.value = strikes[newIndex]
+        } else {
+          selectedPutStrike.value = strikes[newIndex]
+        }
+        updateTradingSymbol(
+          options.strikeType === 'CALL' ? selectedCallStrike.value : selectedPutStrike.value
+        )
+      }
+      break
   }
 }

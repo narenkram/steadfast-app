@@ -71,7 +71,8 @@
             </label>
             <div class="input-group input-group-sm">
               <input type="number" id="Quantity" class="form-control form-control-sm" v-model.number="selectedLots"
-                :min="1" :max="maxLots" @input="updateSelectedQuantity" @wheel.prevent="handleQuantityScroll"
+                :min="1" :max="maxLots" @input="updateSelectedQuantity"
+                @wheel.prevent="(e) => handleFormInputMouseScroll(e, { type: 'quantity' })"
                 :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">{{ selectedQuantity }}</span>
             </div>
@@ -163,7 +164,8 @@
                 </span>
                 <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
                   aria-label="Call Strike" v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }"
-                  @change="updateTradingSymbol(selectedCallStrike)" @wheel.prevent="handleStrikeScroll($event, 'CALL')">
+                  @change="updateTradingSymbol(selectedCallStrike)"
+                  @wheel.prevent="(e) => handleFormInputMouseScroll(e, { type: 'strike', strikeType: 'CALL' })">
                   <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
@@ -263,7 +265,8 @@
               <div class="col-12 d-flex align-items-center justify-content-between">
                 <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto me-2"
                   aria-label="Put Strike" v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }"
-                  @change="updateTradingSymbol(selectedPutStrike)" @wheel.prevent="handleStrikeScroll($event, 'PUT')">
+                  @change="updateTradingSymbol(selectedPutStrike)"
+                  @wheel.prevent="(e) => handleFormInputMouseScroll(e, { type: 'strike', strikeType: 'PUT' })">
                   <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
@@ -735,8 +738,7 @@ import {
   openMarkerPosition,
   putLtpRangeWidth,
   putOpenMarkerPosition,
-  handleQuantityScroll,
-  handleStrikeScroll
+  handleFormInputMouseScroll
 } from '@/composables/useTradeView'
 
 // PnL Calculations Composables
