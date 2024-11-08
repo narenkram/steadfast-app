@@ -19,7 +19,7 @@ import {
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
-import { getExchangeSegment, updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
+import { getMarketExchangeSegment, updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
 
 export const fetchTradingData = async () => {
   const masterSymbols = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
@@ -116,7 +116,7 @@ export const getMasterSymbolPrice = () => {
 }
 export const subscribeToLTP = (securityId, callback) => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-    const exchangeSegment = getExchangeSegment()
+    const exchangeSegment = getMarketExchangeSegment()
     const symbolToSubscribe = `${exchangeSegment}|${securityId}`
     const data = {
       action: 'subscribe',

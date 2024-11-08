@@ -30,7 +30,7 @@ import {
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
-import { getExchangeSegment, getProductTypeValue } from '@/composables/useTradeConfiguration'
+import { getMarketExchangeSegment, getProductTypeValue } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { selectedLots, getTransactionType } from '@/composables/useTradeConfiguration'
@@ -106,7 +106,7 @@ export const placeOrder = async (transactionType, drvOptionType) => {
       throw new Error(`Selected ${drvOptionType.toLowerCase()} strike is not properly defined`)
     }
 
-    const exchangeSegment = getExchangeSegment()
+    const exchangeSegment = getMarketExchangeSegment()
     const instrument = quantities.value[selectedMasterSymbol.value]
     const freezeLimit = instrument.freezeLimit
     const orderLots = selectedLots.value

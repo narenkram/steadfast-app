@@ -22,7 +22,7 @@ import {
 } from '@/stores/globalStore'
 
 // Trade Configuration Composables
-import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+import { getMarketExchangeSegment } from '@/composables/useTradeConfiguration'
 
 // Real Time LTP Data Composables
 import { subscribeToLTP } from '@/composables/useMarketData'

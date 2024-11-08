@@ -38,7 +38,7 @@ import {
 import { brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { getExchangeSegment } from '@/composables/useTradeConfiguration'
+import { getMarketExchangeSegment } from '@/composables/useTradeConfiguration'
 
 export const isWebSocketReady = () => {
   return socket.value && socket.value.readyState === WebSocket.OPEN
@@ -307,7 +307,7 @@ export const subscribeToMasterSymbol = () => {
 export const subscribeToOptions = () => {
   if (socket.value && socket.value.readyState === WebSocket.OPEN) {
     const symbolsToSubscribe = []
-    const exchangeSegment = getExchangeSegment()
+    const exchangeSegment = getMarketExchangeSegment()
 
     // Add subscriptions for both Call and Put options
     if (defaultCallSecurityId.value && defaultCallSecurityId.value !== 'N/A') {
