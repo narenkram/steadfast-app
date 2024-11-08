@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import {
   marketExchanges,
   selectedMarketExchange,
+  marketExchangeSegments,
+  selectedMarketExchangeSegment,
   selectedBroker,
   selectedExchange,
   lotsPerSymbol,
@@ -31,6 +33,7 @@ import {
 // WebSocket Composables
 import { subscribeToOptions } from '@/composables/useWebSocket'
 
+// Market Exchange
 export const getMarketExchange = () => {
   return selectedMarketExchange.value
 }
@@ -55,6 +58,34 @@ export const handleMarketExchangeChange = async () => {
   saveMarketExchange()
   await fetchTradingData()
 }
+
+// Market Exchange Segment
+export const getMarketExchangeSegment = () => {
+  return selectedMarketExchangeSegment.value
+}
+
+export const saveMarketExchangeSegment = () => {
+  localStorage.setItem('selectedMarketExchangeSegment', selectedMarketExchangeSegment.value)
+}
+
+export const loadMarketExchangeSegment = () => {
+  const savedSegment = localStorage.getItem('selectedMarketExchangeSegment')
+
+  if (savedSegment && marketExchangeSegments.value.includes(savedSegment)) {
+    selectedMarketExchangeSegment.value = savedSegment
+  } else {
+    // Set default to Options if no valid saved preference
+    selectedMarketExchangeSegment.value = 'Options'
+    saveMarketExchangeSegment() // Save the default
+  }
+}
+
+export const handleMarketExchangeSegmentChange = async () => {
+  saveMarketExchangeSegment()
+  await fetchTradingData()
+}
+
+// Other
 export const getExchangeSegment = () => {
   if (!selectedBroker.value || !selectedExchange.value) {
     throw new Error('Broker or exchange not selected')

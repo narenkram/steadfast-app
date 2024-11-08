@@ -27,9 +27,11 @@
           <div class="col-6 col-md-4 col-lg-2">
             <label for="Segment" class="form-label mb-0 small">Segment</label>
             <select id="Segment" class="form-select form-select-sm" aria-label="Segment"
-              :class="{ 'disabled-form': isFormDisabled }" disabled>
-              <option value="Options" selected>Options</option>
-              <option value="Futures">Futures</option>
+              v-model="selectedMarketExchangeSegment" @change="handleMarketExchangeSegmentChange"
+              :class="{ 'disabled-form': isFormDisabled }">
+              <option v-for="segment in marketExchangeSegments" :key="segment" :value="segment">
+                {{ segment }}
+              </option>
             </select>
           </div>
 
@@ -648,6 +650,8 @@ import PnlComponent from '@/components/PnlComponent.vue';
 import {
   marketExchanges,
   selectedMarketExchange,
+  marketExchangeSegments,
+  selectedMarketExchangeSegment,
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
   selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData,
   currentTime,
@@ -691,7 +695,12 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity, updateStrikesForExpiry, handleMarketExchangeChange, loadMarketExchange } from '@/composables/useTradeConfiguration'
+import {
+  handleMarketExchangeChange, loadMarketExchange,
+  loadMarketExchangeSegment,
+  handleMarketExchangeSegmentChange,
+  productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity, updateStrikesForExpiry
+} from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions, cancelPendingOrders, closeSelectedPositions } from '@/composables/useOrderManagement'
@@ -764,6 +773,7 @@ let positionCheckInterval;
 onMounted(async () => {
 
   loadMarketExchange()
+  loadMarketExchangeSegment()
 
   await checkAllTokens();
   initKillSwitch();
