@@ -10,18 +10,20 @@
     <form @submit.prevent>
       <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
         <div class="row">
-          <!-- Exchange Selection -->
+          <!-- Market Exchange Selection -->
           <div class="col-6 col-md-4 col-lg-2">
             <label for="Exchange" class="form-label mb-0 small">Exchange</label>
-            <select id="Exchange" class="form-select form-select-sm" aria-label="Exchange" v-model="selectedExchange"
-              @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="exchange in exchangeOptions" :key="exchange" :value="exchange">
+            <select id="Exchange" class="form-select form-select-sm" aria-label="Exchange"
+              v-model="selectedMarketExchange" @change="handleMarketExchangeChange"
+              :class="{ 'disabled-form': isFormDisabled }">
+              <option v-for="exchange in marketExchanges" :key="exchange" :value="exchange">
                 {{ exchange }}
               </option>
             </select>
           </div>
 
-          <!-- Segment Selection -->
+
+          <!-- Exchange Segment Selection -->
           <div class="col-6 col-md-4 col-lg-2">
             <label for="Segment" class="form-label mb-0 small">Segment</label>
             <select id="Segment" class="form-select form-select-sm" aria-label="Segment"
@@ -644,6 +646,8 @@ import PnlComponent from '@/components/PnlComponent.vue';
 
 // Global State
 import {
+  marketExchanges,
+  selectedMarketExchange,
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
   selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData,
   currentTime,
@@ -687,7 +691,7 @@ import { killSwitchRemainingTime, toggleKillSwitch, initKillSwitch, killSwitchBu
 import { availableBrokers, brokerStatus } from '@/composables/useBrokerFunctions'
 
 // Trade Configuration Composables
-import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity, updateStrikesForExpiry } from '@/composables/useTradeConfiguration'
+import { productTypes, getProductTypeValue, updateAvailableQuantities, orderTypes, displayOrderTypes, selectedLots, loadLots, updateSelectedQuantity, updateStrikesForExpiry, handleMarketExchangeChange, loadMarketExchange } from '@/composables/useTradeConfiguration'
 
 // Order Management Composables
 import { closeAllPositions, cancelPendingOrders, closeSelectedPositions } from '@/composables/useOrderManagement'
@@ -758,6 +762,8 @@ let positionCheckInterval;
 
 // Lifecycle hooks
 onMounted(async () => {
+
+  loadMarketExchange()
 
   await checkAllTokens();
   initKillSwitch();

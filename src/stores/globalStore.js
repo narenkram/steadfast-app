@@ -1,6 +1,8 @@
 import { ref, reactive } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 
+export const marketExchanges = ref(['NSE', 'BSE'])
+export const selectedMarketExchange = ref('NSE')
 export const BASE_URL = import.meta.env.VITE_BASE_URL
 export const showLTPRangeBar = ref(false)
 export const showToast = ref(false)
