@@ -10,24 +10,27 @@
     <form @submit.prevent>
       <fieldset :disabled="isFormDisabled" :class="{ 'disabled-form': isFormDisabled }">
         <div class="row">
-          <!-- Exchange Selection -->
+          <!-- Market Exchange Selection -->
           <div class="col-6 col-md-4 col-lg-2">
             <label for="Exchange" class="form-label mb-0 small">Exchange</label>
             <select id="Exchange" class="form-select form-select-sm" aria-label="Exchange" v-model="selectedExchange"
               @change="fetchTradingData" :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="exchange in exchangeOptions" :key="exchange" :value="exchange">
+              <option v-for="exchange in Object.keys(marketExchanges)" :key="exchange" :value="exchange"
+                :selected="exchange === 'NSE'">
                 {{ exchange }}
               </option>
             </select>
           </div>
 
-          <!-- Segment Selection -->
+          <!-- Exchange Segment Selection -->
           <div class="col-6 col-md-4 col-lg-2">
             <label for="Segment" class="form-label mb-0 small">Segment</label>
             <select id="Segment" class="form-select form-select-sm" aria-label="Segment"
-              :class="{ 'disabled-form': isFormDisabled }" disabled>
-              <option value="Options" selected>Options</option>
-              <option value="Futures">Futures</option>
+              :class="{ 'disabled-form': isFormDisabled }">
+              <option v-for="(segment, key) in exchangeSegments" :key="key" :value="segment"
+                :selected="segment === 'Options'">
+                {{ segment }}
+              </option>
             </select>
           </div>
 
@@ -36,7 +39,7 @@
             <label for="MasterSymbol" class="form-label mb-0 small">Master Symbol</label>
             <select id="MasterSymbol" class="form-select form-select-sm" aria-label="Master Symbol"
               v-model="selectedMasterSymbol" :class="{ 'disabled-form': isFormDisabled }">
-              <option v-for="symbol in exchangeSymbols[selectedExchange]" :key="symbol" :value="symbol">
+              <option v-for="symbol in masterSymbols[selectedExchange]" :key="symbol" :value="symbol">
                 {{ symbol }}
               </option>
             </select>
@@ -644,6 +647,9 @@ import PnlComponent from '@/components/PnlComponent.vue';
 
 // Global State
 import {
+  marketExchanges,
+  exchangeSegments,
+  masterSymbols,
   killSwitchActive, selectedCallStrike, selectedPutStrike, selectedMasterSymbol, shoonyaPositionBook, flatTradePositionBook, selectedBroker, selectedBrokerName, selectedExchange, socket, selectedProductType,
   selectedQuantity, enableStoploss, enableTarget, stoplossValue, targetValue, selectedOrderType, limitPrice, selectedFlattradePositionsSet, selectedShoonyaPositionsSet, enableHotKeys, exchangeSymbols, selectedExpiry, selectedStrike, callStrikes, putStrikes, allSymbolsData,
   currentTime,
@@ -699,7 +705,7 @@ import { checkStoplossesAndTargets, setStoploss, removeStoploss, increaseStoplos
 import { handleHotKeys } from '@/composables/useKeyboardShortcuts'
 
 // Market Data Composables
-import { fetchTradingData, updateSymbolData } from '@/composables/useMarketData'
+import { fetchMasterSymbols, fetchTradingData, updateSymbolData } from '@/composables/useMarketData'
 
 // Formatters
 import {
@@ -768,6 +774,9 @@ onMounted(async () => {
     selectedBroker.value = brokerDetails;
     selectedBrokerName.value = brokerDetails.brokerName;
   }
+
+  // Fetch master symbols first
+  await fetchMasterSymbols();
 
   // Load cached trading data
   const cachedData = JSON.parse(localStorage.getItem('cachedTradingData'));

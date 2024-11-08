@@ -2,6 +2,15 @@ import { ref, reactive } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 
 export const BASE_URL = import.meta.env.VITE_BASE_URL
+export const marketExchanges = {
+  NSE: [],
+  BSE: []
+}
+export const selectedExchange = ref('NSE')
+export const exchangeSegments = {
+  Options: 'Options',
+  Futures: 'Futures'
+}
 export const showLTPRangeBar = ref(false)
 export const showToast = ref(false)
 export const toastMessage = ref('')
@@ -20,7 +29,6 @@ export const tokenStatus = reactive({
 
 export const selectedBroker = ref(null)
 export const selectedBrokerName = ref('')
-export const selectedExchange = ref({})
 export const selectedMasterSymbol = ref('')
 export const selectedQuantity = ref(0)
 export const selectedExpiry = ref(null)
@@ -173,3 +181,7 @@ export const reconnectAttempts = ref(0)
 export const reconnectTimeout = ref(null)
 export const wsConnectionState = ref('disconnected')
 export const messageQueue = ref([])
+export const masterSymbols = {
+  NFO: [],
+  BFO: []
+}
