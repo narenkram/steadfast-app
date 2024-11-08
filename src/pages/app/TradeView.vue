@@ -429,12 +429,12 @@
     :killSwitchActive="killSwitchActive" :killSwitchRemainingTime="killSwitchRemainingTime" />
 
   <!-- Positions & Trades -->
-  <section class="row py-3">
+  <section class="row pb-3">
     <div class="col-12">
-      <div class="row m-0">
+      <div class="row my-2">
         <nav class="col-12 col-md-6 order-2 order-md-1">
           <ul class="navbar-nav d-flex flex-row">
-            <li class="nav-item me-3">
+            <li class="nav-item">
               <a href="#" class="nav-link" :class="{ 'active-route': activeTab === 'positions' }"
                 @click.prevent="setActiveTab('positions')">
                 <font-awesome-icon icon="hard-drive" class="nav-icon text-success" />
