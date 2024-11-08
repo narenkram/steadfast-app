@@ -861,3 +861,15 @@ kbd {
 .bg-purple {
   background-color: var(--bs-purple);
 }
+
+.d-md-none {
+    overflow-y: scroll; /* Enables scrolling */
+    max-height: 80vh; /* Control height */
+    padding-bottom: 20px; /* Extra space at the bottom */
+    scrollbar-width: none; /* Hides scrollbar in Firefox */
+}
+
+/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+.d-md-none::-webkit-scrollbar {
+    display: none;
+}
