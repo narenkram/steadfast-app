@@ -61,7 +61,17 @@ export const handleMarketExchangeChange = async () => {
 
 // Market Exchange Segment
 export const getMarketExchangeSegment = () => {
-  return selectedMarketExchangeSegment.value
+  if (!selectedMarketExchange.value) {
+    throw new Error('Market exchange not selected')
+  }
+
+  if (selectedMarketExchange.value === 'NSE') {
+    return 'NFO'
+  } else if (selectedMarketExchange.value === 'BSE') {
+    return 'BFO'
+  } else {
+    throw new Error(`Selected market exchange is not valid: ${selectedMarketExchange.value}`)
+  }
 }
 
 export const saveMarketExchangeSegment = () => {
