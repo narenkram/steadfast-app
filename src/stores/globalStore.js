@@ -60,7 +60,7 @@ export const quantities = ref({
 })
 export const availableQuantities = ref([])
 export const selectedStrike = ref({})
-export const selectedProductType = ref('')
+export const selectedProductType = ref(localStorage.getItem('selectedProductType') || '')
 export const limitPrice = ref(null)
 export const modalTransactionType = ref('')
 export const modalOptionType = ref('')

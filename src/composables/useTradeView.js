@@ -701,18 +701,26 @@ watch(selectedBroker, async (newBroker) => {
     try {
       selectedOrderType.value = orderTypes.value[0]
       previousOrderType.value = orderTypes.value[0]
-      selectedProductType.value = getProductTypeValue(productTypes.value[1]) // Default to 'Margin' or 'M'
+
+      // Only set product type if it's not already set
+      if (!selectedProductType.value) {
+        const savedProductType = getInitialProductType()
+        if (savedProductType) {
+          selectedProductType.value = savedProductType
+        } else {
+          selectedProductType.value = getProductTypeValue(productTypes.value[1])
+        }
+      }
+
       await fetchFundLimit()
       updateExchangeSymbols()
       setDefaultExchangeAndMasterSymbol()
       await fetchTradingData()
       setDefaultExpiry()
 
-      // Update the table based on the active tab
       debouncedFetchData()
     } catch (error) {
       console.error('Error updating broker data:', error)
-      // Handle the error appropriately
     }
   }
 })
@@ -787,11 +795,30 @@ watch(
   productTypes,
   (newProductTypes) => {
     if (newProductTypes.length > 0) {
-      selectedProductType.value = getProductTypeValue(newProductTypes[1]) // Default to 'Margin' or 'M'
+      // Only set default if there's no existing value
+      if (!selectedProductType.value) {
+        const savedProductType = getInitialProductType()
+        if (savedProductType) {
+          selectedProductType.value = savedProductType
+        } else {
+          selectedProductType.value = getProductTypeValue(newProductTypes[1]) // Default to 'Margin' or 'M'
+        }
+      }
     }
   },
   { immediate: true }
 )
+export const getInitialProductType = () => {
+  const savedProductType = localStorage.getItem('selectedProductType')
+  if (savedProductType) {
+    return savedProductType
+  }
+  // If no saved value, return null and let the watcher set the default
+  return null
+}
+watch(selectedProductType, (newValue) => {
+  localStorage.setItem('selectedProductType', newValue)
+})
 // Add a watcher for selectedExchange
 watch(selectedExchange, (newValue) => {
   saveUserChoice() // Save the user's choice
