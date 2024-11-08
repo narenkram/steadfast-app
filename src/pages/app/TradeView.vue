@@ -163,7 +163,7 @@
                 </span>
                 <select id="CallStrike" class="form-select form-select-sm d-inline-block w-auto ms-2"
                   aria-label="Call Strike" v-model="selectedCallStrike" :class="{ 'disabled-form': isFormDisabled }"
-                  @change="updateTradingSymbol(selectedCallStrike)">
+                  @change="updateTradingSymbol(selectedCallStrike)" @wheel.prevent="handleStrikeScroll($event, 'CALL')">
                   <option v-for="strike in callStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
@@ -263,7 +263,7 @@
               <div class="col-12 d-flex align-items-center justify-content-between">
                 <select id="PutStrike" class="form-select form-select-sm d-inline-block w-auto me-2"
                   aria-label="Put Strike" v-model="selectedPutStrike" :class="{ 'disabled-form': isFormDisabled }"
-                  @change="updateTradingSymbol(selectedPutStrike)">
+                  @change="updateTradingSymbol(selectedPutStrike)" @wheel.prevent="handleStrikeScroll($event, 'PUT')">
                   <option v-for="strike in putStrikes" :key="strike.securityId" :value="strike">
                     {{ strike.strikePrice }}
                   </option>
@@ -735,7 +735,8 @@ import {
   openMarkerPosition,
   putLtpRangeWidth,
   putOpenMarkerPosition,
-  handleQuantityScroll
+  handleQuantityScroll,
+  handleStrikeScroll
 } from '@/composables/useTradeView'
 
 // PnL Calculations Composables

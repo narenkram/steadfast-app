@@ -953,3 +953,34 @@ export const handleQuantityScroll = (event) => {
     updateSelectedQuantity()
   }
 }
+export const handleStrikeScroll = (event, type) => {
+  if (isFormDisabled.value) return
+
+  // Prevent default scroll behavior
+  event.preventDefault()
+
+  // Determine scroll direction (up = -1, down = 1)
+  const direction = event.deltaY > 0 ? 1 : -1
+
+  if (type === 'CALL') {
+    const currentIndex = callStrikes.value.findIndex(
+      (strike) => strike.securityId === selectedCallStrike.value.securityId
+    )
+    const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
+
+    if (newIndex >= 0 && newIndex < callStrikes.value.length) {
+      selectedCallStrike.value = callStrikes.value[newIndex]
+      updateTradingSymbol(selectedCallStrike.value)
+    }
+  } else if (type === 'PUT') {
+    const currentIndex = putStrikes.value.findIndex(
+      (strike) => strike.securityId === selectedPutStrike.value.securityId
+    )
+    const newIndex = currentIndex - direction // Subtract direction to make scroll up go to higher strikes
+
+    if (newIndex >= 0 && newIndex < putStrikes.value.length) {
+      selectedPutStrike.value = putStrikes.value[newIndex]
+      updateTradingSymbol(selectedPutStrike.value)
+    }
+  }
+}
