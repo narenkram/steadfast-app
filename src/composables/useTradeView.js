@@ -372,8 +372,9 @@ export const limitPriceErrorMessage = computed(() => {
 export const updateToastVisibility = (value) => {
   showToast.value = value
 }
-export const setActiveTab = (tab) => {
-  activeTab.value = tab
+export const setActiveTab = async (tab) => {
+  activeTab.value = tab;
+  await setActiveFetchFunctionAndFetch();
 }
 
 export const checkOvertradeProtection = () => {

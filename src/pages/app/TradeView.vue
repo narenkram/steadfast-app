@@ -432,23 +432,24 @@
   <section class="row py-3">
     <div class="col-12">
       <div class="row m-0">
-        <ul class="nav nav-tabs col-12 col-md-6 order-2 order-md-1" id="myTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" :class="{ 'active': activeTab === 'positions' }" id="positions-tab"
-              data-bs-toggle="tab" data-bs-target="#positions-tab-pane" type="button" role="tab"
-              aria-controls="positions-tab-pane" :aria-selected="activeTab === 'positions'"
-              @click="setActiveTab('positions')">
-              <font-awesome-icon icon="hard-drive" class="text-success nav-icon" /> <span class="ms-2">Positions</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" :class="{ 'active': activeTab === 'trades' }" id="trades-tab" data-bs-toggle="tab"
-              data-bs-target="#trades-tab-pane" type="button" role="tab" aria-controls="trades-tab-pane"
-              :aria-selected="activeTab === 'trades'" @click="setActiveTab('trades')">
-              <font-awesome-icon icon="up-down" class="text-primary nav-icon" /> <span class="ms-2">Trades</span>
-            </button>
-          </li>
-        </ul>
+        <nav class="col-12 col-md-6 order-2 order-md-1">
+          <ul class="navbar-nav d-flex flex-row">
+            <li class="nav-item me-3">
+              <a href="#" class="nav-link" :class="{ 'active-route': activeTab === 'positions' }"
+                @click.prevent="setActiveTab('positions')">
+                <font-awesome-icon icon="hard-drive" class="nav-icon text-success" />
+                <span class="ms-2">Positions</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" :class="{ 'active-route': activeTab === 'trades' }"
+                @click.prevent="setActiveTab('trades')">
+                <font-awesome-icon icon="up-down" class="nav-icon text-primary" />
+                <span class="ms-2">Trades</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
         <div class="d-flex justify-content-between align-items-center col-12 col-md-6 order-1 order-md-2 my-3 my-md-0">
           <b>
             <span>
@@ -470,45 +471,46 @@
           tabindex="0">
 
           <div class="TabContent bg-color">
-            <!-- Flattrade Positions -->
-            <PositionsTableComponent v-if="activeFetchFunction === 'fetchFlattradePositions'"
-              :positions="flatTradePositionBook" :selected-broker="selectedBroker"
-              :selected-positions-set="selectedFlattradePositionsSet"
-              @update:selected-positions-set="selectedFlattradePositionsSet = $event"
-              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+            <!-- Positions Content -->
+            <div v-show="activeTab === 'positions'">
+              <!-- Flattrade Positions -->
+              <PositionsTableComponent v-if="activeFetchFunction === 'fetchFlattradePositions'"
+                :positions="flatTradePositionBook" :selected-broker="selectedBroker"
+                :selected-positions-set="selectedFlattradePositionsSet"
+                @update:selected-positions-set="selectedFlattradePositionsSet = $event"
+                @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
+                @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
+                @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
-            <!-- Shoonya Positions -->
-            <PositionsTableComponent v-if="activeFetchFunction === 'fetchShoonyaPositions'"
-              :positions="shoonyaPositionBook" :selected-broker="selectedBroker"
-              :selected-positions-set="selectedShoonyaPositionsSet"
-              @update:selected-positions-set="selectedShoonyaPositionsSet = $event"
-              @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
-              @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
-              @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
+              <!-- Shoonya Positions -->
+              <PositionsTableComponent v-if="activeFetchFunction === 'fetchShoonyaPositions'"
+                :positions="shoonyaPositionBook" :selected-broker="selectedBroker"
+                :selected-positions-set="selectedShoonyaPositionsSet"
+                @update:selected-positions-set="selectedShoonyaPositionsSet = $event"
+                @set-stoploss="(position, type) => setStoploss(position, type)" @remove-stoploss="removeStoploss"
+                @increase-stoploss="increaseStoploss" @decrease-stoploss="decreaseStoploss" @set-target="setTarget"
+                @remove-target="removeTarget" @increase-target="increaseTarget" @decrease-target="decreaseTarget" />
 
+              <p class="text-secondary my-2">
+                The targets & stoplosses are stored locally in the browser, they are not sent to the exchange, so if you
+                internet goes down or you close this window, you positons will not close when they hit sl, tsl or
+                target.
+              </p>
+            </div>
+
+            <!-- Trades Content -->
+            <div v-show="activeTab === 'trades'">
+              <OrdersNTradesComponent
+                v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook' || activeFetchFunction === 'fetchShoonyaOrdersTradesBook'"
+                :combinedOrdersAndTrades="combinedOrdersAndTrades" :selectedBroker="selectedBroker" />
+
+              <p class="text-secondary my-2">
+                This trades tab fetches orders and trades from selected broker and combines them. Only
+                failed orders are shown. If the order is successfully placed, you'll only see the
+                respective trade.
+              </p>
+            </div>
           </div>
-
-
-          <p class="text-secondary my-2">
-            The targets & stoplosses are stored locally in the browser, they are not sent to the exchange, so if you
-            internet goes down or you close this window, you positons will not close when they hit sl, tsl or target.
-          </p>
-        </div>
-        <div class="tab-pane fade" id="trades-tab-pane" role="tabpanel" aria-labelledby="trades-tab" tabindex="0">
-
-          <div class="TabContent bg-color">
-            <OrdersNTradesComponent v-if="activeFetchFunction === 'fetchFlattradeOrdersTradesBook' ||
-              activeFetchFunction === 'fetchShoonyaOrdersTradesBook'"
-              :combinedOrdersAndTrades="combinedOrdersAndTrades" :selectedBroker="selectedBroker" />
-          </div>
-
-          <p class="text-secondary my-2">
-            This trades tab fetches orders and trades from selected broker and combines them. Only
-            failed orders are shown. If the order is successfully placed, you'll only see the
-            respective trade.
-          </p>
         </div>
       </div>
     </div>
