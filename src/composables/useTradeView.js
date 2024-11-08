@@ -373,8 +373,8 @@ export const updateToastVisibility = (value) => {
   showToast.value = value
 }
 export const setActiveTab = async (tab) => {
-  activeTab.value = tab;
-  await setActiveFetchFunctionAndFetch();
+  activeTab.value = tab
+  await setActiveFetchFunctionAndFetch()
 }
 
 export const checkOvertradeProtection = () => {
@@ -935,3 +935,21 @@ watch(stickyMTM, (newValue) => {
   localStorage.setItem('stickyMTM', JSON.stringify(newValue))
 })
 // ... (add all other watchers here)
+export const handleQuantityScroll = (event) => {
+  if (isFormDisabled.value) return
+
+  // Prevent default scroll behavior
+  event.preventDefault()
+
+  // Determine scroll direction
+  const direction = event.deltaY < 0 ? 1 : -1
+
+  // Update selectedLots
+  const newValue = selectedLots.value + direction
+
+  // Ensure the new value is within bounds
+  if (newValue >= 1 && newValue <= maxLots.value) {
+    selectedLots.value = newValue
+    updateSelectedQuantity()
+  }
+}

@@ -71,7 +71,8 @@
             </label>
             <div class="input-group input-group-sm">
               <input type="number" id="Quantity" class="form-control form-control-sm" v-model.number="selectedLots"
-                :min="1" :max="maxLots" @input="updateSelectedQuantity" :class="{ 'disabled-form': isFormDisabled }" />
+                :min="1" :max="maxLots" @input="updateSelectedQuantity" @wheel.prevent="handleQuantityScroll"
+                :class="{ 'disabled-form': isFormDisabled }" />
               <span class="input-group-text">{{ selectedQuantity }}</span>
             </div>
           </div>
@@ -734,7 +735,7 @@ import {
   openMarkerPosition,
   putLtpRangeWidth,
   putOpenMarkerPosition,
-
+  handleQuantityScroll
 } from '@/composables/useTradeView'
 
 // PnL Calculations Composables
