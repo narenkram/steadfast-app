@@ -32,7 +32,9 @@ import {
   faArrowDown,
   faArrowLeft,
   faArrowRight,
-  faInfoCircle
+  faInfoCircle,
+  faHandHoldingDollar,
+  faCrown
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faTelegram, faGithub } from '@fortawesome/free-brands-svg-icons'
@@ -71,7 +73,9 @@ library.add(
   faArrowLeft,
   faArrowRight,
   faInfoCircle,
-  faGithub
+  faGithub,
+  faHandHoldingDollar,
+  faCrown
 )
 
 export { FontAwesomeIcon }

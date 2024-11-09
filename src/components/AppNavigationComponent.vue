@@ -19,20 +19,21 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-md-auto">
                         <li class="nav-item" v-for="route in routes" :key="route.path">
-                            <RouterLink :to="route.path" class="nav-link"
+                            <RouterLink v-if="!route.external" :to="route.path" class="nav-link"
                                 :class="{ 'active-route': $route.path === route.path }">
                                 <font-awesome-icon :icon="route.icon" :class="['nav-icon', route.iconClass]" />
                                 <span class="nav-text">{{ route.name }}</span>
                             </RouterLink>
+                            <a v-else :href="route.path" target="_blank" class="nav-link">
+                                <font-awesome-icon :icon="route.icon" :class="['nav-icon', route.iconClass]" />
+                                <span class="nav-text">{{ route.name }}</span>
+                            </a>
                         </li>
                     </ul>
                     <!-- Always-on Notification Area -->
                     <div class="notification-area d-none d-lg-flex align-items-center ms-3">
                         <NotificationComponent v-model:showToast="showToast" v-model:message="toastMessage"
                             :notificationSound="notificationSound" />
-                    </div>
-                    <div class="ms-auto" v-if="user">
-                        <button class="btn btn-outline-secondary" @click="logout">Logout</button>
                     </div>
                 </div>
             </div>
@@ -41,45 +42,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { FontAwesomeIcon } from '@/font-awesome';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import NotificationComponent from './NotificationComponent.vue'
 
 // Global State
 import { notificationSound, toastMessage, showToast } from '@/stores/globalStore';
-const user = ref(null);
 
 const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
     { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-purple' },
     { path: '/manage-brokers', name: 'Brokers', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
-    // Only show Account page if user is logged in
-    ...(user.value ? [{ path: '/dashboard', name: 'Account', icon: ['fas', 'user-astronaut'], iconClass: 'text-secondary' }] : []),
-    // { path: '/parallel-copy-trade', name: 'Parallel Copy Trade', icon: ['fas', 'sync'], iconClass: 'text-info' },
+    { path: "/", name: "Support Open Source Development", icon: ['fas', 'hand-holding-dollar'], iconClass: 'text-danger' },
+    { path: "https://steadfastapp.in", name: "Get Premium Version", icon: ['fas', 'crown'], iconClass: 'text-warning', external: true }
 ]);
 
-
 const router = useRouter();
-
-onMounted(() => {
-    const auth = getAuth();
-    onAuthStateChanged(auth, (currentUser) => {
-        user.value = currentUser;
-    });
-});
-
-const logout = async () => {
-    const auth = getAuth();
-    try {
-        await signOut(auth);
-        // Clear all items from localStorage
-        localStorage.clear();
-        // Redirect to the login page after successful logout
-        router.push('/login');
-    } catch (error) {
-        console.error('Error during logout:', error);
-    }
-};
 </script>
