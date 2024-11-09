@@ -1,130 +1,57 @@
 <template>
-    <NormalNavigationComponent />
-    <div class="container-fluid">
+    <div class="container-fluid py-2">
+        <section class="row py-4 border border-success rounded">
+            <div class="col-lg-8 mx-auto text-center">
+                <img src="/steadfast_logo.png" alt="Steadfast" class="img-fluid" style="max-height: 200px;">
+                <h1 class="display-3 mb-4">Steadfast</h1>
+                <blockquote class="blockquote mb-5">
+                    <p>
+                        A free, open-source tool for index options trading.
+                    </p>
+                </blockquote>
+                <div
+                    class="col-12 mx-auto d-flex justify-content-between align-items-center">
+                    <a href="https://t.me/steadfastapp" target="_blank" class="w-50 btn btn-outline text-decoration-none">
+                        💬 Join Telegram Community
+                    </a>
+                    <RouterLink to="/steadfast" class="ms-2 w-50 btn btn-dark">
+                        ⚡ Launch App
+                    </RouterLink>
+                </div>
+                <a href="https://steadfastapp.in" target="_blank" class="w-100 mt-2 btn btn-outline text-decoration-none">
+                    🌐 Visit Website
+                </a>
+            </div>
+        </section>
 
-        <!-- Key Features Section -->
-        <section class="row py-5 bg-color-2 rounded">
-            <div class="col-lg-10 mx-auto">
-                <h2 class="text-center mb-5 display-4 fw-bold">Lightning-Fast Trades, Tactical Limits: Execute with
-                    Precision</h2>
-                <p class="lead text-center mb-5">Gain Your Edge with Built-in Safeguards</p>
-                <div class="row">
-                    <div v-for="(feature, index) in features" :key="index" class="col-md-6 col-lg-4 mb-4">
-                        <div class="card h-100 shadow hover-effect"
-                            :style="{ backgroundColor: `var(--card-bg-${index + 1})` }">
-                            <div class="card-body text-center">
-                                <h3 class="card-title h4 mb-4 fw-bold">{{ feature.title }}</h3>
-                                <component :is="feature.mediaType" :src="feature.mediaSrc" :alt="feature.title"
-                                    class="img-fluid mb-3 rounded" style="max-height: 100px;" autoplay loop muted
-                                    playsinline>
-                                    <source :src="feature.mediaSrc" type="video/mp4"
-                                        v-if="feature.mediaType === 'video'">
-                                    Your browser does not support the video tag.
-                                </component>
-                                <p class="card-text">{{ feature.description }}</p>
-                            </div>
+        <!-- Sponsor to support development -->
+        <section class="row mt-3 py-4 border border-danger rounded" style="font-family: monospace;">
+            <div class="col-lg-4 d-flex flex-column justify-content-center align-items-center">
+                <div class="card shadow-sm border">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-3">Quick & Easy Donation</h5>
+                        <img src="/scan_upi_id.jpg" alt="UPI QR Code" class="img-fluid mb-3 rounded shadow"
+                            style="max-width: 200px;">
+                        <div class="d-flex justify-content-center align-items-center mb-2">
+                            <span class="me-2 fw-bold">Scan to donate via</span>
+                            <img src="/upi_logo.png" alt="UPI Logo" class="img-fluid" style="max-width: 60px;">
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Multi-Broker Support Section -->
-        <section class="row py-5 bg-color rounded">
-            <div class="col-lg-10 mx-auto text-center">
-                <h2 class="mb-4 display-4">Multi-Broker Trading</h2>
-                <p class="lead mb-4">Manage multiple accounts from one powerful platform.</p>
-
-                <div class="row justify-content-center">
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="card-title mb-3">Flattrade</h3>
-                                <img src="/flattrade_logo.png" alt="Flattrade" class="img-fluid mb-3"
-                                    style="max-height: 60px;">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="card-title mb-3">Shoonya</h3>
-                                <img src="/shoonya_logo.png" alt="Shoonya" class="img-fluid mb-3"
-                                    style="max-height: 60px;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p class="mt-4 lead">More brokers coming soon!</p>
-            </div>
-        </section>
-
-        <!-- Open Source Section -->
-        <section class="row py-5 bg-color-2 rounded">
-            <div class="col-lg-10 mx-auto text-center">
-                <h2 class="mb-4 display-4">Open Source</h2>
-                <p class="lead mb-4">Built with transparency and community in mind.</p>
-                <p class="mb-4">
-                    Steadfast is completely open source. Check out our code, contribute, or suggest improvements on
-                    GitHub.
-                </p>
-                <a href="https://github.com/narenkram/steadfast-monorepo" class="btn btn-outline btn-lg" target="_blank"
-                    rel="noopener noreferrer">
-                    <font-awesome-icon :icon="['fab', 'github']" class="me-2" />View on GitHub
+            <div class="col-lg-8 mb-3 mb-lg-0">
+                <h3 class="mb-3 text-danger">Support Steadfast</h3>
+                <blockquote class="blockquote">
+                    Join Steadfast's journey. Your support accelerates our progress and innovation.
+                    Each contribution moves us forward in crafting a better trading experience for
+                    our community.
+                </blockquote>
+                <a href="https://github.com/sponsors/narenkram" target="_blank"
+                    class="btn btn-outline-danger btn-md me-2 mt-2 ">
+                    Donate via GitHub
                 </a>
             </div>
         </section>
 
     </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import NormalNavigationComponent from '@/components/LandingNavigationComponent.vue';
-
-const features = [
-    {
-        title: '1-Click Trading',
-        mediaType: 'img',
-        mediaSrc: '/1click_arrow_keys.png',
-        description: 'Execute trades instantly using arrow keys, providing lightning-fast control for capturing real-time market opportunities.'
-    },
-    {
-        title: 'Kill Switch',
-        mediaType: 'video',
-        mediaSrc: '/videos/activate_killswitch.mp4',
-        description: 'Activate to prevent overtrading, block further trades for the day, and put your mind at ease. Helps protect profits and limit potential losses.'
-    },
-    {
-        title: 'Automatic TSL',
-        mediaType: 'video',
-        mediaSrc: '/videos/TSL.mp4',
-        description: 'Implement automatic profit trailing with Trailing Stop Loss on individual positions, maximizing gains while minimizing risks.'
-    },
-    {
-        title: 'Risk Management',
-        mediaType: 'video',
-        mediaSrc: '/videos/risk_mangement2.mp4',
-        description: 'Set precise risk parameters using amount or percentage-based limits. Define maximum risk and target values to safeguard your capital and maintain disciplined trading practices.'
-    }
-];
-
-onMounted(() => {
-    const root = document.documentElement;
-    const colors = [
-        'rgba(255, 182, 193, 0.2)', // Light pink
-        'rgba(173, 216, 230, 0.2)', // Light blue
-        'rgba(144, 238, 144, 0.2)', // Light green
-        'rgba(255, 255, 224, 0.2)', // Light yellow
-        'rgba(230, 230, 250, 0.2)', // Lavender
-        'rgba(255, 218, 185, 0.2)', // Peach
-    ];
-
-    colors.sort(() => Math.random() - 0.5);
-
-    features.forEach((_, index) => {
-        root.style.setProperty(`--card-bg-${index + 1}`, colors[index % colors.length]);
-    });
-});
-</script>

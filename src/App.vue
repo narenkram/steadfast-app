@@ -1,7 +1,7 @@
 <template>
   <header></header>
 
-  <main :class="['container', currentRoute === '/steadfast' ? 'bg-color-2' : 'bg-color']">
+  <main :class="['container', ['/steadfast', '/'].includes(currentRoute) ? 'bg-color-2' : 'bg-color']">
     <RouterView />
   </main>
 </template>
