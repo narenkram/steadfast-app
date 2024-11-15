@@ -77,7 +77,7 @@ export const connectWebSocket = () => {
 
   const getWebSocketUrl = (broker) => {
     if (isDev) {
-      return broker === 'Flattrade' ? `${wsBaseUrl}:8765` : `${wsBaseUrl}:8766`
+      return broker === 'Flattrade' ? `${wsBaseUrl}:8765/ws` : `${wsBaseUrl}:8766/ws`
     } else {
       return `${wsBaseUrl}/ws/${broker.toLowerCase()}`
     }
