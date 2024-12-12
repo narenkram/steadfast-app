@@ -7,8 +7,8 @@ export const updateSelectedBrokerOnServer = async (broker) => {
     const response = await axios.post(`${baseURL}/set-broker`, { broker })
     console.log('Broker set successfully:', response.data.message)
 
-    // Add delay to allow websocket server to initialize
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Increase delay to 2 seconds to ensure Python server is ready
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
     return response.data
   } catch (error) {
