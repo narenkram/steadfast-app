@@ -51,7 +51,7 @@ export const flatTradePositionBook = ref([])
 export const shoonyaPositionBook = ref([])
 export const fundLimits = ref({})
 export const quantities = ref({
-  NIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
+  NIFTY: { lotSize: 75, maxLots: 360, freezeLimit: 72 },
   BANKNIFTY: { lotSize: 15, maxLots: 300, freezeLimit: 60 },
   FINNIFTY: { lotSize: 25, maxLots: 360, freezeLimit: 72 },
   MIDCPNIFTY: { lotSize: 50, maxLots: 280, freezeLimit: 56 },
