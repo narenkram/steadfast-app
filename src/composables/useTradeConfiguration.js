@@ -74,9 +74,9 @@ export const getProductTypeValue = (productType) => {
 
 export const getTransactionType = (type) => {
   if (selectedBroker.value?.brokerName === 'Flattrade') {
-    return type === 'BUY' ? 'B' : 'S'
+    return type === 'BUY' || type === 'B' ? 'B' : 'S'
   } else if (selectedBroker.value?.brokerName === 'Shoonya') {
-    return type === 'BUY' ? 'B' : 'S'
+    return type === 'BUY' || type === 'B' ? 'B' : 'S'
   }
   return type
 }

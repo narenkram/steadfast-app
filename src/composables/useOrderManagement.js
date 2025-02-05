@@ -35,6 +35,9 @@ import { getExchangeSegment, getProductTypeValue } from '@/composables/useTradeC
 // Order Management Composables
 import { selectedLots, getTransactionType } from '@/composables/useTradeConfiguration'
 
+// CurrentLTP Composables
+import { getCurrentLTP } from '@/composables/useTradeView'
+
 // Portfolio Management Composables
 import {
   updateOrdersAndPositions,
