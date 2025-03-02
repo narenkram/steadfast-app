@@ -102,33 +102,32 @@ const router = useRouter()
 
 .premium-button-background {
   position: absolute;
-  top: -150%;
-  left: -150%;
-  width: 400%;
-  height: 400%;
+  width: 100%;
+  height: 100%;
   background-image: url('/colors.png');
   background-size: cover;
   opacity: 0.8;
   z-index: -1;
   animation: slowMove 20s infinite linear;
   transition: animation-duration 0.5s ease;
+  background-color: black;
 }
 
 @keyframes slowMove {
   0% {
-    transform: rotate(0deg) translate(0%, 0%);
+    transform: translate(0%, 0%) rotate(0deg);
   }
   25% {
-    transform: rotate(90deg) translate(3%, -3%);
+    transform: translate(-10%, -10%) rotate(90deg);
   }
   50% {
-    transform: rotate(180deg) translate(0%, 0%);
+    transform: translate(10%, -10%) rotate(180deg);
   }
   75% {
-    transform: rotate(270deg) translate(-3%, 3%);
+    transform: translate(10%, 10%) rotate(270deg);
   }
   100% {
-    transform: rotate(360deg) translate(0%, 0%);
+    transform: translate(-10%, 10%) rotate(360deg);
   }
 }
 .premium-button:hover .premium-button-background {
