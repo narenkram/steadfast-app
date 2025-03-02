@@ -111,23 +111,17 @@ const router = useRouter()
   animation: slowMove 20s infinite linear;
   transition: animation-duration 0.5s ease;
   background-color: black;
+  left: 0;
+  right: 0;
 }
 
 @keyframes slowMove {
   0% {
-    transform: translate(0%, 0%) rotate(0deg);
+    transform: translate(0%, 0%);
   }
-  25% {
-    transform: translate(-10%, -10%) rotate(90deg);
-  }
-  50% {
-    transform: translate(10%, -10%) rotate(180deg);
-  }
-  75% {
-    transform: translate(10%, 10%) rotate(270deg);
-  }
+ 
   100% {
-    transform: translate(-10%, 10%) rotate(360deg);
+    transform: translate(0%, 0%);
   }
 }
 .premium-button:hover .premium-button-background {
