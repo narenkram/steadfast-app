@@ -105,31 +105,24 @@ const router = useRouter()
   width: 100%;
   height: 100%;
   background-image: url('/colors.png');
-  background-size: cover;
+  background-size: 200% 100%;  /* Make the background image twice as wide */
   opacity: 0.8;
   z-index: -1;
-  background-position: 0% 0%;
-  animation: slowMove 20s infinite linear;
-  transition: animation-duration 0.5s ease;
-  background-color: black;
   left: 0;
-  right: 0;
+  top: 0;
+  background-color: black;
   background-repeat: repeat-x;
+  animation: moveBackground 15s linear infinite;
 }
 
-@keyframes slowMove {
-  0% {
-    background-position: 0% 0%;
-  }
- 
-  100% {
-    background-position: 100% 0%;
-  }
+@keyframes moveBackground {
+  from { background-position: 0 0; }
+  to { background-position: -200% 0; }  /* Move to negative full width for seamless loop */
 }
+
 .premium-button:hover .premium-button-background {
-  animation-duration: 10s;
+  animation-duration: 7s;
 }
-
 .premium-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
@@ -147,6 +140,5 @@ const router = useRouter()
   position: relative;
   z-index: 2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  font-weight: bold;
 }
 </style>
