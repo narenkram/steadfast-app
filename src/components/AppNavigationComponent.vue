@@ -102,10 +102,10 @@ const router = useRouter()
 
 .premium-button-background {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -150%;
+  left: -150%;
+  width: 400%;
+  height: 400%;
   background-image: url('/colors.png');
   background-size: cover;
   opacity: 0.8;
@@ -114,26 +114,25 @@ const router = useRouter()
   transition: animation-duration 0.5s ease;
 }
 
-.premium-button:hover .premium-button-background {
-  animation-duration: 10s;
-}
-
 @keyframes slowMove {
   0% {
-    transform: rotate(0deg) translate(-10%, -10%);
+    transform: rotate(0deg) translate(0%, 0%);
   }
   25% {
-    transform: rotate(90deg) translate(-5%, -15%);
+    transform: rotate(90deg) translate(3%, -3%);
   }
   50% {
-    transform: rotate(180deg) translate(-10%, -10%);
+    transform: rotate(180deg) translate(0%, 0%);
   }
   75% {
-    transform: rotate(270deg) translate(-15%, -5%);
+    transform: rotate(270deg) translate(-3%, 3%);
   }
   100% {
-    transform: rotate(360deg) translate(-10%, -10%);
+    transform: rotate(360deg) translate(0%, 0%);
   }
+}
+.premium-button:hover .premium-button-background {
+  animation-duration: 10s;
 }
 
 .premium-button:hover {
