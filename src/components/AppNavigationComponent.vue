@@ -108,20 +108,22 @@ const router = useRouter()
   background-size: cover;
   opacity: 0.8;
   z-index: -1;
+  background-position: 0% 0%;
   animation: slowMove 20s infinite linear;
   transition: animation-duration 0.5s ease;
   background-color: black;
   left: 0;
   right: 0;
+  background-repeat: repeat-x;
 }
 
 @keyframes slowMove {
   0% {
-    transform: translate(0%, 0%);
+    background-position: 0% 0%;
   }
  
   100% {
-    transform: translate(0%, 0%);
+    background-position: 100% 0%;
   }
 }
 .premium-button:hover .premium-button-background {
