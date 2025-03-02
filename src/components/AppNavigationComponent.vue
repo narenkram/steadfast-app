@@ -102,22 +102,56 @@ const router = useRouter()
 
 .premium-button-background {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 102%;  /* Slightly wider to prevent gaps */
+  height: 102%; /* Slightly taller to prevent gaps */
   background-image: url('/colors.png');
-  background-size: 200% 100%;  /* Make the background image twice as wide */
+  background-size: 200% 100%;
   opacity: 0.8;
   z-index: -1;
-  left: 0;
-  top: 0;
+  left: -1%;  /* Offset to center the expanded element */
+  top: -1%;   /* Offset to center the expanded element */
   background-color: black;
   background-repeat: repeat-x;
-  animation: moveBackground 15s linear infinite;
+  animation: moveBackgroundWithVibration 15s linear infinite;
 }
 
-@keyframes moveBackground {
-  from { background-position: 0 0; }
-  to { background-position: -200% 0; }  /* Move to negative full width for seamless loop */
+@keyframes moveBackgroundWithVibration {
+  0% { 
+    background-position: 0 0;
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(-1px);
+  }
+  20% {
+    transform: translateY(1px);
+  }
+  30% {
+    transform: translateY(-1px);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+  50% { 
+    background-position: -100% 0;
+    transform: translateY(-1px);
+  }
+  60% {
+    transform: translateY(1px);
+  }
+  70% {
+    transform: translateY(-1px);
+  }
+  80% {
+    transform: translateY(1px);
+  }
+  90% {
+    transform: translateY(-1px);
+  }
+  100% { 
+    background-position: -200% 0;
+    transform: translateY(0);
+  }
 }
 
 .premium-button:hover .premium-button-background {
