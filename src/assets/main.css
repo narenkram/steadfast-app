@@ -473,10 +473,6 @@ html {
   transition: opacity 0.3s ease;
 }
 
-.nav-link:hover .nav-icon {
-  transform: scale(1.1) rotate(15deg);
-}
-
 .nav-link:hover .nav-text {
   opacity: 1;
 }
