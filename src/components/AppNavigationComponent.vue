@@ -54,10 +54,8 @@ const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
     { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-purple' },
     { path: '/manage-brokers', name: 'Brokers', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
-    { path: "/", name: "Support Open Source Development", icon: ['fas', 'hand-holding-dollar'], iconClass: 'text-danger' },
+    { path: "https://www.steadfastapp.in", name: "Get Premium Version", icon: ['fas', 'crown'], iconClass: 'text-warning', external: true }
 ]);
-// const routes = ref([
-//     { path: "https://steadfastapp.in", name: "Get Premium Version", icon: ['fas', 'crown'], iconClass: 'text-warning', external: true }
-// ]);
+
 const router = useRouter();
 </script>
