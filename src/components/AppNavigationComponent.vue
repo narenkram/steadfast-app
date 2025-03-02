@@ -54,7 +54,7 @@ const routes = ref([
     { path: '/steadfast', name: 'Trade', icon: ['fas', 'bolt'], iconClass: 'text-danger' },
     { path: '/app-settings', name: 'Settings', icon: ['fas', 'cog'], iconClass: 'text-purple' },
     { path: '/manage-brokers', name: 'Brokers', icon: ['fas', 'dollar-sign'], iconClass: 'text-success' },
-    { path: "https://www.steadfastapp.in", name: "Get Premium Version", icon: ['fas', 'crown'], iconClass: 'text-warning', external: true }
+    { path: "https://www.steadfastapp.in", name: "Get Premium Version", icon: ['fas', 'gem'], iconClass: 'text-warning', external: true }
 ]);
 
 const router = useRouter();
